@@ -1,0 +1,59 @@
+; libcluon Inno setup script
+
+[Setup]
+AppName=libcluon
+AppId=libcluon
+AppVersion=RELEASE
+AppVerName=libcluon RELEASE
+AppPublisher=Christian Berger
+AppPublisherURL=https://github.com/chrberger/libcluon/
+AppCopyright=Copyright (C) 2017 Christian Berger
+
+DefaultDirName={pf}\\libcluon
+DefaultGroupName=libcluon
+PrivilegesRequired=none
+DisableProgramGroupPage=yes
+UninstallDisplayIcon={uninstallexe}
+ChangesEnvironment=yes
+
+SourceDir=..\\install\\libcluon
+OutputDir=..\\..\\innosetup
+OutputBaseFilename=libcluon-RELEASE
+
+[Files]
+Source: "C:/projects/libcluon/Win64/install/bin/*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs
+Source: "C:/projects/libcluon/Win64/install/lib/*"; DestDir: "{app}\lib"; Flags: ignoreversion recursesubdirs
+Source: "C:/projects/libcluon/Win64/install/include/*"; DestDir: "{app}\include"; Flags: ignoreversion recursesubdirs
+
+[Tasks]
+Name: modifypath; Description: Add libcluon to PATH environment variable (recommended)
+
+[Icons]
+Name: "{group}\\Uninstall libcluon"; Filename: "{uninstallexe}"
+
+[Code]
+
+// Set PATH variable (if ticked)  ////////
+const 
+  ModPathName = 'modifypath'; 
+  ModPathType = 'user'; 
+
+function ModPathDir(): TArrayOfString; 
+begin
+  setArrayLength(Result, 1) 
+  Result[0] := ExpandConstant('{app}\\bin'); 
+end; 
+        
+#include "modpath.iss"
+
+// Trigger post-install (taken from modpath.iss) /////////
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+    if CurStep = ssPostInstall then begin
+        if IsTaskSelected(ModPathName) then begin
+            ModPath(); // In 'modpath.iss', calls 'ModPathDir()'
+        end
+    end
+end;
+

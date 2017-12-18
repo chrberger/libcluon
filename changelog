@@ -1,0 +1,132 @@
+libcluon (0.0.23) xenial; urgency=low
+
+  * Code refactoring to remove superfluous includes
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 18 Dec 2017 05:56:58 +0100
+
+libcluon (0.0.22) xenial; urgency=low
+
+  * Improved performance for UDPReceiver; added tool cluon-OD4toStdout
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 17 Dec 2017 22:22:59 +0100
+
+libcluon (0.0.21) xenial; urgency=low
+
+  * Dyamic message resolving at runtime and JSON transformation
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 17 Dec 2017 08:30:15 +0100
+
+libcluon (0.0.20) xenial; urgency=low
+
+  * Support for non-primitive types in messages
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 11 Dec 2017 02:33:39 +0100
+
+libcluon (0.0.19) xenial; urgency=low
+
+  * Support multi-line comments in .odvd files
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 05 Dec 2017 03:32:59 +0100
+
+libcluon (0.0.18) xenial; urgency=low
+
+  * Proto decoder and code cleanup
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 03 Dec 2017 06:54:15 +0100
+
+libcluon (0.0.17) xenial; urgency=low
+
+  * Code cleanup and compile fixes
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 02 Dec 2017 02:09:59 +0100
+
+libcluon (0.0.16) xenial; urgency=low
+
+  * Added visitor interface to generated data structures to enable toString or serialization/deserialization
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 30 Nov 2017 03:20:26 +0100
+
+libcluon (0.0.15) xenial; urgency=low
+
+  * cluon-msc exports to Protobuf format
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 10 Nov 2017 23:20:16 +0100
+
+libcluon (0.0.13) xenial; urgency=low
+
+  * Message specification language and self-contained code-generation to C++
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 09 Nov 2017 22:14:49 +0100
+
+libcluon (0.0.12) xenial; urgency=low
+
+  * Improving portability for Win64 and added script to create installer for Windows
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 03 Nov 2017 05:57:29 +0100
+
+libcluon (0.0.11) xenial; urgency=low
+
+  * Fixing deployment to Launchpad
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 02 Nov 2017 14:20:56 +0100
+
+libcluon (0.0.10) xenial; urgency=low
+
+  * Enabling test cases for Launchpad build
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 01 Nov 2017 22:41:25 +0100
+
+libcluon (0.0.9) xenial; urgency=low
+
+  * Added example code and better error handling
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 01 Nov 2017 06:08:43 +0100
+
+libcluon (0.0.8) xenial; urgency=low
+
+  * Support for UDP multicast
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 31 Oct 2017 16:00:57 +0100
+
+libcluon (0.0.7) xenial; urgency=low
+
+  * Implemented portable UDPReceiver
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 29 Oct 2017 05:57:06 +0100
+
+libcluon (0.0.6) xenial; urgency=low
+
+  * Trigger hub.docker.com automated build
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 27 Oct 2017 20:03:04 +0200
+
+libcluon (0.0.5) xenial; urgency=low
+
+  * Enable version tracking with launchpad
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 27 Oct 2017 19:08:14 +0200
+
+libcluon (0.0.4) xenial; urgency=low
+
+  * Removing symbols from libraries and executables
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 27 Oct 2017 17:28:52 +0200
+
+libcluon (0.0.3) xenial; urgency=low
+
+  * Using std::move semantics for sending data
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 27 Oct 2017 17:15:45 +0200
+
+libcluon (0.0.2) xenial; urgency=low
+
+  * Launchpad fix
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 27 Oct 2017 05:46:00 +0200
+
+libcluon (0.0.1) xenial; urgency=low
+
+  Initial version
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 27 Oct 2017 05:35:09 +0200
+

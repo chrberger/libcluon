@@ -1,0 +1,130 @@
+language: cpp
+
+# Downloading ccache's cache is around 6s, uploading is around 3s.
+cache: ccache
+
+# The following two lines are required to use Docker.
+sudo: required
+services:
+    - docker
+
+# What branches are we reacting upon.
+branches:
+    only:
+    - master
+    - pre-release
+    - coverity_scan
+    - /^20..Q.*/
+
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "s/tDPXSVw368cyS2AoWoIEV+aSmNIKVE8T52hbLJvF4CDaZMbxahGtgjfTn7tDadVdmF7ZWNwuyj79FDbOQ+CLjUto2LgiJCBu1HFNS83rqxdwcd+vgInfGYA/of/DOy2oK367FxHqnbSFzfZKwtabypkvcoZP0/6Q6SqfcbCq1WaS9ZevpkqIaEdVz8/NiMzxaPhgK4YJYDXiD6zjukXkkFFb+Q2Zz7sMxbdZZYGhLR/avmvGGoGd3Qoy8Mq8m/WLvBGUudjWIPvJC2/Jd6SLmAbt1IqfYzcpRdH8rWH3kqk3nDA3NzyqRVzlYR07714xqA1oT6tXv5XVBOwrKMNWIL9/rinkkf+AjdFMP8OD4qn1NxliPDbHmn6/EZXhqxhl7vnBXo+YgKqgTPy5esUy41hmXShMkAkkhXFXmoyzuGvh2LS3MLdV1IM28TbRfWm9xvxVqowVxFw6BFWCr8r+d4WtiWpYKI17zr/8BRsqputyXJ1NmJf6j0MVKjDWfzp3t4kLR2Uv3gf0z4Cgc1Vtelur3XfsqIRqERbEzrNXBRsd0cRZ6z1VLVjbvpSrndd9lMzSSCDABiSDAuh3lCVDG3MEm8NaVA8oCtopnuVZibDhzQCiEgPot94EgehT64rHAK4nPLj0k5UHi0Za6v8Cw+YAwA2VL4gY0WWaiyLJ4="
+
+
+matrix:
+  include:
+    # clang 5.0: Regular build using Travis' default compiler for performance reasons to determine the code coverage when running the test cases on any branch (except for coverity_scan) or PR.
+    - os: linux
+      if: branch != coverity_scan
+      compiler: clang
+      env:
+        - DO_COVERAGE=1
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang
+        - COMPILER_CXX=clang++
+        - PATH=/usr/local/clang-5.0.0/bin:$PATH
+        - CXXFLAGS="-stdlib=libc++"
+        - LD_LIBRARY_PATH=/usr/local/clang-5.0.0/lib:$LD_LIBRARY_PATH
+        - BUILD=Debug
+
+    # clang/OSX: Build for pre-release to check if OSX could be built.
+    - os: osx
+      osx_image: xcode9.1
+      if: branch = pre-release
+      compiler: clang
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang
+        - COMPILER_CXX=clang++
+        - BUILD=Release
+
+    # clang 4.0/armhf: Build for pre-release to check if armhf could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: clang
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=1
+        - COMPILER_CC=
+        - COMPILER_CXX=
+        - BUILD=
+        - DOCKER_BUILD_ARCH=armhf
+
+    # GCC 6: Regular build to run coverity_scan analysis.
+    - os: linux
+      if: branch = coverity_scan
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=1
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=gcc-6
+        - COMPILER_CXX=g++-6
+        - BUILD=Debug
+        - COVERITY_SCAN_PROJECT_NAME="chrberger/libcluon"
+        - COVERITY_SCAN_BRANCH_PATTERN="coverity_scan"
+        - COVERITY_SCAN_NOTIFICATION_EMAIL="libcluon@christianberger.net"
+        - COVERITY_SCAN_BUILD_COMMAND_PREPEND="mkdir -p builds/non-docker && cd builds/non-docker && cmake -D CMAKE_BUILD_TYPE=Release ../../libcluon"
+        - COVERITY_SCAN_BUILD_COMMAND="make"
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages: # TODO: Check if the regular output from llvm-cov could work as well instead kcov.
+            - gcc-6
+            - g++-6
+
+
+before_install:
+    # Steps for coverity_scan.
+    - if [[ ${DO_COVERITY_SCAN} == "1" ]]; then echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-; fi
+    # Re-adjust compiler symlinks to make coverity_scan work properly.
+    - if [[ ${DO_COVERITY_SCAN} == "1" ]]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 90; fi
+    - if [[ ${DO_COVERITY_SCAN} == "1" ]]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90; fi
+    # The following call is actually executing the build.
+    - if [[ ${DO_COVERITY_SCAN} == "1" ]]; then curl -s 'https://scan.coverity.com/scripts/travisci_build_coverity_scan.sh' | bash || true; fi
+
+    # Fixes for ccache and clang.
+    - if [[ "${DO_DOCKER_BUILD}" == "0" ]]; then if [[ "${DO_COVERITY_SCAN}" == "0" ]]; then if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo ln -s /usr/bin/ccache /usr/lib/ccache/clang; fi; fi; fi
+    - if [[ "${DO_DOCKER_BUILD}" == "0" ]]; then if [[ "${DO_COVERITY_SCAN}" == "0" ]]; then if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo ln -s /usr/bin/ccache /usr/lib/ccache/clang++; fi; fi; fi
+    # This environment variable is needed to let ccache handle the preprocessor from clang correctly.
+    - if [[ "${DO_DOCKER_BUILD}" == "0" ]]; then if [[ "${DO_COVERITY_SCAN}" == "0" ]]; then if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then export CCACHE_CPP2=yes; fi; fi; fi
+
+
+install:
+    - if [[ "${COMPILER_CC}" != "" ]]; then export CC=${COMPILER_CC}; fi
+    - if [[ "${COMPILER_CXX}" != "" ]]; then export CXX=${COMPILER_CXX}; fi
+
+
+# Enabling ARM emulation.
+before_script:
+    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then sudo sh -c "echo ':arm:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-arm-static:' > /proc/sys/fs/binfmt_misc/register"; fi
+
+
+script:
+    - if [[ "${DO_DOCKER_BUILD}" == "0" ]]; then if [[ "${DO_COVERAGE}" == "0" ]]; then if [[ "${DO_COVERITY_SCAN}" == "0" ]]; then mkdir -p builds/non-docker && cd builds/non-docker && cmake -D CMAKE_BUILD_TYPE=${BUILD} -D ENABLE_COVERAGE=${DO_COVERAGE} ../../libcluon && make && make test; fi; fi; fi
+    - if [[ "${DO_DOCKER_BUILD}" == "0" ]]; then if [[ "${DO_COVERAGE}" == "1" ]]; then if [[ "${DO_COVERITY_SCAN}" == "0" ]]; then if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then mkdir -p builds/non-docker && cd builds/non-docker && cmake -D CMAKE_BUILD_TYPE=${BUILD} -D ENABLE_COVERAGE=${DO_COVERAGE} ../../libcluon && make && make test && for i in $(grep '^[^#[:space:]].*:' Makefile|grep "ShowCoverage_"|grep -v ".PHONY"|grep -v "/fast:"|cut -f1 -d":"); do make $i; done | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | sed -e '/\/catch.hpp/,/^$/d' | sed -e '/^\/usr\/include/,/^$/d' | sed -e '/\[100%\]/d' | sed -e 's/.*\libcluon\/src/libcluon\/src/g' | sed -e 's/.*\libcluon\/test/libcluon\/test/g' > app.coverage.txt; fi; fi; fi; fi
+    - if [[ "${DO_DOCKER_BUILD}" == "0" ]]; then if [[ "${DO_COVERITY_SCAN}" == "1" ]]; then echo "coverity_scan build executed."; fi; fi
+    - if [[ "${DO_DOCKER_BUILD}" == "1" ]]; then make ARCH=$DOCKER_BUILD_ARCH IMAGE=debian-$DOCKER_BUILD_ARCH; fi
+
+
+after_success:
+  - if [[ "${DO_COVERAGE}" == "1" ]]; then bash <(curl -s https://codecov.io/bash); fi
+

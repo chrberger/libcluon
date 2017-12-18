@@ -1,0 +1,70 @@
+//
+// Copyright (C) 2017  Christian Berger
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+message testdata.MyTestMessage0 [id = 30000] {
+    bool attribute1 [default = true, id = 1];
+    char attribute2 [default = 'c', id = 2];
+}
+
+message testdata.MyTestMessage1 [id = 30001] {
+    bool attribute1 [default = true, id = 1];
+    char attribute2 [default = 'c', id = 2];
+    int8 attribute3 [default = -1, id = 3];
+    uint8 attribute4 [default = 2, id = 4];
+    int16 attribute5 [default = -3, id = 5];
+    uint16 attribute6 [default = 4, id = 6];
+    int32 attribute7 [default = -5, id = 7];
+    uint32 attribute8 [default = 6, id = 8];
+    int64 attribute9 [default = -7, id = 9];
+    uint64 attribute10 [default = 8, id = 10];
+    float attribute11 [default = -9.5, id = 11];
+    double attribute12 [default = 10.6, id = 12];
+    string attribute13 [default = "Hello World", id = 13];
+    bytes attribute14 [default = "Hello Galaxy", id = 14];
+}
+
+message testdata.MyTestMessage2 [id = 30002] {
+    uint8 attribute1 [ default = 123, id = 1 ];
+}
+
+message testdata.MyTestMessage3 [id = 30003] {
+    uint8 attribute1 [ default = 124, id = 1 ];
+    int8 attribute2 [ default = -124, id = 2 ];
+}
+
+message testdata.MyTestMessage4 [id = 30004] {
+    string attribute1 [ id = 2 ];
+}
+
+message testdata.MyTestMessage5 [id = 30005] {
+    uint8 attribute1 [ default = 1, id = 1 ];
+    int8 attribute2 [ default = -1, id = 2 ];
+    uint16 attribute3 [ default = 100, id = 3 ];
+    int16 attribute4 [ default = -100, id = 4 ];
+    uint32 attribute5 [ default = 10000, id = 5 ];
+    int32 attribute6 [ default = -10000, id = 6 ];
+    uint64 attribute7 [ default = 12345, id = 7 ];
+    int64 attribute8 [ default = -12345, id = 8 ];
+    float attribute9 [ default = -1.2345, id = 9 ];
+    double attribute10 [ default = -10.2345, id = 10 ];
+    string attribute11 [ default = "Hello World!", id = 11 ];
+}
+
+message testdata.MyTestMessage6 [id = 30006] {
+    testdata.MyTestMessage2 attribute1 [ id = 3 ];
+}
+

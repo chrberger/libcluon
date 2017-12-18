@@ -1,0 +1,6 @@
+path-exclude=/usr/share/doc/*
+# Keep copyright files for legal reasons.
+path-include=/usr/share/doc/*/copyright
+path-exclude=/usr/share/man/*
+path-exclude=/usr/share/groff/*
+path-exclude=/usr/share/info/*
