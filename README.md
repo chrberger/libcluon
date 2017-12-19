@@ -13,7 +13,24 @@
 
 libcluon is a small and efficient library written in modern C++ library to _glue_ distributed software components together - in a _clever_ way - simply: cluon. Its name is inspired by gluon, an [elementary particle acting as exchange particle](https://en.wikipedia.org/wiki/Gluon).
 
-## Installation on Ubuntu 16.04 LTS
+## Table of Contents
+
+* [Dependencies](#dependencies)
+* [Installation on Ubuntu 16.04 LTS](#installation-on-ubuntu-1604-lts)
+* [Installation on Alpine 3.7](#installation-on-alpine-37)
+* [Installation on Windows](#installation-on-windows)
+* [Build from sources on the example of Ubuntu 16.04 LTS](#build-from-sources-on-the-example-of-ubuntu-1604-lts)
+* [Tutorials](#tutorials--api-documentation)
+* [Contributing](#contributing)
+* [License](#license)
+
+
+## Dependencies
+All you need is a C++14-compliant compiler (we are testing with Clang 5.0, GCC 5.4, GCC 6.0, GCC 7.2, Xcode 9.1, and Visual Studio 14 (MSVC 19.0)).
+
+
+## Installation
+### Installation on Ubuntu 16.04 LTS
 
 We are providing pre-compiled binaries for Ubuntu 16.04 LTS (Xenial Xerus) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
 
@@ -28,7 +45,7 @@ sudo apt-get update
 sudo apt-get install libcluon
 ```
 
-## Installation on Alpine 3.7
+### Installation on Alpine 3.7
 
 We are providing pre-compiled binaries for Alpine 3.7 for `x86_64` and `armfh`; simply install the pre-compile `.apk` package as follows:
 
@@ -36,11 +53,12 @@ We are providing pre-compiled binaries for Alpine 3.7 for `x86_64` and `armfh`; 
 apk add libcluon --no-cache --repository https://chrberger.github.io/libcluon/alpine/v3.7 --allow-untrusted
 ```
 
-## Installation on Windows
+### Installation on Windows
 
 We are providing pre-compiled binaries including debug symbols for Windows 64 via BinTray here: https://bintray.com/chrberger/libcluon/libcluon-win64-debug#files/
 
-## Compiling from sources on the example of Ubuntu 16.04 LTS
+
+## Build from sources on the example of Ubuntu 16.04 LTS
 
 To compile `libcluon` from sources on an Ubuntu 16.04 LTS (Xenial Xerus) system, you need to have `build-essential`, `cmake`, and `git` installed:
 
@@ -83,3 +101,11 @@ make install
 * [API Documentation](https://chrberger.github.io/libcluon/)
 * [How to send data via a UDP socket](docs/cluon-UDPSender.md)
 * [How to receive data via a UDP socket](docs/cluon-UDPReceiver.md)
+
+
+## Contributing
+We are happy to receive your PRs to accelerate libcluon's development; before contributing, please take a look at the [Contribution Documents](CONTRIBUTING.md).
+
+
+## License
+The GNU GPLv3 License.
