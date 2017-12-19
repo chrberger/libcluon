@@ -26,6 +26,7 @@ libcluon is a small and efficient library written in modern C++ library to _glue
 
 
 ## Features
+* Written in highly portable and high quality C++14.
 * Portable implementation of publish/subscribe communication: [Example](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestUDPReceiver.cpp#L111)
 * Native implementation of [Protobuf](https://developers.google.com/protocol-buffers/) for data serialization & deserialization: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessagesToProto.cpp)
 * libcluon natively available for JavaScript enabled by [Emscripten](https://github.com/kripken/emscripten): [libcluon.js](https://bintray.com/chrberger/libcluon/javascript#files)
