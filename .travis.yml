@@ -128,3 +128,11 @@ script:
 after_success:
   - if [[ "${DO_COVERAGE}" == "1" ]]; then bash <(curl -s https://codecov.io/bash); fi
 
+
+notifications:
+  email:
+    recipients:
+      - libcluon@christianberger.net
+    on_success: change
+    on_failure: always
+
