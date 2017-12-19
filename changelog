@@ -1,3 +1,9 @@
+libcluon (0.0.26) xenial; urgency=low
+
+  * Emitting JSON with no dots; fixed floating point print out in JSON
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 19 Dec 2017 21:53:36 +0100
+
 libcluon (0.0.25) xenial; urgency=low
 
   * Changed exported module for JS to var libcluon;
