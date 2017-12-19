@@ -21,7 +21,7 @@ To maintain a high quality of our code base, we are very strict in terms of revi
     - Cleaning the build folder: `make clean`
     - Running a build: `make compile && make test`
     - Re-formatting the code according to our coding guidelines: `make reformat-code`
-    - Running our static-code-analysis (currently including: `scan-build`, `clang-tidy`, `flawfinder`, `oclint`, `vera++`, `cppcheck`, and `Flint++`): `make static-code-analysis`
+    - Running our static-code-analysis (currently including: [`scan-build`](https://clang-analyzer.llvm.org/scan-build.html), [`clang-tidy`](http://clang.llvm.org/extra/clang-tidy/), [`flawfinder`](https://www.dwheeler.com/flawfinder/), [`oclint`](https://github.com/oclint/oclint), [`vera++`](https://bitbucket.org/verateam/vera/wiki/Home), [`cppcheck`](http://cppcheck.sourceforge.net/), and [`Flint++`](https://github.com/L2Program/FlintPlusPlus)): `make static-code-analysis`
     - Any PRs that are not following these recommendations will not be considered for potential inclusion!
 
 ## Coding Guidelines
