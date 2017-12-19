@@ -3,6 +3,11 @@
 | Linux & OSX Build (TravisCI) | Win64 Build (AppVeyor) | Test Coverage | Coverity Analysis | CII Best Practices |
 | :--------------------------: | :--------------------: | :-----------: | :---------------: | :----------------: |
 | [![Build Status](https://travis-ci.org/chrberger/libcluon.svg?branch=master)](https://travis-ci.org/chrberger/libcluon) | [![Build status](https://ci.appveyor.com/api/projects/status/n33il43mb6ot5422/branch/master?svg=true)](https://ci.appveyor.com/project/chrberger/libcluon/branch/master) | [![codecov](https://codecov.io/gh/chrberger/libcluon/branch/master/graph/badge.svg)](https://codecov.io/gh/chrberger/libcluon) | [![Coverity Scan](https://scan.coverity.com/projects/14014/badge.svg)]() | [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1479/badge)](https://bestpractices.coreinfrastructure.org/projects/1479) |
+| License | Documentation | Ubuntu (x86_64) | Ubuntu (armhf) | -- |
+| :--------------------------: | :--------------------: | :-----------: | :---------------: | :----------------: |
+| [![License](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://raw.githubusercontent.com/chrberger/libcluon/master/LICENSE) | [![API documentation](https://img.shields.io/badge/docs-latest-blue.svg)](http://tiny-dnn.readthedocs.io/)  | [![Ubuntu (x86_64)](https://img.shields.io/badge/deb-x86__64-blue.svg
+)](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) | [![Ubuntu (armhf)](https://img.shields.io/badge/deb-armhf-blue.svg
+)](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) | -- |
 
 libcluon is a small and efficient library written in modern C++ library to _glue_ distributed software components together - in a _clever_ way - simply: cluon. Its name is inspired by gluon, an [elementary particle acting as exchange particle](https://en.wikipedia.org/wiki/Gluon).
 
