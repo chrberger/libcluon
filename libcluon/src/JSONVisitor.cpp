@@ -16,6 +16,7 @@
  */
 
 #include "cluon/JSONVisitor.hpp"
+#include <iomanip>
 #include <sstream>
 
 namespace cluon {
@@ -128,7 +129,7 @@ void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name,
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
         m_buffer << "\"" << name << "\""
-                 << ":" << v << "," << '\n';
+                 << ":" << std::setprecision(7) << v << std::setprecision(6) << "," << '\n';
     }
 }
 
@@ -136,7 +137,7 @@ void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name,
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
         m_buffer << "\"" << name << "\""
-                 << ":" << v << "," << '\n';
+                 << ":" << std::setprecision(11) << v << std::setprecision(6) << "," << '\n';
     }
 }
 

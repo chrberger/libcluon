@@ -227,7 +227,7 @@ message example.Envelope [id = 1] {
 "sampleTimeStamp":{"seconds":100,
 "microseconds":200},
 "senderStamp":2,
-"example.TimeStamp":{"seconds":3,
+"example_TimeStamp":{"seconds":3,
 "microseconds":4}})";
 
     cluon::EnvelopeToJSON env2JSON;
@@ -466,6 +466,110 @@ message MessageB [id = 30006] {
 "microseconds":200},
 "senderStamp":2,
 "MessageB":{"attribute1":{"attribute1":99}}})";
+
+    cluon::EnvelopeToJSON env2JSON;
+    REQUIRE(2 == env2JSON.setMessageSpecification(std::string(messageSpecification)));
+
+    // Test with Envelope:
+    const std::string JSON_A = env2JSON.getJSONFromEnvelope(env);
+    REQUIRE(std::string(JSON) == JSON_A);
+
+    // Test without OD4 header:
+    const std::string JSON_B = env2JSON.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
+    REQUIRE(std::string(JSON) == JSON_B);
+
+    // Test with OD4-header:
+    const std::string JSON_C = env2JSON.getJSONFromProtoEncodedEnvelope(output);
+    REQUIRE(std::string(JSON) == JSON_C);
+}
+
+TEST_CASE("Transform Envelope into JSON represention for nested payloads with punctuated type names to be converted to underscores.") {
+    cluon::data::Envelope env;
+    REQUIRE(env.serializedData().empty());
+    REQUIRE(0 == env.senderStamp());
+    REQUIRE(0 == env.dataType());
+    REQUIRE(0 == env.sent().seconds());
+    REQUIRE(0 == env.sent().microseconds());
+    REQUIRE(0 == env.received().seconds());
+    REQUIRE(0 == env.received().microseconds());
+    REQUIRE(0 == env.sampleTimeStamp().seconds());
+    REQUIRE(0 == env.sampleTimeStamp().microseconds());
+
+    cluon::data::TimeStamp ts1;
+    ts1.seconds(1).microseconds(2);
+    cluon::data::TimeStamp ts2;
+    ts2.seconds(10).microseconds(20);
+    cluon::data::TimeStamp ts3;
+    ts3.seconds(100).microseconds(200);
+
+    env.senderStamp(2).sent(ts1).received(ts2).sampleTimeStamp(ts3).dataType(30006);
+    {
+        testdata::MyTestMessage2 tm2;
+        tm2.attribute1(99);
+
+        testdata::MyTestMessage6 tm6;
+        tm6.attribute1(tm2);
+
+        cluon::MessageAsProtoEncoder proto;
+        tm6.accept<cluon::MessageAsProtoEncoder>(proto);
+        env.serializedData(proto.encodedData());
+    }
+
+    REQUIRE(2 == env.senderStamp());
+    REQUIRE(30006 == env.dataType());
+    REQUIRE(1 == env.sent().seconds());
+    REQUIRE(2 == env.sent().microseconds());
+    REQUIRE(10 == env.received().seconds());
+    REQUIRE(20 == env.received().microseconds());
+    REQUIRE(100 == env.sampleTimeStamp().seconds());
+    REQUIRE(200 == env.sampleTimeStamp().microseconds());
+
+    REQUIRE(4 == env.serializedData().size());
+
+    // Next, turn Envelope into Proto-encoded byte stream.
+    std::string envelopeAsProto;
+    {
+        cluon::MessageAsProtoEncoder proto;
+        env.accept<cluon::MessageAsProtoEncoder>(proto);
+        envelopeAsProto = proto.encodedData();
+    }
+
+    uint32_t length = static_cast<uint32_t>(envelopeAsProto.size()); // NOLINT
+    length          = htole32(length);
+    length <<= 8;
+    length |= 0xA4;
+
+    std::stringstream sstr;
+    constexpr char c{0x0D};
+    sstr.write(&c, sizeof(char));
+    sstr.write(reinterpret_cast<const char *>(&length), sizeof(uint32_t)); // NOLINT
+    sstr.write(&envelopeAsProto[0], static_cast<int64_t>(envelopeAsProto.size()));
+
+    const std::string output{sstr.str()};
+
+    // output contains now an Envelope in a structure similar to how
+    // a Container would be encoded.
+
+    const char *messageSpecification = R"(
+package ABC.DEF;
+message GHI.MessageA [id = 30002] {
+    uint8 attribute1 [ default = 123, id = 1 ];
+}
+
+message GHI.MessageB [id = 30006] {
+    GHI.MessageA attribute1 [ id = 3 ];
+}
+)";
+
+    const char *JSON = R"({"dataType":30006,
+"sent":{"seconds":1,
+"microseconds":2},
+"received":{"seconds":10,
+"microseconds":20},
+"sampleTimeStamp":{"seconds":100,
+"microseconds":200},
+"senderStamp":2,
+"GHI_MessageB":{"attribute1":{"attribute1":99}}})";
 
     cluon::EnvelopeToJSON env2JSON;
     REQUIRE(2 == env2JSON.setMessageSpecification(std::string(messageSpecification)));

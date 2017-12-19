@@ -21,6 +21,7 @@
 #include "cluon/JSONVisitor.hpp"
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
+#include <algorithm>
 #include <sstream>
 
 namespace cluon {
@@ -98,7 +99,10 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             JSONVisitor jsonFromPayload{OUTER_CURLY_BRACES};
             gm.accept(jsonFromPayload);
 
-            retVal = '{' + jsonFromEnvelope.json() + ',' + '\n' + '"' + payload.messageName() + '"' + ':' + '{'
+            std::string tmp{payload.messageName()};
+            std::replace(tmp.begin(), tmp.end(), '.', '_');
+
+            retVal = '{' + jsonFromEnvelope.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{'
                      + jsonFromPayload.json() + '}' + '}';
         }
     }

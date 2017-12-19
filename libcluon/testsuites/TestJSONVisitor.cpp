@@ -26,6 +26,8 @@
 TEST_CASE("Testing MyTestMessage1.") {
     testdata::MyTestMessage1 tmp;
 
+    tmp.attribute11(-9.123456f).attribute12(10.123456789);
+
     REQUIRE(tmp.attribute1());
     REQUIRE('c' == tmp.attribute2());
     REQUIRE(-1 == tmp.attribute3());
@@ -36,8 +38,8 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE(6 == tmp.attribute8());
     REQUIRE(-7 == tmp.attribute9());
     REQUIRE(8 == tmp.attribute10());
-    REQUIRE(-9.5 == Approx(tmp.attribute11()));
-    REQUIRE(10.6 == Approx(tmp.attribute12()));
+    REQUIRE(-9.123456 == Approx(tmp.attribute11()));
+    REQUIRE(10.123456789 == Approx(tmp.attribute12()));
     REQUIRE("Hello World" == tmp.attribute13());
     REQUIRE("Hello Galaxy" == tmp.attribute14());
 
@@ -54,8 +56,8 @@ TEST_CASE("Testing MyTestMessage1.") {
 "attribute8":6,
 "attribute9":-7,
 "attribute10":8,
-"attribute11":-9.5,
-"attribute12":10.6,
+"attribute11":-9.123456,
+"attribute12":10.123456789,
 "attribute13":"Hello World",
 "attribute14":"Hello Galaxy"})";
 
