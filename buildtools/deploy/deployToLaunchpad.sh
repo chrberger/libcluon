@@ -220,7 +220,7 @@ Architecture: any
 Depends: 
 Description: libcluon is a small and efficient library written in modern C++
              to glue distributed software components together - in a clever
-             way - simly: cluon.
+             way - simply: cluon.
 EOF
 
 cat <<EOF >debian/changelog
