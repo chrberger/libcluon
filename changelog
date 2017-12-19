@@ -1,3 +1,9 @@
+libcluon (0.0.24) xenial; urgency=low
+
+  * Release from chrberger
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 19 Dec 2017 01:27:42 +0100
+
 libcluon (0.0.23) xenial; urgency=low
 
   * Code refactoring to remove superfluous includes
