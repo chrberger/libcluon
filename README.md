@@ -114,6 +114,6 @@ We are happy to receive your PRs to accelerate libcluon's development; before co
 
 ## License
 
-* libcluon is released under the terms of [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg
+* This project is released under the terms of the GNU GPLv3 License - [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg
 )](https://www.gnu.org/licenses/gpl-3.0.txt)
-* libcluon.js is released under the terms of [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+* The auto-generated code for libcluon.js is released under the terms of the MIT License - [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
