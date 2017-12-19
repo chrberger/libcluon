@@ -21,6 +21,11 @@ RELEASER_EMAIL="christian.berger@gu.se"
 RELEASE_DATE=$(date -R)
 OLDPWD=$(pwd)
 
+if [ "$CHRBERGER_DOCKER_CLUON_ARMHF" == "" ]; then
+    echo "No Docker oAuth specified."
+    exit 1
+fi
+
 echo "Cleaning repository: "
 make clean
 
@@ -159,7 +164,8 @@ rm -fr tmp.alpine-armhf && \
     docker run --rm -ti -w /home/berger --user=berger -h alpine-builder -v $PWD/alpine:/home/berger/tmp-alpine chrberger/alpine-libcluon-armhf-builder /home/berger/tmp-alpine/builder.sh && \
     git clone --branch gh-pages --depth 1 git@github.com:chrberger/libcluon.git && \
     cp -r alpine/armhf/* libcluon/alpine/v3.7/armhf && \
-    cd libcluon && git add -f alpine/v3.7/armhf/* && git commit -s -m "Updated apk (armhf)" && git push origin gh-pages
+    cd libcluon && git add -f alpine/v3.7/armhf/* && git commit -s -m "Updated apk (armhf)" && git push origin gh-pages && \
+    curl -H "Content-Type: application/json" --data '{"build": true}' -X POST https://registry.hub.docker.com/u/chrberger/cluon-armhf/trigger/${CHRBERGER_DOCKER_CLUON_ARMHF}/
 
 cd $OLDPWD && rm -fr tmp.alpine-armhf
 
