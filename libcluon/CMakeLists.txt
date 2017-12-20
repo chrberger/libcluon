@@ -165,9 +165,9 @@ install(FILES "${CMAKE_BINARY_DIR}/cluonDataStructures.proto" DESTINATION share/
 
 ###############################################################################
 # Check superfluous include directives.
-if(NOT "${iwyu_path}" STREQUAL "iwyu_path-NOTFOUND")
-    set_property(TARGET ${PROJECT_NAME}-objects PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
-endif()
+#if(NOT "${iwyu_path}" STREQUAL "iwyu_path-NOTFOUND")
+#    set_property(TARGET ${PROJECT_NAME}-objects PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+#endif()
 
 ################################################################################
 # Include Catch unit test framework (MUST follow this project's targets as
