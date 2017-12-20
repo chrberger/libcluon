@@ -37,155 +37,52 @@ namespace cluon {
 class LIBCLUON_API GenericMessage {
    private:
     class GenericMessageVisitor {
+       private:
         GenericMessageVisitor(const GenericMessageVisitor &) = delete;
         GenericMessageVisitor(GenericMessageVisitor &&)      = delete;
         GenericMessageVisitor &operator=(const GenericMessageVisitor &) = delete;
         GenericMessageVisitor &operator=(GenericMessageVisitor &&) = delete;
+
        public:
         GenericMessageVisitor() = default;
 
-        void preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
-            m_metaMessage.messageIdentifier(id).messageName(shortName);
-std::cout << shortName << ", " << longName << std::endl;
-        }
+       public:
+        // The following methods are provided to allow an instance of this class to
+        // be used as visitor for an instance with the method signature void accept<T>(T&);
+        void preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept;
+        void postVisit() noexcept;
 
-        void postVisit() noexcept {
-            std::cout << m_metaMessage.messageIdentifier() << ": " << m_metaMessage.messageName() << std::endl;
-            for (auto mf : m_metaMessage.listOfMetaFields()) {
-                auto &v = m_intermediateDataRepresentation[mf.fieldIdentifier()];
-                std::cout << mf.fieldIdentifier() << ", " << mf.fieldDataType() << ", " << mf.fieldDataTypeName() << ", " << mf.fieldName() << std::endl;
-            }
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::BOOL_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::CHAR_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::INT8_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::UINT8_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::INT16_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::UINT16_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::INT32_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::UINT32_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::INT64_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::UINT64_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::FLOAT_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::DOUBLE_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
-
-        void visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
-            cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::STRING_T).fieldDataTypeName(typeName).fieldName(name);
-            linb::any _v{v};
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
-            m_metaMessage.add(std::move(mf));
-        }
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept;
+        void visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept;
 
         template <typename T>
         void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
-            GenericMessageVisitor gmv;
-            value.accept([&gmv](uint32_t messageIdentifier, const std::string &shortName, const std::string &longName) { gmv.preVisit(messageIdentifier, shortName, longName); },
-                       [&gmv](uint32_t fieldIdentifier, std::string &&typeName, std::string &&name, auto &value) { gmv.visit(fieldIdentifier, std::move(typeName), std::move(name), value); },
-                       [&gmv]() { gmv.postVisit(); });
-
-            GenericMessage gm;
-            gm.setMetaMessage(gmv.metaMessage(), gmv.intermediateDataRepresentation());
-
             cluon::MetaMessage::MetaField mf;
             mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::MESSAGE_T).fieldDataTypeName(typeName).fieldName(name);
+std::cout << __LINE__ << ", id = " << id << std::endl;
+
+            GenericMessage gm;
+            gm.createFrom<T>(value);
+
             linb::any _v = gm;
             m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
             m_metaMessage.add(std::move(mf));
         }
 
        public:
-        MetaMessage metaMessage() const noexcept {
-            return m_metaMessage;
-        }
-
-        std::map<uint32_t, linb::any> intermediateDataRepresentation() const noexcept {
-            return m_intermediateDataRepresentation;
-        }
+        MetaMessage metaMessage() const noexcept;
+        std::map<uint32_t, linb::any> intermediateDataRepresentation() const noexcept;
 
        private:
         MetaMessage m_metaMessage{};
@@ -201,27 +98,34 @@ std::cout << shortName << ", " << longName << std::endl;
     GenericMessage(const GenericMessage &) = default;
     GenericMessage &operator=(const GenericMessage &) = default;
 
-    void
-    setMetaMessage(const MetaMessage &mm, const std::map<uint32_t, linb::any> &idr) noexcept {
+    /**
+     * This method sets the meta information for this GenericMessage.
+     *
+     * @param mm MetaMessage describing the meta-information about the fields.
+     * @param mms List of MetaMessages that are known (used for resolving).
+     * @param pd ProtoDecoder containing the values to be decoded.
+     */
+    void setMetaMessage(const MetaMessage &mm, const std::vector<MetaMessage> &mms, MessageFromProtoDecoder &pd) noexcept;
+
+    /**
+     * This methods creates a GenericMessage from a given concrete message.
+     *
+     * @param msg Concrete message used to derive this GenericMessage from.
+     */
+    template<typename T>
+    void createFrom(T &msg) {
+        GenericMessageVisitor gmv;
+        msg.accept(gmv);
+        setMetaMessage(gmv.metaMessage(), gmv.intermediateDataRepresentation());
+    }
+
+   private:
+    void setMetaMessage(const MetaMessage &mm, const std::map<uint32_t, linb::any> &idr) noexcept {
         m_intermediateDataRepresentation.clear();
         m_intermediateDataRepresentation = idr;
         m_metaMessage = mm;
     }
 
-    void
-    setMetaMessage(const MetaMessage &mm, const std::vector<MetaMessage> &mms, MessageFromProtoDecoder &pd) noexcept;
-
-    template<typename T>
-    void createFrom(T &msg) {
-        GenericMessageVisitor gmv;
-        msg.accept([&gmv](uint32_t messageIdentifier, const std::string &shortName, const std::string &longName) { gmv.preVisit(messageIdentifier, shortName, longName); },
-                   [&gmv](uint32_t fieldIdentifier, std::string &&typeName, std::string &&name, auto &value) { gmv.visit(fieldIdentifier, std::move(typeName), std::move(name), value); },
-                   [&gmv]() { gmv.postVisit(); });
-
-        setMetaMessage(gmv.metaMessage(), gmv.intermediateDataRepresentation());
-    }
-
-   private:
     void createIntermediateRepresentationFrom(MessageFromProtoDecoder &pd) noexcept {
         m_intermediateDataRepresentation.clear();
         for (const auto &f : m_metaMessage.listOfMetaFields()) {
@@ -308,6 +212,38 @@ std::cout << shortName << ", " << longName << std::endl;
                     m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
                 }
             }
+        }
+    }
+
+   public:
+
+    void preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept;
+    void postVisit() noexcept;
+
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept;
+    void visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept;
+
+    template <typename T>
+    void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
+        (void)typeName;
+        (void)name;
+        if (0 < m_intermediateDataRepresentation.count(id)) {
+            try {
+                auto &v = linb::any_cast<cluon::GenericMessage&>(m_intermediateDataRepresentation[id]);
+                value.accept(v);
+            }
+            catch(const linb::bad_any_cast&) {}
         }
     }
 

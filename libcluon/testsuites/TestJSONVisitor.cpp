@@ -109,6 +109,74 @@ TEST_CASE("Testing MyTestMessage1 to GenericMessage to JSON.") {
     REQUIRE(std::string(JSON) == j.json());
 }
 
+TEST_CASE("Testing MyTestMessage1 to GenericMessage to MyTestMessage1.") {
+    testdata::MyTestMessage1 src;
+    src.attribute1(false)
+        .attribute2('a')
+        .attribute3(-10)
+        .attribute4(20)
+        .attribute5(-30)
+        .attribute6(40)
+        .attribute7(-50)
+        .attribute8(60)
+        .attribute9(-70)
+        .attribute10(80)
+        .attribute11(-90.5)
+        .attribute12(100.6)
+        .attribute13("World, Hello")
+        .attribute14("Galaxy, Hello");
+
+    REQUIRE(!src.attribute1());
+    REQUIRE('a' == src.attribute2());
+    REQUIRE(-10 == src.attribute3());
+    REQUIRE(20 == src.attribute4());
+    REQUIRE(-30 == src.attribute5());
+    REQUIRE(40 == src.attribute6());
+    REQUIRE(-50 == src.attribute7());
+    REQUIRE(60 == src.attribute8());
+    REQUIRE(-70 == src.attribute9());
+    REQUIRE(80 == src.attribute10());
+    REQUIRE(-90.5 == Approx(src.attribute11()));
+    REQUIRE(100.6 == Approx(src.attribute12()));
+    REQUIRE("World, Hello" == src.attribute13());
+    REQUIRE("Galaxy, Hello" == src.attribute14());
+
+    testdata::MyTestMessage1 dest;
+    REQUIRE('c' == dest.attribute2());
+    REQUIRE(-1 == dest.attribute3());
+    REQUIRE(2 == dest.attribute4());
+    REQUIRE(-3 == dest.attribute5());
+    REQUIRE(4 == dest.attribute6());
+    REQUIRE(-5 == dest.attribute7());
+    REQUIRE(6 == dest.attribute8());
+    REQUIRE(-7 == dest.attribute9());
+    REQUIRE(8 == dest.attribute10());
+    REQUIRE(-9.5 == Approx(dest.attribute11()));
+    REQUIRE(10.6 == Approx(dest.attribute12()));
+    REQUIRE("Hello World" == dest.attribute13());
+    REQUIRE("Hello Galaxy" == dest.attribute14());
+
+    // Create a generic representation from the given message.
+    cluon::GenericMessage gm;
+    gm.createFrom<testdata::MyTestMessage1>(src);
+
+    dest.accept(gm);
+    REQUIRE(!dest.attribute1());
+    REQUIRE('a' == dest.attribute2());
+    REQUIRE(-10 == dest.attribute3());
+    REQUIRE(20 == dest.attribute4());
+    REQUIRE(-30 == dest.attribute5());
+    REQUIRE(40 == dest.attribute6());
+    REQUIRE(-50 == dest.attribute7());
+    REQUIRE(60 == dest.attribute8());
+    REQUIRE(-70 == dest.attribute9());
+    REQUIRE(80 == dest.attribute10());
+    REQUIRE(-90.5 == Approx(dest.attribute11()));
+    REQUIRE(100.6 == Approx(dest.attribute12()));
+    REQUIRE("World, Hello" == dest.attribute13());
+    REQUIRE("Galaxy, Hello" == dest.attribute14());
+}
+
 TEST_CASE("Testing MyTestMessage6 to GenericMessage to JSON.") {
     testdata::MyTestMessage6 tmp6;
     testdata::MyTestMessage2 tmp2;
@@ -128,4 +196,23 @@ TEST_CASE("Testing MyTestMessage6 to GenericMessage to JSON.") {
     const char *JSON = R"({"attribute1":97})";
 
     REQUIRE(std::string(JSON) == j.json());
+}
+
+TEST_CASE("Testing MyTestMessage6 to GenericMessage to MyTestMessage6.") {
+    testdata::MyTestMessage6 tmp6;
+    testdata::MyTestMessage2 tmp2;
+    tmp2.attribute1(98);
+    tmp6.attribute1(tmp2);
+
+    REQUIRE(98 == tmp6.attribute1().attribute1());
+
+    // Create a generic representation from the given message.
+    cluon::GenericMessage gm;
+    gm.createFrom<testdata::MyTestMessage6>(tmp6);
+
+    testdata::MyTestMessage6 tmp6_2;
+    REQUIRE(123 == tmp6_2.attribute1().attribute1());
+
+    tmp6_2.accept(gm);
+    REQUIRE(98 == tmp6_2.attribute1().attribute1());
 }
