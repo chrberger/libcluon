@@ -63,6 +63,23 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE(std::string(JSON) == j.json());
 }
 
+
+TEST_CASE("Testing MyTestMessage6.") {
+    testdata::MyTestMessage6 tmp6;
+    testdata::MyTestMessage2 tmp2;
+    tmp2.attribute1(97);
+    tmp6.attribute1(tmp2);
+
+    REQUIRE(97 == tmp6.attribute1().attribute1());
+
+    cluon::JSONVisitor j;
+    tmp6.accept(j);
+
+    const char *JSON = R"({"attribute1":{"attribute1":97}})";
+
+    REQUIRE(std::string(JSON) == j.json());
+}
+
 TEST_CASE("Testing MyTestMessage1 to GenericMessage to JSON.") {
     testdata::MyTestMessage1 tmp;
 
