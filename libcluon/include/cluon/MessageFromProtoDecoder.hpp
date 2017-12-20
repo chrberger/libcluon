@@ -18,8 +18,8 @@
 #ifndef MESSAGEFROMPROTODECODER_HPP
 #define MESSAGEFROMPROTODECODER_HPP
 
-#include "cluon/cluon.hpp"
 #include "cluon/ProtoConstants.hpp"
+#include "cluon/cluon.hpp"
 
 #include <map>
 #include <sstream>
@@ -96,6 +96,11 @@ class LIBCLUON_API MessageFromProtoDecoder {
    public:
     MessageFromProtoDecoder &operator=(const MessageFromProtoDecoder &other) noexcept;
 
+    /**
+     * This method decodes a given istream into Proto.
+     *
+     * @param in istream to decode.
+     */
     void decodeFrom(std::istream &in) noexcept;
 
    public:

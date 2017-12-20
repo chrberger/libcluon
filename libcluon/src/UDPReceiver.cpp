@@ -285,7 +285,8 @@ void UDPReceiver::readFromSocket() noexcept {
                             &((reinterpret_cast<struct sockaddr_in *>(&remote))->sin_addr), // NOLINT
                             remoteAddress.data(),
                             remoteAddress.max_size());
-                const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
+                const uint16_t RECVFROM_PORT{
+                    ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
 
                 // Call delegate.
                 m_delegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)),

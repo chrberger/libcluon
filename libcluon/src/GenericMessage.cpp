@@ -27,10 +27,9 @@ void GenericMessage::setMetaMessage(const MetaMessage &mm,
     m_scopeOfMetaMessages.clear();
     m_scopeOfMetaMessages = mms;
     m_mapForScopeOfMetaMessages.clear();
-
     for (const auto &e : m_scopeOfMetaMessages) { m_mapForScopeOfMetaMessages[e.messageName()] = e; }
 
-    setData(pd);
+    createIntermediateRepresentationFrom(pd);
 }
 
 } // namespace cluon

@@ -102,8 +102,8 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             std::string tmp{payload.messageName()};
             std::replace(tmp.begin(), tmp.end(), '.', '_');
 
-            retVal = '{' + jsonFromEnvelope.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{'
-                     + jsonFromPayload.json() + '}' + '}';
+            retVal = '{' + jsonFromEnvelope.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{' + jsonFromPayload.json()
+                     + '}' + '}';
         }
     }
     return retVal;

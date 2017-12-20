@@ -483,7 +483,8 @@ message MessageB [id = 30006] {
     REQUIRE(std::string(JSON) == JSON_C);
 }
 
-TEST_CASE("Transform Envelope into JSON represention for nested payloads with punctuated type names to be converted to underscores.") {
+TEST_CASE("Transform Envelope into JSON represention for nested payloads with punctuated type names to be converted to "
+          "underscores.") {
     cluon::data::Envelope env;
     REQUIRE(env.serializedData().empty());
     REQUIRE(0 == env.senderStamp());

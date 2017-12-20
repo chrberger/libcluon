@@ -96,7 +96,10 @@ void MetaMessageToProtoTransformator::visit(const MetaMessage &mm) noexcept {
           + namespacePrefix;
 
     std::string completePackageNameWithNamespacePrefixWithUnderscores{completePackageNameWithNamespacePrefix};
-    std::replace(completePackageNameWithNamespacePrefixWithUnderscores.begin(), completePackageNameWithNamespacePrefixWithUnderscores.end(), '.', '_');
+    std::replace(completePackageNameWithNamespacePrefixWithUnderscores.begin(),
+                 completePackageNameWithNamespacePrefixWithUnderscores.end(),
+                 '.',
+                 '_');
     const std::string completeMessageNameWithUnderscores
         = completePackageNameWithNamespacePrefixWithUnderscores
           + (!completePackageNameWithNamespacePrefixWithUnderscores.empty() ? +"_" : "") + messageName;
