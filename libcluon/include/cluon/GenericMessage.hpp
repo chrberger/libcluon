@@ -23,6 +23,8 @@
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MetaMessage.hpp"
 
+#include "any/any.hpp"
+
 #include <map>
 #include <string>
 #include <utility>
