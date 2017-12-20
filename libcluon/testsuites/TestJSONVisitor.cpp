@@ -63,7 +63,6 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE(std::string(JSON) == j.json());
 }
 
-
 TEST_CASE("Testing MyTestMessage6.") {
     testdata::MyTestMessage6 tmp6;
     testdata::MyTestMessage2 tmp2;
@@ -194,27 +193,6 @@ TEST_CASE("Testing MyTestMessage1 to GenericMessage to MyTestMessage1.") {
     REQUIRE("Galaxy, Hello" == dest.attribute14());
 }
 
-TEST_CASE("Testing MyTestMessage6 to GenericMessage to JSON.") {
-    testdata::MyTestMessage6 tmp6;
-    testdata::MyTestMessage2 tmp2;
-    tmp2.attribute1(97);
-    tmp6.attribute1(tmp2);
-
-    REQUIRE(97 == tmp6.attribute1().attribute1());
-
-    // Create a generic representation from the given message.
-    cluon::GenericMessage gm;
-    gm.createFrom<testdata::MyTestMessage6>(tmp6);
-
-    // Create a JSON representation from the generic message.
-    cluon::JSONVisitor j;
-    gm.accept(j);
-
-    const char *JSON = R"({"attribute1":97})";
-
-    REQUIRE(std::string(JSON) == j.json());
-}
-
 TEST_CASE("Testing MyTestMessage6 to GenericMessage to MyTestMessage6.") {
     testdata::MyTestMessage6 tmp6;
     testdata::MyTestMessage2 tmp2;
@@ -232,4 +210,25 @@ TEST_CASE("Testing MyTestMessage6 to GenericMessage to MyTestMessage6.") {
 
     tmp6_2.accept(gm);
     REQUIRE(98 == tmp6_2.attribute1().attribute1());
+}
+
+TEST_CASE("Testing MyTestMessage6 to GenericMessage to JSON.") {
+    testdata::MyTestMessage6 tmp6;
+    testdata::MyTestMessage2 tmp2;
+    tmp2.attribute1(97);
+    tmp6.attribute1(tmp2);
+
+    REQUIRE(97 == tmp6.attribute1().attribute1());
+
+    // Create a generic representation from the given message.
+    cluon::GenericMessage gm;
+    gm.createFrom<testdata::MyTestMessage6>(tmp6);
+std::cout << __LINE__ << std::endl;
+    // Create a JSON representation from the generic message.
+    cluon::JSONVisitor j;
+    gm.accept(j);
+
+    const char *JSON = R"({"attribute1":{"attribute1":97}})";
+
+    REQUIRE(std::string(JSON) == j.json());
 }

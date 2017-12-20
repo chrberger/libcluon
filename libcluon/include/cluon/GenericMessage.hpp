@@ -70,7 +70,7 @@ class LIBCLUON_API GenericMessage {
         void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
             cluon::MetaMessage::MetaField mf;
             mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::MESSAGE_T).fieldDataTypeName(typeName).fieldName(name);
-std::cout << __LINE__ << ", id = " << id << std::endl;
+std::cout << __LINE__ << ", id = " << id << ", tN = " << typeName << std::endl;
 
             GenericMessage gm;
             gm.createFrom<T>(value);
@@ -114,6 +114,8 @@ std::cout << __LINE__ << ", id = " << id << std::endl;
      */
     template<typename T>
     void createFrom(T &msg) {
+std::cout << __LINE__ << msg.LongName() << std::endl;
+
         GenericMessageVisitor gmv;
         msg.accept(gmv);
         setMetaMessage(gmv.metaMessage(), gmv.intermediateDataRepresentation());
@@ -250,6 +252,7 @@ std::cout << __LINE__ << ", id = " << id << std::endl;
    public:
     template <class Visitor>
     void accept(Visitor &visitor) {
+std::cout << __LINE__ << m_metaMessage.messageName() << std::endl;
         visitor.preVisit(m_metaMessage.messageIdentifier(), m_metaMessage.messageName(), m_longName);
 
         for (const auto &f : m_metaMessage.listOfMetaFields()) {
@@ -308,12 +311,11 @@ std::cout << __LINE__ << ", id = " << id << std::endl;
                 doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
             } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T
                        && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
-                if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
-                    auto &v = linb::any_cast<cluon::GenericMessage &>(
-                        m_intermediateDataRepresentation[f.fieldIdentifier()]);
-                    doVisit(
-                        f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
-                }
+                auto &v = linb::any_cast<cluon::GenericMessage &>(
+                    m_intermediateDataRepresentation[f.fieldIdentifier()]);
+std::cout << __LINE__ << v.m_metaMessage.messageName() << std::endl;
+                doVisit(
+                    f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
             }
         }
 
@@ -475,7 +477,7 @@ std::cout << __LINE__ << ", id = " << id << std::endl;
         std::forward<PostVisitor>(postVisit)();
     }
 
-   private:
+//   private:
     MetaMessage m_metaMessage{};
     std::vector<MetaMessage> m_scopeOfMetaMessages{};
     std::map<std::string, MetaMessage> m_mapForScopeOfMetaMessages{};

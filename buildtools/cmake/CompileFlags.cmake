@@ -41,17 +41,17 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     endif ()
 endif()
 
-IF("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
     set(GENERAL_BUILD_FLAGS "-D_DARWIN_C_SOURCE=1 ")
-ENDIF()
+endif()
 
-IF(WIN32)
+if(WIN32)
     set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
         /O2 ")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
         ${GENERAL_BUILD_FLAGS} ")
-ELSE()
+else()
     set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
         -D_XOPEN_SOURCE=700 \
         -fstack-protector \
@@ -74,10 +74,12 @@ ELSE()
         ${CXX_WARNING_FLAGS}")
 
     # Remove symbols from libraries.
-    IF(NOT("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin"))
+    if(NOT("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin"))
+    if(NOT("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ")
         set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} -s ")
         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s ")
-    ENDIF()
-ENDIF()
+    endif()
+    endif()
+endif()
 
