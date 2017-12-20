@@ -104,7 +104,7 @@ Files: libcluon/thirdparty/Mustache/*
 Copyright: Copyright 2015-2017 Kevin Wojniak.
 License: Boost-1.0
 
-Files: libcluon/thirdparty/any/*
+Files: libcluon/thirdparty/cluon/any/*
 Copyright: Copyright (c) 2016 Denilson das Mercês Amorim.
 License: Boost-1.0
 

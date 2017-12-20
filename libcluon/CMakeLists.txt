@@ -158,7 +158,7 @@ install(TARGETS ${CLUON-OD4TOSTDOUT}   DESTINATION bin COMPONENT lib${PROJECT_NA
 # Install header files.
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include COMPONENT lib${PROJECT_NAME})
 install(FILES "${CMAKE_BINARY_DIR}/include/cluon/cluonDataStructures.hpp" DESTINATION include/cluon COMPONENT lib${PROJECT_NAME})
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/any/any.hpp" DESTINATION include/any/ COMPONENT lib${PROJECT_NAME})
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cluon/any/any.hpp" DESTINATION include/cluon/any/ COMPONENT lib${PROJECT_NAME})
 # Install message specification files.
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd" DESTINATION share/${PROJECT_NAME} COMPONENT lib${PROJECT_NAME})
 install(FILES "${CMAKE_BINARY_DIR}/cluonDataStructures.proto" DESTINATION share/${PROJECT_NAME} COMPONENT lib${PROJECT_NAME})

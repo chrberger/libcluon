@@ -23,8 +23,9 @@
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MetaMessage.hpp"
 
-#include "any/any.hpp"
+#include "cluon/any/any.hpp"
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <utility>
@@ -35,81 +36,92 @@ namespace cluon {
  * This class provides an instance of a generic message to read values from.
  */
 class LIBCLUON_API GenericMessage {
-   private:
-    GenericMessage(GenericMessage &&) = delete;
-    GenericMessage &operator=(const GenericMessage &) = delete;
-    GenericMessage &operator=(GenericMessage &&) = delete;
-
    public:
-    GenericMessage()                       = default;
+    GenericMessage() = default;
     GenericMessage(const GenericMessage &) = default;
+    GenericMessage(GenericMessage &&) = default;
+    GenericMessage &operator=(const GenericMessage &) = default;
+    GenericMessage &operator=(GenericMessage &&) = delete;
 
     void setMetaMessage(const MetaMessage &mm,
                         const std::vector<MetaMessage> &mms,
-                        const MessageFromProtoDecoder &pd) noexcept;
+                        MessageFromProtoDecoder &pd) noexcept;
 
-    template <class Visitor>
-    void accept(Visitor &visitor) {
-        visitor.preVisit(m_metaMessage.messageIdentifier(), m_metaMessage.messageName(), m_longName);
+   private:
+    void setData(MessageFromProtoDecoder &pd) noexcept {
+        m_data.clear();
 
         for (const auto &f : m_metaMessage.listOfMetaFields()) {
             if (f.fieldDataType() == MetaMessage::MetaField::BOOL_T) {
-                bool v{false};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{false};
+                auto &v = linb::any_cast<bool&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::CHAR_T) {
-                char v{'\0'};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<char>('\0')};
+                auto &v = linb::any_cast<char&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::UINT8_T) {
-                uint8_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<uint8_t>(0)};
+                auto &v = linb::any_cast<uint8_t&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::INT8_T) {
-                int8_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<int8_t>(0)};
+                auto &v = linb::any_cast<int8_t&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::UINT16_T) {
-                uint16_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<uint16_t>(0)};
+                auto &v = linb::any_cast<uint16_t&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::INT16_T) {
-                int16_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<int16_t>(0)};
+                auto &v = linb::any_cast<int16_t&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::UINT32_T) {
-                uint32_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<uint32_t>(0)};
+                auto &v = linb::any_cast<uint32_t&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::INT32_T) {
-                int32_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<int32_t>(0)};
+                auto &v = linb::any_cast<int32_t&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::UINT64_T) {
-                uint64_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<uint64_t>(0)};
+                auto &v = linb::any_cast<uint64_t&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::INT64_T) {
-                int64_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<int64_t>(0)};
+                auto &v = linb::any_cast<int64_t&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::FLOAT_T) {
-                float v{0.0f};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<float>(0.0f)};
+                auto &v = linb::any_cast<float&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::DOUBLE_T) {
-                double v{0.0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v{static_cast<double>(0.0)};
+                auto &v = linb::any_cast<double&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if ((f.fieldDataType() == MetaMessage::MetaField::STRING_T)
                        || (f.fieldDataType() == MetaMessage::MetaField::BYTES_T)) {
-                std::string v{""};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
-                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                linb::any _v = std::string{};
+                auto &v = linb::any_cast<std::string&>(_v);
+                pd.visit(f.fieldIdentifier(), v);
+                m_data[f.fieldIdentifier()] = _v;
             } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T) {
                 if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
                     std::string s;
-                    m_protoDecoder.visit(f.fieldIdentifier(), s);
+                    pd.visit(f.fieldIdentifier(), s);
 
                     std::stringstream sstr{s};
                     cluon::MessageFromProtoDecoder protoDecoder;
@@ -119,8 +131,64 @@ class LIBCLUON_API GenericMessage {
                     gm.setMetaMessage(
                         m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages, protoDecoder);
 
+                    linb::any _v = gm;
+                    m_data[f.fieldIdentifier()] = _v;
+                }
+            }
+        }
+    }
+
+   public:
+    template <class Visitor>
+    void accept(Visitor &visitor) {
+        visitor.preVisit(m_metaMessage.messageIdentifier(), m_metaMessage.messageName(), m_longName);
+
+        for (const auto &f : m_metaMessage.listOfMetaFields()) {
+            if (f.fieldDataType() == MetaMessage::MetaField::BOOL_T) {
+                auto &v = linb::any_cast<bool&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::CHAR_T) {
+                auto &v = linb::any_cast<char&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::UINT8_T) {
+                auto &v = linb::any_cast<uint8_t&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::INT8_T) {
+                auto &v = linb::any_cast<int8_t&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::UINT16_T) {
+                auto &v = linb::any_cast<uint16_t&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::INT16_T) {
+                auto &v = linb::any_cast<int16_t&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::UINT32_T) {
+                auto &v = linb::any_cast<uint32_t&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::INT32_T) {
+                auto &v = linb::any_cast<int32_t&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::UINT64_T) {
+                auto &v = linb::any_cast<uint64_t&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::INT64_T) {
+                auto &v = linb::any_cast<int64_t&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::FLOAT_T) {
+                auto &v = linb::any_cast<float&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::DOUBLE_T) {
+                auto &v = linb::any_cast<double&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if ((f.fieldDataType() == MetaMessage::MetaField::STRING_T)
+                       || (f.fieldDataType() == MetaMessage::MetaField::BYTES_T)) {
+                auto &v = linb::any_cast<std::string&>(m_data[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+            } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T) {
+                if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
+                    auto &v = linb::any_cast<cluon::GenericMessage&>(m_data[f.fieldIdentifier()]);
                     doVisit(
-                        f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), gm, visitor);
+                        f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
                 }
             }
         }
@@ -134,8 +202,7 @@ class LIBCLUON_API GenericMessage {
 
         for (const auto &f : m_metaMessage.listOfMetaFields()) {
             if (f.fieldDataType() == MetaMessage::MetaField::BOOL_T) {
-                bool v{false};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<bool&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -144,8 +211,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::CHAR_T) {
-                char v{'\0'};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<char&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -154,8 +220,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::UINT8_T) {
-                uint8_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<uint8_t&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -164,8 +229,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::INT8_T) {
-                int8_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<int8_t&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -174,8 +238,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::UINT16_T) {
-                uint16_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<uint16_t&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -184,8 +247,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::INT16_T) {
-                int16_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<int16_t&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -194,8 +256,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::UINT32_T) {
-                uint32_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<uint32_t&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -204,8 +265,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::INT32_T) {
-                int32_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<int32_t&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -214,8 +274,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::UINT64_T) {
-                uint64_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<uint64_t&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -224,8 +283,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::INT64_T) {
-                int64_t v{0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<int64_t&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -234,8 +292,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::FLOAT_T) {
-                float v{0.0f};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<float&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -244,8 +301,7 @@ class LIBCLUON_API GenericMessage {
                                       visit,
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::DOUBLE_T) {
-                double v{0.0};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<double&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -255,8 +311,7 @@ class LIBCLUON_API GenericMessage {
                                       postVisit);
             } else if ((f.fieldDataType() == MetaMessage::MetaField::STRING_T)
                        || (f.fieldDataType() == MetaMessage::MetaField::BYTES_T)) {
-                std::string v{""};
-                m_protoDecoder.visit(f.fieldIdentifier(), v);
+                auto &v = linb::any_cast<std::string&>(m_data[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),
@@ -266,21 +321,11 @@ class LIBCLUON_API GenericMessage {
                                       postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T) {
                 if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
-                    std::string s;
-                    m_protoDecoder.visit(f.fieldIdentifier(), s);
-
-                    std::stringstream sstr{s};
-                    cluon::MessageFromProtoDecoder protoDecoder;
-                    protoDecoder.decodeFrom(sstr);
-
-                    cluon::GenericMessage gm;
-                    gm.setMetaMessage(
-                        m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages, protoDecoder);
-
+                    auto &v = linb::any_cast<cluon::GenericMessage&>(m_data[f.fieldIdentifier()]);
                     doTripletForwardVisit(f.fieldIdentifier(),
                                           std::move(f.fieldDataTypeName()),
                                           std::move(f.fieldName()),
-                                          gm,
+                                          v,
                                           preVisit,
                                           visit,
                                           postVisit);
@@ -296,7 +341,7 @@ class LIBCLUON_API GenericMessage {
     std::vector<MetaMessage> m_scopeOfMetaMessages{};
     std::map<std::string, MetaMessage> m_mapForScopeOfMetaMessages{};
     std::string m_longName{""};
-    MessageFromProtoDecoder m_protoDecoder{};
+    std::map<uint32_t, linb::any> m_data;
 };
 } // namespace cluon
 

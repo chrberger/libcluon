@@ -75,9 +75,11 @@ ELSE()
 
     # Remove symbols from libraries.
     IF(NOT("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin"))
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ")
-        set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} -s ")
-        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s ")
+        IF("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ")
+            set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} -s ")
+            set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s ")
+        ENDIF()
     ENDIF()
 ENDIF()
 

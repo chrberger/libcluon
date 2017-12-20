@@ -21,15 +21,16 @@ namespace cluon {
 
 void GenericMessage::setMetaMessage(const MetaMessage &mm,
                                     const std::vector<MetaMessage> &mms,
-                                    const MessageFromProtoDecoder &pd) noexcept {
+                                    MessageFromProtoDecoder &pd) noexcept {
     m_metaMessage = mm;
     m_longName    = m_metaMessage.messageName();
     m_scopeOfMetaMessages.clear();
     m_scopeOfMetaMessages = mms;
     m_mapForScopeOfMetaMessages.clear();
-    m_protoDecoder = pd;
 
     for (const auto &e : m_scopeOfMetaMessages) { m_mapForScopeOfMetaMessages[e.messageName()] = e; }
+
+    setData(pd);
 }
 
 } // namespace cluon
