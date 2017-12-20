@@ -50,7 +50,7 @@ class LIBCLUON_API MetaMessageToProtoTransformator {
     /**
      * @return Content of the .proto file.
      */
-    std::string content(const bool &withProtoHeader) noexcept;
+    std::string content(bool withProtoHeader) noexcept;
 
    private:
     kainjow::mustache::data m_dataToBeRendered;

@@ -113,7 +113,7 @@ class LIBCLUON_API MetaMessage {
          * @param v Identifier for this field.
          * @return Reference to this instance.
          */
-        MetaField &fieldIdentifier(const uint32_t &v) noexcept;
+        MetaField &fieldIdentifier(uint32_t v) noexcept;
 
         /**
          * @return Field's default initialization value.
@@ -199,7 +199,7 @@ class LIBCLUON_API MetaMessage {
      * @param v Message identifier for this message.
      * @return Reference to this instance.
      */
-    MetaMessage &messageIdentifier(const uint32_t &v) noexcept;
+    MetaMessage &messageIdentifier(uint32_t v) noexcept;
 
    private:
     std::string m_packageName{""};

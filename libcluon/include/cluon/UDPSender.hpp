@@ -77,7 +77,7 @@ class LIBCLUON_API UDPSender {
      * @param sendToAddress Numerical IPv4 address to send a UDP packet to.
      * @param sendToPort Port to send a UDP packet to.
      */
-    UDPSender(const std::string &sendToAddress, const uint16_t &sendToPort) noexcept;
+    UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noexcept;
     ~UDPSender() noexcept;
 
     /**

@@ -50,7 +50,7 @@ uint32_t MetaMessage::MetaField::fieldIdentifier() const noexcept {
     return m_fieldIdentifier;
 }
 
-MetaMessage::MetaField &MetaMessage::MetaField::fieldIdentifier(const uint32_t &v) noexcept {
+MetaMessage::MetaField &MetaMessage::MetaField::fieldIdentifier(uint32_t v) noexcept {
     m_fieldIdentifier = v;
     return *this;
 }
@@ -88,7 +88,7 @@ uint32_t MetaMessage::messageIdentifier() const noexcept {
     return m_messageIdentifier;
 }
 
-MetaMessage &MetaMessage::messageIdentifier(const uint32_t &v) noexcept {
+MetaMessage &MetaMessage::messageIdentifier(uint32_t v) noexcept {
     m_messageIdentifier = v;
     return *this;
 }

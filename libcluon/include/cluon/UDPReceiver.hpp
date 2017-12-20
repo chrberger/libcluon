@@ -91,7 +91,7 @@ class LIBCLUON_API UDPReceiver {
      * @param delegate Functional (noexcept) to handle received bytes; parameters are received data, sender, timestamp.
      */
     UDPReceiver(const std::string &receiveFromAddress,
-                const uint16_t &receiveFromPort,
+                uint16_t receiveFromPort,
                 std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)>
                     delegate) noexcept;
     ~UDPReceiver() noexcept;
@@ -107,7 +107,7 @@ class LIBCLUON_API UDPReceiver {
      *
      * @param errorCode Error code that caused this closing.
      */
-    void closeSocket(const int &errorCode) noexcept;
+    void closeSocket(int errorCode) noexcept;
     void readFromSocket() noexcept;
 
    private:

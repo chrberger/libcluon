@@ -47,23 +47,23 @@ namespace cluon {
 
 UDPReceiver::UDPReceiver(
     const std::string &receiveFromAddress,
-    const uint16_t &receiveFromPort,
+    uint16_t receiveFromPort,
     std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate) noexcept
     : m_receiveFromAddress()
     , m_mreq()
     , m_readFromSocketThread()
     , m_delegate(std::move(delegate)) {
     // Decompose given address string to check validity with numerical IPv4 address.
-    std::string tmp(receiveFromAddress);
+    std::string tmp{receiveFromAddress};
     std::replace(tmp.begin(), tmp.end(), '.', ' ');
-    std::istringstream sstr(tmp);
+    std::istringstream sstr{tmp};
     std::vector<int> receiveFromAddressTokens{std::istream_iterator<int>(sstr), std::istream_iterator<int>()};
 
     if ((!receiveFromAddress.empty()) && (4 == receiveFromAddressTokens.size())
         && !(std::end(receiveFromAddressTokens)
              != std::find_if(receiveFromAddressTokens.begin(),
                              receiveFromAddressTokens.end(),
-                             [](int a) { return (0 > a) || (a > 255); }))
+                             [](int a) { return (a < 0) || (a > 255); }))
         && (0 < receiveFromPort)) {
         // Check for valid IP address.
         struct sockaddr_in tmpSocketAddress {};
@@ -183,7 +183,7 @@ UDPReceiver::~UDPReceiver() noexcept {
     closeSocket(0);
 }
 
-void UDPReceiver::closeSocket(const int &errorCode) noexcept {
+void UDPReceiver::closeSocket(int errorCode) noexcept {
     if (0 != errorCode) {
         std::cerr << "[cluon::UDPSender] Failed to perform socket operation: ";
 #ifdef WIN32
@@ -273,7 +273,7 @@ void UDPReceiver::readFromSocket() noexcept {
                     ts.microseconds(static_cast<int32_t>(receivedTimeStamp.tv_usec));
 
                 } else { // LCOV_EXCL_LINE
-                    // In case the ioctl failed, fall back to chrono.   // LCOV_EXCL_LINE
+                    // In case the ioctl failed, fall back to chrono. // LCOV_EXCL_LINE
                     timestamp = std::chrono::system_clock::now(); // LCOV_EXCL_LINE
                 }
 #else
@@ -285,12 +285,11 @@ void UDPReceiver::readFromSocket() noexcept {
                             &((reinterpret_cast<struct sockaddr_in *>(&remote))->sin_addr), // NOLINT
                             remoteAddress.data(),
                             remoteAddress.max_size());
-                const uint16_t RECVFROM_PORT
-                    = ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port); // NOLINT
+                const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
 
                 // Call delegate.
                 m_delegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)),
-                           std::string(remoteAddress.data()) + ":" + std::to_string(RECVFROM_PORT),
+                           std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT),
                            timestamp);
             }
         } else {

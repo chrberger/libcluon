@@ -38,19 +38,19 @@
 
 namespace cluon {
 
-UDPSender::UDPSender(const std::string &sendToAddress, const uint16_t &sendToPort) noexcept
+UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noexcept
     : m_socketMutex()
     , m_sendToAddress() {
     // Decompose given address into tokens to check validity with numerical IPv4 address.
-    std::string tmp(sendToAddress);
+    std::string tmp{sendToAddress};
     std::replace(tmp.begin(), tmp.end(), '.', ' ');
-    std::istringstream sstr(tmp);
+    std::istringstream sstr{tmp};
     std::vector<int> sendToAddressTokens{std::istream_iterator<int>(sstr), std::istream_iterator<int>()};
 
     if (!sendToAddress.empty() && (4 == sendToAddressTokens.size())
         && !(std::end(sendToAddressTokens)
              != std::find_if(
-                    sendToAddressTokens.begin(), sendToAddressTokens.end(), [](int a) { return (0 > a) || (a > 255); }))
+                    sendToAddressTokens.begin(), sendToAddressTokens.end(), [](int a) { return (a < 0) || (a > 255); }))
         && (0 < sendToPort)) {
         ::memset(&m_sendToAddress, 0, sizeof(m_sendToAddress));
         m_sendToAddress.sin_addr.s_addr = ::inet_addr(sendToAddress.c_str());
@@ -102,7 +102,7 @@ std::pair<ssize_t, int32_t> UDPSender::send(std::string &&data) noexcept {
     constexpr uint16_t MAX_LENGTH = static_cast<uint16_t>(UDPPacketSizeConstraints::MAX_SIZE_UDP_PACKET)
                                     - static_cast<uint16_t>(UDPPacketSizeConstraints::SIZE_IPv4_HEADER)
                                     - static_cast<uint16_t>(UDPPacketSizeConstraints::SIZE_UDP_HEADER);
-    if (data.size() > MAX_LENGTH) {
+    if (MAX_LENGTH < data.size()) {
         return {-1, E2BIG};
     }
 
