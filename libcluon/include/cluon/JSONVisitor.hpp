@@ -26,7 +26,17 @@
 
 namespace cluon {
 /**
-This class provides a visitor to transform a message into JSON.
+This class provides a visitor to transform a message into JSON:
+
+\code{.cpp}
+MyMessage msg;
+// Set some values in msg.
+
+cluon::JSONVisitor j;
+msg.accept(j);
+
+std::cout << j.json() << std::endl;
+\endcode
 */
 class LIBCLUON_API JSONVisitor {
    private:

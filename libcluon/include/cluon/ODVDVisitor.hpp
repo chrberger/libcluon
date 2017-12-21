@@ -28,7 +28,22 @@
 namespace cluon {
 /**
 This class provides a visitor to transform a message into its corresponding
-message specification in ODVD format.
+message specification in ODVD format:
+
+\code{.cpp}
+MyMessage msg;
+// Set some values in msg.
+
+cluon::ODVDVisitor odvd;
+msg.accept(odvd);
+
+const std::string generatedMessageSpecification{odvd.messageSpecification()};
+std::cout << generatedMessageSpecification << std::endl;
+
+cluon::MessageParser mp;
+auto retVal = mp.parse(generatedMessageSpecification);
+std::cout << (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+\endcode
 */
 class LIBCLUON_API ODVDVisitor {
    private:
