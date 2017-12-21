@@ -94,7 +94,7 @@ namespace cluon {
  *
  * std::stringstream buffer;
  * gm.accept([](uint32_t, const std::string &, const std::string &) {},
- *           [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << '\n'; },
+ *           [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << std::endl; },
  *           []() {});
  * std::cout << buffer.str() << std::endl;
  *
