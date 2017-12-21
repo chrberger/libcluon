@@ -20,7 +20,7 @@
 
 #include "cluon/cluon.hpp"
 
-#include <map>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -68,10 +68,16 @@ class LIBCLUON_API ODVDVisitor {
 
     template <typename T>
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
-        (void)typeName;
-        ODVDVisitor odvdVisitor;
-        value.accept(odvdVisitor);
-        m_forwardDeclarations.emplace(m_forwardDeclarations.begin(), odvdVisitor.messageSpecification());
+        try {
+            std::string tmp{std::regex_replace(typeName, std::regex("::"), ".")}; // NOLINT
+
+            ODVDVisitor odvdVisitor;
+            value.accept(odvdVisitor);
+            m_forwardDeclarations.emplace(m_forwardDeclarations.begin(), odvdVisitor.messageSpecification());
+
+            m_buffer << "    " << tmp << " " << name << " [ id = " << id << " ];" << '\n';
+        } catch (std::regex_error&) { // LCOV_EXCL_LINE
+        }
     }
 
    private:

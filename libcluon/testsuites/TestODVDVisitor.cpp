@@ -111,3 +111,51 @@ TEST_CASE("Testing MyTestMessage1.") {
 
     REQUIRE(std::string(JSON) == j.json());
 }
+
+TEST_CASE("Testing MyTestMessage6.") {
+    testdata::MyTestMessage6 tmp6;
+    testdata::MyTestMessage2 tmp2;
+    tmp2.attribute1(97);
+    tmp6.attribute1(tmp2);
+
+    REQUIRE(97 == tmp6.attribute1().attribute1());
+
+    cluon::MessageAsProtoEncoder protoEncoder;
+    tmp6.accept(protoEncoder);
+    const std::string protoEncoded{protoEncoder.encodedData()};
+
+    cluon::ODVDVisitor odvdVisitor;
+    tmp6.accept(odvdVisitor);
+
+    const char *msg = R"(message testdata.MyTestMessage2 [ id = 30002 ] {
+    uint8 attribute1 [ default = 0, id = 1 ];
+}
+message testdata.MyTestMessage6 [ id = 30006 ] {
+    testdata.MyTestMessage2 attribute1 [ id = 3 ];
+}
+)";
+
+    const std::string generatedMessageSpecification{odvdVisitor.messageSpecification()};
+    REQUIRE(std::string(msg) == generatedMessageSpecification);
+
+    cluon::MessageParser mp;
+    auto retVal = mp.parse(generatedMessageSpecification);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    auto listOfMetaMessages = retVal.first;
+    REQUIRE(2 == listOfMetaMessages.size());
+
+    cluon::MessageFromProtoDecoder protoDecoder;
+    std::stringstream sstr{protoEncoded};
+    protoDecoder.decodeFrom(sstr);
+
+    cluon::MetaMessage m = listOfMetaMessages[1];
+    cluon::GenericMessage gm;
+    gm.createFrom(m, listOfMetaMessages, protoDecoder);
+
+    cluon::JSONVisitor j;
+    gm.accept(j);
+
+    const char *JSON = R"({"attribute1":{"attribute1":97}})";
+
+    REQUIRE(std::string(JSON) == j.json());
+}
