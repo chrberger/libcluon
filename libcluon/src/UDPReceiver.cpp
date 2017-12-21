@@ -215,7 +215,7 @@ void UDPReceiver::closeSocket(int errorCode) noexcept {
     m_socket = -1;
 }
 
-bool UDPReceiver::isRunning() noexcept {
+bool UDPReceiver::isRunning() const noexcept {
     return m_readFromSocketThreadRunning.load();
 }
 

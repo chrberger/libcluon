@@ -99,7 +99,7 @@ class LIBCLUON_API UDPReceiver {
     /**
      * @return true if the UDPReceiver could successfully be created and is able to receive data.
      */
-    bool isRunning() noexcept;
+    bool isRunning() const noexcept;
 
    private:
     /**
