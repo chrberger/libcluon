@@ -21,7 +21,7 @@
 
 namespace cluon {
 
-std::string MessageAsProtoEncoder::encodedData() noexcept {
+std::string MessageAsProtoEncoder::encodedData() const noexcept {
     std::string s{m_protoBuffer.str()};
     return s;
 }

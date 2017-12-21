@@ -43,7 +43,7 @@ class LIBCLUON_API MessageAsProtoEncoder {
     /**
      * @return Encoded data in Proto format.
      */
-    std::string encodedData() noexcept;
+    std::string encodedData() const noexcept;
 
    public:
     void visit(uint32_t id, bool &v) noexcept;

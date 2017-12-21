@@ -144,7 +144,7 @@ class LIBCLUON_API MessageFromProtoDecoder {
         (void)typeName;
         (void)name;
 
-        if (m_mapOfKeyValues.count(id) > 0) {
+        if (0 < m_mapOfKeyValues.count(id)) {
             const std::string s{m_mapOfKeyValues[id].valueAsString()};
 
             std::stringstream sstr{s};
@@ -164,7 +164,7 @@ class LIBCLUON_API MessageFromProtoDecoder {
     std::size_t fromVarInt(std::istream &in, uint64_t &value) noexcept;
 
     void
-    readBytesFromStream(std::istream &in, const std::size_t &bytesToReadFromStream, std::vector<char> &buffer) noexcept;
+    readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, std::vector<char> &buffer) noexcept;
 
    private:
     std::stringstream m_buffer{""};

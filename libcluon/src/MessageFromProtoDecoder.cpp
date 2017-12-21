@@ -22,23 +22,22 @@
 namespace cluon {
 
 void MessageFromProtoDecoder::readBytesFromStream(std::istream &in,
-                                                  const std::size_t &bytesToReadFromStream,
+                                                  std::size_t bytesToReadFromStream,
                                                   std::vector<char> &buffer) noexcept {
     constexpr std::size_t CHUNK_SIZE{1024};
-    std::size_t bytesToRead{bytesToReadFromStream};
     std::streamsize bufferPosition{0};
 
     // Ensure buffer has enough space to hold the bytes.
-    buffer.reserve(bytesToRead);
+    buffer.reserve(bytesToReadFromStream);
 
-    while ((0 < bytesToRead) && in.good()) {
+    while ((0 < bytesToReadFromStream) && in.good()) {
         // clang-format off
         in.read(&buffer[static_cast<std::size_t>(bufferPosition)], /* Flawfinder: ignore */ /* Cf. buffer.reserve(...) above.  */
-                (bytesToRead > CHUNK_SIZE) ? CHUNK_SIZE : static_cast<std::streamsize>(bytesToRead));
+                (bytesToReadFromStream > CHUNK_SIZE) ? CHUNK_SIZE : static_cast<std::streamsize>(bytesToReadFromStream));
         // clang-format on
         const std::streamsize EXTRACTED_BYTES{in.gcount()};
         bufferPosition += EXTRACTED_BYTES;
-        bytesToRead -= static_cast<std::size_t>(EXTRACTED_BYTES);
+        bytesToReadFromStream -= static_cast<std::size_t>(EXTRACTED_BYTES);
     }
 }
 
