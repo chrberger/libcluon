@@ -305,7 +305,7 @@ void GenericMessage::createFrom(const MetaMessage &mm,
     m_mapForScopeOfMetaMessages.clear();
     for (const auto &e : m_scopeOfMetaMessages) { m_mapForScopeOfMetaMessages[e.messageName()] = e; }
 
-    createIntermediateRepresentationFrom(pd);
+    createIntermediateDataRepresentationFrom(pd);
 }
 
 } // namespace cluon

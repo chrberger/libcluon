@@ -35,7 +35,8 @@ namespace cluon {
  * GenericMessage is providing an abstraction level to work with concrete
  * messages. Therefore, it is acting as both, a Visitor to turn concrete
  * messages into GenericMessages or as Visitable to access the contained
- * data.
+ * data. GenericMessage would use C++'s std::any type; to allow C++14
+ * compilers, we use the backport from linb::any.
  *
  * Creating a GenericMessage:
  * There are several ways to create a GenericMessage. The first option is to
@@ -168,13 +169,19 @@ class LIBCLUON_API GenericMessage {
             GenericMessage gm;
             gm.createFrom<T>(value);
 
-            linb::any _v = gm;
-            m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+            m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{gm};
             m_metaMessage.add(std::move(mf));
         }
 
        public:
+        /**
+         * @return MetaMessage for this GenericMessage.
+         */
         MetaMessage metaMessage() const noexcept;
+
+        /**
+         * @return Intermediate data representation for this GenericMessage.
+         */
         std::map<uint32_t, linb::any> intermediateDataRepresentation() const noexcept;
 
        private:
@@ -192,6 +199,21 @@ class LIBCLUON_API GenericMessage {
     GenericMessage &operator=(const GenericMessage &) = default;
 
     /**
+     * This methods creates this GenericMessage from a given concrete message.
+     *
+     * @param msg Concrete message used to derive this GenericMessage from.
+     */
+    template<typename T>
+    void createFrom(T &msg) {
+        GenericMessageVisitor gmv;
+        msg.accept(gmv);
+
+        m_metaMessage = gmv.metaMessage();
+        m_intermediateDataRepresentation.clear();
+        m_intermediateDataRepresentation = gmv.intermediateDataRepresentation();
+    }
+
+    /**
      * This method creates this GenericMessage from a serialized representation
      * in Proto-format and a given message specification parsed from MessageParser.
      *
@@ -201,26 +223,14 @@ class LIBCLUON_API GenericMessage {
      */
     void createFrom(const MetaMessage &mm, const std::vector<MetaMessage> &mms, MessageFromProtoDecoder &pd) noexcept;
 
-    /**
-     * This methods creates a GenericMessage from a given concrete message.
-     *
-     * @param msg Concrete message used to derive this GenericMessage from.
-     */
-    template<typename T>
-    void createFrom(T &msg) {
-        GenericMessageVisitor gmv;
-        msg.accept(gmv);
-        setMetaMessage(gmv.metaMessage(), gmv.intermediateDataRepresentation());
-    }
-
    private:
-    void setMetaMessage(const MetaMessage &mm, const std::map<uint32_t, linb::any> &idr) noexcept {
-        m_intermediateDataRepresentation.clear();
-        m_intermediateDataRepresentation = idr;
-        m_metaMessage = mm;
-    }
-
-    void createIntermediateRepresentationFrom(MessageFromProtoDecoder &pd) noexcept {
+    /**
+     * This method creates the intermediate data representation from the
+     * Proto-encoded data contained in pd.
+     *
+     * @param pd ProtoDecoder containing the decoded Proto fields.
+     */
+    void createIntermediateDataRepresentationFrom(MessageFromProtoDecoder &pd) noexcept {
         m_intermediateDataRepresentation.clear();
         for (const auto &f : m_metaMessage.listOfMetaFields()) {
             if (f.fieldDataType() == MetaMessage::MetaField::BOOL_T) {
@@ -294,23 +304,25 @@ class LIBCLUON_API GenericMessage {
                     std::string s;
                     pd.visit(f.fieldIdentifier(), s);
 
+                    // Create a nested ProtoDecoder for the contained complex message.
                     std::stringstream sstr{s};
                     cluon::MessageFromProtoDecoder protoDecoder;
                     protoDecoder.decodeFrom(sstr);
 
+                    // Create a GenericMessage from the decoded Proto-data.
                     cluon::GenericMessage gm;
                     gm.createFrom(
                         m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages, protoDecoder);
 
-                    linb::any _v                                          = gm;
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+                    m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
                 }
             }
         }
     }
 
    public:
-
+    // The following methods are provided to allow an instance of this class to
+    // be used as visitor for an instance with the method signature void accept<T>(T&);
     void preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept;
     void postVisit() noexcept;
 
@@ -342,6 +354,12 @@ class LIBCLUON_API GenericMessage {
     }
 
    public:
+    /**
+     * This method allows other instances to visit this GenericMessage for
+     * post-processing the contained data.
+     *
+     * @param visitor Instance of the visitor visiting this GenericMessage.
+     */
     template <class Visitor>
     void accept(Visitor &visitor) {
         visitor.preVisit(m_metaMessage.messageIdentifier(), m_metaMessage.messageName(), m_longName);
@@ -412,6 +430,14 @@ class LIBCLUON_API GenericMessage {
         visitor.postVisit();
     }
 
+    /**
+     * This method allows other instances to visit this GenericMessage for
+     * post-processing the contained data.
+     *
+     * @param _preVisit Instance of the visitor pre-visiting this GenericMessage.
+     * @param _visit Instance of the visitor visiting this GenericMessage.
+     * @param _postVisit Instance of the visitor post-visiting this GenericMessage.
+     */
     template <class PreVisitor, class Visitor, class PostVisitor>
     void accept(PreVisitor &&_preVisit, Visitor &&_visit, PostVisitor &&_postVisit) {
         std::forward<PreVisitor>(_preVisit)(m_metaMessage.messageIdentifier(), m_metaMessage.messageName(), m_longName);
@@ -550,17 +576,15 @@ class LIBCLUON_API GenericMessage {
                                       _postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T
                        && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
-                if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
-                    auto &v = linb::any_cast<cluon::GenericMessage &>(
-                        m_intermediateDataRepresentation[f.fieldIdentifier()]);
-                    doTripletForwardVisit(f.fieldIdentifier(),
-                                          std::move(f.fieldDataTypeName()),
-                                          std::move(f.fieldName()),
-                                          v,
-                                          _preVisit,
-                                          _visit,
-                                          _postVisit);
-                }
+                auto &v = linb::any_cast<cluon::GenericMessage &>(
+                    m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                doTripletForwardVisit(f.fieldIdentifier(),
+                                      std::move(f.fieldDataTypeName()),
+                                      std::move(f.fieldName()),
+                                      v,
+                                      _preVisit,
+                                      _visit,
+                                      _postVisit);
             }
         }
 
