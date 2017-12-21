@@ -30,104 +30,91 @@ void GenericMessage::GenericMessageVisitor::postVisit() noexcept {}
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::BOOL_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::CHAR_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::INT8_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::UINT8_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::INT16_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::UINT16_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::INT32_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::UINT32_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::INT64_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::UINT64_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::FLOAT_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::DOUBLE_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
 void GenericMessage::GenericMessageVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     cluon::MetaMessage::MetaField mf;
     mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::STRING_T).fieldDataTypeName(typeName).fieldName(name);
-    linb::any _v{v};
-    m_intermediateDataRepresentation[mf.fieldIdentifier()] = _v;
+    m_intermediateDataRepresentation[mf.fieldIdentifier()] = linb::any{v};
     m_metaMessage.add(std::move(mf));
 }
 
@@ -300,8 +287,10 @@ void GenericMessage::createFrom(const MetaMessage &mm,
                                 MessageFromProtoDecoder &pd) noexcept {
     m_metaMessage = mm;
     m_longName    = m_metaMessage.messageName();
+
     m_scopeOfMetaMessages.clear();
     m_scopeOfMetaMessages = mms;
+
     m_mapForScopeOfMetaMessages.clear();
     for (const auto &e : m_scopeOfMetaMessages) { m_mapForScopeOfMetaMessages[e.messageName()] = e; }
 

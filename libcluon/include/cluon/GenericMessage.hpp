@@ -128,6 +128,34 @@ namespace cluon {
  * cluon::JSONVisitor j;
  * gm.accept(j);
  * std::cout << j.json();
+ *
+ *
+ * 4) Dynamically transforming a given Proto-encoded byte sequence into JSON
+ *    at runtime:
+ *
+ * // protoEncodedData is provided from somewhere, i.e., via network for example
+ * std::string protoEncodedData = <...>
+ * std::stringstream sstr{protoEncodedData};
+ * cluon::MessageFromProtoDecoder protoDecoder;
+ * protoDecoder.decodeFrom(sstr);
+ *
+ * const char *messageSpecification = R"(
+ * message MyMessage [id = 123] {
+ *    int32 field1 [id = 1];
+ *    int32 field2 [id = 2];
+ * }
+ *
+ * cluon::MessageParser mp;
+ * auto retVal = mp.parse(std::string(messageSpecification));
+ * if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second) {
+ *     cluon::GenericMessage gm;
+ *     auto listOfMetaMessages = retVal.first;
+ *     gm.createFrom(listOfMetaMessages[0], listOfMetaMessages, protoDecoder);
+ * }
+ *
+ * cluon::JSONVisitor j;
+ * gm.accept(j);
+ * std::cout << j.json();
  */
 class LIBCLUON_API GenericMessage {
    private:
