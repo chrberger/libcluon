@@ -49,7 +49,7 @@ class LIBCLUON_API JSONVisitor {
     /**
      * @return JSON-encoded data.
      */
-    std::string json() noexcept;
+    std::string json() const noexcept;
 
    public:
     // The following methods are provided to allow an instance of this class to

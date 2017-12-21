@@ -25,7 +25,7 @@ JSONVisitor::JSONVisitor(bool withOuterCurlyBraces, const std::map<uint32_t, boo
     : m_withOuterCurlyBraces(withOuterCurlyBraces)
     , m_mask(mask) {}
 
-std::string JSONVisitor::json() noexcept {
+std::string JSONVisitor::json() const noexcept {
     const std::string tmp{m_buffer.str()};
     std::string retVal{"{}"};
     if (2 < tmp.size()) {
