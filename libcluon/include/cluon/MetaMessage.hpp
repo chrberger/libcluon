@@ -26,10 +26,10 @@
 
 namespace cluon {
 /**
- * This class provides a generic description for a message. It is internally
- * used during the processing of message specifications to generate targets
- * like C++ or .proto files.
- */
+This class provides a generic description for a message. It is internally
+used during the processing of message specifications to generate targets
+like C++ or .proto files.
+*/
 class LIBCLUON_API MetaMessage {
    public:
     /**

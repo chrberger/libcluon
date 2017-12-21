@@ -26,10 +26,10 @@
 
 namespace cluon {
 /**
- * This class transforms a given MetaMessage to a .proto file.
- *
- * Transformation is using https://github.com/kainjow/Mustache.
- */
+This class transforms a given MetaMessage to a .proto file.
+
+Transformation is using https://github.com/kainjow/Mustache.
+*/
 class LIBCLUON_API MetaMessageToProtoTransformator {
    private:
     MetaMessageToProtoTransformator(MetaMessageToProtoTransformator &&) = delete;

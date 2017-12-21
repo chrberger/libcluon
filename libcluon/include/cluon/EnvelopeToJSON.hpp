@@ -28,9 +28,9 @@
 
 namespace cluon {
 /**
- * This class transforms a given Envelope into a JSON representation for its
- * contained payload.
- */
+This class transforms a given Envelope into a JSON representation for its
+contained payload.
+*/
 class LIBCLUON_API EnvelopeToJSON {
    private:
     EnvelopeToJSON(const EnvelopeToJSON &) = delete;

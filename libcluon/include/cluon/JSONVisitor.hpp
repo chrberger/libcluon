@@ -26,8 +26,8 @@
 
 namespace cluon {
 /**
- * This class provides a visitor to transform a message into JSON.
- */
+This class provides a visitor to transform a message into JSON.
+*/
 class LIBCLUON_API JSONVisitor {
    private:
     JSONVisitor(const JSONVisitor &) = delete;

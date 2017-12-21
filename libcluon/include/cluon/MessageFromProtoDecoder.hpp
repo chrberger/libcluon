@@ -28,8 +28,8 @@
 
 namespace cluon {
 /**
- * This class decodes a given message from Proto format.
- */
+This class decodes a given message from Proto format.
+*/
 class LIBCLUON_API MessageFromProtoDecoder {
     /**
      * This class represents an entry in a Proto payload stream.

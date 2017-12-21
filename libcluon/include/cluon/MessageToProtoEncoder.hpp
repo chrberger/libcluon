@@ -27,8 +27,8 @@
 
 namespace cluon {
 /**
- * This class encodes a given message in Proto format.
- */
+This class encodes a given message in Proto format.
+*/
 class LIBCLUON_API MessageAsProtoEncoder {
    private:
     MessageAsProtoEncoder(const MessageAsProtoEncoder &) = delete;

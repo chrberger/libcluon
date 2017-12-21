@@ -26,36 +26,38 @@
 
 namespace cluon {
 /**
- * This class provides a parser for message specifications in .odvd format. The
- * format is inspired by Google Protobuf (https://developers.google.com/protocol-buffers/)
- * but simplified to enforce backwards and forwards compatibility next to
- * numerical message identifiers.
- *
- * This message specification format is also used by OpenDaVINCI (http://code.opendavinci.org).
- *
- * The parser is based on https://github.com/yhirose/cpp-peglib.
- *
- * An example for a .odvd compliant message is demonstrated in the following:
- *
- * const char *spec = R"(
- * message myMessage.SubName [id = 1] {
- *     uint8 field1 [id = 1];
- *     uint32 field2 [id = 2];
- *     int64 field3 [id = 3];
- *     string field4 [id = 4];
- * }
- * )";
- *
- * cluon::MessageParser mp;
- * auto retVal = mp.parse(std::string(spec));
- * if (retVal.second == cluon::MessageParser::MessageParserErrorCodes::NO_ERROR) {
- *     auto listOfMessages = retVal.first;
- *     for (auto message : listOfMessages) {
- *         message.accept([](const cluon::MetaMessage &mm){ std::cout << "Message name = " << mm.messageName() <<
- * std::endl; });
- *     }
- * }
- */
+This class provides a parser for message specifications in .odvd format. The
+format is inspired by Google Protobuf (https://developers.google.com/protocol-buffers/)
+but simplified to enforce backwards and forwards compatibility next to
+numerical message identifiers.
+
+This message specification format is also used by OpenDaVINCI (http://code.opendavinci.org).
+
+The parser is based on https://github.com/yhirose/cpp-peglib.
+
+An example for a .odvd compliant message is demonstrated in the following:
+
+\code{.cpp}
+const char *spec = R"(
+message myMessage.SubName [id = 1] {
+    uint8 field1 [id = 1];
+    uint32 field2 [id = 2];
+    int64 field3 [id = 3];
+    string field4 [id = 4];
+}
+)";
+
+cluon::MessageParser mp;
+auto retVal = mp.parse(std::string(spec));
+if (retVal.second == cluon::MessageParser::MessageParserErrorCodes::NO_ERROR) {
+    auto listOfMessages = retVal.first;
+    for (auto message : listOfMessages) {
+        message.accept([](const cluon::MetaMessage &mm){ std::cout << "Message name = " << mm.messageName() <<
+std::endl; });
+    }
+}
+\endcode
+*/
 class LIBCLUON_API MessageParser {
    public:
     enum MessageParserErrorCodes : uint8_t { NO_ERROR = 0, SYNTAX_ERROR = 1, DUPLICATE_IDENTIFIERS = 2 };

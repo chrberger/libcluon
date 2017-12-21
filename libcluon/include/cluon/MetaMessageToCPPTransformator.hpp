@@ -26,10 +26,10 @@
 
 namespace cluon {
 /**
- * This class transforms a given MetaMessage to a C++ header and source content.
- *
- * Transformation is using https://github.com/kainjow/Mustache.
- */
+This class transforms a given MetaMessage to a C++ header and source content.
+
+Transformation is using https://github.com/kainjow/Mustache.
+*/
 class LIBCLUON_API MetaMessageToCPPTransformator {
    private:
     MetaMessageToCPPTransformator(MetaMessageToCPPTransformator &&) = delete;
