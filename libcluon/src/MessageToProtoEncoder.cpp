@@ -21,67 +21,67 @@
 
 namespace cluon {
 
-std::string MessageAsProtoEncoder::encodedData() const noexcept {
+std::string MessageToProtoEncoder::encodedData() const noexcept {
     std::string s{m_protoBuffer.str()};
     return s;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void MessageAsProtoEncoder::visit(uint32_t id, bool &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, bool &v) noexcept {
     toKeyValue<bool>(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, char &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, char &v) noexcept {
     uint8_t _v = static_cast<uint8_t>(v); // NOLINT
     toKeyValue<uint8_t>(id, _v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, int8_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, int8_t &v) noexcept {
     toKeyValue<int8_t>(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, uint8_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, uint8_t &v) noexcept {
     toKeyValue<uint8_t>(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, int16_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, int16_t &v) noexcept {
     toKeyValue<int16_t>(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, uint16_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, uint16_t &v) noexcept {
     toKeyValue<uint16_t>(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, int32_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, int32_t &v) noexcept {
     toKeyValue<int32_t>(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, uint32_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, uint32_t &v) noexcept {
     toKeyValue<uint32_t>(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, int64_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, int64_t &v) noexcept {
     toKeyValue<int64_t>(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, uint64_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, uint64_t &v) noexcept {
     toKeyValue<uint64_t>(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, float &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, float &v) noexcept {
     uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::FOUR_BYTES));
     toVarInt(m_protoBuffer, key);
     encode(m_protoBuffer, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, double &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, double &v) noexcept {
     uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::EIGHT_BYTES));
     toVarInt(m_protoBuffer, key);
     encode(m_protoBuffer, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, const std::string &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, const std::string &v) noexcept {
     uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED));
     toVarInt(m_protoBuffer, key);
     encode(m_protoBuffer, v);
@@ -89,87 +89,87 @@ void MessageAsProtoEncoder::visit(uint32_t id, const std::string &v) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void MessageAsProtoEncoder::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void MessageToProtoEncoder::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;
 }
 
-void MessageAsProtoEncoder::postVisit() noexcept {}
+void MessageToProtoEncoder::postVisit() noexcept {}
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
 }
 
-void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
+void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)typeName;
     (void)name;
     visit(id, v);
@@ -177,51 +177,51 @@ void MessageAsProtoEncoder::visit(uint32_t id, std::string &&typeName, std::stri
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, bool &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, bool &v) noexcept {
     uint64_t _v{(v ? 1u : 0u)};
     return toVarInt(o, _v);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, int8_t &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, int8_t &v) noexcept {
     uint64_t _v = toZigZag8(v);
     return toVarInt(o, _v);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, uint8_t &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, uint8_t &v) noexcept {
     uint64_t _v = v;
     return toVarInt(o, _v);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, int16_t &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, int16_t &v) noexcept {
     uint64_t _v = toZigZag16(v);
     return toVarInt(o, _v);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, uint16_t &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, uint16_t &v) noexcept {
     uint64_t _v = v;
     return toVarInt(o, _v);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, int32_t &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, int32_t &v) noexcept {
     uint64_t _v = toZigZag32(v);
     return toVarInt(o, _v);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, uint32_t &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, uint32_t &v) noexcept {
     uint64_t _v = v;
     return toVarInt(o, _v);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, int64_t &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, int64_t &v) noexcept {
     uint64_t _v = toZigZag64(v);
     return toVarInt(o, _v);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, uint64_t &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, uint64_t &v) noexcept {
     return toVarInt(o, v);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, float &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, float &v) noexcept {
     // Store 4 bytes as little endian encoding.
     uint32_t _v{0};
     std::memmove(&_v, &v, sizeof(float));
@@ -230,7 +230,7 @@ std::size_t MessageAsProtoEncoder::encode(std::ostream &o, float &v) noexcept {
     return sizeof(uint32_t);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, double &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, double &v) noexcept {
     // Store 8 bytes as little endian encoding.
     uint64_t _v{0};
     std::memmove(&_v, &v, sizeof(double));
@@ -239,34 +239,34 @@ std::size_t MessageAsProtoEncoder::encode(std::ostream &o, double &v) noexcept {
     return sizeof(uint64_t);
 }
 
-std::size_t MessageAsProtoEncoder::encode(std::ostream &o, const std::string &v) noexcept {
+std::size_t MessageToProtoEncoder::encode(std::ostream &o, const std::string &v) noexcept {
     const std::size_t LENGTH = v.length();
     std::size_t size         = toVarInt(o, LENGTH);
     o.write(v.c_str(), static_cast<std::streamsize>(LENGTH)); // LENGTH won't be negative.
     return size + LENGTH;
 }
 
-uint8_t MessageAsProtoEncoder::toZigZag8(int8_t v) noexcept {
+uint8_t MessageToProtoEncoder::toZigZag8(int8_t v) noexcept {
     return static_cast<uint8_t>((v << 1) ^ (v >> ((sizeof(v) * 8) - 1)));
 }
 
-uint16_t MessageAsProtoEncoder::toZigZag16(int16_t v) noexcept {
+uint16_t MessageToProtoEncoder::toZigZag16(int16_t v) noexcept {
     return static_cast<uint16_t>((v << 1) ^ (v >> ((sizeof(v) * 8) - 1)));
 }
 
-uint32_t MessageAsProtoEncoder::toZigZag32(int32_t v) noexcept {
+uint32_t MessageToProtoEncoder::toZigZag32(int32_t v) noexcept {
     return static_cast<uint32_t>((v << 1) ^ (v >> ((sizeof(v) * 8) - 1)));
 }
 
-uint64_t MessageAsProtoEncoder::toZigZag64(int64_t v) noexcept {
+uint64_t MessageToProtoEncoder::toZigZag64(int64_t v) noexcept {
     return static_cast<uint64_t>((v << 1) ^ (v >> ((sizeof(v) * 8) - 1)));
 }
 
-uint64_t MessageAsProtoEncoder::encodeKey(uint32_t fieldIdentifier, uint8_t protoType) noexcept {
+uint64_t MessageToProtoEncoder::encodeKey(uint32_t fieldIdentifier, uint8_t protoType) noexcept {
     return (fieldIdentifier << 0x3) | protoType;
 }
 
-std::size_t MessageAsProtoEncoder::toVarInt(std::ostream &out, uint64_t v) noexcept {
+std::size_t MessageToProtoEncoder::toVarInt(std::ostream &out, uint64_t v) noexcept {
     // VarInt is little endian.
     v = htole64(v);
 

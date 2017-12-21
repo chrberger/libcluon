@@ -29,16 +29,16 @@ namespace cluon {
 /**
 This class encodes a given message in Proto format.
 */
-class LIBCLUON_API MessageAsProtoEncoder {
+class LIBCLUON_API MessageToProtoEncoder {
    private:
-    MessageAsProtoEncoder(const MessageAsProtoEncoder &) = delete;
-    MessageAsProtoEncoder(MessageAsProtoEncoder &&)      = delete;
-    MessageAsProtoEncoder &operator=(const MessageAsProtoEncoder &) = delete;
-    MessageAsProtoEncoder &operator=(MessageAsProtoEncoder &&) = delete;
+    MessageToProtoEncoder(const MessageToProtoEncoder &) = delete;
+    MessageToProtoEncoder(MessageToProtoEncoder &&)      = delete;
+    MessageToProtoEncoder &operator=(const MessageToProtoEncoder &) = delete;
+    MessageToProtoEncoder &operator=(MessageToProtoEncoder &&) = delete;
 
    public:
-    MessageAsProtoEncoder()  = default;
-    ~MessageAsProtoEncoder() = default;
+    MessageToProtoEncoder()  = default;
+    ~MessageToProtoEncoder() = default;
 
     /**
      * @return Encoded data in Proto format.
@@ -87,7 +87,7 @@ class LIBCLUON_API MessageAsProtoEncoder {
         (void)name;
 
         toVarInt(m_protoBuffer, std::move(encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED))));
-        cluon::MessageAsProtoEncoder nestedProtoEncoder;
+        cluon::MessageToProtoEncoder nestedProtoEncoder;
         value.accept(nestedProtoEncoder);
         encode(m_protoBuffer, std::move(nestedProtoEncoder.encodedData()));
     }

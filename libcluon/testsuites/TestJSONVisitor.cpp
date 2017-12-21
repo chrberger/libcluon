@@ -306,8 +306,8 @@ message FaultyMyMessageA [id = 60006] {
     REQUIRE(10 == msg3.attribute1());
     REQUIRE(20 == msg3.attribute2());
 
-    cluon::MessageAsProtoEncoder proto;
-    msg3.accept<cluon::MessageAsProtoEncoder>(proto);
+    cluon::MessageToProtoEncoder proto;
+    msg3.accept<cluon::MessageToProtoEncoder>(proto);
     std::string s{proto.encodedData()};
 
     REQUIRE(4 == s.size());
@@ -372,8 +372,8 @@ message FaultyMyMessageA [id = 30003] {
     REQUIRE(10 == msg3.attribute1());
     REQUIRE(20 == msg3.attribute2());
 
-    cluon::MessageAsProtoEncoder proto;
-    msg3.accept<cluon::MessageAsProtoEncoder>(proto);
+    cluon::MessageToProtoEncoder proto;
+    msg3.accept<cluon::MessageToProtoEncoder>(proto);
     std::string s{proto.encodedData()};
 
     REQUIRE(4 == s.size());

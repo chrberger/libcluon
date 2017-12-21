@@ -34,7 +34,7 @@ TEST_CASE("Testing MyTestMessage0.") {
 
     tmp.attribute2('C');
 
-    cluon::MessageAsProtoEncoder protoEncoder;
+    cluon::MessageToProtoEncoder protoEncoder;
     tmp.accept([](uint32_t, const std::string &, const std::string &) {},
                [&protoEncoder](uint32_t id, std::string &&, std::string &&, auto v) { protoEncoder.visit(id, v); },
                []() {});
@@ -70,7 +70,7 @@ TEST_CASE("Testing MyTestMessage2.") {
     tmp.attribute1(150);
     REQUIRE(150 == tmp.attribute1());
 
-    cluon::MessageAsProtoEncoder proto;
+    cluon::MessageToProtoEncoder proto;
     tmp.accept([](uint32_t, const std::string &, const std::string &) {},
                [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
                []() {});
@@ -105,7 +105,7 @@ TEST_CASE("Testing MyTestMessage3.") {
     REQUIRE(123 == tmp.attribute1());
     REQUIRE(-123 == tmp.attribute2());
 
-    cluon::MessageAsProtoEncoder proto;
+    cluon::MessageToProtoEncoder proto;
     tmp.accept([](uint32_t, const std::string &, const std::string &) {},
                [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
                []() {});
@@ -142,7 +142,7 @@ TEST_CASE("Testing MyTestMessage4.") {
     tmp.attribute1("testing");
     REQUIRE("testing" == tmp.attribute1());
 
-    cluon::MessageAsProtoEncoder proto;
+    cluon::MessageToProtoEncoder proto;
     tmp.accept([](uint32_t, const std::string &, const std::string &) {},
                [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
                []() {});
@@ -213,7 +213,7 @@ TEST_CASE("Testing MyTestMessage5.") { // NOLINT
     REQUIRE(-50.4321 == Approx(tmp.attribute10()));
     REQUIRE("Hello cluon World!" == tmp.attribute11());
 
-    cluon::MessageAsProtoEncoder proto;
+    cluon::MessageToProtoEncoder proto;
     tmp.accept([](uint32_t, const std::string &, const std::string &) {},
                [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
                []() {});
@@ -324,8 +324,8 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
 
     REQUIRE(150 == tmp6.attribute1().attribute1());
 
-    cluon::MessageAsProtoEncoder proto;
-    tmp6.accept<cluon::MessageAsProtoEncoder>(proto);
+    cluon::MessageToProtoEncoder proto;
+    tmp6.accept<cluon::MessageToProtoEncoder>(proto);
     std::string s = proto.encodedData();
 
     REQUIRE(5 == s.size());

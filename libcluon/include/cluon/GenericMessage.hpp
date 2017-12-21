@@ -124,8 +124,8 @@ msg.accept(gm);
 GenericMessage gm;
 // gm is created using one of the aforementioned options.
 
-cluon::MessageAsProtoEncoder protoEncoder;
-gm.accept<cluon::MessageAsProtoEncoder>(protoEncoder);
+cluon::MessageToProtoEncoder protoEncoder;
+gm.accept<cluon::MessageToProtoEncoder>(protoEncoder);
 const std::string{protoEncoder.encodedData()};
 \endcode
 

@@ -49,7 +49,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE("Hello World" == tmp.attribute13());
     REQUIRE("Hello Galaxy" == tmp.attribute14());
 
-    cluon::MessageAsProtoEncoder protoEncoder;
+    cluon::MessageToProtoEncoder protoEncoder;
     tmp.accept(protoEncoder);
     const std::string protoEncoded{protoEncoder.encodedData()};
 
@@ -120,7 +120,7 @@ TEST_CASE("Testing MyTestMessage6.") {
 
     REQUIRE(97 == tmp6.attribute1().attribute1());
 
-    cluon::MessageAsProtoEncoder protoEncoder;
+    cluon::MessageToProtoEncoder protoEncoder;
     tmp6.accept(protoEncoder);
     const std::string protoEncoded{protoEncoder.encodedData()};
 
