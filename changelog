@@ -1,3 +1,9 @@
+libcluon (0.0.28) xenial; urgency=low
+
+  * Refactored GenericMessage implementation with any-type
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 21 Dec 2017 03:07:57 +0100
+
 libcluon (0.0.27) xenial; urgency=low
 
   * Improvements for some interfaces
