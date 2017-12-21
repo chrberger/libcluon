@@ -94,7 +94,7 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             // Now, create JSON from payload.
             cluon::MetaMessage payload{m_scopeOfMetaMessages[static_cast<uint32_t>(envelope.dataType())]};
             cluon::GenericMessage gm;
-            gm.setMetaMessage(payload, m_listOfMetaMessages, protoDecoder);
+            gm.createFrom(payload, m_listOfMetaMessages, protoDecoder);
 
             JSONVisitor jsonFromPayload{OUTER_CURLY_BRACES};
             gm.accept(jsonFromPayload);

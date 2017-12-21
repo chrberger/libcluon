@@ -398,7 +398,7 @@ message MyMessageA [id = 30003] {
     cluon::MetaMessage m = listOfMessages.front();
 
     cluon::GenericMessage gm;
-    gm.setMetaMessage(m, listOfMessages, protoDecoder);
+    gm.createFrom(m, listOfMessages, protoDecoder);
 
     // Turn GenericMessage back into Proto.
     {
@@ -495,7 +495,7 @@ message example.MyTestMessage1 [id = 30001] {
     cluon::MetaMessage m = listOfMessages.front();
 
     cluon::GenericMessage gm;
-    gm.setMetaMessage(m, listOfMessages, protoDecoder);
+    gm.createFrom(m, listOfMessages, protoDecoder);
 
     // Turn GenericMessage back into Proto and decode C++ message.
     {
@@ -612,7 +612,7 @@ message MyTest.Envelope [id = 1] {
     cluon::MetaMessage m = listOfMessages[1];
 
     cluon::GenericMessage gm;
-    gm.setMetaMessage(m, listOfMessages, protoDecoder);
+    gm.createFrom(m, listOfMessages, protoDecoder);
 
     // Turn GenericMessage back into Proto and decode C++ message.
     {

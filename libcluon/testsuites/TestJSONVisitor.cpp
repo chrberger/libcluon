@@ -20,6 +20,9 @@
 
 #include "cluon/JSONVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
+#include "cluon/MessageParser.hpp"
+#include "cluon/MessageToProtoEncoder.hpp"
+#include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing MyTestMessage1.") {
@@ -229,6 +232,183 @@ TEST_CASE("Testing MyTestMessage6 to GenericMessage to JSON.") {
     gm.accept(j);
 
     const char *JSON = R"({"attribute1":{"attribute1":97}})";
+
+    REQUIRE(std::string(JSON) == j.json());
+}
+
+TEST_CASE("Testing MyTestMessage6 to GenericMessage to copy of GenericMessage to JSON.") {
+    testdata::MyTestMessage6 tmp6;
+    testdata::MyTestMessage2 tmp2;
+    tmp2.attribute1(97);
+    tmp6.attribute1(tmp2);
+
+    REQUIRE(97 == tmp6.attribute1().attribute1());
+
+    // Create a generic representation from the given message.
+    cluon::GenericMessage gm;
+    gm.createFrom<testdata::MyTestMessage6>(tmp6);
+
+    cluon::GenericMessage gm2{gm};
+
+    // Create a JSON representation from the generic message.
+    cluon::JSONVisitor j;
+    gm2.accept(j);
+
+    const char *JSON = R"({"attribute1":{"attribute1":97}})";
+
+    REQUIRE(std::string(JSON) == j.json());
+}
+
+TEST_CASE("Testing MyTestMessage6 to GenericMessage to GenericMessage to JSON.") {
+    testdata::MyTestMessage6 tmp6;
+    testdata::MyTestMessage2 tmp2;
+    tmp2.attribute1(97);
+    tmp6.attribute1(tmp2);
+
+    REQUIRE(97 == tmp6.attribute1().attribute1());
+
+    // Create a generic representation from the given message.
+    cluon::GenericMessage gm;
+    gm.createFrom<testdata::MyTestMessage6>(tmp6);
+
+    cluon::GenericMessage gm2;
+    gm2.createFrom<cluon::GenericMessage>(gm);
+
+    // Create a JSON representation from the generic message.
+    cluon::JSONVisitor j;
+    gm2.accept(j);
+
+    const char *JSON = R"({"attribute1":{"attribute1":97}})";
+
+    REQUIRE(std::string(JSON) == j.json());
+}
+
+TEST_CASE("Dynamically creating messages for simple message for wrong message specification (not matching message identifier results in default values).") {
+    const char *msg = R"(
+// Original message:
+// message testdata.MyTestMessage3 [id = 30003] {
+//    uint8 attribute1 [ default = 124, id = 1 ];
+//    int8 attribute2 [ default = -124, id = 2 ];
+// }
+
+message FaultyMyMessageA [id = 60006] {
+    string field1 [id = 10];
+    int32 field2 [id = 20];
+}
+)";
+
+    testdata::MyTestMessage3 msg3;
+    REQUIRE(124 == msg3.attribute1());
+    REQUIRE(-124 == msg3.attribute2());
+
+    msg3.attribute1(10).attribute2(20);
+    REQUIRE(10 == msg3.attribute1());
+    REQUIRE(20 == msg3.attribute2());
+
+    cluon::MessageAsProtoEncoder proto;
+    msg3.accept<cluon::MessageAsProtoEncoder>(proto);
+    std::string s{proto.encodedData()};
+
+    REQUIRE(4 == s.size());
+    REQUIRE(0x8 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x10 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x28 == static_cast<uint8_t>(s.at(3)));
+
+    std::stringstream sstr{s};
+    cluon::MessageFromProtoDecoder protoDecoder;
+    protoDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage3 msg3_2;
+    REQUIRE(124 == msg3_2.attribute1());
+    REQUIRE(-124 == msg3_2.attribute2());
+    msg3_2.accept(protoDecoder);
+    REQUIRE(10 == msg3_2.attribute1());
+    REQUIRE(20 == msg3_2.attribute2());
+
+    cluon::MessageParser mp;
+    auto retVal = mp.parse(std::string(msg));
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+
+    auto listOfMessages = retVal.first;
+    REQUIRE(1 == listOfMessages.size());
+
+    cluon::MetaMessage m = listOfMessages.front();
+
+    cluon::GenericMessage gm;
+    gm.createFrom(m, listOfMessages, protoDecoder);
+
+    // Create a JSON representation from the generic message.
+    cluon::JSONVisitor j;
+    gm.accept(j);
+
+    const char *JSON = R"({"field1":"",
+"field2":0})";
+
+    REQUIRE(std::string(JSON) == j.json());
+}
+
+TEST_CASE("Dynamically creating messages for simple message for wrong message specification (matching message identifier but wrong type for fields might result in coincidentally matching values).") {
+    const char *msg = R"(
+// Original message:
+// message testdata.MyTestMessage3 [id = 30003] {
+//    uint8 attribute1 [ default = 124, id = 1 ];
+//    int8 attribute2 [ default = -124, id = 2 ];
+// }
+
+message FaultyMyMessageA [id = 30003] {
+    string field1 [id = 1];
+    int32 field2 [id = 2];
+}
+)";
+
+    testdata::MyTestMessage3 msg3;
+    REQUIRE(124 == msg3.attribute1());
+    REQUIRE(-124 == msg3.attribute2());
+
+    msg3.attribute1(10).attribute2(20);
+    REQUIRE(10 == msg3.attribute1());
+    REQUIRE(20 == msg3.attribute2());
+
+    cluon::MessageAsProtoEncoder proto;
+    msg3.accept<cluon::MessageAsProtoEncoder>(proto);
+    std::string s{proto.encodedData()};
+
+    REQUIRE(4 == s.size());
+    REQUIRE(0x8 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x10 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x28 == static_cast<uint8_t>(s.at(3)));
+
+    std::stringstream sstr{s};
+    cluon::MessageFromProtoDecoder protoDecoder;
+    protoDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage3 msg3_2;
+    REQUIRE(124 == msg3_2.attribute1());
+    REQUIRE(-124 == msg3_2.attribute2());
+    msg3_2.accept(protoDecoder);
+    REQUIRE(10 == msg3_2.attribute1());
+    REQUIRE(20 == msg3_2.attribute2());
+
+    cluon::MessageParser mp;
+    auto retVal = mp.parse(std::string(msg));
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+
+    auto listOfMessages = retVal.first;
+    REQUIRE(1 == listOfMessages.size());
+
+    cluon::MetaMessage m = listOfMessages.front();
+
+    cluon::GenericMessage gm;
+    gm.createFrom(m, listOfMessages, protoDecoder);
+
+    // Create a JSON representation from the generic message.
+    cluon::JSONVisitor j;
+    gm.accept(j);
+
+    const char *JSON = R"({"field1":"",
+"field2":20})";
 
     REQUIRE(std::string(JSON) == j.json());
 }

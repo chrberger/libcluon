@@ -32,7 +32,101 @@
 
 namespace cluon {
 /**
- * This class provides an instance of a generic message to read values from.
+ * GenericMessage is providing an abstraction level to work with concrete
+ * messages. Therefore, it is acting as both, a Visitor to turn concrete
+ * messages into GenericMessages or as Visitable to access the contained
+ * data.
+ *
+ * Creating a GenericMessage:
+ * There are several ways to create a GenericMessage. The first option is to
+ * provide a message specification in ODVD format as result from MessageParser
+ * next to a serialized byte sequence in Proto format:
+ *
+ * 1) This example demonstrates how to process a given message specification
+ *    to decode a Proto-encoded byte sequence (in protoEncodedData). The
+ *    message specification is given in messageSpecification that is parsed
+ *    from MessageParser. On success, it is tried to decode the Proto-encoded
+ *    data into a GenericMesssage representing an instance of "MyMessage".
+ *
+ *    Using a message specification that does not match the serialized Proto
+ *    data might result in unexpected behavior.
+ *
+ * // protoEncodedData is provided from somewhere, i.e., via network for example
+ * std::string protoEncodedData = <...>
+ * std::stringstream sstr{protoEncodedData};
+ * cluon::MessageFromProtoDecoder protoDecoder;
+ * protoDecoder.decodeFrom(sstr);
+ *
+ * const char *messageSpecification = R"(
+ * message MyMessage [id = 123] {
+ *    int32 field1 [id = 1];
+ *    int32 field2 [id = 2];
+ * }
+ *
+ * cluon::MessageParser mp;
+ * auto retVal = mp.parse(std::string(messageSpecification));
+ * if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second) {
+ *     cluon::GenericMessage gm;
+ *     auto listOfMetaMessages = retVal.first;
+ *     gm.createFrom(listOfMetaMessages[0], listOfMetaMessages, protoDecoder);
+ * }
+ *
+ *
+ * 2) This example demonstrates how to turn a given concrete message into a
+ *    GenericMessage. Afterwards, the GenericMessage can be post-processed
+ *    with Visitors.
+ *
+ *
+ * MyMessage msg;
+ * // set some fields in msg.
+ *
+ * cluon::GenericMessage gm;
+ * gm.createFrom<MyMessage>(msg);
+ *
+ *
+ * After an instance of GenericMessage is available, it can be post-processed
+ * into various representations:
+ *
+ * 1) Printing the contained data ("toString"; GenericMessage is being visited):
+ *
+ * GenericMessage gm;
+ * // gm is created using one of the aforementioned options.
+ *
+ * std::stringstream buffer;
+ * gm.accept([](uint32_t, const std::string &, const std::string &) {},
+ *           [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << '\n'; },
+ *           []() {});
+ * std::cout << buffer.str() << std::endl;
+ *
+ *
+ * 2) Filling the values of another concrete message (GenericMessage is
+ *    acting as Visitor to another message):
+ *
+ * GenericMessage gm;
+ * // gm is created using one of the aforementioned options.
+ *
+ * Message msg;
+ * msg.accept(gm);
+ *
+ *
+ * 3) Serialize the GenericMessage gm into a Proto-format:
+ *
+ * GenericMessage gm;
+ * // gm is created using one of the aforementioned options.
+ *
+ * cluon::MessageAsProtoEncoder protoEncoder;
+ * gm.accept<cluon::MessageAsProtoEncoder>(protoEncoder);
+ * const std::string{protoEncoder.encodedData()};
+ *
+ *
+ * 4) Serialize the GenericMessage gm into JSON:
+ *
+ * GenericMessage gm;
+ * // gm is created using one of the aforementioned options.
+ *
+ * cluon::JSONVisitor j;
+ * gm.accept(j);
+ * std::cout << j.json();
  */
 class LIBCLUON_API GenericMessage {
    private:
@@ -98,13 +192,14 @@ class LIBCLUON_API GenericMessage {
     GenericMessage &operator=(const GenericMessage &) = default;
 
     /**
-     * This method sets the meta information for this GenericMessage.
+     * This method creates this GenericMessage from a serialized representation
+     * in Proto-format and a given message specification parsed from MessageParser.
      *
-     * @param mm MetaMessage describing the meta-information about the fields.
-     * @param mms List of MetaMessages that are known (used for resolving).
+     * @param mm MetaMessage describing the fields for the message to be resolved.
+     * @param mms List of MetaMessages that are known (used for resolving nested message).
      * @param pd ProtoDecoder containing the values to be decoded.
      */
-    void setMetaMessage(const MetaMessage &mm, const std::vector<MetaMessage> &mms, MessageFromProtoDecoder &pd) noexcept;
+    void createFrom(const MetaMessage &mm, const std::vector<MetaMessage> &mms, MessageFromProtoDecoder &pd) noexcept;
 
     /**
      * This methods creates a GenericMessage from a given concrete message.
@@ -204,7 +299,7 @@ class LIBCLUON_API GenericMessage {
                     protoDecoder.decodeFrom(sstr);
 
                     cluon::GenericMessage gm;
-                    gm.setMetaMessage(
+                    gm.createFrom(
                         m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages, protoDecoder);
 
                     linb::any _v                                          = gm;

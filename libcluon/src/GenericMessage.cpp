@@ -295,9 +295,9 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void GenericMessage::setMetaMessage(const MetaMessage &mm,
-                                    const std::vector<MetaMessage> &mms,
-                                    MessageFromProtoDecoder &pd) noexcept {
+void GenericMessage::createFrom(const MetaMessage &mm,
+                                const std::vector<MetaMessage> &mms,
+                                MessageFromProtoDecoder &pd) noexcept {
     m_metaMessage = mm;
     m_longName    = m_metaMessage.messageName();
     m_scopeOfMetaMessages.clear();
