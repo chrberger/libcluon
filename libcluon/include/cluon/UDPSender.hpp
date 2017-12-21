@@ -86,10 +86,10 @@ class LIBCLUON_API UDPSender {
      * @param data Data to send.
      * @return Pair: Number of bytes sent and errno.
      */
-    std::pair<ssize_t, int32_t> send(std::string &&data) noexcept;
+    std::pair<ssize_t, int32_t> send(std::string &&data) const noexcept;
 
    private:
-    std::mutex m_socketMutex{};
+    mutable std::mutex m_socketMutex{};
     int32_t m_socket{-1};
     struct sockaddr_in m_sendToAddress {};
 };

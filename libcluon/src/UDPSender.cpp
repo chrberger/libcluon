@@ -90,7 +90,7 @@ UDPSender::~UDPSender() noexcept {
     m_socket = -1;
 }
 
-std::pair<ssize_t, int32_t> UDPSender::send(std::string &&data) noexcept {
+std::pair<ssize_t, int32_t> UDPSender::send(std::string &&data) const noexcept {
     if (-1 == m_socket) {
         return {-1, EBADF};
     }
