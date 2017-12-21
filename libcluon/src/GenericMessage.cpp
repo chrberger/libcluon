@@ -22,7 +22,13 @@ namespace cluon {
 void GenericMessage::GenericMessageVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)longName;
     m_metaMessage.messageIdentifier(id).messageName(shortName);
-// TODO: Turn longName into package.
+    if (!longName.empty()) {
+        const auto pos = longName.rfind(shortName);
+        if ( (std::string::npos != pos) && 
+             (0 <= (pos-1)) ) {
+            m_metaMessage.packageName(longName.substr(0, pos-1));
+        }
+    }
 }
 
 void GenericMessage::GenericMessageVisitor::postVisit() noexcept {}
