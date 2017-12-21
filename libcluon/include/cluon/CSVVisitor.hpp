@@ -59,8 +59,21 @@ class LIBCLUON_API CSVVisitor {
      *        column headers.
      * @param isNested If true, the returned CSV values do not have a trailing new line.
      */
-    CSVVisitor(const std::string &prefix = "", char delimiter = ';', bool withHeader = true, bool isNested = false) noexcept;
+    CSVVisitor(char delimiter = ';', bool withHeader = true) noexcept;
 
+   protected:
+    /**
+     * Constructor for internal use.
+     *
+     * @param prefix Prefix to prepend per column header.
+     * @param delimiter Delimiter character.
+     * @param withHeader If true, the first line in the output contains the
+     *        column headers.
+     * @param isNested If true, the returned CSV values do not have a trailing new line.
+     */
+    CSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept;
+
+   public:
     /**
      * @return CSV-encoded data.
      */

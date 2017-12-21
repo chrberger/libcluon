@@ -21,6 +21,9 @@
 
 namespace cluon {
 
+CSVVisitor::CSVVisitor(char delimiter, bool withHeader) noexcept :
+    CSVVisitor::CSVVisitor("", delimiter, withHeader, false) {}
+
 CSVVisitor::CSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept 
     : m_prefix(prefix)
     , m_delimiter(delimiter)
@@ -154,7 +157,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     if (m_fillHeader) {
         m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
+    m_bufferValues << std::setprecision(7) << v << std::setprecision(6) << m_delimiter;
 }
 
 void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
@@ -163,7 +166,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     if (m_fillHeader) {
         m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
+    m_bufferValues << std::setprecision(11) << v << std::setprecision(6) << m_delimiter;
 }
 
 void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
