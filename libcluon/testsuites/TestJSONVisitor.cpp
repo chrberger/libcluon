@@ -223,7 +223,7 @@ TEST_CASE("Testing MyTestMessage6 to GenericMessage to JSON.") {
     // Create a generic representation from the given message.
     cluon::GenericMessage gm;
     gm.createFrom<testdata::MyTestMessage6>(tmp6);
-std::cout << __LINE__ << std::endl;
+
     // Create a JSON representation from the generic message.
     cluon::JSONVisitor j;
     gm.accept(j);
