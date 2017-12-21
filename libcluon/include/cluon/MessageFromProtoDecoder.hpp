@@ -41,7 +41,7 @@ class LIBCLUON_API MessageFromProtoDecoder {
 
        public:
         ProtoKeyValue() noexcept;
-        ProtoKeyValue(const ProtoKeyValue &) = default;
+        ProtoKeyValue(const ProtoKeyValue &) = default; // LCOV_EXCL_LINE
         ProtoKeyValue &operator=(ProtoKeyValue &&) = default;
         ~ProtoKeyValue()                           = default;
 

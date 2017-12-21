@@ -227,7 +227,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<bool>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -237,7 +238,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<char>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -247,7 +249,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<int8_t>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -257,7 +260,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<uint8_t>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -267,7 +271,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<int16_t>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -277,7 +282,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<uint16_t>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -287,7 +293,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<int32_t>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -297,7 +304,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<uint32_t>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -307,7 +315,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<int64_t>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -317,7 +326,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<uint64_t>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -327,7 +337,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<float>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -337,7 +348,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<double>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -347,7 +359,8 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
     if (0 < m_intermediateDataRepresentation.count(id)) {
         try {
             v = linb::any_cast<std::string>(m_intermediateDataRepresentation[id]);
-        } catch (const linb::bad_any_cast &) {}
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 

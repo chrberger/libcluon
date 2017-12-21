@@ -379,7 +379,8 @@ class LIBCLUON_API GenericMessage {
             try {
                 auto &v = linb::any_cast<cluon::GenericMessage &>(m_intermediateDataRepresentation[id]);
                 value.accept(v);
-            } catch (const linb::bad_any_cast &) {}
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
         }
     }
 

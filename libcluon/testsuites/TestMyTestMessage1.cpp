@@ -635,7 +635,10 @@ message MyTest.Envelope [id = 1] {
         cluon::MessageFromProtoDecoder protoDecoder2;
         protoDecoder2.decodeFrom(sstr2);
 
-        env2.accept(protoDecoder2);
+        cluon::MessageFromProtoDecoder protoDecoder3;
+        protoDecoder3 = protoDecoder2;
+
+        env2.accept(protoDecoder3);
         REQUIRE(!env2.serializedData().empty());
         REQUIRE("ABCDEF" == env2.serializedData());
         REQUIRE(1 == env2.senderStamp());
