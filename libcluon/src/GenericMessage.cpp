@@ -217,7 +217,6 @@ void GenericMessage::preVisit(uint32_t id, const std::string &shortName, const s
     (void)id;
     (void)shortName;
     (void)longName;
-    // TODO: Set packageName etc from here?
 }
 
 void GenericMessage::postVisit() noexcept {}

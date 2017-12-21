@@ -44,7 +44,7 @@ class LIBCLUON_API JSONVisitor {
      *             fields will be emitted; individual field identifiers
      *             can be masked setting them to false.
      */
-    JSONVisitor(const bool &withOuterCurlyBraces = true, const std::map<uint32_t, bool> &mask = {}) noexcept;
+    JSONVisitor(bool withOuterCurlyBraces = true, const std::map<uint32_t, bool> &mask = {}) noexcept;
 
     /**
      * @return JSON-encoded data.

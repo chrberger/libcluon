@@ -53,7 +53,7 @@ std::string EnvelopeToJSON::getJSONFromProtoEncodedEnvelope(const std::string &p
             uint32_t length{0};
             {
                 std::stringstream sstr{std::string(&protoEncodedEnvelope[1], 4)};
-                sstr.read(reinterpret_cast<char *>(&length), sizeof(uint32_t)); // NOLINT
+                sstr.read(reinterpret_cast<char *>(&length), sizeof(uint32_t)); /* Flawfinder: ignore */ // NOLINT
                 length = le32toh(length);
                 length >>= 8;
             }

@@ -21,7 +21,7 @@
 
 namespace cluon {
 
-JSONVisitor::JSONVisitor(const bool &withOuterCurlyBraces, const std::map<uint32_t, bool> &mask) noexcept
+JSONVisitor::JSONVisitor(bool withOuterCurlyBraces, const std::map<uint32_t, bool> &mask) noexcept
     : m_withOuterCurlyBraces(withOuterCurlyBraces)
     , m_mask(mask) {}
 
