@@ -53,11 +53,9 @@ class LIBCLUON_API CSVVisitor {
     /**
      * Constructor.
      *
-     * @param prefix Prefix to prepend per column header.
      * @param delimiter Delimiter character.
      * @param withHeader If true, the first line in the output contains the
      *        column headers.
-     * @param isNested If true, the returned CSV values do not have a trailing new line.
      */
     CSVVisitor(char delimiter = ';', bool withHeader = true) noexcept;
 
