@@ -192,7 +192,10 @@ class LIBCLUON_API GenericMessage {
         template <typename T>
         void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
             cluon::MetaMessage::MetaField mf;
-            mf.fieldIdentifier(id).fieldDataType(cluon::MetaMessage::MetaField::MESSAGE_T).fieldDataTypeName(typeName).fieldName(name);
+            mf.fieldIdentifier(id)
+                .fieldDataType(cluon::MetaMessage::MetaField::MESSAGE_T)
+                .fieldDataTypeName(typeName)
+                .fieldName(name);
 
             GenericMessage gm;
             gm.createFrom<T>(value);
@@ -231,7 +234,7 @@ class LIBCLUON_API GenericMessage {
      *
      * @param msg Concrete message used to derive this GenericMessage from.
      */
-    template<typename T>
+    template <typename T>
     void createFrom(T &msg) {
         GenericMessageVisitor gmv;
         msg.accept(gmv);
@@ -374,10 +377,9 @@ class LIBCLUON_API GenericMessage {
         (void)name;
         if (0 < m_intermediateDataRepresentation.count(id)) {
             try {
-                auto &v = linb::any_cast<cluon::GenericMessage&>(m_intermediateDataRepresentation[id]);
+                auto &v = linb::any_cast<cluon::GenericMessage &>(m_intermediateDataRepresentation[id]);
                 value.accept(v);
-            }
-            catch(const linb::bad_any_cast&) {}
+            } catch (const linb::bad_any_cast &) {}
         }
     }
 
@@ -448,10 +450,9 @@ class LIBCLUON_API GenericMessage {
                 doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
             } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T
                        && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
-                auto &v = linb::any_cast<cluon::GenericMessage &>(
-                    m_intermediateDataRepresentation[f.fieldIdentifier()]);
-                doVisit(
-                    f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                auto &v
+                    = linb::any_cast<cluon::GenericMessage &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
             }
         }
 
@@ -604,8 +605,8 @@ class LIBCLUON_API GenericMessage {
                                       _postVisit);
             } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T
                        && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
-                auto &v = linb::any_cast<cluon::GenericMessage &>(
-                    m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                auto &v
+                    = linb::any_cast<cluon::GenericMessage &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
                 doTripletForwardVisit(f.fieldIdentifier(),
                                       std::move(f.fieldDataTypeName()),
                                       std::move(f.fieldName()),

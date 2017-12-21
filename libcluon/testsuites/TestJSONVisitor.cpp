@@ -18,11 +18,11 @@
 #include "catch.hpp"
 #include <string>
 
-#include "cluon/JSONVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
+#include "cluon/JSONVisitor.hpp"
+#include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/MessageToProtoEncoder.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing MyTestMessage1.") {
@@ -283,7 +283,8 @@ TEST_CASE("Testing MyTestMessage6 to GenericMessage to GenericMessage to JSON.")
     REQUIRE(std::string(JSON) == j.json());
 }
 
-TEST_CASE("Dynamically creating messages for simple message for wrong message specification (not matching message identifier results in default values).") {
+TEST_CASE("Dynamically creating messages for simple message for wrong message specification (not matching message "
+          "identifier results in default values).") {
     const char *msg = R"(
 // Original message:
 // message testdata.MyTestMessage3 [id = 30003] {
@@ -348,7 +349,8 @@ message FaultyMyMessageA [id = 60006] {
     REQUIRE(std::string(JSON) == j.json());
 }
 
-TEST_CASE("Dynamically creating messages for simple message for wrong message specification (matching message identifier but wrong type for fields might result in coincidentally matching values).") {
+TEST_CASE("Dynamically creating messages for simple message for wrong message specification (matching message "
+          "identifier but wrong type for fields might result in coincidentally matching values).") {
     const char *msg = R"(
 // Original message:
 // message testdata.MyTestMessage3 [id = 30003] {
