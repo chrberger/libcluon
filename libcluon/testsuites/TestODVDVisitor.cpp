@@ -106,8 +106,8 @@ TEST_CASE("Testing MyTestMessage1.") {
 "attribute10":8,
 "attribute11":-9.123456,
 "attribute12":10.123456789,
-"attribute13":"Hello World",
-"attribute14":"Hello Galaxy"})";
+"attribute13":"SGVsbG8gV29ybGQ=",
+"attribute14":"SGVsbG8gR2FsYXh5"})";
 
     REQUIRE(std::string(JSON) == j.json());
 }

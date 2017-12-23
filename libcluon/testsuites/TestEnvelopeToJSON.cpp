@@ -361,8 +361,8 @@ message TestMessageA [id = 30001] {
 "attribute10":8,
 "attribute11":-9.5,
 "attribute12":10.6,
-"attribute13":"Hello World",
-"attribute14":"Hello Galaxy"}})";
+"attribute13":"SGVsbG8gV29ybGQ=",
+"attribute14":"SGVsbG8gR2FsYXh5"}})";
 
     cluon::EnvelopeToJSON env2JSON;
     REQUIRE(1 == env2JSON.setMessageSpecification(std::string(messageSpecification)));
