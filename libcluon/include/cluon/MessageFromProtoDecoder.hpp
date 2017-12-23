@@ -163,8 +163,7 @@ class LIBCLUON_API MessageFromProtoDecoder {
 
     std::size_t fromVarInt(std::istream &in, uint64_t &value) noexcept;
 
-    void
-    readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, std::vector<char> &buffer) noexcept;
+    void readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, std::vector<char> &buffer) noexcept;
 
    private:
     std::stringstream m_buffer{""};

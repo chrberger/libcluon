@@ -91,7 +91,7 @@ class LIBCLUON_API ODVDVisitor {
             m_forwardDeclarations.emplace(m_forwardDeclarations.begin(), odvdVisitor.messageSpecification());
 
             m_buffer << "    " << tmp << " " << name << " [ id = " << id << " ];" << '\n';
-        } catch (std::regex_error&) { // LCOV_EXCL_LINE
+        } catch (std::regex_error &) { // LCOV_EXCL_LINE
         }
     }
 

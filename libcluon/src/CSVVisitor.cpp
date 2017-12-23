@@ -21,15 +21,14 @@
 
 namespace cluon {
 
-CSVVisitor::CSVVisitor(char delimiter, bool withHeader) noexcept :
-    CSVVisitor::CSVVisitor("", delimiter, withHeader, false) {}
+CSVVisitor::CSVVisitor(char delimiter, bool withHeader) noexcept
+    : CSVVisitor::CSVVisitor("", delimiter, withHeader, false) {}
 
-CSVVisitor::CSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept 
+CSVVisitor::CSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept
     : m_prefix(prefix)
     , m_delimiter(delimiter)
     , m_withHeader(withHeader)
-    , m_isNested(isNested)
-{}
+    , m_isNested(isNested) {}
 
 void CSVVisitor::clear() noexcept {
     m_bufferHeader.str("");

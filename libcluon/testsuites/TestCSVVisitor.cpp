@@ -18,8 +18,8 @@
 #include "catch.hpp"
 #include <string>
 
-#include "cluon/GenericMessage.hpp"
 #include "cluon/CSVVisitor.hpp"
+#include "cluon/GenericMessage.hpp"
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/MessageToProtoEncoder.hpp"
@@ -48,7 +48,8 @@ TEST_CASE("Testing MyTestMessage1.") {
     cluon::CSVVisitor csv;
     tmp.accept(csv);
 
-    const char *CSV = R"(attribute1;attribute2;attribute3;attribute4;attribute5;attribute6;attribute7;attribute8;attribute9;attribute10;attribute11;attribute12;attribute13;attribute14;
+    const char *CSV
+        = R"(attribute1;attribute2;attribute3;attribute4;attribute5;attribute6;attribute7;attribute8;attribute9;attribute10;attribute11;attribute12;attribute13;attribute14;
 1;c;-1;2;-3;4;-5;6;-7;8;-9.123456;10.123456789;"Hello World";"Hello Galaxy";
 )";
 
@@ -78,7 +79,8 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter.") {
     cluon::CSVVisitor csv(',');
     tmp.accept(csv);
 
-    const char *CSV = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
+    const char *CSV
+        = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
 1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
 )";
 
@@ -107,14 +109,16 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and appending data.") {
 
     cluon::CSVVisitor csv(',');
 
-    const char *CSV1 = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
+    const char *CSV1
+        = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
 1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
 )";
     tmp.accept(csv);
     REQUIRE(std::string(CSV1) == csv.csv());
 
     tmp.attribute4(77);
-    const char *CSV2 = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
+    const char *CSV2
+        = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
 1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
 1,c,-1,77,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
 )";
@@ -122,7 +126,8 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and appending data.") {
     REQUIRE(std::string(CSV2) == csv.csv());
 
     tmp.attribute4(99);
-    const char *CSV3 = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
+    const char *CSV3
+        = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
 1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
 1,c,-1,77,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
 1,c,-1,99,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
@@ -131,7 +136,8 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and appending data.") {
     REQUIRE(std::string(CSV3) == csv.csv());
 
     tmp.attribute4(44);
-    const char *CSV4 = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
+    const char *CSV4
+        = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
 1,c,-1,44,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
 )";
     csv.clear();
