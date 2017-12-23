@@ -123,7 +123,7 @@ deployToJavaScript:
 deployToLaunchpad:
 	./buildtools/deploy/deployToLaunchpad.sh
 
-deploy: deployToLaunchpad deployToAlpine deployToJavaScript docs deployToAlpine-armhf
+deploy: deployToLaunchpad docs deployToAlpine deployToJavaScript deployToAlpine-armhf
 
 docs:
 	./buildtools/deploy/generateDocumentation.sh
