@@ -93,6 +93,14 @@ class LIBCLUON_API JSONVisitor {
         }
     }
 
+    /**
+     * This method returns the base64-encoded representation for the given input.
+     *
+     * @param input to encode as base64
+     * @return base64 encoded input.
+     */
+    std::string encodeBase64(const std::string &input) const noexcept;
+
    private:
     bool m_withOuterCurlyBraces{true};
     std::map<uint32_t, bool> m_mask;

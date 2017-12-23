@@ -16,6 +16,7 @@
  */
 
 #include "catch.hpp"
+#include <iostream>
 #include <string>
 
 #include "cluon/GenericMessage.hpp"
@@ -24,6 +25,17 @@
 #include "cluon/MessageParser.hpp"
 #include "cluon/MessageToProtoEncoder.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
+
+TEST_CASE("Testing base64") {
+    cluon::JSONVisitor j;
+
+    REQUIRE("SGVsbG8gV29ybGQh" == j.encodeBase64("Hello World!"));
+    REQUIRE("QUFBQQ==" == j.encodeBase64("AAAA"));
+    REQUIRE("QUFB" == j.encodeBase64("AAA"));
+    REQUIRE("QUE=" == j.encodeBase64("AA"));
+    REQUIRE("QQ==" == j.encodeBase64("A"));
+    REQUIRE("" == j.encodeBase64(""));
+}
 
 TEST_CASE("Testing MyTestMessage1.") {
     testdata::MyTestMessage1 tmp;
@@ -60,8 +72,8 @@ TEST_CASE("Testing MyTestMessage1.") {
 "attribute10":8,
 "attribute11":-9.123456,
 "attribute12":10.123456789,
-"attribute13":"Hello World",
-"attribute14":"Hello Galaxy"})";
+"attribute13":"SGVsbG8gV29ybGQ=",
+"attribute14":"SGVsbG8gR2FsYXh5"})";
 
     REQUIRE(std::string(JSON) == j.json());
 }
@@ -122,8 +134,8 @@ TEST_CASE("Testing MyTestMessage1 to GenericMessage to JSON.") {
 "attribute10":8,
 "attribute11":-9.123456,
 "attribute12":10.123456789,
-"attribute13":"Hello World",
-"attribute14":"Hello Galaxy"})";
+"attribute13":"SGVsbG8gV29ybGQ=",
+"attribute14":"SGVsbG8gR2FsYXh5"})";
 
     REQUIRE(std::string(JSON) == j.json());
 }
