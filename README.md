@@ -27,7 +27,7 @@ libcluon is a small and efficient library written in modern C++ library to _glue
 
 ## Features
 * Written in highly portable and high quality C++14
-* Message compiler produces fully self-contained messages that do only depend on C++14 - external libraries are needed allowing easy embedding into existing projects
+* Message compiler produces fully self-contained messages that do only depend on C++14 - external libraries are not needed allowing easy embedding into existing projects
 * Native implementation of [Protobuf](https://developers.google.com/protocol-buffers/) for data serialization & deserialization: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessagesToProto.cpp)
 * Native implementation of JSON export for messages: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestJSONVisitor.cpp#L28)
 * libcluon natively available for JavaScript via [Emscripten](https://github.com/kripken/emscripten): [libcluon.js](https://bintray.com/chrberger/libcluon/javascript#files)
