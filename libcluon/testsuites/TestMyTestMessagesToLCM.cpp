@@ -34,11 +34,16 @@ TEST_CASE("Testing MyTestMessage0.") {
 
     // Result in Proto format: 0x8 0x1 0x16 0x99.
 
+    tmp.attribute1(false).attribute2('d');
+    REQUIRE(!tmp.attribute1());
+    REQUIRE('d' == tmp.attribute2());
+
     cluon::MessageToLCMEncoder lcmEncoder;
     tmp.accept(lcmEncoder);
 
     const std::string s = lcmEncoder.encodedData();
     REQUIRE(10 == s.size());
+
     REQUIRE(0x66 == static_cast<uint8_t>(s.at(0)));
     REQUIRE(0xe1 == static_cast<uint8_t>(s.at(1)));
     REQUIRE(0xfa == static_cast<uint8_t>(s.at(2)));
@@ -47,8 +52,8 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(0x27 == static_cast<uint8_t>(s.at(5)));
     REQUIRE(0x15 == static_cast<uint8_t>(s.at(6)));
     REQUIRE(0xee == static_cast<uint8_t>(s.at(7)));
-    REQUIRE(0x1 == static_cast<uint8_t>(s.at(8)));
-    REQUIRE(0x63 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x64 == static_cast<uint8_t>(s.at(9)));
 
 //int i = 0;
 //for (auto c : s) {
