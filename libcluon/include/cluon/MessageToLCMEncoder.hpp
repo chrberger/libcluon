@@ -20,6 +20,7 @@
 
 #include "cluon/cluon.hpp"
 
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -40,9 +41,10 @@ class LIBCLUON_API MessageToLCMEncoder {
     ~MessageToLCMEncoder() = default;
 
     /**
+     * @param withHash True if the hash value from the fields shall be included.
      * @return Encoded data in LCM format.
      */
-    std::string encodedData() const noexcept;
+    std::string encodedData(bool withHash = true) const noexcept;
 
    public:
     // The following methods are provided to allow an instance of this class to
@@ -69,14 +71,19 @@ class LIBCLUON_API MessageToLCMEncoder {
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
         (void)id;
         (void)typeName;
-        (void)name;
-        (void)value;
+        // No hash for the type but for name and dimension.
+        calculateHash(name);
+        calculateHash(0);
 
-//// TODO: Adjust for LCM.
-//        toVarInt(m_buffer, std::move(encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED))));
-//        cluon::MessageToLCMEncoder nestedProtoEncoder;
-//        value.accept(nestedProtoEncoder);
-//        encode(m_buffer, std::move(nestedProtoEncoder.encodedData()));
+        cluon::MessageToLCMEncoder nestedLCMEncoder;
+        value.accept(nestedLCMEncoder);
+
+        constexpr bool WITH_HASH{false};
+        const std::string s = nestedLCMEncoder.encodedData(WITH_HASH);
+
+        m_buffer.write(s.c_str(), s.size());
+
+        m_hash += nestedLCMEncoder.hash();
     }
 
    private:

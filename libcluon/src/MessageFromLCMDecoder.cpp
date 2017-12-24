@@ -23,13 +23,16 @@
 
 namespace cluon {
 
-void MessageFromLCMDecoder::decodeFrom(std::istream &in) noexcept {
+void MessageFromLCMDecoder::decodeFrom(std::istream &in, bool hasHash) noexcept {
     // Reset internal states as this deserializer could be reused.
     m_buffer.clear();
     m_buffer.str("");
 
-    in.read(reinterpret_cast<char*>(&m_expectedHash), sizeof(int64_t));
-    m_expectedHash = static_cast<int64_t>(be64toh(m_expectedHash));
+    m_expectedHash = 0;
+    if (hasHash) {
+        in.read(reinterpret_cast<char*>(&m_expectedHash), sizeof(int64_t));
+        m_expectedHash = static_cast<int64_t>(be64toh(m_expectedHash));
+    }
 
     m_buffer << in.rdbuf();
 }
@@ -50,7 +53,7 @@ void MessageFromLCMDecoder::preVisit(uint32_t id,
 }
 
 void MessageFromLCMDecoder::postVisit() noexcept {
-    if (m_expectedHash != hash()) {
+    if ( (0 != m_expectedHash) && (m_expectedHash != hash())) {
         std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding has failed" << std::endl;
     }
 }

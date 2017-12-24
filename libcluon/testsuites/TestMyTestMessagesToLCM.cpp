@@ -17,13 +17,11 @@
 
 #include "catch.hpp"
 
-#include "cluon/MessageFromLCMDecoder.hpp"
-#include "cluon/MessageToLCMEncoder.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
+#include "cluon/MessageFromLCMDecoder.hpp"
+#include "cluon/MessageToLCMEncoder.hpp"
 
-#include <iomanip>
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -31,8 +29,6 @@ TEST_CASE("Testing MyTestMessage0.") {
     testdata::MyTestMessage0 tmp;
     REQUIRE(tmp.attribute1());
     REQUIRE('c' == tmp.attribute2());
-
-    // Result in Proto format: 0x8 0x1 0x16 0x99.
 
     tmp.attribute1(false).attribute2('d');
     REQUIRE(!tmp.attribute1());
@@ -67,6 +63,16 @@ TEST_CASE("Testing MyTestMessage0.") {
 
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
+
+    testdata::MyTestMessage0 tmp2_2;
+    REQUIRE(tmp2_2.attribute1());
+    REQUIRE('c' == tmp2_2.attribute2());
+
+    // Re-using same decoder.
+    tmp2_2.accept(lcmDecoder);
+
+    REQUIRE(tmp2_2.attribute1() == tmp.attribute1());
+    REQUIRE(tmp2_2.attribute2() == tmp.attribute2());
 }
 
 TEST_CASE("Testing MyTestMessage5.") {
@@ -221,162 +227,43 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(tmp2.attribute11() == tmp.attribute11());
 }
 
+TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
+    testdata::MyTestMessage6 tmp6;
 
+    REQUIRE(123 == tmp6.attribute1().attribute1());
 
-//int i = 0;
-//for (auto c : s) {
-//    std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));"<< std::endl;
-////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
-//}
-//std::cout << std::endl;
+    testdata::MyTestMessage2 tmp2;
+    tmp6.attribute1(tmp2.attribute1(150));
 
+    REQUIRE(150 == tmp6.attribute1().attribute1());
 
+    cluon::MessageToLCMEncoder lcmEncoder;
+    tmp6.accept(lcmEncoder);
+    std::string s = lcmEncoder.encodedData();
 
-//TEST_CASE("Testing MyTestMessage2.") {
-//    testdata::MyTestMessage2 tmp;
-//    REQUIRE(123 == tmp.attribute1());
+    REQUIRE(9 == s.size());
 
-//    tmp.attribute1(150);
-//    REQUIRE(150 == tmp.attribute1());
+    REQUIRE(0xeb == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0xfc == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x23 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x20 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x8c == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0xc0 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0xa0 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x96 == static_cast<uint8_t>(s.at(8)));
 
-//    cluon::MessageToProtoEncoder proto;
-//    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
-//               [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
-//               []() {});
+    std::stringstream sstr{s};
+    cluon::MessageFromLCMDecoder lcmDecoder;
+    lcmDecoder.decodeFrom(sstr);
 
-//    std::string s = proto.encodedData();
-//    REQUIRE(3 == s.size());
+    testdata::MyTestMessage6 tmp6_2;
+    REQUIRE(123 == tmp6_2.attribute1().attribute1());
+    tmp6_2.accept(lcmDecoder);
+    REQUIRE(150 == tmp6_2.attribute1().attribute1());
 
-//    REQUIRE(0x8 == static_cast<uint8_t>(s.at(0)));
-//    REQUIRE(0x96 == static_cast<uint8_t>(s.at(1)));
-//    REQUIRE(0x1 == static_cast<uint8_t>(s.at(2)));
-
-//    std::stringstream sstr{s};
-//    cluon::MessageFromProtoDecoder protoDecoder;
-//    protoDecoder.decodeFrom(sstr);
-
-//    testdata::MyTestMessage2 tmp2;
-//    REQUIRE(123 == tmp2.attribute1());
-
-//    tmp2.accept([](uint32_t, const std::string &, const std::string &) {},
-//                [&protoDecoder](uint32_t id, std::string &&, std::string &&, auto &v) { protoDecoder.visit(id, v); },
-//                []() {});
-
-//    REQUIRE(tmp2.attribute1() == tmp.attribute1());
-//}
-
-//TEST_CASE("Testing MyTestMessage3.") {
-//    testdata::MyTestMessage3 tmp;
-//    REQUIRE(124 == tmp.attribute1());
-//    REQUIRE(-124 == tmp.attribute2());
-
-//    tmp.attribute1(123).attribute2(-123);
-//    REQUIRE(123 == tmp.attribute1());
-//    REQUIRE(-123 == tmp.attribute2());
-
-//    cluon::MessageToProtoEncoder proto;
-//    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
-//               [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
-//               []() {});
-
-//    std::string s = proto.encodedData();
-//    REQUIRE(5 == s.size());
-
-//    REQUIRE(0x8 == static_cast<uint8_t>(s.at(0)));
-//    REQUIRE(0x7b == static_cast<uint8_t>(s.at(1)));
-//    REQUIRE(0x10 == static_cast<uint8_t>(s.at(2)));
-//    REQUIRE(0xf5 == static_cast<uint8_t>(s.at(3)));
-//    REQUIRE(0x1 == static_cast<uint8_t>(s.at(4)));
-
-//    std::stringstream sstr{s};
-//    cluon::MessageFromProtoDecoder protoDecoder;
-//    protoDecoder.decodeFrom(sstr);
-
-//    testdata::MyTestMessage3 tmp2;
-//    REQUIRE(124 == tmp2.attribute1());
-//    REQUIRE(-124 == tmp2.attribute2());
-
-//    tmp2.accept([](uint32_t, const std::string &, const std::string &) {},
-//                [&protoDecoder](uint32_t id, std::string &&, std::string &&, auto &v) { protoDecoder.visit(id, v); },
-//                []() {});
-
-//    REQUIRE(tmp2.attribute1() == tmp.attribute1());
-//    REQUIRE(tmp2.attribute2() == tmp.attribute2());
-//}
-
-//TEST_CASE("Testing MyTestMessage4.") {
-//    testdata::MyTestMessage4 tmp;
-//    REQUIRE(tmp.attribute1().empty());
-
-//    tmp.attribute1("testing");
-//    REQUIRE("testing" == tmp.attribute1());
-
-//    cluon::MessageToProtoEncoder proto;
-//    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
-//               [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
-//               []() {});
-
-//    std::string s = proto.encodedData();
-//    REQUIRE(9 == s.size());
-
-//    REQUIRE(0x12 == static_cast<uint8_t>(s.at(0)));
-//    REQUIRE(0x7 == static_cast<uint8_t>(s.at(1)));
-//    REQUIRE(0x74 == static_cast<uint8_t>(s.at(2)));
-//    REQUIRE(0x65 == static_cast<uint8_t>(s.at(3)));
-//    REQUIRE(0x73 == static_cast<uint8_t>(s.at(4)));
-//    REQUIRE(0x74 == static_cast<uint8_t>(s.at(5)));
-//    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
-//    REQUIRE(0x6e == static_cast<uint8_t>(s.at(7)));
-//    REQUIRE(0x67 == static_cast<uint8_t>(s.at(8)));
-
-//    std::stringstream sstr{s};
-//    cluon::MessageFromProtoDecoder protoDecoder;
-//    protoDecoder.decodeFrom(sstr);
-
-//    testdata::MyTestMessage4 tmp2;
-//    REQUIRE(tmp2.attribute1().empty());
-
-//    tmp2.accept([](uint32_t, const std::string &, const std::string &) {},
-//                [&protoDecoder](uint32_t id, std::string &&, std::string &&, auto &v) { protoDecoder.visit(id, v); },
-//                []() {});
-
-//    REQUIRE("testing" == tmp2.attribute1());
-//}
-
-//TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
-//    testdata::MyTestMessage6 tmp6;
-
-//    REQUIRE(123 == tmp6.attribute1().attribute1());
-
-//    testdata::MyTestMessage2 tmp2;
-//    tmp6.attribute1(tmp2.attribute1(150));
-
-//    REQUIRE(150 == tmp6.attribute1().attribute1());
-
-//    cluon::MessageToProtoEncoder proto;
-//    tmp6.accept<cluon::MessageToProtoEncoder>(proto);
-//    std::string s = proto.encodedData();
-
-//    REQUIRE(5 == s.size());
-//    REQUIRE(0x1a == static_cast<uint8_t>(s.at(0)));
-//    REQUIRE(0x3 == static_cast<uint8_t>(s.at(1)));
-//    REQUIRE(0x8 == static_cast<uint8_t>(s.at(2)));
-//    REQUIRE(0x96 == static_cast<uint8_t>(s.at(3)));
-//    REQUIRE(0x1 == static_cast<uint8_t>(s.at(4)));
-
-//    std::stringstream sstr{s};
-//    cluon::MessageFromProtoDecoder protoDecoder;
-//    protoDecoder.decodeFrom(sstr);
-
-//    testdata::MyTestMessage6 tmp6_2;
-//    REQUIRE(123 == tmp6_2.attribute1().attribute1());
-//    tmp6_2.accept(protoDecoder);
-//    REQUIRE(150 == tmp6_2.attribute1().attribute1());
-
-//    // Simple toString().
-//    std::stringstream buffer;
-//    tmp6_2.accept([](uint32_t, const std::string &, const std::string &) {},
-//                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << +v << '\n'; },
-//                  []() {});
-//    std::cout << buffer.str() << std::endl;
-//}
+    testdata::MyTestMessage6 tmp6_2_2;
+    REQUIRE(123 == tmp6_2_2.attribute1().attribute1());
+    tmp6_2_2.accept(lcmDecoder);
+    REQUIRE(150 == tmp6_2_2.attribute1().attribute1());
+}

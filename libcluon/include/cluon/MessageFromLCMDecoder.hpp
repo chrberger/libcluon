@@ -44,8 +44,9 @@ class LIBCLUON_API MessageFromLCMDecoder {
      * This method decodes a given istream into LCM.
      *
      * @param in istream to decode.
+     * @param hasHash true if the stream contains a hash value from the fields.
      */
-    void decodeFrom(std::istream &in) noexcept;
+    void decodeFrom(std::istream &in, bool hasHash = true) noexcept;
 
    public:
     // The following methods are provided to allow an instance of this class to
@@ -72,18 +73,25 @@ class LIBCLUON_API MessageFromLCMDecoder {
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
         (void)id;
         (void)typeName;
-        (void)name;
-        (void)value;
+        // No hash for the type but for name and dimension.
+        calculateHash(name);
+        calculateHash(0);
 
-//        if (0 < m_mapOfKeyValues.count(id)) {
-//            const std::string s{m_mapOfKeyValues[id].valueAsString()};
+        // Simply copy the remaining read buffer over.
+        std::stringstream buffer;
+        char c{0};
+        while (m_buffer.good()) {
+            c = m_buffer.get();
+            buffer.put(c);
+        }
 
-//            std::stringstream sstr{s};
-//            cluon::MessageFromLCMDecoder nestedProtoDecoder;
-//            nestedProtoDecoder.decodeFrom(sstr);
+        constexpr bool HAS_HASH{false};
+        cluon::MessageFromLCMDecoder nestedLCMDecoder;
+        nestedLCMDecoder.decodeFrom(buffer, HAS_HASH);
 
-//            value.accept(nestedProtoDecoder);
-//        }
+        value.accept(nestedLCMDecoder);
+
+        m_calculatedHash += nestedLCMDecoder.hash();
     }
 
    private:

@@ -22,13 +22,13 @@
 
 namespace cluon {
 
-std::string MessageToLCMEncoder::encodedData() const noexcept {
+std::string MessageToLCMEncoder::encodedData(bool withHash) const noexcept {
     int64_t _hash = hash();
     _hash = static_cast<int64_t>(htobe64(_hash));
     std::stringstream hashBuffer;
     hashBuffer.write(reinterpret_cast<const char *>(&_hash), sizeof(int64_t));
 
-    const std::string s{hashBuffer.str() + m_buffer.str()};
+    const std::string s{(withHash ? hashBuffer.str() : "") + m_buffer.str()};
     return s;
 }
 
