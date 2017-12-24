@@ -26,69 +26,6 @@ std::string MessageToProtoEncoder::encodedData() const noexcept {
     return s;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-void MessageToProtoEncoder::visit(uint32_t id, bool &v) noexcept {
-    toKeyValue<bool>(id, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, char &v) noexcept {
-    uint8_t _v = static_cast<uint8_t>(v); // NOLINT
-    toKeyValue<uint8_t>(id, _v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, int8_t &v) noexcept {
-    toKeyValue<int8_t>(id, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, uint8_t &v) noexcept {
-    toKeyValue<uint8_t>(id, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, int16_t &v) noexcept {
-    toKeyValue<int16_t>(id, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, uint16_t &v) noexcept {
-    toKeyValue<uint16_t>(id, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, int32_t &v) noexcept {
-    toKeyValue<int32_t>(id, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, uint32_t &v) noexcept {
-    toKeyValue<uint32_t>(id, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, int64_t &v) noexcept {
-    toKeyValue<int64_t>(id, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, uint64_t &v) noexcept {
-    toKeyValue<uint64_t>(id, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, float &v) noexcept {
-    uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::FOUR_BYTES));
-    toVarInt(m_buffer, key);
-    encode(m_buffer, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, double &v) noexcept {
-    uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::EIGHT_BYTES));
-    toVarInt(m_buffer, key);
-    encode(m_buffer, v);
-}
-
-void MessageToProtoEncoder::visit(uint32_t id, const std::string &v) noexcept {
-    uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED));
-    toVarInt(m_buffer, key);
-    encode(m_buffer, v);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void MessageToProtoEncoder::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
@@ -100,79 +37,86 @@ void MessageToProtoEncoder::postVisit() noexcept {}
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    toKeyValue<bool>(id, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    uint8_t _v = static_cast<uint8_t>(v); // NOLINT
+    toKeyValue<uint8_t>(id, _v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    toKeyValue<int8_t>(id, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    toKeyValue<uint8_t>(id, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    toKeyValue<int16_t>(id, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    toKeyValue<uint16_t>(id, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    toKeyValue<int32_t>(id, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    toKeyValue<uint32_t>(id, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    toKeyValue<int64_t>(id, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    toKeyValue<uint64_t>(id, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::FOUR_BYTES));
+    toVarInt(m_buffer, key);
+    encode(m_buffer, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::EIGHT_BYTES));
+    toVarInt(m_buffer, key);
+    encode(m_buffer, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED));
+    toVarInt(m_buffer, key);
+    encode(m_buffer, v);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
