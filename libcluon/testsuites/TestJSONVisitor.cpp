@@ -34,7 +34,7 @@ TEST_CASE("Testing base64") {
     REQUIRE("QUFB" == j.encodeBase64("AAA"));
     REQUIRE("QUE=" == j.encodeBase64("AA"));
     REQUIRE("QQ==" == j.encodeBase64("A"));
-    REQUIRE("" == j.encodeBase64(""));
+    REQUIRE(j.encodeBase64("").empty());
 }
 
 TEST_CASE("Testing MyTestMessage1.") {
