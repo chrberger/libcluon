@@ -15,6 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// clang-format off
+#ifdef WIN32
+    #include <Winsock2.h> // for htonll
+#endif
+// clang-format on
+
 #include "cluon/MessageToLCMEncoder.hpp"
 
 #include <cstring>
