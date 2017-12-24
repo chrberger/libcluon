@@ -81,7 +81,7 @@ class LIBCLUON_API MessageFromLCMDecoder {
         std::stringstream buffer;
         char c{0};
         while (m_buffer.good()) {
-            c = m_buffer.get();
+            c = static_cast<char>(m_buffer.get());
             buffer.put(c);
         }
 
