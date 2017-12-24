@@ -58,7 +58,7 @@ TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
         payload.seconds(3).microseconds(4);
 
         cluon::MessageToProtoEncoder proto;
-        payload.accept<cluon::MessageToProtoEncoder>(proto);
+        payload.accept(proto);
         env.serializedData(proto.encodedData());
     }
 
@@ -81,7 +81,7 @@ TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
     std::string envelopeAsProto;
     {
         cluon::MessageToProtoEncoder proto;
-        env.accept<cluon::MessageToProtoEncoder>(proto);
+        env.accept(proto);
         envelopeAsProto = proto.encodedData();
     }
     REQUIRE(30 == envelopeAsProto.size());
@@ -283,7 +283,7 @@ TEST_CASE("Transform Envelope into JSON represention for complex payload.") {
         REQUIRE("Hello Galaxy" == msg1.attribute14());
 
         cluon::MessageToProtoEncoder proto;
-        msg1.accept<cluon::MessageToProtoEncoder>(proto);
+        msg1.accept(proto);
         env.serializedData(proto.encodedData());
     }
 
@@ -302,7 +302,7 @@ TEST_CASE("Transform Envelope into JSON represention for complex payload.") {
     std::string envelopeAsProto;
     {
         cluon::MessageToProtoEncoder proto;
-        env.accept<cluon::MessageToProtoEncoder>(proto);
+        env.accept(proto);
         envelopeAsProto = proto.encodedData();
     }
 
@@ -408,7 +408,7 @@ TEST_CASE("Transform Envelope into JSON represention for nested payloads.") {
         tm6.attribute1(tm2);
 
         cluon::MessageToProtoEncoder proto;
-        tm6.accept<cluon::MessageToProtoEncoder>(proto);
+        tm6.accept(proto);
         env.serializedData(proto.encodedData());
     }
 
@@ -427,7 +427,7 @@ TEST_CASE("Transform Envelope into JSON represention for nested payloads.") {
     std::string envelopeAsProto;
     {
         cluon::MessageToProtoEncoder proto;
-        env.accept<cluon::MessageToProtoEncoder>(proto);
+        env.accept(proto);
         envelopeAsProto = proto.encodedData();
     }
 
@@ -512,7 +512,7 @@ TEST_CASE("Transform Envelope into JSON represention for nested payloads with pu
         tm6.attribute1(tm2);
 
         cluon::MessageToProtoEncoder proto;
-        tm6.accept<cluon::MessageToProtoEncoder>(proto);
+        tm6.accept(proto);
         env.serializedData(proto.encodedData());
     }
 
@@ -531,7 +531,7 @@ TEST_CASE("Transform Envelope into JSON represention for nested payloads with pu
     std::string envelopeAsProto;
     {
         cluon::MessageToProtoEncoder proto;
-        env.accept<cluon::MessageToProtoEncoder>(proto);
+        env.accept(proto);
         envelopeAsProto = proto.encodedData();
     }
 

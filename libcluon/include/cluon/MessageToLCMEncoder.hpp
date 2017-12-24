@@ -80,9 +80,9 @@ class LIBCLUON_API MessageToLCMEncoder {
     }
 
    private:
-        int64_t hash() const noexcept;
-        void calculateHash(char c) noexcept;
-        void calculateHash(const std::string &s) noexcept;
+    int64_t hash() const noexcept;
+    void calculateHash(char c) noexcept;
+    void calculateHash(const std::string &s) noexcept;
 
    private:
     int64_t m_hash{0x12345678};

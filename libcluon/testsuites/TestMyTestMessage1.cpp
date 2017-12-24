@@ -368,7 +368,7 @@ message MyMessageA [id = 30003] {
     REQUIRE(20 == msg3.attribute2());
 
     cluon::MessageToProtoEncoder proto;
-    msg3.accept<cluon::MessageToProtoEncoder>(proto);
+    msg3.accept(proto);
     std::string s{proto.encodedData()};
 
     REQUIRE(4 == s.size());
@@ -403,7 +403,7 @@ message MyMessageA [id = 30003] {
     // Turn GenericMessage back into Proto.
     {
         cluon::MessageToProtoEncoder proto2;
-        gm.accept<cluon::MessageToProtoEncoder>(proto2);
+        gm.accept(proto2);
         std::string s2 = proto2.encodedData();
         REQUIRE(4 == s2.size());
         REQUIRE(0x8 == static_cast<uint8_t>(s2.at(0)));
@@ -478,7 +478,7 @@ message example.MyTestMessage1 [id = 30001] {
     REQUIRE("Hello Galaxy" == msg1.attribute14());
 
     cluon::MessageToProtoEncoder proto;
-    msg1.accept<cluon::MessageToProtoEncoder>(proto);
+    msg1.accept(proto);
     std::string s = proto.encodedData();
 
     std::stringstream sstr{s};
@@ -531,7 +531,7 @@ message example.MyTestMessage1 [id = 30001] {
         REQUIRE("Galaxy, Hello" == src.attribute14());
 
         cluon::MessageToProtoEncoder proto2;
-        gm.accept<cluon::MessageToProtoEncoder>(proto2);
+        gm.accept(proto2);
         std::string s2 = proto2.encodedData();
 
         std::stringstream sstr2{s2};
@@ -595,7 +595,7 @@ message MyTest.Envelope [id = 1] {
     REQUIRE(200 == env.sampleTimeStamp().microseconds());
 
     cluon::MessageToProtoEncoder proto;
-    env.accept<cluon::MessageToProtoEncoder>(proto);
+    env.accept(proto);
     std::string s = proto.encodedData();
 
     std::stringstream sstr{s};
@@ -628,7 +628,7 @@ message MyTest.Envelope [id = 1] {
         REQUIRE(0 == env2.sampleTimeStamp().microseconds());
 
         cluon::MessageToProtoEncoder proto2;
-        gm.accept<cluon::MessageToProtoEncoder>(proto2);
+        gm.accept(proto2);
         std::string s2 = proto2.encodedData();
 
         std::stringstream sstr2{s2};

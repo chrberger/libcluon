@@ -91,6 +91,9 @@ class LIBCLUON_API MessageFromLCMDecoder {
     void calculateHash(char c) noexcept;
     void calculateHash(const std::string &s) noexcept;
 
+    float ntohf(float f) const noexcept;
+    double ntohd(double d) const noexcept;
+
    private:
     int64_t m_calculatedHash{0x12345678};
     int64_t m_expectedHash{0};

@@ -17,8 +17,7 @@
 
 #include "cluon/MessageToLCMEncoder.hpp"
 
-#include <inttypes.h>
-#include <cstdio>
+#include <cstring>
 #include <iostream>
 
 namespace cluon {
@@ -64,67 +63,115 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("int8_t");
+    calculateHash(0);
+    m_buffer.write(reinterpret_cast<char*>(&v), sizeof(int8_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("int8_t");
+    calculateHash(0);
+    m_buffer.write(reinterpret_cast<char*>(&v), sizeof(uint8_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("int16_t");
+    calculateHash(0);
+    int16_t _v = static_cast<int16_t>(htobe16(v));
+    m_buffer.write(reinterpret_cast<char*>(&_v), sizeof(int16_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("int16_t");
+    calculateHash(0);
+    int16_t _v = static_cast<int16_t>(htobe16(v));
+    m_buffer.write(reinterpret_cast<char*>(&_v), sizeof(int16_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("int32_t");
+    calculateHash(0);
+    int32_t _v = static_cast<int32_t>(htobe32(v));
+    m_buffer.write(reinterpret_cast<char*>(&_v), sizeof(int32_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("int32_t");
+    calculateHash(0);
+    int32_t _v = static_cast<int32_t>(htobe32(v));
+    m_buffer.write(reinterpret_cast<char*>(&_v), sizeof(int32_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("int64_t");
+    calculateHash(0);
+    int64_t _v = static_cast<int64_t>(htobe64(v));
+    m_buffer.write(reinterpret_cast<char*>(&_v), sizeof(int64_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("int64_t");
+    calculateHash(0);
+    int64_t _v = static_cast<int64_t>(htobe64(v));
+    m_buffer.write(reinterpret_cast<char*>(&_v), sizeof(int64_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("float");
+    calculateHash(0);
+    int32_t _v{0};
+    std::memmove(&_v, &v, sizeof(int32_t));
+    _v = static_cast<int32_t>(htobe32(_v));
+    m_buffer.write(reinterpret_cast<char*>(&_v), sizeof(int32_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("double");
+    calculateHash(0);
+    int64_t _v{0};
+    std::memmove(&_v, &v, sizeof(int64_t));
+    _v = static_cast<int64_t>(htobe64(_v));
+    m_buffer.write(reinterpret_cast<char*>(&_v), sizeof(int64_t));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)id;
     (void)typeName;
-    std::cout << "LCM " << name << ", " << v << std::endl;
+    calculateHash(name);
+    calculateHash("string");
+    calculateHash(0);
+    const uint32_t length = static_cast<uint32_t>(v.length() + 1);
+    int32_t _v = static_cast<int32_t>(htobe32(length)); // +1 to include the terminating 0.
+    m_buffer.write(reinterpret_cast<char*>(&_v), sizeof(int32_t));
+    m_buffer.write(v.c_str(), length);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

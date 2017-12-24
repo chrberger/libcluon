@@ -16,45 +16,22 @@
  */
 
 #include "cluon/MessageFromLCMDecoder.hpp"
+
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 namespace cluon {
 
-//void MessageFromLCMDecoder::readBytesFromStream(std::istream &in,
-//                                                  std::size_t bytesToReadFromStream,
-//                                                  std::vector<char> &buffer) noexcept {
-//    constexpr std::size_t CHUNK_SIZE{1024};
-//    std::streamsize bufferPosition{0};
-
-//    // Ensure buffer has enough space to hold the bytes.
-//    buffer.reserve(bytesToReadFromStream);
-
-//    while ((0 < bytesToReadFromStream) && in.good()) {
-//        // clang-format off
-//        in.read(&buffer[static_cast<std::size_t>(bufferPosition)], /* Flawfinder: ignore */ /* Cf. buffer.reserve(...) above.  */
-//                (bytesToReadFromStream > CHUNK_SIZE) ? CHUNK_SIZE : static_cast<std::streamsize>(bytesToReadFromStream));
-//        // clang-format on
-//        const std::streamsize EXTRACTED_BYTES{in.gcount()};
-//        bufferPosition += EXTRACTED_BYTES;
-//        bytesToReadFromStream -= static_cast<std::size_t>(EXTRACTED_BYTES);
-//    }
-//}
-
 void MessageFromLCMDecoder::decodeFrom(std::istream &in) noexcept {
     // Reset internal states as this deserializer could be reused.
+    m_buffer.clear();
     m_buffer.str("");
 
     in.read(reinterpret_cast<char*>(&m_expectedHash), sizeof(int64_t));
     m_expectedHash = static_cast<int64_t>(be64toh(m_expectedHash));
 
     m_buffer << in.rdbuf();
-
-//    // Transfer the remaining data into our internal buffer.
-//    while (in.good()) {
-//        c = in.get();
-//        m_buffer.put(c);
-//    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,11 +43,10 @@ void MessageFromLCMDecoder::preVisit(uint32_t id,
     (void)shortName;
     (void)longName;
 
+    // Reset m_buffer read pointer to beginning.
     m_buffer.clear();
     m_buffer.seekg(0);
     m_calculatedHash = 0x12345678;
-
-    // TODO: Reset m_buffer read pointer to beginning.
 }
 
 void MessageFromLCMDecoder::postVisit() noexcept {
@@ -100,71 +76,109 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("int8_t");
+    calculateHash(0);
+    m_buffer.read(reinterpret_cast<char*>(&v), sizeof(int8_t));
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("int8_t");
+    calculateHash(0);
+    m_buffer.read(reinterpret_cast<char*>(&v), sizeof(int8_t));
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("int16_t");
+    calculateHash(0);
+    int16_t _v{0};
+    m_buffer.read(reinterpret_cast<char*>(&_v), sizeof(int16_t));
+    v = static_cast<int16_t>(be16toh(_v));
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("int16_t");
+    calculateHash(0);
+    int16_t _v{0};
+    m_buffer.read(reinterpret_cast<char*>(&_v), sizeof(int16_t));
+    v = be16toh(_v);
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("int32_t");
+    calculateHash(0);
+    int32_t _v{0};
+    m_buffer.read(reinterpret_cast<char*>(&_v), sizeof(int32_t));
+    v = static_cast<int32_t>(be32toh(_v));
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("int32_t");
+    calculateHash(0);
+    int32_t _v{0};
+    m_buffer.read(reinterpret_cast<char*>(&_v), sizeof(int32_t));
+    v = be32toh(_v);
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("int64_t");
+    calculateHash(0);
+    int64_t _v{0};
+    m_buffer.read(reinterpret_cast<char*>(&_v), sizeof(int64_t));
+    v = static_cast<int64_t>(be64toh(_v));
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("int64_t");
+    calculateHash(0);
+    int64_t _v{0};
+    m_buffer.read(reinterpret_cast<char*>(&_v), sizeof(int64_t));
+    v = be64toh(_v);
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("float");
+    calculateHash(0);
+    int32_t _v{0};
+    m_buffer.read(reinterpret_cast<char*>(&_v), sizeof(int32_t));
+    _v = static_cast<int32_t>(be32toh(_v));
+    std::memmove(&v, &_v, sizeof(int32_t));
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)id;
     (void)typeName;
-    (void)name;
-    (void)v;
+    calculateHash(name);
+    calculateHash("double");
+    calculateHash(0);
+    int64_t _v{0};
+    m_buffer.read(reinterpret_cast<char*>(&_v), sizeof(int64_t));
+    _v = static_cast<int64_t>(be64toh(_v));
+    std::memmove(&v, &_v, sizeof(int64_t));
 }
 
 void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
@@ -172,6 +186,20 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     (void)typeName;
     (void)name;
     (void)v;
+    calculateHash(name);
+    calculateHash("string");
+    calculateHash(0);
+
+    int32_t length{0};
+    m_buffer.read(reinterpret_cast<char*>(&length), sizeof(int32_t));
+    length = static_cast<int32_t>(be32toh(length));
+
+    std::vector<char> buffer;
+    buffer.reserve(static_cast<uint32_t>(length));
+    m_buffer.read(&buffer[0], length);
+
+    const std::string s(buffer.data());
+    v = s;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
