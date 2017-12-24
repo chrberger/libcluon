@@ -169,95 +169,6 @@ MessageFromProtoDecoder &MessageFromProtoDecoder::operator=(const MessageFromPro
 
     return *this;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-void MessageFromProtoDecoder::visit(uint32_t id, bool &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        v = (0 != m_mapOfKeyValues[id].valueAsVarInt());
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, char &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<char>(_v);
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, int8_t &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<int8_t>(fromZigZag8(static_cast<uint8_t>(_v)));
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, uint8_t &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<uint8_t>(_v);
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, int16_t &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<int16_t>(fromZigZag16(static_cast<uint16_t>(_v)));
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, uint16_t &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<uint16_t>(_v);
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, int32_t &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<int32_t>(fromZigZag32(static_cast<uint32_t>(_v)));
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, uint32_t &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<uint32_t>(_v);
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, int64_t &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<int64_t>(fromZigZag64(_v));
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, uint64_t &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        v = m_mapOfKeyValues[id].valueAsVarInt();
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, float &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        v = m_mapOfKeyValues[id].valueAsFloat();
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, double &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        v = m_mapOfKeyValues[id].valueAsDouble();
-    }
-}
-
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &v) noexcept {
-    if (m_mapOfKeyValues.count(id) > 0) {
-        v = m_mapOfKeyValues[id].valueAsString();
-    }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void MessageFromProtoDecoder::preVisit(uint32_t id,
@@ -273,79 +184,113 @@ void MessageFromProtoDecoder::postVisit() noexcept {}
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        v = (0 != m_mapOfKeyValues[id].valueAsVarInt());
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
+        v           = static_cast<char>(_v);
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
+        v           = static_cast<int8_t>(fromZigZag8(static_cast<uint8_t>(_v)));
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
+        v           = static_cast<uint8_t>(_v);
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
+        v           = static_cast<int16_t>(fromZigZag16(static_cast<uint16_t>(_v)));
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
+        v           = static_cast<uint16_t>(_v);
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
+        v           = static_cast<int32_t>(fromZigZag32(static_cast<uint32_t>(_v)));
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
+        v           = static_cast<uint32_t>(_v);
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
+        v           = static_cast<int64_t>(fromZigZag64(_v));
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        v = m_mapOfKeyValues[id].valueAsVarInt();
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        v = m_mapOfKeyValues[id].valueAsFloat();
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        v = m_mapOfKeyValues[id].valueAsDouble();
+    }
 }
 
 void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)typeName;
     (void)name;
-    visit(id, v);
+    if (m_mapOfKeyValues.count(id) > 0) {
+        v = m_mapOfKeyValues[id].valueAsString();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

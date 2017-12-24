@@ -104,21 +104,6 @@ class LIBCLUON_API MessageFromProtoDecoder {
     void decodeFrom(std::istream &in) noexcept;
 
    public:
-    void visit(uint32_t id, bool &v) noexcept;
-    void visit(uint32_t id, char &v) noexcept;
-    void visit(uint32_t id, int8_t &v) noexcept;
-    void visit(uint32_t id, uint8_t &v) noexcept;
-    void visit(uint32_t id, int16_t &v) noexcept;
-    void visit(uint32_t id, uint16_t &v) noexcept;
-    void visit(uint32_t id, int32_t &v) noexcept;
-    void visit(uint32_t id, uint32_t &v) noexcept;
-    void visit(uint32_t id, int64_t &v) noexcept;
-    void visit(uint32_t id, uint64_t &v) noexcept;
-    void visit(uint32_t id, float &v) noexcept;
-    void visit(uint32_t id, double &v) noexcept;
-    void visit(uint32_t id, std::string &v) noexcept;
-
-   public:
     // The following methods are provided to allow an instance of this class to
     // be used as visitor for an instance with the method signature void accept<T>(T&);
 
