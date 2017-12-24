@@ -17,7 +17,7 @@
 
 #include "catch.hpp"
 
-//#include "cluon/MessageLCMProtoDecoder.hpp"
+#include "cluon/MessageFromLCMDecoder.hpp"
 #include "cluon/MessageToLCMEncoder.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
@@ -61,18 +61,18 @@ TEST_CASE("Testing MyTestMessage0.") {
 //}
 //std::cout << std::endl;
 
-//    std::stringstream sstr{s};
-//    cluon::MessageFromProtoDecoder protoDecoder;
-//    protoDecoder.decodeFrom(sstr);
+    std::stringstream sstr{s};
+    cluon::MessageFromLCMDecoder lcmDecoder;
+    lcmDecoder.decodeFrom(sstr);
 
-//    testdata::MyTestMessage0 tmp2;
-//    REQUIRE(tmp2.attribute1());
-//    REQUIRE('c' == tmp2.attribute2());
+    testdata::MyTestMessage0 tmp2;
+    REQUIRE(tmp2.attribute1());
+    REQUIRE('c' == tmp2.attribute2());
 
-//    tmp2.accept(protoDecoder);
+    tmp2.accept(lcmDecoder);
 
-//    REQUIRE(tmp2.attribute1() == tmp.attribute1());
-//    REQUIRE(tmp2.attribute2() == tmp.attribute2());
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+    REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
 
 //TEST_CASE("Testing MyTestMessage2.") {

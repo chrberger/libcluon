@@ -24,10 +24,10 @@
 namespace cluon {
 
 std::string MessageToLCMEncoder::encodedData() const noexcept {
-    uint64_t _hash = hash();
-    _hash = htobe64(_hash);
+    int64_t _hash = hash();
+    _hash = static_cast<int64_t>(htobe64(_hash));
     std::stringstream hashBuffer;
-    hashBuffer.write(reinterpret_cast<const char *>(&_hash), sizeof(uint64_t));
+    hashBuffer.write(reinterpret_cast<const char *>(&_hash), sizeof(int64_t));
 
     const std::string s{hashBuffer.str() + m_buffer.str()};
     return s;
@@ -49,18 +49,15 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     calculateHash(name);
     calculateHash("boolean");
     calculateHash(0);
-//    m_hash = calculateHash(m_hash, name);
-//    m_hash = calculateHash(m_hash, "boolean");
-//    m_hash = calculateHash(m_hash, 0);
     m_buffer.write(reinterpret_cast<char*>(&v), sizeof(bool));
 }
 
 void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)id;
     (void)typeName;
-    m_hash = calculateHash(m_hash, name);
-    m_hash = calculateHash(m_hash, "int8_t");
-    m_hash = calculateHash(m_hash, 0);
+    calculateHash(name);
+    calculateHash("int8_t");
+    calculateHash(0);
     m_buffer.write(reinterpret_cast<char*>(&v), sizeof(char));
 }
 
@@ -143,23 +140,12 @@ void MessageToLCMEncoder::calculateHash(char c) noexcept {
 }
 
 void MessageToLCMEncoder::calculateHash(const std::string &s) noexcept {
-    calculateHash(s.length());
+    const std::string tmp{(s.length() > 255 ? s.substr(0, 255) : s)};
+    const uint8_t length{static_cast<uint8_t>(tmp.length())};
+    calculateHash(static_cast<char>(length));
     for (auto c : s) {
         calculateHash(c);
     }
-}
-
-int64_t MessageToLCMEncoder::calculateHash(int64_t v, char c) const noexcept {
-    v = ((v<<8) ^ (v>>55)) + c;
-    return v;
-}
-
-int64_t MessageToLCMEncoder::calculateHash(int64_t v, const std::string &s) const noexcept {
-    v = calculateHash(v, s.length());
-    for (auto c : s) {
-        v = calculateHash(v, c);
-    }
-    return v;
 }
 
 } // namespace cluon

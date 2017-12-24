@@ -169,6 +169,7 @@ MessageFromProtoDecoder &MessageFromProtoDecoder::operator=(const MessageFromPro
 
     return *this;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void MessageFromProtoDecoder::preVisit(uint32_t id,

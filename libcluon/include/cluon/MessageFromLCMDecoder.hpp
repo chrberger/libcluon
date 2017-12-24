@@ -15,34 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MESSAGEASLCMENCODER_HPP
-#define MESSAGEASLCMENCODER_HPP
+#ifndef MESSAGEFROMLCMDECODER_HPP
+#define MESSAGEFROMLCMDECODER_HPP
 
 #include "cluon/cluon.hpp"
 
-#include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace cluon {
 /**
-This class encodes a given message in LCM format.
+This class decodes a given message from LCM format.
 */
-class LIBCLUON_API MessageToLCMEncoder {
+class LIBCLUON_API MessageFromLCMDecoder {
    private:
-    MessageToLCMEncoder(const MessageToLCMEncoder &) = delete;
-    MessageToLCMEncoder(MessageToLCMEncoder &&)      = delete;
-    MessageToLCMEncoder &operator=(const MessageToLCMEncoder &) = delete;
-    MessageToLCMEncoder &operator=(MessageToLCMEncoder &&) = delete;
+    MessageFromLCMDecoder(const MessageFromLCMDecoder &) = delete;
+    MessageFromLCMDecoder(MessageFromLCMDecoder &&)      = delete;
+    MessageFromLCMDecoder &operator=(const MessageFromLCMDecoder &) = delete;
+    MessageFromLCMDecoder &operator=(MessageFromLCMDecoder &&) = delete;
 
    public:
-    MessageToLCMEncoder()  = default;
-    ~MessageToLCMEncoder() = default;
+    MessageFromLCMDecoder()  = default;
+    ~MessageFromLCMDecoder() = default;
 
+   public:
     /**
-     * @return Encoded data in LCM format.
+     * This method decodes a given istream into LCM.
+     *
+     * @param in istream to decode.
      */
-    std::string encodedData() const noexcept;
+    void decodeFrom(std::istream &in) noexcept;
 
    public:
     // The following methods are provided to allow an instance of this class to
@@ -72,20 +75,25 @@ class LIBCLUON_API MessageToLCMEncoder {
         (void)name;
         (void)value;
 
-//// TODO: Adjust for LCM.
-//        toVarInt(m_buffer, std::move(encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED))));
-//        cluon::MessageToLCMEncoder nestedProtoEncoder;
-//        value.accept(nestedProtoEncoder);
-//        encode(m_buffer, std::move(nestedProtoEncoder.encodedData()));
+//        if (0 < m_mapOfKeyValues.count(id)) {
+//            const std::string s{m_mapOfKeyValues[id].valueAsString()};
+
+//            std::stringstream sstr{s};
+//            cluon::MessageFromLCMDecoder nestedProtoDecoder;
+//            nestedProtoDecoder.decodeFrom(sstr);
+
+//            value.accept(nestedProtoDecoder);
+//        }
     }
 
    private:
-        int64_t hash() const noexcept;
-        void calculateHash(char c) noexcept;
-        void calculateHash(const std::string &s) noexcept;
+    int64_t hash() const noexcept;
+    void calculateHash(char c) noexcept;
+    void calculateHash(const std::string &s) noexcept;
 
    private:
-    int64_t m_hash{0x12345678};
+    int64_t m_calculatedHash{0x12345678};
+    int64_t m_expectedHash{0};
     std::stringstream m_buffer{""};
 };
 } // namespace cluon
