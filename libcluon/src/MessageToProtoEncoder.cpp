@@ -22,7 +22,7 @@
 namespace cluon {
 
 std::string MessageToProtoEncoder::encodedData() const noexcept {
-    std::string s{m_protoBuffer.str()};
+    std::string s{m_buffer.str()};
     return s;
 }
 
@@ -71,20 +71,20 @@ void MessageToProtoEncoder::visit(uint32_t id, uint64_t &v) noexcept {
 
 void MessageToProtoEncoder::visit(uint32_t id, float &v) noexcept {
     uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::FOUR_BYTES));
-    toVarInt(m_protoBuffer, key);
-    encode(m_protoBuffer, v);
+    toVarInt(m_buffer, key);
+    encode(m_buffer, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, double &v) noexcept {
     uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::EIGHT_BYTES));
-    toVarInt(m_protoBuffer, key);
-    encode(m_protoBuffer, v);
+    toVarInt(m_buffer, key);
+    encode(m_buffer, v);
 }
 
 void MessageToProtoEncoder::visit(uint32_t id, const std::string &v) noexcept {
     uint64_t key = encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED));
-    toVarInt(m_protoBuffer, key);
-    encode(m_protoBuffer, v);
+    toVarInt(m_buffer, key);
+    encode(m_buffer, v);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

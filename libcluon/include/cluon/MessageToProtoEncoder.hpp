@@ -45,7 +45,7 @@ class LIBCLUON_API MessageToProtoEncoder {
      */
     std::string encodedData() const noexcept;
 
-   public:
+   private:
     void visit(uint32_t id, bool &v) noexcept;
     void visit(uint32_t id, char &v) noexcept;
     void visit(uint32_t id, int8_t &v) noexcept;
@@ -86,10 +86,10 @@ class LIBCLUON_API MessageToProtoEncoder {
         (void)typeName;
         (void)name;
 
-        toVarInt(m_protoBuffer, std::move(encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED))));
+        toVarInt(m_buffer, std::move(encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED))));
         cluon::MessageToProtoEncoder nestedProtoEncoder;
         value.accept(nestedProtoEncoder);
-        encode(m_protoBuffer, std::move(nestedProtoEncoder.encodedData()));
+        encode(m_buffer, std::move(nestedProtoEncoder.encodedData()));
     }
 
    private:
@@ -132,8 +132,8 @@ class LIBCLUON_API MessageToProtoEncoder {
     std::size_t toKeyValue(uint32_t fieldIdentifier, T &v) noexcept {
         std::size_t size{0};
         uint64_t key = encodeKey(fieldIdentifier, static_cast<uint8_t>(ProtoConstants::VARINT));
-        size += toVarInt(m_protoBuffer, key);
-        size += encode(m_protoBuffer, v);
+        size += toVarInt(m_buffer, key);
+        size += encode(m_buffer, v);
         return size;
     }
 
@@ -147,7 +147,7 @@ class LIBCLUON_API MessageToProtoEncoder {
     uint64_t encodeKey(uint32_t fieldIdentifier, uint8_t protoType) noexcept;
 
    private:
-    std::stringstream m_protoBuffer{""};
+    std::stringstream m_buffer{""};
 };
 } // namespace cluon
 

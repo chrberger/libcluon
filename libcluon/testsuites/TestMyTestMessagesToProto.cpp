@@ -35,9 +35,7 @@ TEST_CASE("Testing MyTestMessage0.") {
     tmp.attribute2('C');
 
     cluon::MessageToProtoEncoder protoEncoder;
-    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
-               [&protoEncoder](uint32_t id, std::string &&, std::string &&, auto v) { protoEncoder.visit(id, v); },
-               []() {});
+    tmp.accept(protoEncoder);
 
     std::string s = protoEncoder.encodedData();
     REQUIRE(4 == s.size());
@@ -55,9 +53,7 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(tmp2.attribute1());
     REQUIRE('c' == tmp2.attribute2());
 
-    tmp2.accept([](uint32_t, const std::string &, const std::string &) {},
-                [&protoDecoder](uint32_t id, std::string &&, std::string &&, auto &v) { protoDecoder.visit(id, v); },
-                []() {});
+    tmp2.accept(protoDecoder);
 
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
@@ -70,12 +66,10 @@ TEST_CASE("Testing MyTestMessage2.") {
     tmp.attribute1(150);
     REQUIRE(150 == tmp.attribute1());
 
-    cluon::MessageToProtoEncoder proto;
-    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
-               [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
-               []() {});
+    cluon::MessageToProtoEncoder protoEncoder;
+    tmp.accept(protoEncoder);
 
-    std::string s = proto.encodedData();
+    std::string s = protoEncoder.encodedData();
     REQUIRE(3 == s.size());
 
     REQUIRE(0x8 == static_cast<uint8_t>(s.at(0)));
@@ -89,9 +83,7 @@ TEST_CASE("Testing MyTestMessage2.") {
     testdata::MyTestMessage2 tmp2;
     REQUIRE(123 == tmp2.attribute1());
 
-    tmp2.accept([](uint32_t, const std::string &, const std::string &) {},
-                [&protoDecoder](uint32_t id, std::string &&, std::string &&, auto &v) { protoDecoder.visit(id, v); },
-                []() {});
+    tmp2.accept(protoDecoder);
 
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
 }
@@ -105,12 +97,10 @@ TEST_CASE("Testing MyTestMessage3.") {
     REQUIRE(123 == tmp.attribute1());
     REQUIRE(-123 == tmp.attribute2());
 
-    cluon::MessageToProtoEncoder proto;
-    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
-               [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
-               []() {});
+    cluon::MessageToProtoEncoder protoEncoder;
+    tmp.accept(protoEncoder);
 
-    std::string s = proto.encodedData();
+    std::string s = protoEncoder.encodedData();
     REQUIRE(5 == s.size());
 
     REQUIRE(0x8 == static_cast<uint8_t>(s.at(0)));
@@ -127,9 +117,7 @@ TEST_CASE("Testing MyTestMessage3.") {
     REQUIRE(124 == tmp2.attribute1());
     REQUIRE(-124 == tmp2.attribute2());
 
-    tmp2.accept([](uint32_t, const std::string &, const std::string &) {},
-                [&protoDecoder](uint32_t id, std::string &&, std::string &&, auto &v) { protoDecoder.visit(id, v); },
-                []() {});
+    tmp2.accept(protoDecoder);
 
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
@@ -142,12 +130,10 @@ TEST_CASE("Testing MyTestMessage4.") {
     tmp.attribute1("testing");
     REQUIRE("testing" == tmp.attribute1());
 
-    cluon::MessageToProtoEncoder proto;
-    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
-               [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
-               []() {});
+    cluon::MessageToProtoEncoder protoEncoder;
+    tmp.accept(protoEncoder);
 
-    std::string s = proto.encodedData();
+    std::string s = protoEncoder.encodedData();
     REQUIRE(9 == s.size());
 
     REQUIRE(0x12 == static_cast<uint8_t>(s.at(0)));
@@ -167,9 +153,7 @@ TEST_CASE("Testing MyTestMessage4.") {
     testdata::MyTestMessage4 tmp2;
     REQUIRE(tmp2.attribute1().empty());
 
-    tmp2.accept([](uint32_t, const std::string &, const std::string &) {},
-                [&protoDecoder](uint32_t id, std::string &&, std::string &&, auto &v) { protoDecoder.visit(id, v); },
-                []() {});
+    tmp2.accept(protoDecoder);
 
     REQUIRE("testing" == tmp2.attribute1());
 }
@@ -213,12 +197,10 @@ TEST_CASE("Testing MyTestMessage5.") { // NOLINT
     REQUIRE(-50.4321 == Approx(tmp.attribute10()));
     REQUIRE("Hello cluon World!" == tmp.attribute11());
 
-    cluon::MessageToProtoEncoder proto;
-    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
-               [&proto](uint32_t id, std::string &&, std::string &&, auto v) { proto.visit(id, v); },
-               []() {});
+    cluon::MessageToProtoEncoder protoEncoder;
+    tmp.accept(protoEncoder);
 
-    std::string s = proto.encodedData();
+    std::string s = protoEncoder.encodedData();
     REQUIRE(58 == s.size());
 
     REQUIRE(0x8 == static_cast<uint8_t>(s.at(0)));
@@ -297,9 +279,7 @@ TEST_CASE("Testing MyTestMessage5.") { // NOLINT
     REQUIRE(-10.2345 == Approx(tmp2.attribute10()));
     REQUIRE("Hello World!" == tmp2.attribute11());
 
-    tmp2.accept([](uint32_t, const std::string &, const std::string &) {},
-                [&protoDecoder](uint32_t id, std::string &&, std::string &&, auto &v) { protoDecoder.visit(id, v); },
-                []() {});
+    tmp2.accept(protoDecoder);
 
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
@@ -324,9 +304,9 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
 
     REQUIRE(150 == tmp6.attribute1().attribute1());
 
-    cluon::MessageToProtoEncoder proto;
-    tmp6.accept<cluon::MessageToProtoEncoder>(proto);
-    std::string s = proto.encodedData();
+    cluon::MessageToProtoEncoder protoEncoder;
+    tmp6.accept(protoEncoder);
+    std::string s = protoEncoder.encodedData();
 
     REQUIRE(5 == s.size());
     REQUIRE(0x1a == static_cast<uint8_t>(s.at(0)));
