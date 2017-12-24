@@ -17,10 +17,10 @@
 
 #include "catch.hpp"
 
-#include "cluon/cluon.hpp"
-#include "cluon/cluonTestDataStructures.hpp"
 #include "cluon/MessageFromLCMDecoder.hpp"
 #include "cluon/MessageToLCMEncoder.hpp"
+#include "cluon/cluon.hpp"
+#include "cluon/cluonTestDataStructures.hpp"
 
 #include <sstream>
 #include <string>
