@@ -32,6 +32,7 @@
 #elif defined(__OpenBSD__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
     #include <sys/endian.h>
 #elif (defined(_WIN16) || defined(_WIN32) || defined(_WIN64))
+    #include <Winsock2.h> // for WSAStartUp
     #if BYTE_ORDER == LITTLE_ENDIAN
         #define htobe16(x) htons(x)
         #define htole16(x) (x)
