@@ -174,10 +174,12 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     calculateHash(name);
     calculateHash("string");
     calculateHash(0);
-    const uint32_t length = static_cast<uint32_t>(v.length() + 1);
-    int32_t _v            = static_cast<int32_t>(htobe32(length)); // +1 to include the terminating 0.
+
+    const std::size_t LENGTH = v.length();
+    int32_t _v            = static_cast<int32_t>(htobe32(LENGTH + 1));
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int32_t));
-    m_buffer.write(v.c_str(), length);
+    m_buffer.write(v.c_str(), static_cast<std::streamsize>(LENGTH)); // LENGTH won't be negative.
+    m_buffer << '\0';
 }
 
 ////////////////////////////////////////////////////////////////////////////////

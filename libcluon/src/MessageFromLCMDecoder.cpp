@@ -58,7 +58,7 @@ void MessageFromLCMDecoder::preVisit(uint32_t id, const std::string &shortName, 
 
 void MessageFromLCMDecoder::postVisit() noexcept {
     if ((0 != m_expectedHash) && (m_expectedHash != hash())) {
-        std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding has failed" << std::endl;
+        std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding has failed" << std::endl; // NOLINT
     }
 }
 
@@ -203,9 +203,14 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
 
     std::vector<char> buffer;
     buffer.reserve(static_cast<uint32_t>(length));
-    m_buffer.read(&buffer[0], length);
+    // Read data but skip trailing \0.
+    for (uint32_t i = 0; i < static_cast<uint32_t>(length-1); i++) {
+        char c;
+        m_buffer.get(c);
+        buffer.push_back(c);
+    }
 
-    const std::string s(buffer.data());
+    const std::string s(buffer.begin(), buffer.end());
     v = s;
 }
 
