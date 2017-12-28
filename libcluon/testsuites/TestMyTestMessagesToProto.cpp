@@ -323,13 +323,6 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
     REQUIRE(123 == tmp6_2.attribute1().attribute1());
     tmp6_2.accept(protoDecoder);
     REQUIRE(150 == tmp6_2.attribute1().attribute1());
-
-    // Simple toString().
-    std::stringstream buffer;
-    tmp6_2.accept([](uint32_t, const std::string &, const std::string &) {},
-                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << +v << '\n'; },
-                  []() {});
-    std::cout << buffer.str() << std::endl;
 }
 
 TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for serialization and deserialization.") {
