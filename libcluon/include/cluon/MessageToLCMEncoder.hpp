@@ -79,7 +79,7 @@ class LIBCLUON_API MessageToLCMEncoder {
 
         constexpr bool WITH_HASH{false};
         const std::string s = nestedLCMEncoder.encodedData(WITH_HASH);
-        m_buffer.write(s.c_str(), static_cast<uint32_t>(s.size()));
+        m_buffer.write(s.c_str(), static_cast<std::streamsize>(s.size()));
 
         // Save this complex field's hash for later to compute final hash.
         m_hashes.push_back(nestedLCMEncoder.hash());
