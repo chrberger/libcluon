@@ -55,8 +55,8 @@ void MessageFromLCMDecoder::decodeFrom(std::istream &in) noexcept {
 void MessageFromLCMDecoder::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
-//    (void)longName;
-std::cerr << longName << std::endl;
+    (void)longName;
+
     // Reset m_buffer read pointer to beginning only if we are not dealing with
     // nested complex types as we are sharing our buffer with our parent message.
     if (0 != m_expectedHash) {
@@ -68,7 +68,6 @@ std::cerr << longName << std::endl;
 }
 
 void MessageFromLCMDecoder::postVisit() noexcept {
-std::cerr << "e = " << m_expectedHash << ", h = " << hash() << std::endl;
     if ((0 != m_expectedHash) && (m_expectedHash != hash())) {
         std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding has failed" << std::endl; // LCOV_EXCL_LINE
     }
@@ -213,25 +212,25 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     m_buffer.read(reinterpret_cast<char *>(&length), sizeof(int32_t));
     length = static_cast<int32_t>(be32toh(length));
 
-#ifdef WIN32 // LCOV_EXCL_LINE
-    std::vector<char> buffer;
-    buffer.reserve(static_cast<uint32_t>(length));
-    // Read data but skip trailing \0.
-    for (uint32_t i = 0; i < static_cast<uint32_t>(length-1); i++) {
-        char c;
-        m_buffer.get(c);
-        buffer.push_back(c);
-    }
-    const std::string s(buffer.begin(), buffer.end());
-    v = s;
-#else
     v.clear();
-    // Read data but skip trailing \0.
     if (length > 0) {
+#ifdef WIN32 // LCOV_EXCL_LINE
+        std::vector<char> buffer;
+        buffer.reserve(static_cast<uint32_t>(length));
+        // Read data but skip trailing \0.
+        for (uint32_t i = 0; i < static_cast<uint32_t>(length-1); i++) {
+            char c;
+            m_buffer.get(c);
+            buffer.push_back(c);
+        }
+        const std::string s(buffer.begin(), buffer.end());
+        v = s;
+#else
+        // Read data but skip trailing \0.
         v.reserve(static_cast<uint32_t>(length));
         std::copy_n(std::istreambuf_iterator<char>(m_buffer), static_cast<uint32_t>(length-1), std::back_inserter(v));
-    }
 #endif
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

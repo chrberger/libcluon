@@ -22,7 +22,6 @@
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -119,11 +118,6 @@ TEST_CASE("Testing MyTestMessage5.") {
     tmp.accept(lcmEncoder);
 
     std::string s = lcmEncoder.encodedData();
-
-//for (auto c : s ) {
-//    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
-//}
-//std::cout << std::endl;
 
     REQUIRE(73 == s.size());
 
@@ -233,7 +227,6 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(tmp2.attribute11() == tmp.attribute11());
 }
 
-// TODO: Single fields need to return consumed size to position seekg/tellg correctly as multiple nested messages would fail to decode as the MessageFromLCMDecoder is greedy and would not leave any bytes for consumption to the second nested field.
 TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
     testdata::MyTestMessage6 tmp6;
 
@@ -330,11 +323,11 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     REQUIRE(13 == tmp7_2.attribute3().attribute1());
 
     // Simple toString().
-    std::stringstream buffer;
-    tmp7_2.accept([](uint32_t, const std::string &, const std::string &) {},
-                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << +v << '\n'; },
-                  []() {});
-    std::cout << buffer.str() << std::endl;
+//    std::stringstream buffer;
+//    tmp7_2.accept([](uint32_t, const std::string &, const std::string &) {},
+//                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << +v << '\n'; },
+//                  []() {});
+//    std::cout << buffer.str() << std::endl;
 
 //int i = 0;
 //for (auto c : s ) {
