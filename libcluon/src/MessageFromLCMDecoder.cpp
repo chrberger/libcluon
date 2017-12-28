@@ -24,6 +24,7 @@
 #include "cluon/MessageFromLCMDecoder.hpp"
 
 #include <cstring>
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -201,17 +202,12 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     m_buffer.read(reinterpret_cast<char *>(&length), sizeof(int32_t));
     length = static_cast<int32_t>(be32toh(length));
 
-    std::vector<char> buffer;
-    buffer.reserve(static_cast<uint32_t>(length));
+    v.clear();
     // Read data but skip trailing \0.
-    for (uint32_t i = 0; i < static_cast<uint32_t>(length-1); i++) {
-        char c;
-        m_buffer.get(c);
-        buffer.push_back(c);
+    if (length > 0) {
+        v.reserve(static_cast<uint32_t>(length));
+        std::copy_n(std::istreambuf_iterator<char>(m_buffer), static_cast<uint32_t>(length-1), std::back_inserter(v));
     }
-
-    const std::string s(buffer.begin(), buffer.end());
-    v = s;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
