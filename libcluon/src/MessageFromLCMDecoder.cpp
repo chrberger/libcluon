@@ -59,10 +59,11 @@ void MessageFromLCMDecoder::preVisit(uint32_t id, const std::string &shortName, 
 std::cerr << longName << std::endl;
     // Reset m_buffer read pointer to beginning only if we are not dealing with
     // nested complex types as we are sharing our buffer with our parent message.
-    if (!m_internalBuffer.str().empty()) {
+    if (0 != m_expectedHash) {
         m_buffer.clear();
         m_buffer.seekg(0);
         m_calculatedHash = 0x12345678;
+        m_hashes.clear();
     }
 }
 
