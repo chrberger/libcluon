@@ -177,7 +177,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     calculateHash(0);
 
     const std::size_t LENGTH = v.length();
-    int32_t _v            = static_cast<int32_t>(htobe32(LENGTH + 1));
+    int32_t _v               = static_cast<int32_t>(htobe32(LENGTH + 1));
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int32_t));
     m_buffer.write(v.c_str(), static_cast<std::streamsize>(LENGTH)); // LENGTH won't be negative.
     m_buffer << '\0';
@@ -189,9 +189,7 @@ int64_t MessageToLCMEncoder::hash() const noexcept {
     // Apply ZigZag encoding for hash from this message's fields and depending
     // hashes for complex nested types.
     int64_t tmp{m_hash};
-    for (int64_t v : m_hashes) {
-        tmp += v;
-    }
+    for (int64_t v : m_hashes) { tmp += v; }
 
     const int64_t hash = (tmp << 1) + ((tmp >> 63) & 1);
     return hash;

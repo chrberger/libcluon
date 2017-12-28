@@ -31,13 +31,11 @@
 namespace cluon {
 
 MessageFromLCMDecoder::MessageFromLCMDecoder() noexcept
-    : m_buffer(m_internalBuffer)
-{}
+    : m_buffer(m_internalBuffer) {}
 
 MessageFromLCMDecoder::MessageFromLCMDecoder(std::stringstream &in) noexcept
     : m_expectedHash{0}
-    , m_buffer(in)
-{}
+    , m_buffer(in) {}
 
 void MessageFromLCMDecoder::decodeFrom(std::istream &in) noexcept {
     // Reset internal states as this deserializer could be reused.
@@ -69,7 +67,8 @@ void MessageFromLCMDecoder::preVisit(uint32_t id, const std::string &shortName, 
 
 void MessageFromLCMDecoder::postVisit() noexcept {
     if ((0 != m_expectedHash) && (m_expectedHash != hash())) {
-        std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding has failed" << std::endl; // LCOV_EXCL_LINE
+        std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding might have failed"
+                  << std::endl; // LCOV_EXCL_LINE
     }
 }
 
@@ -218,7 +217,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
         std::vector<char> buffer;
         buffer.reserve(static_cast<uint32_t>(length));
         // Read data but skip trailing \0.
-        for (uint32_t i = 0; i < static_cast<uint32_t>(length-1); i++) {
+        for (uint32_t i = 0; i < static_cast<uint32_t>(length - 1); i++) {
             char c;
             m_buffer.get(c);
             buffer.push_back(c);
@@ -228,7 +227,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
 #else
         // Read data but skip trailing \0.
         v.reserve(static_cast<uint32_t>(length));
-        std::copy_n(std::istreambuf_iterator<char>(m_buffer), static_cast<uint32_t>(length-1), std::back_inserter(v));
+        std::copy_n(std::istreambuf_iterator<char>(m_buffer), static_cast<uint32_t>(length - 1), std::back_inserter(v));
 #endif
     }
 }
@@ -239,9 +238,7 @@ int64_t MessageFromLCMDecoder::hash() const noexcept {
     // Apply ZigZag encoding for hash from this message's fields and depending
     // hashes for complex nested types.
     int64_t tmp{m_calculatedHash};
-    for (int64_t v : m_hashes) {
-        tmp += v;
-    }
+    for (int64_t v : m_hashes) { tmp += v; }
 
     const int64_t hash = (tmp << 1) + ((tmp >> 63) & 1);
     return hash;

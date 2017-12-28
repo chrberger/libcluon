@@ -283,7 +283,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     testdata::MyTestMessage2 tmp2_3;
     tmp7.attribute3(tmp2_3.attribute1(13));
 
-    REQUIRE(9== tmp7.attribute1().attribute1());
+    REQUIRE(9 == tmp7.attribute1().attribute1());
     REQUIRE(12 == tmp7.attribute2());
     REQUIRE(13 == tmp7.attribute3().attribute1());
 
@@ -318,22 +318,15 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
 
     tmp7_2.accept(lcmDecoder);
 
-    REQUIRE(9== tmp7_2.attribute1().attribute1());
+    REQUIRE(9 == tmp7_2.attribute1().attribute1());
     REQUIRE(12 == tmp7_2.attribute2());
     REQUIRE(13 == tmp7_2.attribute3().attribute1());
 
     // Simple toString().
-//    std::stringstream buffer;
-//    tmp7_2.accept([](uint32_t, const std::string &, const std::string &) {},
-//                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << +v << '\n'; },
-//                  []() {});
-//    std::cout << buffer.str() << std::endl;
-
-//int i = 0;
-//for (auto c : s ) {
-////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
-//std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));" << std::endl;
-//}
-//std::cout << std::endl;
+    //    std::stringstream buffer;
+    //    tmp7_2.accept([](uint32_t, const std::string &, const std::string &) {},
+    //                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << +v <<
+    //                  '\n'; },
+    //                  []() {});
+    //    std::cout << buffer.str() << std::endl;
 }
-

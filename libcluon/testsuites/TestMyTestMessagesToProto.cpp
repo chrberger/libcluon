@@ -340,7 +340,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     testdata::MyTestMessage2 tmp2_3;
     tmp7.attribute3(tmp2_3.attribute1(13));
 
-    REQUIRE(9== tmp7.attribute1().attribute1());
+    REQUIRE(9 == tmp7.attribute1().attribute1());
     REQUIRE(12 == tmp7.attribute2());
     REQUIRE(13 == tmp7.attribute3().attribute1());
 
@@ -370,7 +370,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     REQUIRE(123 == tmp7_2.attribute3().attribute1());
 
     tmp7_2.accept(protoDecoder);
-    REQUIRE(9== tmp7_2.attribute1().attribute1());
+    REQUIRE(9 == tmp7_2.attribute1().attribute1());
     REQUIRE(12 == tmp7_2.attribute2());
     REQUIRE(13 == tmp7_2.attribute3().attribute1());
 
