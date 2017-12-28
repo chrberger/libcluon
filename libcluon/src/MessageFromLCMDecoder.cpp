@@ -30,16 +30,22 @@
 
 namespace cluon {
 
-void MessageFromLCMDecoder::decodeFrom(std::istream &in, bool hasHash) noexcept {
+MessageFromLCMDecoder::MessageFromLCMDecoder() noexcept
+    : m_buffer(m_internalBuffer)
+{}
+
+MessageFromLCMDecoder::MessageFromLCMDecoder(std::stringstream &in) noexcept
+    : m_expectedHash{0}
+    , m_buffer(in)
+{}
+
+void MessageFromLCMDecoder::decodeFrom(std::istream &in) noexcept {
     // Reset internal states as this deserializer could be reused.
     m_buffer.clear();
     m_buffer.str("");
 
-    m_expectedHash = 0;
-    if (hasHash) {
-        in.read(reinterpret_cast<char *>(&m_expectedHash), sizeof(int64_t));
-        m_expectedHash = static_cast<int64_t>(be64toh(m_expectedHash));
-    }
+    in.read(reinterpret_cast<char *>(&m_expectedHash), sizeof(int64_t));
+    m_expectedHash = static_cast<int64_t>(be64toh(m_expectedHash));
 
     m_buffer << in.rdbuf();
 }
@@ -49,15 +55,19 @@ void MessageFromLCMDecoder::decodeFrom(std::istream &in, bool hasHash) noexcept 
 void MessageFromLCMDecoder::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
-    (void)longName;
-
-    // Reset m_buffer read pointer to beginning.
-    m_buffer.clear();
-    m_buffer.seekg(0);
-    m_calculatedHash = 0x12345678;
+//    (void)longName;
+std::cerr << longName << std::endl;
+    // Reset m_buffer read pointer to beginning only if we are not dealing with
+    // nested complex types as we are sharing our buffer with our parent message.
+    if (!m_internalBuffer.str().empty()) {
+        m_buffer.clear();
+        m_buffer.seekg(0);
+        m_calculatedHash = 0x12345678;
+    }
 }
 
 void MessageFromLCMDecoder::postVisit() noexcept {
+std::cerr << "e = " << m_expectedHash << ", h = " << hash() << std::endl;
     if ((0 != m_expectedHash) && (m_expectedHash != hash())) {
         std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding has failed" << std::endl; // LCOV_EXCL_LINE
     }
@@ -226,8 +236,14 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
 ////////////////////////////////////////////////////////////////////////////////
 
 int64_t MessageFromLCMDecoder::hash() const noexcept {
-    // Apply ZigZag encoding for hash.
-    const int64_t hash = (m_calculatedHash << 1) + ((m_calculatedHash >> 63) & 1);
+    // Apply ZigZag encoding for hash from this message's fields and depending
+    // hashes for complex nested types.
+    int64_t tmp{m_calculatedHash};
+    for (int64_t v : m_hashes) {
+        tmp += v;
+    }
+
+    const int64_t hash = (tmp << 1) + ((tmp >> 63) & 1);
     return hash;
 }
 

@@ -30,13 +30,14 @@ This class decodes a given message from LCM format.
 */
 class LIBCLUON_API MessageFromLCMDecoder {
    private:
+    MessageFromLCMDecoder(std::stringstream &in) noexcept;
     MessageFromLCMDecoder(const MessageFromLCMDecoder &) = delete;
     MessageFromLCMDecoder(MessageFromLCMDecoder &&)      = delete;
     MessageFromLCMDecoder &operator=(const MessageFromLCMDecoder &) = delete;
     MessageFromLCMDecoder &operator=(MessageFromLCMDecoder &&) = delete;
 
    public:
-    MessageFromLCMDecoder()  = default;
+    MessageFromLCMDecoder() noexcept;
     ~MessageFromLCMDecoder() = default;
 
    public:
@@ -44,9 +45,8 @@ class LIBCLUON_API MessageFromLCMDecoder {
      * This method decodes a given istream into LCM.
      *
      * @param in istream to decode.
-     * @param hasHash true if the stream contains a hash value from the fields.
      */
-    void decodeFrom(std::istream &in, bool hasHash = true) noexcept;
+    void decodeFrom(std::istream &in) noexcept;
 
    public:
     // The following methods are provided to allow an instance of this class to
@@ -77,21 +77,10 @@ class LIBCLUON_API MessageFromLCMDecoder {
         calculateHash(name);
         calculateHash(0);
 
-        // Simply copy the remaining read buffer over.
-        std::stringstream buffer;
-        char c{0};
-        while (m_buffer.good()) {
-            c = static_cast<char>(m_buffer.get());
-            buffer.put(c);
-        }
-
-        constexpr bool HAS_HASH{false};
-        cluon::MessageFromLCMDecoder nestedLCMDecoder;
-        nestedLCMDecoder.decodeFrom(buffer, HAS_HASH);
-
+        cluon::MessageFromLCMDecoder nestedLCMDecoder(m_buffer);
         value.accept(nestedLCMDecoder);
 
-        m_calculatedHash += nestedLCMDecoder.hash();
+        m_hashes.push_back(nestedLCMDecoder.hash());
     }
 
    private:
@@ -99,13 +88,12 @@ class LIBCLUON_API MessageFromLCMDecoder {
     void calculateHash(char c) noexcept;
     void calculateHash(const std::string &s) noexcept;
 
-    float ntohf(float f) const noexcept;
-    double ntohd(double d) const noexcept;
-
    private:
     int64_t m_calculatedHash{0x12345678};
     int64_t m_expectedHash{0};
-    std::stringstream m_buffer{""};
+    std::stringstream m_internalBuffer{""};
+    std::stringstream &m_buffer;
+    std::vector<int64_t> m_hashes{};
 };
 } // namespace cluon
 

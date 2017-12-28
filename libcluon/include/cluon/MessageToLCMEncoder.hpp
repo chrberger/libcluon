@@ -20,7 +20,6 @@
 
 #include "cluon/cluon.hpp"
 
-#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
