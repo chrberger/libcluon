@@ -31,6 +31,7 @@ namespace cluon {
 std::string MessageToLCMEncoder::encodedData(bool withHash) const noexcept {
     int64_t _hash = hash();
     _hash         = static_cast<int64_t>(htobe64(_hash));
+
     std::stringstream hashBuffer;
     hashBuffer.write(reinterpret_cast<const char *>(&_hash), sizeof(int64_t));
 
@@ -185,17 +186,14 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
 ////////////////////////////////////////////////////////////////////////////////
 
 int64_t MessageToLCMEncoder::hash() const noexcept {
-    // Apply ZigZag encoding for hash.
-//    const int64_t hash = (m_hash << 1) + ((m_hash >> 63) & 1);
-printf("H = 0x%" PRIx64 "\n\n", m_hash);
+    // Apply ZigZag encoding for hash from this message's fields and depending
+    // hashes for complex nested types.
     int64_t tmp{m_hash};
     for (int64_t v : m_hashes) {
         tmp += v;
     }
-printf("C = 0x%" PRIx64 "\n", m_hash);
 
     const int64_t hash = (tmp << 1) + ((tmp >> 63) & 1);
-printf("H_2 = 0x%" PRIx64 "\n\n", hash);
     return hash;
 }
 
@@ -204,7 +202,6 @@ void MessageToLCMEncoder::calculateHash(char c) noexcept {
 }
 
 void MessageToLCMEncoder::calculateHash(const std::string &s) noexcept {
-printf("S = %s, v = 0x%" PRIx64 "\n", s.c_str(), m_hash);
     const std::string tmp{(s.length() > 255 ? s.substr(0, 255) : s)};
     const uint8_t length{static_cast<uint8_t>(tmp.length())};
     calculateHash(static_cast<char>(length));

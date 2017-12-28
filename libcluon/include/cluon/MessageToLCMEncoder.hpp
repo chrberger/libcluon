@@ -20,9 +20,6 @@
 
 #include "cluon/cluon.hpp"
 
-#include <inttypes.h>
-#include <cstdio>
-#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -74,26 +71,19 @@ class LIBCLUON_API MessageToLCMEncoder {
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
         (void)id;
         (void)typeName;
-printf("A = 0x%" PRIx64 "\n", m_hash);
         calculateHash(name);
         calculateHash(0);
-printf("B = 0x%" PRIx64 "\n", m_hash);
 
         // No hash for the type but for name and dimension.
         cluon::MessageToLCMEncoder nestedLCMEncoder;
-printf("0 = 0x%" PRIx64 "\n", m_hash);
         value.accept(nestedLCMEncoder);
 
         constexpr bool WITH_HASH{false};
         const std::string s = nestedLCMEncoder.encodedData(WITH_HASH);
-
         m_buffer.write(s.c_str(), static_cast<uint32_t>(s.size()));
 
-//        m_hash += nestedLCMEncoder.hash();
-printf("C = 0x%" PRIx64 "\n", m_hash);
-
+        // Save this complex field's hash for later to compute final hash.
         m_hashes.push_back(nestedLCMEncoder.hash());
-printf("D = 0x%" PRIx64 "\n", nestedLCMEncoder.hash());
     }
 
    private:

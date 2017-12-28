@@ -22,6 +22,7 @@
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -297,24 +298,21 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     tmp7.accept(lcmEncoder);
     std::string s = lcmEncoder.encodedData();
 
-    // Expected: 0x3e 0x7e 0x1b 0x94 0x1a 0x2c 0x3d 0xf0 0x9 0x0 0x0 0x0 0xc 0xd 
-              // 0xb2 0x26 0x63 0xeb 0x34 0x47 0x5b 0x92 0x9 0x0 0x0 0x0 0xc 0xd 
-for (auto c : s ) {
-    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
-}
-std::cout << std::endl;
-
-    REQUIRE(10 == s.size());
-    REQUIRE(0xa == static_cast<uint8_t>(s.at(0)));
-    REQUIRE(0x2 == static_cast<uint8_t>(s.at(1)));
-    REQUIRE(0x8 == static_cast<uint8_t>(s.at(2)));
-    REQUIRE(0x9 == static_cast<uint8_t>(s.at(3)));
-    REQUIRE(0x10 == static_cast<uint8_t>(s.at(4)));
-    REQUIRE(0xc == static_cast<uint8_t>(s.at(5)));
-    REQUIRE(0x1a == static_cast<uint8_t>(s.at(6)));
-    REQUIRE(0x2 == static_cast<uint8_t>(s.at(7)));
-    REQUIRE(0x8 == static_cast<uint8_t>(s.at(8)));
-    REQUIRE(0xd == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(14 == s.size());
+    REQUIRE(0x3e == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0x7e == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x1b == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x94 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x1a == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x2c == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x3d == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0xf0 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x9 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xc == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0xd == static_cast<uint8_t>(s.at(13)));
 
     std::stringstream sstr{s};
     cluon::MessageFromLCMDecoder lcmDecoder;
@@ -336,5 +334,12 @@ std::cout << std::endl;
                   [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << +v << '\n'; },
                   []() {});
     std::cout << buffer.str() << std::endl;
+
+//int i = 0;
+//for (auto c : s ) {
+////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
+//std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));" << std::endl;
+//}
+//std::cout << std::endl;
 }
 
