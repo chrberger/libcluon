@@ -331,3 +331,60 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
                   []() {});
     std::cout << buffer.str() << std::endl;
 }
+
+TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for serialization and deserialization.") {
+    testdata::MyTestMessage7 tmp7;
+
+    REQUIRE(123 == tmp7.attribute1().attribute1());
+    REQUIRE(12345 == tmp7.attribute2());
+    REQUIRE(123 == tmp7.attribute3().attribute1());
+
+    testdata::MyTestMessage2 tmp2_1;
+    tmp7.attribute1(tmp2_1.attribute1(9));
+
+    tmp7.attribute2(12);
+
+    testdata::MyTestMessage2 tmp2_3;
+    tmp7.attribute3(tmp2_3.attribute1(13));
+
+    REQUIRE(9== tmp7.attribute1().attribute1());
+    REQUIRE(12 == tmp7.attribute2());
+    REQUIRE(13 == tmp7.attribute3().attribute1());
+
+    cluon::MessageToProtoEncoder protoEncoder;
+    tmp7.accept(protoEncoder);
+    std::string s = protoEncoder.encodedData();
+
+    REQUIRE(10 == s.size());
+    REQUIRE(0xa == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0x2 == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x8 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x9 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x10 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0xc == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x1a == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x2 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x8 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0xd == static_cast<uint8_t>(s.at(9)));
+
+    std::stringstream sstr{s};
+    cluon::MessageFromProtoDecoder protoDecoder;
+    protoDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage7 tmp7_2;
+    REQUIRE(123 == tmp7_2.attribute1().attribute1());
+    REQUIRE(12345 == tmp7_2.attribute2());
+    REQUIRE(123 == tmp7_2.attribute3().attribute1());
+
+    tmp7_2.accept(protoDecoder);
+    REQUIRE(9== tmp7_2.attribute1().attribute1());
+    REQUIRE(12 == tmp7_2.attribute2());
+    REQUIRE(13 == tmp7_2.attribute3().attribute1());
+
+    // Simple toString().
+    std::stringstream buffer;
+    tmp7_2.accept([](uint32_t, const std::string &, const std::string &) {},
+                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << +v << '\n'; },
+                  []() {});
+    std::cout << buffer.str() << std::endl;
+}

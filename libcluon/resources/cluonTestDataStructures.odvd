@@ -68,3 +68,9 @@ message testdata.MyTestMessage6 [id = 30006] {
     testdata.MyTestMessage2 attribute1 [ id = 3 ];
 }
 
+message testdata.MyTestMessage7 [id = 30007] {
+    testdata.MyTestMessage2 attribute1 [ id = 1 ];
+    uint32 attribute2 [ default = 12345, id = 2 ];
+    testdata.MyTestMessage2 attribute3 [ id = 3 ];
+}
+
