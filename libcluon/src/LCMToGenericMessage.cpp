@@ -34,7 +34,7 @@ int32_t LCMToGenericMessage::setMessageSpecification(const std::string &ms) noex
     auto parsingResult = mp.parse(ms);
     if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == parsingResult.second) {
         m_listOfMetaMessages = parsingResult.first;
-        for (const auto &mm : m_listOfMetaMessages) { m_scopeOfMetaMessages[mm.messageName()] = mm; std::cout << "M = '" << mm.messageName() << "'" << std::endl;}
+        for (const auto &mm : m_listOfMetaMessages) { m_scopeOfMetaMessages[mm.messageName()] = mm; }
         retVal = static_cast<int32_t>(m_listOfMetaMessages.size());
     }
     return retVal;
