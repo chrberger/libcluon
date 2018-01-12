@@ -91,6 +91,10 @@ set(CLUON-OD4TOSTDOUT cluon-OD4toStdout)
 add_executable(${CLUON-OD4TOSTDOUT} ${CMAKE_CURRENT_SOURCE_DIR}/tools/${CLUON-OD4TOSTDOUT}.cpp)
 target_link_libraries(${CLUON-OD4TOSTDOUT} ${LIBRARIES})
 
+set(CLUON-OD4TOJSON cluon-OD4toJSON)
+add_executable(${CLUON-OD4TOJSON} ${CMAKE_CURRENT_SOURCE_DIR}/tools/${CLUON-OD4TOJSON}.cpp)
+target_link_libraries(${CLUON-OD4TOJSON} ${LIBRARIES})
+
 # The target for the JavaScript interface.
 if("${WEB}" STREQUAL "1")
     add_executable(libcluon ${CMAKE_CURRENT_SOURCE_DIR}/tools/libcluon.cpp)
@@ -155,6 +159,7 @@ install(TARGETS ${PROJECT_NAME}-static DESTINATION lib COMPONENT lib${PROJECT_NA
 install(TARGETS ${PROJECT_NAME}        DESTINATION lib COMPONENT lib${PROJECT_NAME})
 install(TARGETS ${CLUON-MSC}           DESTINATION bin COMPONENT lib${PROJECT_NAME})
 install(TARGETS ${CLUON-OD4TOSTDOUT}   DESTINATION bin COMPONENT lib${PROJECT_NAME})
+install(TARGETS ${CLUON-OD4TOJSON}     DESTINATION bin COMPONENT lib${PROJECT_NAME})
 # Install header files.
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include COMPONENT lib${PROJECT_NAME})
 install(FILES "${CMAKE_BINARY_DIR}/include/cluon/cluonDataStructures.hpp" DESTINATION include/cluon COMPONENT lib${PROJECT_NAME})
