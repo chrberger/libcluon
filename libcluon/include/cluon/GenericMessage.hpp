@@ -235,11 +235,11 @@ class LIBCLUON_API GenericMessage {
     };
 
    private:
-    GenericMessage(GenericMessage &&) = delete;
     GenericMessage &operator=(GenericMessage &&) = delete;
 
    public:
     GenericMessage()                       = default;
+    GenericMessage(GenericMessage &&)      = default;
     GenericMessage(const GenericMessage &) = default;
     GenericMessage &operator=(const GenericMessage &) = default;
 
@@ -257,6 +257,15 @@ class LIBCLUON_API GenericMessage {
         m_intermediateDataRepresentation.clear();
         m_intermediateDataRepresentation = gmv.intermediateDataRepresentation();
     }
+
+    /**
+     * This method creates an empty GenericMessage from a given message
+     * specification parsed from MessageParser.
+     *
+     * @param mm MetaMessage describing the fields for the message to be resolved.
+     * @param mms List of MetaMessages that are known (used for resolving nested message).
+     */
+    void createFrom(const MetaMessage &mm, const std::vector<MetaMessage> &mms) noexcept;
 
     /**
      * This method creates this GenericMessage from a serialized representation

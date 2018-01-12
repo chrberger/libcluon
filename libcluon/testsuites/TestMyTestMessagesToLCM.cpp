@@ -19,6 +19,7 @@
 
 #include "cluon/MessageFromLCMDecoder.hpp"
 #include "cluon/MessageToLCMEncoder.hpp"
+#include "cluon/LCMToGenericMessage.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
@@ -330,3 +331,71 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     //                  []() {});
     //    std::cout << buffer.str() << std::endl;
 }
+
+TEST_CASE("Dynamically creating GenericMessage from LCM channel payload.") {
+    const char *msg = R"(
+message example.MyTestMessage0 [id = 12345] {
+    bool attribute1 [default = true, id = 1];
+    char attribute2 [default = 'c', id = 2];
+}
+)";
+
+    // Create LCM payload.
+    testdata::MyTestMessage0 tmp;
+    REQUIRE(tmp.attribute1());
+    REQUIRE('c' == tmp.attribute2());
+
+    tmp.attribute1(false).attribute2('e');
+    REQUIRE(!tmp.attribute1());
+    REQUIRE('e' == tmp.attribute2());
+
+    cluon::MessageToLCMEncoder lcmEncoder;
+    tmp.accept(lcmEncoder);
+
+    const std::string s = lcmEncoder.encodedData();
+    REQUIRE(10 == s.size());
+
+    REQUIRE(0x66 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xe1 == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0xfa == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x59 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x27 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x15 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0xee == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(9)));
+
+    std::stringstream sstr;
+
+    constexpr int32_t MAGIC_NUMBER_LCM2 = 0x4c433032;
+    int32_t v = htobe32(MAGIC_NUMBER_LCM2);
+    sstr.write(reinterpret_cast<char*>(&v), sizeof(int32_t));
+
+    constexpr int32_t SEQUENCE_NUMBER = 0;
+    v = htobe32(SEQUENCE_NUMBER);
+    sstr.write(reinterpret_cast<char*>(&v), sizeof(int32_t));
+
+    const std::string CHANNEL_NAME("example.MyTestMessage0");
+    sstr.write(CHANNEL_NAME.c_str(), CHANNEL_NAME.size()+1); // Include binary '\0'.
+
+    // Write LCM payload.
+    sstr.write(s.c_str(), s.size());
+
+    // Create GenericMessage from LCM-serialized payload.
+    cluon::LCMToGenericMessage lcm2GM;
+    REQUIRE(1 == lcm2GM.setMessageSpecification(std::string(msg)));
+
+    const std::string data = sstr.str();
+    cluon::GenericMessage gm = lcm2GM.getGenericMessage(data);
+
+    // Test correct decoding.
+    testdata::MyTestMessage0 tmp2;
+    REQUIRE(tmp2.attribute1());
+    REQUIRE('c' == tmp2.attribute2());
+
+    tmp2.accept(gm);
+    REQUIRE(!tmp2.attribute1());
+    REQUIRE('e' == tmp2.attribute2());
+}
+

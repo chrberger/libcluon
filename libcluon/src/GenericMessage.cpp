@@ -381,4 +381,119 @@ void GenericMessage::createFrom(const MetaMessage &mm,
     createIntermediateDataRepresentationFrom(pd);
 }
 
+void GenericMessage::createFrom(const MetaMessage &mm,
+                                const std::vector<MetaMessage> &mms) noexcept {
+    m_metaMessage = mm;
+    m_longName    = m_metaMessage.messageName();
+
+    m_scopeOfMetaMessages.clear();
+    m_scopeOfMetaMessages = mms;
+
+    m_mapForScopeOfMetaMessages.clear();
+    for (const auto &e : m_scopeOfMetaMessages) { m_mapForScopeOfMetaMessages[e.messageName()] = e; }
+
+    m_intermediateDataRepresentation.clear();
+    for (const auto &f : m_metaMessage.listOfMetaFields()) {
+        if (f.fieldDataType() == MetaMessage::MetaField::BOOL_T) {
+            try {
+                linb::any _v{false};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::CHAR_T) {
+            try {
+                linb::any _v{static_cast<char>('\0')};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::UINT8_T) {
+            try {
+                linb::any _v{static_cast<uint8_t>(0)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::INT8_T) {
+            try {
+                linb::any _v{static_cast<int8_t>(0)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::UINT16_T) {
+            try {
+                linb::any _v{static_cast<uint16_t>(0)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::INT16_T) {
+            try {
+                linb::any _v{static_cast<int16_t>(0)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::UINT32_T) {
+            try {
+                linb::any _v{static_cast<uint32_t>(0)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::INT32_T) {
+            try {
+                linb::any _v{static_cast<int32_t>(0)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::UINT64_T) {
+            try {
+                linb::any _v{static_cast<uint64_t>(0)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::INT64_T) {
+            try {
+                linb::any _v{static_cast<int64_t>(0)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::FLOAT_T) {
+            try {
+                linb::any _v{static_cast<float>(0.0f)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::DOUBLE_T) {
+            try {
+                linb::any _v{static_cast<double>(0.0)};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        } else if ((f.fieldDataType() == MetaMessage::MetaField::STRING_T)
+                   || (f.fieldDataType() == MetaMessage::MetaField::BYTES_T)) {
+            try {
+                linb::any _v = std::string{};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        }
+//        } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T) {
+//            if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
+//                std::string s;
+//                pd.visit(f.fieldIdentifier(), "", "", s);
+
+//                // Create a nested ProtoDecoder for the contained complex message.
+//                std::stringstream sstr{s};
+//                cluon::MessageFromProtoDecoder protoDecoder;
+//                protoDecoder.decodeFrom(sstr);
+
+//                // Create a GenericMessage from the decoded Proto-data.
+//                cluon::GenericMessage gm;
+//                gm.createFrom(
+//                    m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages, protoDecoder);
+
+//                m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
+//            }
+//        }
+    }
+}
+
+
 } // namespace cluon
