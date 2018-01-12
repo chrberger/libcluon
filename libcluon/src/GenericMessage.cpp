@@ -473,25 +473,16 @@ void GenericMessage::createFrom(const MetaMessage &mm,
                 m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
             } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
             }
+        } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T) {
+            if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
+                // Create a GenericMessage from the decoded Proto-data.
+                cluon::GenericMessage gm;
+                gm.createFrom(
+                    m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages);
+
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
+            }
         }
-//        } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T) {
-//            if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
-//                std::string s;
-//                pd.visit(f.fieldIdentifier(), "", "", s);
-
-//                // Create a nested ProtoDecoder for the contained complex message.
-//                std::stringstream sstr{s};
-//                cluon::MessageFromProtoDecoder protoDecoder;
-//                protoDecoder.decodeFrom(sstr);
-
-//                // Create a GenericMessage from the decoded Proto-data.
-//                cluon::GenericMessage gm;
-//                gm.createFrom(
-//                    m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages, protoDecoder);
-
-//                m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
-//            }
-//        }
     }
 }
 

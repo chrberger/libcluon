@@ -368,19 +368,19 @@ message example.MyTestMessage0 [id = 12345] {
 
     std::stringstream sstr;
 
-    constexpr int32_t MAGIC_NUMBER_LCM2 = 0x4c433032;
-    int32_t v = htobe32(MAGIC_NUMBER_LCM2);
-    sstr.write(reinterpret_cast<char*>(&v), sizeof(int32_t));
+    constexpr uint32_t MAGIC_NUMBER_LCM2 = 0x4c433032;
+    uint32_t v = htobe32(MAGIC_NUMBER_LCM2);
+    sstr.write(reinterpret_cast<char*>(&v), sizeof(uint32_t));
 
-    constexpr int32_t SEQUENCE_NUMBER = 0;
+    constexpr uint32_t SEQUENCE_NUMBER = 0;
     v = htobe32(SEQUENCE_NUMBER);
-    sstr.write(reinterpret_cast<char*>(&v), sizeof(int32_t));
+    sstr.write(reinterpret_cast<char*>(&v), sizeof(uint32_t));
 
     const std::string CHANNEL_NAME("example.MyTestMessage0");
-    sstr.write(CHANNEL_NAME.c_str(), CHANNEL_NAME.size()+1); // Include binary '\0'.
+    sstr.write(CHANNEL_NAME.c_str(), static_cast<std::streamsize>(CHANNEL_NAME.size()+1)); // Include binary '\0'.
 
     // Write LCM payload.
-    sstr.write(s.c_str(), s.size());
+    sstr.write(s.c_str(), static_cast<std::streamsize>(s.size()));
 
     // Create GenericMessage from LCM-serialized payload.
     cluon::LCMToGenericMessage lcm2GM;

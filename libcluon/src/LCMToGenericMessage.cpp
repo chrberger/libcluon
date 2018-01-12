@@ -47,7 +47,7 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
         constexpr uint8_t LCM_HEADER_SIZE{4 /*magic number*/ + 4 /*sequence number*/};
         if (LCM_HEADER_SIZE < data.size()) {
             // First, read magic number.
-            constexpr int32_t MAGIC_NUMBER_LCM2{0x4c433032};
+            constexpr uint32_t MAGIC_NUMBER_LCM2{0x4c433032};
             uint32_t offset{0};
             uint32_t magicNumber{0};
             {
@@ -55,36 +55,38 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
                 sstr.read(reinterpret_cast<char *>(&magicNumber), sizeof(uint32_t)); /* Flawfinder: ignore */ // NOLINT
                 magicNumber = be32toh(magicNumber);
             }
-            offset += 4;
+            if (MAGIC_NUMBER_LCM2 == magicNumber) {
+                offset += 4;
 
-            // Next, read sequence number in case of fragmented data.
-            uint32_t sequenceNumber{0};
-            {
-                std::stringstream sstr{std::string(&data[offset], 4)};
-                sstr.read(reinterpret_cast<char *>(&sequenceNumber), sizeof(uint32_t)); /* Flawfinder: ignore */ // NOLINT
-                sequenceNumber = be32toh(sequenceNumber);
-            }
-            offset += 4;
+                // Next, read sequence number in case of fragmented data.
+                uint32_t sequenceNumber{0};
+                {
+                    std::stringstream sstr{std::string(&data[offset], 4)};
+                    sstr.read(reinterpret_cast<char *>(&sequenceNumber), sizeof(uint32_t)); /* Flawfinder: ignore */ // NOLINT
+                    sequenceNumber = be32toh(sequenceNumber);
+                }
+                offset += 4;
 
-            std::array<char, 256> buffer;
-            uint8_t i{0};
-            char c{0};
-            do {
-                c = data[offset+i];
-                buffer[i++] = c;
-            } while (c != 0);
-            const std::string channelName(std::begin(buffer), std::begin(buffer)+i-1); // Omit '\0' at the end.
+                std::array<char, 256> buffer;
+                uint8_t i{0};
+                char c{0};
+                do {
+                    c = data[offset+i];
+                    buffer[i++] = c;
+                } while (c != 0);
+                const std::string channelName(std::begin(buffer), std::begin(buffer)+i-1); // Omit '\0' at the end.
 
-            // Next, find the MetaMessage corresponding to the channel name
-            // and create a Message therefrom based on the decoded LCM data.
-            if (0 < m_scopeOfMetaMessages.count(channelName)) {
-                // data[offset+i] marks now the beginning of the payload to be decoded.
-                std::stringstream sstr{data.substr(offset+i)};
-                cluon::MessageFromLCMDecoder lcmDecoder;
-                lcmDecoder.decodeFrom(sstr);
+                // Next, find the MetaMessage corresponding to the channel name
+                // and create a Message therefrom based on the decoded LCM data.
+                if (0 < m_scopeOfMetaMessages.count(channelName)) {
+                    // data[offset+i] marks now the beginning of the payload to be decoded.
+                    std::stringstream sstr{data.substr(offset+i)};
+                    cluon::MessageFromLCMDecoder lcmDecoder;
+                    lcmDecoder.decodeFrom(sstr);
 
-                gm.createFrom(m_scopeOfMetaMessages[channelName], m_listOfMetaMessages);
-                gm.accept(lcmDecoder);
+                    gm.createFrom(m_scopeOfMetaMessages[channelName], m_listOfMetaMessages);
+                    gm.accept(lcmDecoder);
+                }
             }
         }
     }
