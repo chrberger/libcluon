@@ -23,6 +23,7 @@
 #include <sstream>
 
 #ifdef WIN32
+    #undef be32toh
     #define be32toh(x) __ntohl(x)
 
     #include <cstdint>
