@@ -18,9 +18,11 @@
 #ifndef METAMESSAGETOPROTOTRANSFORMATOR_HPP
 #define METAMESSAGETOPROTOTRANSFORMATOR_HPP
 
-#include "Mustache/mustache.hpp"
-#include "cluon/MetaMessage.hpp"
 #include "cluon/cluon.hpp"
+
+#include "Mustache/mustache.hpp"
+
+#include "cluon/MetaMessage.hpp"
 
 #include <string>
 

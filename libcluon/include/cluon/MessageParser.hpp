@@ -18,8 +18,8 @@
 #ifndef MESSAGEPARSER_HPP
 #define MESSAGEPARSER_HPP
 
-#include "cluon/MetaMessage.hpp"
 #include "cluon/cluon.hpp"
+#include "cluon/MetaMessage.hpp"
 
 #include <string>
 #include <vector>

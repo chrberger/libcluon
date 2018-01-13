@@ -18,8 +18,8 @@
 #ifndef ENVELOPETOJSON_HPP
 #define ENVELOPETOJSON_HPP
 
-#include "cluon/MetaMessage.hpp"
 #include "cluon/cluon.hpp"
+#include "cluon/MetaMessage.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
 #include <map>

@@ -18,6 +18,8 @@
 #ifndef UDPSENDER_HPP
 #define UDPSENDER_HPP
 
+#include "cluon/cluon.hpp"
+
 // clang-format off
 #ifdef WIN32
     #include <Winsock2.h> // for WSAStartUp
@@ -27,8 +29,6 @@
     #include <netinet/in.h>
 #endif
 // clang-format on
-
-#include "cluon/cluon.hpp"
 
 #include <mutex>
 #include <cstdint>

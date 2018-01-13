@@ -18,8 +18,8 @@
 #ifndef MESSAGEFROMPROTODECODER_HPP
 #define MESSAGEFROMPROTODECODER_HPP
 
-#include "cluon/ProtoConstants.hpp"
 #include "cluon/cluon.hpp"
+#include "cluon/ProtoConstants.hpp"
 
 #include <map>
 #include <sstream>
