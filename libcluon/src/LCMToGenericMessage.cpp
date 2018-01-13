@@ -17,8 +17,9 @@
 
 // clang-format off
 #ifdef WIN32
-    #include "cluon/cluon.hpp"
-    #include <Winsock2.h> // for ntohll
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <winsock2.h> // for ntohll
 #endif
 // clang-format on
 
@@ -79,7 +80,7 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
                 do {
                     c = data[offset+i];
                     buffer[i++] = c;
-                } while (c != 0);
+                } while ( (c != 0) && (i < 256) );
                 const std::string channelName(std::begin(buffer), std::begin(buffer)+i-1); // Omit '\0' at the end.
 
                 // Next, find the MetaMessage corresponding to the channel name
