@@ -47,7 +47,7 @@ endif()
 
 if(WIN32)
     set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
-        /O2 /D WIN32_LEAN_AND_MEAN ")
+        /O2 ")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
         ${GENERAL_BUILD_FLAGS} ")
