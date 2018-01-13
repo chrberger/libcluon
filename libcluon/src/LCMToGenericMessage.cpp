@@ -15,14 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// clang-format off
-#ifdef WIN32
-    #define WIN32_LEAN_AND_MEAN
-    #include <windows.h>
-    #include <winsock2.h> // for ntohll
-#endif
-// clang-format on
-
 #include "cluon/LCMToGenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/MessageFromLCMDecoder.hpp"
