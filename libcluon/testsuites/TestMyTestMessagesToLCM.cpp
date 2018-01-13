@@ -399,3 +399,70 @@ message example.MyTestMessage0 [id = 12345] {
     REQUIRE('e' == tmp2.attribute2());
 }
 
+TEST_CASE("Dynamically creating GenericMessage from LCM channel payload with nested fields.") {
+    const char *msg = R"(
+message testdata.MyTestMessage2 [id = 30002] {
+    uint8 attribute1 [ default = 123, id = 1 ];
+}
+message testdata.MyTestMessage6 [id = 30006] {
+    testdata.MyTestMessage2 attribute1 [ id = 3 ];
+}
+)";
+
+    // Create LCM payload.
+    testdata::MyTestMessage6 tmp6;
+
+    REQUIRE(123 == tmp6.attribute1().attribute1());
+
+    testdata::MyTestMessage2 tmp2;
+    tmp6.attribute1(tmp2.attribute1(150));
+
+    REQUIRE(150 == tmp6.attribute1().attribute1());
+
+    cluon::MessageToLCMEncoder lcmEncoder;
+    tmp6.accept(lcmEncoder);
+    std::string s = lcmEncoder.encodedData();
+
+    REQUIRE(9 == s.size());
+
+    REQUIRE(0xeb == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0xfc == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x23 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x20 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x8c == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0xc0 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0xa0 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x96 == static_cast<uint8_t>(s.at(8)));
+
+    std::stringstream sstr;
+
+    constexpr uint32_t MAGIC_NUMBER_LCM2 = 0x4c433032;
+    uint32_t v = htobe32(MAGIC_NUMBER_LCM2);
+    sstr.write(reinterpret_cast<char*>(&v), sizeof(uint32_t));
+
+    constexpr uint32_t SEQUENCE_NUMBER = 0;
+    v = htobe32(SEQUENCE_NUMBER);
+    sstr.write(reinterpret_cast<char*>(&v), sizeof(uint32_t));
+
+    const std::string CHANNEL_NAME("testdata.MyTestMessage6");
+    sstr.write(CHANNEL_NAME.c_str(), static_cast<std::streamsize>(CHANNEL_NAME.size()+1)); // Include binary '\0'.
+
+    // Write LCM payload.
+    sstr.write(s.c_str(), static_cast<std::streamsize>(s.size()));
+
+    // Create GenericMessage from LCM-serialized payload.
+    cluon::LCMToGenericMessage lcm2GM;
+    REQUIRE(2 == lcm2GM.setMessageSpecification(std::string(msg)));
+
+    const std::string data = sstr.str();
+    cluon::GenericMessage gm = lcm2GM.getGenericMessage(data);
+
+    // Test correct decoding.
+    testdata::MyTestMessage6 tmp6_2;
+    REQUIRE(123 == tmp6_2.attribute1().attribute1());
+
+    tmp6_2.accept(gm);
+    REQUIRE(150 == tmp6_2.attribute1().attribute1());
+}
+

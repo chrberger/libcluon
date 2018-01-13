@@ -478,12 +478,11 @@ void GenericMessage::createFrom(const MetaMessage &mm,
         } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T) {
             if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
                 // Create a GenericMessage from the decoded Proto-data.
-std::cout << __LINE__ << std::endl;
-//                cluon::GenericMessage gm;
-//                gm.createFrom(
-//                    m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages);
+                cluon::GenericMessage gm;
+                gm.createFrom(
+                    m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages);
 
-//                m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
+                m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
             }
         }
     }
