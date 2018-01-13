@@ -42,7 +42,8 @@
 
     // Avoid include definitions from Winsock v1.
     #define WIN32_LEAN_AND_MEAN
-    #include <Winsock2.h> // for ntohll
+    #include <windows.h>
+    #include <winsock2.h>
 
     // Export symbols.
     #ifdef LIBCLUON_SHARED
