@@ -73,7 +73,7 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
                 do {
                     c = data[offset+i];
                     buffer[i++] = c;
-                } while ( (c != 0) && (i < 256) );
+                } while (c != 0);
                 const std::string channelName(std::begin(buffer), std::begin(buffer)+i-1); // Omit '\0' at the end.
 
                 // Next, find the MetaMessage corresponding to the channel name
