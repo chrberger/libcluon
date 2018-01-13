@@ -37,6 +37,8 @@
     // Disable deprecated API warnings.
     #pragma warning(disable : 4996)
 
+    // Avoid include definitions from Winsock v1.
+    #define WIN32_LEAN_AND_MEAN
 
     // Link against ws2_32.lib for networking.
     #pragma comment(lib, "ws2_32.lib")

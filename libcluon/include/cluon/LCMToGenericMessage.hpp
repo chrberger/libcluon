@@ -18,9 +18,9 @@
 #ifndef LCMTOGENERICMESSAGE_HPP
 #define LCMTOGENERICMESSAGE_HPP
 
+#include "cluon/cluon.hpp"
 #include "cluon/GenericMessage.hpp"
 #include "cluon/MetaMessage.hpp"
-#include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
 #include <map>
