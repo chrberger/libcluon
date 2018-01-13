@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// clang-format off
-#ifdef WIN32
-    #include <Winsock2.h> // for ntohnl
-#endif
-// clang-format on
-
 #include "cluon/LCMToGenericMessage.hpp"
 
 #include "cluon/MessageParser.hpp"
 #include "cluon/MessageFromLCMDecoder.hpp"
 #include <array>
 #include <sstream>
+
+// clang-format off
+#ifdef WIN32
+    #include <Winsock2.h> // for ntohnl
+#endif
+// clang-format on
 
 namespace cluon {
 
