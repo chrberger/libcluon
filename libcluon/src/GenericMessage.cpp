@@ -17,8 +17,6 @@
 
 #include "cluon/GenericMessage.hpp"
 
-#include <iostream>
-
 namespace cluon {
 
 void GenericMessage::GenericMessageVisitor::preVisit(uint32_t id,

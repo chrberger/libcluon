@@ -24,7 +24,6 @@
 #include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
-#include <iostream>
 #include <map>
 #include <string>
 #include <utility>

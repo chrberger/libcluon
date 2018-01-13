@@ -214,22 +214,19 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
 
     v.clear();
     if (length > 0) {
-#ifdef WIN32 // LCOV_EXCL_LINE
         std::vector<char> buffer;
         buffer.reserve(static_cast<uint32_t>(length));
-        // Read data but skip trailing \0.
-        for (uint32_t i = 0; i < static_cast<uint32_t>(length - 1); i++) {
+        for (uint32_t i = 0; i < static_cast<uint32_t>(length); i++) {
             char c;
             m_buffer.get(c);
-            buffer.push_back(c);
+
+            // Read data but skip trailing \0.
+            if (i < static_cast<uint32_t>(length - 1)) {
+                buffer.push_back(c);
+            }
         }
         const std::string s(buffer.begin(), buffer.end());
         v = s;
-#else
-        // Read data but skip trailing \0.
-        v.reserve(static_cast<uint32_t>(length));
-        std::copy_n(std::istreambuf_iterator<char>(m_buffer), static_cast<uint32_t>(length - 1), std::back_inserter(v));
-#endif
     }
 }
 
@@ -253,7 +250,7 @@ void MessageFromLCMDecoder::calculateHash(const std::string &s) noexcept {
     const std::string tmp{(s.length() > 255 ? s.substr(0, 255) : s)};
     const uint8_t length{static_cast<uint8_t>(tmp.length())};
     calculateHash(static_cast<char>(length));
-    for (auto c : s) { calculateHash(c); }
+    for (auto c : tmp) { calculateHash(c); }
 }
 
 } // namespace cluon

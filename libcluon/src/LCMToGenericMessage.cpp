@@ -18,6 +18,7 @@
 #include "cluon/LCMToGenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/MessageFromLCMDecoder.hpp"
+
 #include <array>
 #include <sstream>
 
