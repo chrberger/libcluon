@@ -17,6 +17,8 @@
 
 #include "cluon/GenericMessage.hpp"
 
+#include <iostream>
+
 namespace cluon {
 
 void GenericMessage::GenericMessageVisitor::preVisit(uint32_t id,
@@ -476,11 +478,12 @@ void GenericMessage::createFrom(const MetaMessage &mm,
         } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T) {
             if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
                 // Create a GenericMessage from the decoded Proto-data.
-                cluon::GenericMessage gm;
-                gm.createFrom(
-                    m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages);
+std::cout << __LINE__ << std::endl;
+//                cluon::GenericMessage gm;
+//                gm.createFrom(
+//                    m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages);
 
-                m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
+//                m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
             }
         }
     }

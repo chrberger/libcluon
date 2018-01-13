@@ -17,6 +17,7 @@
 
 // clang-format off
 #ifdef WIN32
+    #include "cluon/cluon.hpp"
     #include <Winsock2.h> // for ntohll
 #endif
 // clang-format on
