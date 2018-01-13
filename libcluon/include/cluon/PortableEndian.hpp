@@ -33,17 +33,6 @@
     #include <sys/endian.h>
 #elif (defined(_WIN16) || defined(_WIN32) || defined(_WIN64))
     #if BYTE_ORDER == LITTLE_ENDIAN
-        #include <cstring>
-        uint32_t __ntohl(const uint32_t v) {
-            uint8_t d[4] = {};
-            std::memcpy(&d, &v, sizeof(d));
-
-            return ((uint32_t) d[3] << 0)
-                 | ((uint32_t) d[2] << 8)
-                 | ((uint32_t) d[1] << 16)
-                 | ((uint32_t) d[0] << 24);
-        }
-
         #define htobe16(x) htons(x)
         #define htole16(x) (x)
         #define be16toh(x) ntohs(x)
@@ -51,7 +40,7 @@
 
         #define htobe32(x) htonl(x)
         #define htole32(x) (x)
-        #define be32toh(x) __ntohl(x)
+        #define be32toh(x) ntohl(x)
         #define le32toh(x) (x)
 
         #define htobe64(x) htonll(x)

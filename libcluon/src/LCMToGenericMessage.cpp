@@ -22,6 +22,22 @@
 #include <array>
 #include <sstream>
 
+#ifdef WIN32
+    #define be32toh(x) __ntohl(x)
+
+    #include <cstdint>
+    #include <cstring>
+    uint32_t __ntohl(const uint32_t v) {
+        uint8_t d[4] = {};
+        std::memcpy(&d, &v, sizeof(d));
+
+        return ((uint32_t) d[3] << 0)
+             | ((uint32_t) d[2] << 8)
+             | ((uint32_t) d[1] << 16)
+             | ((uint32_t) d[0] << 24);
+    }
+#endif
+
 namespace cluon {
 
 int32_t LCMToGenericMessage::setMessageSpecification(const std::string &ms) noexcept {
