@@ -100,7 +100,7 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
 
                         // Next, find the MetaMessage corresponding to the channel name
                         // and create a Message therefrom based on the decoded LCM data.
-                        if ( (0 < m_scopeOfMetaMessages.count(CHANNEL_NAME)) && (std::string::npos != (pos + 1)) ) {
+                        if ((0 < m_scopeOfMetaMessages.count(CHANNEL_NAME)) && (std::string::npos != (pos + 1))) {
                             // data[offset+i] marks now the beginning of the payload to be decoded.
                             std::stringstream sstr{data.substr(pos + 1)};
 
