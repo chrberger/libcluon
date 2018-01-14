@@ -30,12 +30,12 @@
 #endif
 // clang-format on
 
+#include <cstdint>
 #include <atomic>
 #include <chrono>
 #include <functional>
 #include <string>
 #include <thread>
-#include <cstdint>
 
 namespace cluon {
 /**

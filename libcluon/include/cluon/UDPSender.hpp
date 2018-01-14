@@ -30,8 +30,8 @@
 #endif
 // clang-format on
 
-#include <mutex>
 #include <cstdint>
+#include <mutex>
 #include <string>
 #include <utility>
 

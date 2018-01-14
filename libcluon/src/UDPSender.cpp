@@ -28,12 +28,11 @@
 #endif
 // clang-format on
 
-#include <algorithm>
 #include <cerrno>
 #include <cstring>
+#include <algorithm>
 #include <iterator>
 #include <sstream>
-#include <string>
 #include <vector>
 
 namespace cluon {

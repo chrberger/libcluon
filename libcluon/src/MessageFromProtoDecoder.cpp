@@ -16,8 +16,8 @@
  */
 
 #include "cluon/MessageFromProtoDecoder.hpp"
+
 #include <cstring>
-#include <iostream>
 
 namespace cluon {
 

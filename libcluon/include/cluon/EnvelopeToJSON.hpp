@@ -19,9 +19,10 @@
 #define ENVELOPETOJSON_HPP
 
 #include "cluon/cluon.hpp"
-#include "cluon/MetaMessage.hpp"
 #include "cluon/cluonDataStructures.hpp"
+#include "cluon/MetaMessage.hpp"
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>

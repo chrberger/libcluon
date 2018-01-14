@@ -19,15 +19,18 @@
 #define GENERICMESSAGE_HPP
 
 #include "cluon/cluon.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
-#include "cluon/MetaMessage.hpp"
-#include "cluon/any/any.hpp"
 #include "cluon/cluonDataStructures.hpp"
+#include "cluon/any/any.hpp"
+#include "cluon/MetaMessage.hpp"
+#include "cluon/MessageFromProtoDecoder.hpp"
 
+#include <cstdint>
 #include <map>
 #include <string>
-#include <utility>
 #include <vector>
+
+//#include "cluon/cluonDataStructures.hpp"
+//#include <utility>
 
 namespace cluon {
 /**

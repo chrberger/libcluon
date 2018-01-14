@@ -16,11 +16,11 @@
  */
 
 #include "cluon/EnvelopeToJSON.hpp"
-
 #include "cluon/GenericMessage.hpp"
 #include "cluon/JSONVisitor.hpp"
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
+
 #include <algorithm>
 #include <sstream>
 

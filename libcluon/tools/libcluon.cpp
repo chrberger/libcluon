@@ -24,6 +24,7 @@
 // clang-format off
 
 #include "cluon/EnvelopeToJSON.hpp"
+
 #include <string>
 
 static cluon::EnvelopeToJSON env2JSON;

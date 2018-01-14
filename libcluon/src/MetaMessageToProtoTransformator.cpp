@@ -20,8 +20,8 @@
 
 #include <algorithm>
 #include <map>
+#include <regex>
 #include <sstream>
-#include <string>
 
 #include "Mustache/mustache.hpp"
 

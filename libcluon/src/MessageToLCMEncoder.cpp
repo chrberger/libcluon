@@ -24,7 +24,6 @@
 #include "cluon/MessageToLCMEncoder.hpp"
 
 #include <cstring>
-#include <iostream>
 
 namespace cluon {
 

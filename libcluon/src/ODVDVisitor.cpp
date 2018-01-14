@@ -36,7 +36,7 @@ void ODVDVisitor::preVisit(uint32_t id, const std::string &shortName, const std:
 }
 
 void ODVDVisitor::postVisit() noexcept {
-    m_buffer << "}" << '\n';
+    m_buffer << '}' << '\n';
 }
 
 void ODVDVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {

@@ -16,6 +16,7 @@
  */
 
 #include "cluon/CSVVisitor.hpp"
+
 #include <iomanip>
 #include <sstream>
 
@@ -174,7 +175,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     if (m_fillHeader) {
         m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
     }
-    m_bufferValues << "\"" << v << "\"" << m_delimiter;
+    m_bufferValues << '\"' << v << '\"' << m_delimiter;
 }
 
 } // namespace cluon

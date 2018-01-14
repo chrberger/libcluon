@@ -21,7 +21,9 @@
 #include "cluon/cluon.hpp"
 #include "cluon/MetaMessage.hpp"
 
+#include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace cluon {

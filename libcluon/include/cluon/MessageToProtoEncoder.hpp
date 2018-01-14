@@ -21,7 +21,7 @@
 #include "cluon/cluon.hpp"
 #include "cluon/ProtoConstants.hpp"
 
-#include <memory>
+#include <cstdint>
 #include <sstream>
 #include <string>
 

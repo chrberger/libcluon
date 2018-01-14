@@ -18,13 +18,12 @@
 #include "cluon/MetaMessageToCPPTransformator.hpp"
 #include "cluon/MetaMessage.hpp"
 
-#include <algorithm>
 #include <cctype>
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <regex>
 #include <sstream>
-#include <string>
 
 #include "Mustache/mustache.hpp"
 

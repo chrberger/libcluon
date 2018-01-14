@@ -15,11 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MESSAGEASLCMENCODER_HPP
-#define MESSAGEASLCMENCODER_HPP
+#ifndef MESSAGETOLCMENCODER_HPP
+#define MESSAGETOLCMENCODER_HPP
 
 #include "cluon/cluon.hpp"
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <vector>

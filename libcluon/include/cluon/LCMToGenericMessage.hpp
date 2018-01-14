@@ -21,8 +21,8 @@
 #include "cluon/cluon.hpp"
 #include "cluon/GenericMessage.hpp"
 #include "cluon/MetaMessage.hpp"
-#include "cluon/cluonDataStructures.hpp"
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>

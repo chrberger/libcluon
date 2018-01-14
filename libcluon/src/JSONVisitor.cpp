@@ -16,6 +16,7 @@
  */
 
 #include "cluon/JSONVisitor.hpp"
+
 #include <iomanip>
 #include <sstream>
 
@@ -46,108 +47,108 @@ void JSONVisitor::postVisit() noexcept {}
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << v << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << v << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":"
-                 << "\"" << v << "\""
-                 << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':'
+                 << '\"' << v << '\"'
+                 << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << +v << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << +v << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << +v << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << +v << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << +v << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << +v << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << +v << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << +v << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << v << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << v << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << v << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << v << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << v << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << v << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << v << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << v << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << std::setprecision(7) << v << std::setprecision(6) << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << std::setprecision(7) << v << std::setprecision(6) << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":" << std::setprecision(11) << v << std::setprecision(6) << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':' << std::setprecision(11) << v << std::setprecision(6) << ',' << '\n';
     }
 }
 
 void JSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << "\"" << name << "\""
-                 << ":"
-                 << "\"" << encodeBase64(v) << "\""
-                 << "," << '\n';
+        m_buffer << '\"' << name << '\"'
+                 << ':'
+                 << '\"' << encodeBase64(v) << '\"'
+                 << ',' << '\n';
     }
 }
 

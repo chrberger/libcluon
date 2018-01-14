@@ -20,6 +20,7 @@
 
 #include "cluon/cluon.hpp"
 
+#include <cstdint>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -90,7 +91,7 @@ class LIBCLUON_API ODVDVisitor {
             value.accept(odvdVisitor);
             m_forwardDeclarations.emplace(m_forwardDeclarations.begin(), odvdVisitor.messageSpecification());
 
-            m_buffer << "    " << tmp << " " << name << " [ id = " << id << " ];" << '\n';
+            m_buffer << "    " << tmp << ' ' << name << " [ id = " << id << " ];" << '\n';
         } catch (std::regex_error &) { // LCOV_EXCL_LINE
         }
     }

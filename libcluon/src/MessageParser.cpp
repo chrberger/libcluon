@@ -16,7 +16,7 @@
  */
 
 #include "cluon/MessageParser.hpp"
-#include "cluon/MetaMessage.hpp"
+
 #include "cpp-peglib/peglib.h"
 
 #include <algorithm>
