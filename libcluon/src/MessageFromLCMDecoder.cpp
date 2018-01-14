@@ -216,16 +216,21 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     if (length > 0) {
         std::vector<char> buffer;
         buffer.reserve(static_cast<uint32_t>(length));
-        for (uint32_t i = 0; i < static_cast<uint32_t>(length); i++) {
-            char c;
-            m_buffer.get(c);
+        m_buffer.read(static_cast<char*>(&buffer[0]), static_cast<uint32_t>(length));
+        const std::string s(buffer.begin(), buffer.begin()+length-1);
 
-            // Read data but skip trailing \0.
-            if (i < static_cast<uint32_t>(length - 1)) {
-                buffer.push_back(c);
-            }
-        }
-        const std::string s(buffer.begin(), buffer.end());
+//        std::vector<char> buffer;
+//        buffer.reserve(static_cast<uint32_t>(length));
+//        for (uint32_t i = 0; i < static_cast<uint32_t>(length); i++) {
+//            char c;
+//            m_buffer.get(c);
+
+//            // Read data but skip trailing \0.
+//            if (i < static_cast<uint32_t>(length - 1)) {
+//                buffer.push_back(c);
+//            }
+//        }
+//        const std::string s(buffer.begin(), buffer.end());
         v = s;
     }
 }
