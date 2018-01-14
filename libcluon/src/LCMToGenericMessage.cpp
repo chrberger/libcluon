@@ -20,6 +20,7 @@
 #include "cluon/MessageParser.hpp"
 
 #include <array>
+#include <iostream>
 #include <sstream>
 
 // clang-format off
@@ -63,7 +64,7 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
     cluon::GenericMessage gm;
 
     if (!m_listOfMetaMessages.empty()) {
-        constexpr uint8_t LCM_HEADER_SIZE{4 /*magic number*/ + 4 /*sequence number*/};
+        constexpr uint8_t LCM_HEADER_SIZE{4 /*magic number*/ + 4 /*sequence number*/ + 1 /*'\0' after channel name*/};
         if (LCM_HEADER_SIZE < data.size()) {
             // First, read magic number.
             constexpr uint32_t MAGIC_NUMBER_LCM2{0x4c433032};
@@ -88,29 +89,27 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
                     // clang-format on
                     sequenceNumber = be32toh(sequenceNumber);
                 }
-                if (0 == sequenceNumber) { // No support for fragmented messages.
+                // Only support for non-fragmented messages.
+                if (0 == sequenceNumber) {
                     offset += 4;
 
-                    std::array<char, 256> buffer;
-                    uint8_t i{0};
-                    char c{0};
-                    do {
-                        c           = data[offset + i];
-                        buffer[i++] = c;
-                    } while (c != 0);
-                    const std::string channelName(std::begin(buffer),
-                                                  std::begin(buffer) + i - 1); // Omit '\0' at the end.
+                    const std::string::size_type START_POSITION = offset;
+                    std::string::size_type pos = data.find('\0', START_POSITION); // Extract channel name.
+                    if (std::string::npos != pos) {
+                        const std::string CHANNEL_NAME(data.substr(START_POSITION, (pos - START_POSITION)));
 
-                    // Next, find the MetaMessage corresponding to the channel name
-                    // and create a Message therefrom based on the decoded LCM data.
-                    if (0 < m_scopeOfMetaMessages.count(channelName)) {
-                        // data[offset+i] marks now the beginning of the payload to be decoded.
-                        std::stringstream sstr{data.substr(offset + i)};
-                        cluon::MessageFromLCMDecoder lcmDecoder;
-                        lcmDecoder.decodeFrom(sstr);
+                        // Next, find the MetaMessage corresponding to the channel name
+                        // and create a Message therefrom based on the decoded LCM data.
+                        if ( (0 < m_scopeOfMetaMessages.count(CHANNEL_NAME)) && (std::string::npos != (pos + 1)) ) {
+                            // data[offset+i] marks now the beginning of the payload to be decoded.
+                            std::stringstream sstr{data.substr(pos + 1)};
 
-                        gm.createFrom(m_scopeOfMetaMessages[channelName], m_listOfMetaMessages);
-                        gm.accept(lcmDecoder);
+                            cluon::MessageFromLCMDecoder lcmDecoder;
+                            lcmDecoder.decodeFrom(sstr);
+
+                            gm.createFrom(m_scopeOfMetaMessages[CHANNEL_NAME], m_listOfMetaMessages);
+                            gm.accept(lcmDecoder);
+                        }
                     }
                 }
             }
