@@ -66,9 +66,9 @@ void MessageFromLCMDecoder::preVisit(uint32_t id, const std::string &shortName, 
 }
 
 void MessageFromLCMDecoder::postVisit() noexcept {
-    if ((0 != m_expectedHash) && (m_expectedHash != hash())) {
+    if ((0 != m_expectedHash) && (m_expectedHash != hash())) { // LCOV_EXCL_LINE
         // clang-format off
-        std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding might have failed" << std::endl; // LCOV_EXCL_LINE
+        std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding might have failed" << std::endl;
         // clang-format on
     }
 }
