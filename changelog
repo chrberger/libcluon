@@ -1,3 +1,9 @@
+libcluon (0.0.32) xenial; urgency=low
+
+  * Refactoring intermediate data representation for LCM; adding OD4toJSON and LCMtoJSON dumping tools with dynamic message resolving
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 14 Jan 2018 22:13:02 +0100
+
 libcluon (0.0.31) xenial; urgency=low
 
   * Completed LCM implementation
