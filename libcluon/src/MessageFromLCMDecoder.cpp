@@ -216,7 +216,15 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     if (length > 0) {
         std::vector<char> buffer;
         buffer.reserve(static_cast<uint32_t>(length));
+#ifdef WIN32
+        for (uint32_t i = 0; i < static_cast<uint32_t>(length); i++) {
+            char c;
+            m_buffer.get(c);
+            buffer.push_back(c);
+        }
+#else
         m_buffer.read(static_cast<char*>(&buffer[0]), static_cast<uint32_t>(length));
+#endif
         const std::string s(buffer.begin(), buffer.begin()+length-1); // Skip trailing '\0'.
         v = s;
     }
