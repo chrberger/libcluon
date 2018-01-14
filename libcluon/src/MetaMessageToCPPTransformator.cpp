@@ -18,8 +18,8 @@
 #include "cluon/MetaMessageToCPPTransformator.hpp"
 #include "cluon/MetaMessage.hpp"
 
-#include <cctype>
 #include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <map>
 #include <regex>

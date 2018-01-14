@@ -89,8 +89,7 @@ class LIBCLUON_API JSONVisitor {
         if ((0 == m_mask.count(id)) || m_mask[id]) {
             JSONVisitor jsonVisitor;
             value.accept(jsonVisitor);
-            m_buffer << '\"' << name << '\"'
-                     << ':' << jsonVisitor.json() << ',' << '\n';
+            m_buffer << '\"' << name << '\"' << ':' << jsonVisitor.json() << ',' << '\n';
         }
     }
 

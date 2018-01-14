@@ -18,8 +18,8 @@
 #ifndef MESSAGEASPROTOENCODER_HPP
 #define MESSAGEASPROTOENCODER_HPP
 
-#include "cluon/cluon.hpp"
 #include "cluon/ProtoConstants.hpp"
+#include "cluon/cluon.hpp"
 
 #include <cstdint>
 #include <sstream>

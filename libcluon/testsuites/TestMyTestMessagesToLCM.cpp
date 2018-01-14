@@ -528,15 +528,15 @@ message example.MyTestMessage0 [id = 12345] {
     std::stringstream sstr;
 
     constexpr uint32_t MAGIC_NUMBER_LCM2 = 0x4c433032;
-    uint32_t v = htobe32(MAGIC_NUMBER_LCM2);
-    sstr.write(reinterpret_cast<char*>(&v), sizeof(uint32_t));
+    uint32_t v                           = htobe32(MAGIC_NUMBER_LCM2);
+    sstr.write(reinterpret_cast<char *>(&v), sizeof(uint32_t));
 
     constexpr uint32_t SEQUENCE_NUMBER = 0;
-    v = htobe32(SEQUENCE_NUMBER);
-    sstr.write(reinterpret_cast<char*>(&v), sizeof(uint32_t));
+    v                                  = htobe32(SEQUENCE_NUMBER);
+    sstr.write(reinterpret_cast<char *>(&v), sizeof(uint32_t));
 
     const std::string CHANNEL_NAME("example.MyTestMessage0");
-    sstr.write(CHANNEL_NAME.c_str(), static_cast<std::streamsize>(CHANNEL_NAME.size()+1)); // Include binary '\0'.
+    sstr.write(CHANNEL_NAME.c_str(), static_cast<std::streamsize>(CHANNEL_NAME.size() + 1)); // Include binary '\0'.
 
     // Write LCM payload.
     sstr.write(s.c_str(), static_cast<std::streamsize>(s.size()));
@@ -545,7 +545,7 @@ message example.MyTestMessage0 [id = 12345] {
     cluon::LCMToGenericMessage lcm2GM;
     REQUIRE(1 == lcm2GM.setMessageSpecification(std::string(msg)));
 
-    const std::string data = sstr.str();
+    const std::string data   = sstr.str();
     cluon::GenericMessage gm = lcm2GM.getGenericMessage(data);
 
     // Test correct decoding.
@@ -597,15 +597,15 @@ message testdata.MyTestMessage6 [id = 30006] {
     std::stringstream sstr;
 
     constexpr uint32_t MAGIC_NUMBER_LCM2 = 0x4c433032;
-    uint32_t v = htobe32(MAGIC_NUMBER_LCM2);
-    sstr.write(reinterpret_cast<char*>(&v), sizeof(uint32_t));
+    uint32_t v                           = htobe32(MAGIC_NUMBER_LCM2);
+    sstr.write(reinterpret_cast<char *>(&v), sizeof(uint32_t));
 
     constexpr uint32_t SEQUENCE_NUMBER = 0;
-    v = htobe32(SEQUENCE_NUMBER);
-    sstr.write(reinterpret_cast<char*>(&v), sizeof(uint32_t));
+    v                                  = htobe32(SEQUENCE_NUMBER);
+    sstr.write(reinterpret_cast<char *>(&v), sizeof(uint32_t));
 
     const std::string CHANNEL_NAME("testdata.MyTestMessage6");
-    sstr.write(CHANNEL_NAME.c_str(), static_cast<std::streamsize>(CHANNEL_NAME.size()+1)); // Include binary '\0'.
+    sstr.write(CHANNEL_NAME.c_str(), static_cast<std::streamsize>(CHANNEL_NAME.size() + 1)); // Include binary '\0'.
 
     // Write LCM payload.
     sstr.write(s.c_str(), static_cast<std::streamsize>(s.size()));
@@ -614,7 +614,7 @@ message testdata.MyTestMessage6 [id = 30006] {
     cluon::LCMToGenericMessage lcm2GM;
     REQUIRE(2 == lcm2GM.setMessageSpecification(std::string(msg)));
 
-    const std::string data = sstr.str();
+    const std::string data   = sstr.str();
     cluon::GenericMessage gm = lcm2GM.getGenericMessage(data);
 
     // Test correct decoding.
@@ -624,4 +624,3 @@ message testdata.MyTestMessage6 [id = 30006] {
     tmp6_2.accept(gm);
     REQUIRE(150 == tmp6_2.attribute1().attribute1());
 }
-

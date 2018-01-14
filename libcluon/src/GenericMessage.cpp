@@ -381,8 +381,7 @@ void GenericMessage::createFrom(const MetaMessage &mm,
     createIntermediateDataRepresentationFrom(pd);
 }
 
-void GenericMessage::createFrom(const MetaMessage &mm,
-                                const std::vector<MetaMessage> &mms) noexcept {
+void GenericMessage::createFrom(const MetaMessage &mm, const std::vector<MetaMessage> &mms) noexcept {
     m_metaMessage = mm;
     m_longName    = m_metaMessage.messageName();
 
@@ -469,7 +468,7 @@ void GenericMessage::createFrom(const MetaMessage &mm,
         } else if ((f.fieldDataType() == MetaMessage::MetaField::STRING_T)
                    || (f.fieldDataType() == MetaMessage::MetaField::BYTES_T)) {
             try {
-                linb::any _v = std::string{};
+                linb::any _v                                          = std::string{};
                 m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
             } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
             }
@@ -477,14 +476,12 @@ void GenericMessage::createFrom(const MetaMessage &mm,
             if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
                 // Create a GenericMessage from the decoded Proto-data.
                 cluon::GenericMessage gm;
-                gm.createFrom(
-                    m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages);
+                gm.createFrom(m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages);
 
                 m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
             }
         }
     }
 }
-
 
 } // namespace cluon

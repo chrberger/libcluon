@@ -16,12 +16,13 @@
  */
 
 #include "cluon/LCMToGenericMessage.hpp"
-#include "cluon/MessageParser.hpp"
 #include "cluon/MessageFromLCMDecoder.hpp"
+#include "cluon/MessageParser.hpp"
 
 #include <array>
 #include <sstream>
 
+// clang-format off
 #ifdef WIN32
     #undef be32toh
     #define be32toh(x) __ntohl(x)
@@ -38,6 +39,7 @@
              | ((uint32_t) d[0] << 24);
     }
 #endif
+// clang-format on
 
 namespace cluon {
 
@@ -69,7 +71,9 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
             uint32_t magicNumber{0};
             {
                 std::stringstream sstr{std::string(&data[offset], 4)};
+                // clang-format off
                 sstr.read(reinterpret_cast<char *>(&magicNumber), sizeof(uint32_t)); /* Flawfinder: ignore */ // NOLINT
+                // clang-format on
                 magicNumber = be32toh(magicNumber);
             }
             if (MAGIC_NUMBER_LCM2 == magicNumber) {
@@ -79,7 +83,9 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
                 uint32_t sequenceNumber{0};
                 {
                     std::stringstream sstr{std::string(&data[offset], 4)};
+                    // clang-format off
                     sstr.read(reinterpret_cast<char *>(&sequenceNumber), sizeof(uint32_t)); /* Flawfinder: ignore */ // NOLINT
+                    // clang-format on
                     sequenceNumber = be32toh(sequenceNumber);
                 }
                 if (0 == sequenceNumber) { // No support for fragmented messages.
@@ -89,16 +95,17 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
                     uint8_t i{0};
                     char c{0};
                     do {
-                        c = data[offset+i];
+                        c           = data[offset + i];
                         buffer[i++] = c;
                     } while (c != 0);
-                    const std::string channelName(std::begin(buffer), std::begin(buffer)+i-1); // Omit '\0' at the end.
+                    const std::string channelName(std::begin(buffer),
+                                                  std::begin(buffer) + i - 1); // Omit '\0' at the end.
 
                     // Next, find the MetaMessage corresponding to the channel name
                     // and create a Message therefrom based on the decoded LCM data.
                     if (0 < m_scopeOfMetaMessages.count(channelName)) {
                         // data[offset+i] marks now the beginning of the payload to be decoded.
-                        std::stringstream sstr{data.substr(offset+i)};
+                        std::stringstream sstr{data.substr(offset + i)};
                         cluon::MessageFromLCMDecoder lcmDecoder;
                         lcmDecoder.decodeFrom(sstr);
 
@@ -112,6 +119,5 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
 
     return gm;
 }
-
 
 } // namespace cluon

@@ -18,11 +18,11 @@
 #ifndef GENERICMESSAGE_HPP
 #define GENERICMESSAGE_HPP
 
+#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/MetaMessage.hpp"
+#include "cluon/any/any.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
-#include "cluon/any/any.hpp"
-#include "cluon/MetaMessage.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
 
 #include <cstdint>
 #include <map>
