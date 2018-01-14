@@ -223,7 +223,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
             buffer.push_back(c);
         }
 #else
-        m_buffer.read(static_cast<char *>(&buffer[0]), static_cast<uint32_t>(length));
+        m_buffer.read(static_cast<char *>(&buffer[0]), static_cast<std::streamsize>(length));
 #endif
         const std::string s(buffer.begin(), buffer.begin() + length - 1); // Skip trailing '\0'.
         v = s;
