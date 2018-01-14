@@ -349,7 +349,9 @@ message FaultyMyMessageA [id = 60006] {
     cluon::MetaMessage m = listOfMessages.front();
 
     cluon::GenericMessage gm;
-    gm.createFrom(m, listOfMessages, protoDecoder);
+    gm.createFrom(m, listOfMessages);
+    // Set values in GenericMessage from ProtoDecoder.
+    gm.accept(protoDecoder);
 
     // Create a JSON representation from the generic message.
     cluon::JSONVisitor j;
@@ -415,7 +417,9 @@ message FaultyMyMessageA [id = 30003] {
     cluon::MetaMessage m = listOfMessages.front();
 
     cluon::GenericMessage gm;
-    gm.createFrom(m, listOfMessages, protoDecoder);
+    gm.createFrom(m, listOfMessages);
+    // Set values in GenericMessage from ProtoDecoder.
+    gm.accept(protoDecoder);
 
     // Create a JSON representation from the generic message.
     cluon::JSONVisitor j;

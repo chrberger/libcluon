@@ -94,7 +94,12 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             // Now, create JSON from payload.
             cluon::MetaMessage payload{m_scopeOfMetaMessages[static_cast<uint32_t>(envelope.dataType())]};
             cluon::GenericMessage gm;
-            gm.createFrom(payload, m_listOfMetaMessages, protoDecoder);
+
+            // Create "empty" GenericMessage from this MetaMessage.
+            gm.createFrom(payload, m_listOfMetaMessages);
+
+            // Set values in the newly created GenericMessage from ProtoDecoder.
+            gm.accept(protoDecoder);
 
             JSONVisitor jsonFromPayload{OUTER_CURLY_BRACES};
             gm.accept(jsonFromPayload);

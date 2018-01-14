@@ -269,6 +269,7 @@ class LIBCLUON_API GenericMessage {
      */
     void createFrom(const MetaMessage &mm, const std::vector<MetaMessage> &mms) noexcept;
 
+   private:
     /**
      * This method creates this GenericMessage from a serialized representation
      * in Proto-format and a given message specification parsed from MessageParser.

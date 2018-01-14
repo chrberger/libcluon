@@ -89,7 +89,9 @@ TEST_CASE("Testing MyTestMessage1.") {
 
     cluon::MetaMessage m = listOfMetaMessages.front();
     cluon::GenericMessage gm;
-    gm.createFrom(m, listOfMetaMessages, protoDecoder);
+    gm.createFrom(m, listOfMetaMessages);
+    // Set values in GenericMessage from ProtoDecoder.
+    gm.accept(protoDecoder);
 
     cluon::JSONVisitor j;
     gm.accept(j);
@@ -150,7 +152,9 @@ message testdata.MyTestMessage6 [ id = 30006 ] {
 
     cluon::MetaMessage m = listOfMetaMessages[1];
     cluon::GenericMessage gm;
-    gm.createFrom(m, listOfMetaMessages, protoDecoder);
+    gm.createFrom(m, listOfMetaMessages);
+    // Set values in GenericMessage from ProtoDecoder.
+    gm.accept(protoDecoder);
 
     cluon::JSONVisitor j;
     gm.accept(j);
