@@ -366,21 +366,6 @@ void GenericMessage::visit(uint32_t id, std::string &&typeName, std::string &&na
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void GenericMessage::createFrom(const MetaMessage &mm,
-                                const std::vector<MetaMessage> &mms,
-                                MessageFromProtoDecoder &pd) noexcept {
-    m_metaMessage = mm;
-    m_longName    = m_metaMessage.messageName();
-
-    m_scopeOfMetaMessages.clear();
-    m_scopeOfMetaMessages = mms;
-
-    m_mapForScopeOfMetaMessages.clear();
-    for (const auto &e : m_scopeOfMetaMessages) { m_mapForScopeOfMetaMessages[e.messageName()] = e; }
-
-    createIntermediateDataRepresentationFrom(pd);
-}
-
 void GenericMessage::createFrom(const MetaMessage &mm, const std::vector<MetaMessage> &mms) noexcept {
     m_metaMessage = mm;
     m_longName    = m_metaMessage.messageName();

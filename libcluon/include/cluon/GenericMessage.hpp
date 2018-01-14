@@ -29,9 +29,6 @@
 #include <string>
 #include <vector>
 
-//#include "cluon/cluonDataStructures.hpp"
-//#include <utility>
-
 namespace cluon {
 /**
 GenericMessage is providing an abstraction level to work with concrete
@@ -42,8 +39,10 @@ compilers, we use the backport from linb::any.
 
 Creating a GenericMessage:
 There are several ways to create a GenericMessage. The first option is to
-provide a message specification in ODVD format as result from MessageParser
-next to a serialized byte sequence in Proto format:
+provide a message specification in ODVD format as result from MessageParser,
+from which a GenericMessage is created. This instance can then be visited
+afterwards by, for instance, an instance of ProtoDecoder to set the
+GenericMessage's actual values.
 
 1) This example demonstrates how to process a given message specification
    to decode a Proto-encoded byte sequence (in protoEncodedData). The
@@ -72,7 +71,9 @@ auto retVal = mp.parse(std::string(messageSpecification));
 if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second) {
     cluon::GenericMessage gm;
     auto listOfMetaMessages = retVal.first;
-    gm.createFrom(listOfMetaMessages[0], listOfMetaMessages, protoDecoder);
+    gm.createFrom(listOfMetaMessages[0], listOfMetaMessages);
+    // Set values in GenericMessage from protoDecoder.
+    gm.accept(protoDecoder);
 }
 \endcode
 
@@ -165,7 +166,9 @@ auto retVal = mp.parse(std::string(messageSpecification));
 if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second) {
     cluon::GenericMessage gm;
     auto listOfMetaMessages = retVal.first;
-    gm.createFrom(listOfMetaMessages[0], listOfMetaMessages, protoDecoder);
+    gm.createFrom(listOfMetaMessages[0], listOfMetaMessages);
+    // Set values in GenericMessage from protoDecoder.
+    gm.accept(protoDecoder);
 }
 
 cluon::JSONVisitor j;
@@ -268,153 +271,6 @@ class LIBCLUON_API GenericMessage {
      * @param mms List of MetaMessages that are known (used for resolving nested message).
      */
     void createFrom(const MetaMessage &mm, const std::vector<MetaMessage> &mms) noexcept;
-
-   private:
-    /**
-     * This method creates this GenericMessage from a serialized representation
-     * in Proto-format and a given message specification parsed from MessageParser.
-     *
-     * @param mm MetaMessage describing the fields for the message to be resolved.
-     * @param mms List of MetaMessages that are known (used for resolving nested message).
-     * @param pd ProtoDecoder containing the values to be decoded.
-     */
-    void createFrom(const MetaMessage &mm, const std::vector<MetaMessage> &mms, MessageFromProtoDecoder &pd) noexcept;
-
-   private:
-    /**
-     * This method creates the intermediate data representation from the
-     * Proto-encoded data contained in pd.
-     *
-     * @param pd ProtoDecoder containing the decoded Proto fields.
-     */
-    void createIntermediateDataRepresentationFrom(MessageFromProtoDecoder &pd) noexcept {
-        m_intermediateDataRepresentation.clear();
-        for (const auto &f : m_metaMessage.listOfMetaFields()) {
-            if (f.fieldDataType() == MetaMessage::MetaField::BOOL_T) {
-                try {
-                    linb::any _v{false};
-                    auto &v = linb::any_cast<bool &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::CHAR_T) {
-                try {
-                    linb::any _v{static_cast<char>('\0')};
-                    auto &v = linb::any_cast<char &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::UINT8_T) {
-                try {
-                    linb::any _v{static_cast<uint8_t>(0)};
-                    auto &v = linb::any_cast<uint8_t &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::INT8_T) {
-                try {
-                    linb::any _v{static_cast<int8_t>(0)};
-                    auto &v = linb::any_cast<int8_t &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::UINT16_T) {
-                try {
-                    linb::any _v{static_cast<uint16_t>(0)};
-                    auto &v = linb::any_cast<uint16_t &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::INT16_T) {
-                try {
-                    linb::any _v{static_cast<int16_t>(0)};
-                    auto &v = linb::any_cast<int16_t &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::UINT32_T) {
-                try {
-                    linb::any _v{static_cast<uint32_t>(0)};
-                    auto &v = linb::any_cast<uint32_t &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::INT32_T) {
-                try {
-                    linb::any _v{static_cast<int32_t>(0)};
-                    auto &v = linb::any_cast<int32_t &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::UINT64_T) {
-                try {
-                    linb::any _v{static_cast<uint64_t>(0)};
-                    auto &v = linb::any_cast<uint64_t &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::INT64_T) {
-                try {
-                    linb::any _v{static_cast<int64_t>(0)};
-                    auto &v = linb::any_cast<int64_t &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::FLOAT_T) {
-                try {
-                    linb::any _v{static_cast<float>(0.0f)};
-                    auto &v = linb::any_cast<float &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::DOUBLE_T) {
-                try {
-                    linb::any _v{static_cast<double>(0.0)};
-                    auto &v = linb::any_cast<double &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if ((f.fieldDataType() == MetaMessage::MetaField::STRING_T)
-                       || (f.fieldDataType() == MetaMessage::MetaField::BYTES_T)) {
-                try {
-                    linb::any _v = std::string{};
-                    auto &v      = linb::any_cast<std::string &>(_v);
-                    pd.visit(f.fieldIdentifier(), "", "", v);
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = _v;
-                } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
-                }
-            } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T) {
-                if (0 < m_mapForScopeOfMetaMessages.count(f.fieldDataTypeName())) {
-                    std::string s;
-                    pd.visit(f.fieldIdentifier(), "", "", s);
-
-                    // Create a nested ProtoDecoder for the contained complex message.
-                    std::stringstream sstr{s};
-                    cluon::MessageFromProtoDecoder protoDecoder;
-                    protoDecoder.decodeFrom(sstr);
-
-                    // Create a GenericMessage from the decoded Proto-data.
-                    cluon::GenericMessage gm;
-                    gm.createFrom(
-                        m_mapForScopeOfMetaMessages[f.fieldDataTypeName()], m_scopeOfMetaMessages, protoDecoder);
-
-                    m_intermediateDataRepresentation[f.fieldIdentifier()] = linb::any{gm};
-                }
-            }
-        }
-    }
 
    public:
     // The following methods are provided to allow an instance of this class to
