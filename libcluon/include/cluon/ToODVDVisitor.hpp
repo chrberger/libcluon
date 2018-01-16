@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ODVDVISITOR_HPP
-#define ODVDVISITOR_HPP
+#ifndef TOODVDVISITOR_HPP
+#define TOODVDVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 
@@ -35,7 +35,7 @@ message specification in ODVD format:
 MyMessage msg;
 // Set some values in msg.
 
-cluon::ODVDVisitor odvd;
+cluon::ToODVDVisitor odvd;
 msg.accept(odvd);
 
 const std::string generatedMessageSpecification{odvd.messageSpecification()};
@@ -46,15 +46,15 @@ auto retVal = mp.parse(generatedMessageSpecification);
 std::cout << (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
 \endcode
 */
-class LIBCLUON_API ODVDVisitor {
+class LIBCLUON_API ToODVDVisitor {
    private:
-    ODVDVisitor(const ODVDVisitor &) = delete;
-    ODVDVisitor(ODVDVisitor &&)      = delete;
-    ODVDVisitor &operator=(const ODVDVisitor &) = delete;
-    ODVDVisitor &operator=(ODVDVisitor &&) = delete;
+    ToODVDVisitor(const ToODVDVisitor &) = delete;
+    ToODVDVisitor(ToODVDVisitor &&)      = delete;
+    ToODVDVisitor &operator=(const ToODVDVisitor &) = delete;
+    ToODVDVisitor &operator=(ToODVDVisitor &&) = delete;
 
    public:
-    ODVDVisitor() = default;
+    ToODVDVisitor() = default;
 
     /**
      * @return Message specification data.
@@ -87,7 +87,7 @@ class LIBCLUON_API ODVDVisitor {
         try {
             std::string tmp{std::regex_replace(typeName, std::regex("::"), ".")}; // NOLINT
 
-            ODVDVisitor odvdVisitor;
+            ToODVDVisitor odvdVisitor;
             value.accept(odvdVisitor);
             m_forwardDeclarations.emplace(m_forwardDeclarations.begin(), odvdVisitor.messageSpecification());
 

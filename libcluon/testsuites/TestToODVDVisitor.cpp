@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #include "cluon/MessageParser.hpp"
 #include "cluon/MessageToProtoEncoder.hpp"
 #include "cluon/MetaMessage.hpp"
-#include "cluon/ODVDVisitor.hpp"
+#include "cluon/ToODVDVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing MyTestMessage1.") {
@@ -53,7 +53,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     tmp.accept(protoEncoder);
     const std::string protoEncoded{protoEncoder.encodedData()};
 
-    cluon::ODVDVisitor odvdVisitor;
+    cluon::ToODVDVisitor odvdVisitor;
     tmp.accept(odvdVisitor);
 
     const char *msg = R"(message testdata.MyTestMessage1 [ id = 30001 ] {
@@ -126,7 +126,7 @@ TEST_CASE("Testing MyTestMessage6.") {
     tmp6.accept(protoEncoder);
     const std::string protoEncoded{protoEncoder.encodedData()};
 
-    cluon::ODVDVisitor odvdVisitor;
+    cluon::ToODVDVisitor odvdVisitor;
     tmp6.accept(odvdVisitor);
 
     const char *msg = R"(message testdata.MyTestMessage2 [ id = 30002 ] {
