@@ -17,7 +17,7 @@
 
 #include "catch.hpp"
 
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
@@ -46,7 +46,7 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(0x43 == static_cast<uint8_t>(s.at(3)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage0 tmp2;
@@ -77,7 +77,7 @@ TEST_CASE("Testing MyTestMessage2.") {
     REQUIRE(0x1 == static_cast<uint8_t>(s.at(2)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage2 tmp2;
@@ -110,7 +110,7 @@ TEST_CASE("Testing MyTestMessage3.") {
     REQUIRE(0x1 == static_cast<uint8_t>(s.at(4)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage3 tmp2;
@@ -147,7 +147,7 @@ TEST_CASE("Testing MyTestMessage4.") {
     REQUIRE(0x67 == static_cast<uint8_t>(s.at(8)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage4 tmp2;
@@ -263,7 +263,7 @@ TEST_CASE("Testing MyTestMessage5.") { // NOLINT
     REQUIRE(0x21 == static_cast<uint8_t>(s.at(57)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage5 tmp2;
@@ -316,7 +316,7 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
     REQUIRE(0x1 == static_cast<uint8_t>(s.at(4)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage6 tmp6_2;
@@ -361,7 +361,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     REQUIRE(0xd == static_cast<uint8_t>(s.at(9)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage7 tmp7_2;

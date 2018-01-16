@@ -20,7 +20,7 @@
 
 #include "cluon/ToCSVVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"

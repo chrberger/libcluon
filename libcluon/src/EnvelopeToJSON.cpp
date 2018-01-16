@@ -18,7 +18,7 @@
 #include "cluon/EnvelopeToJSON.hpp"
 #include "cluon/GenericMessage.hpp"
 #include "cluon/ToJSONVisitor.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/MessageParser.hpp"
 
 #include <algorithm>
@@ -66,7 +66,7 @@ std::string EnvelopeToJSON::getJSONFromProtoEncodedEnvelope(const std::string &p
             cluon::data::Envelope env;
 
             std::stringstream sstr{input};
-            cluon::MessageFromProtoDecoder protoDecoder;
+            cluon::FromProtoVisitor protoDecoder;
             protoDecoder.decodeFrom(sstr);
             env.accept(protoDecoder);
 
@@ -88,7 +88,7 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             envelope.accept(envelopeToJSON);
 
             std::stringstream sstr{envelope.serializedData()};
-            cluon::MessageFromProtoDecoder protoDecoder;
+            cluon::FromProtoVisitor protoDecoder;
             protoDecoder.decodeFrom(sstr);
 
             // Now, create JSON from payload.

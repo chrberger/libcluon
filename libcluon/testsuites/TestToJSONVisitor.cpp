@@ -21,7 +21,7 @@
 
 #include "cluon/GenericMessage.hpp"
 #include "cluon/ToJSONVisitor.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
@@ -329,7 +329,7 @@ message FaultyMyMessageA [id = 60006] {
     REQUIRE(0x28 == static_cast<uint8_t>(s.at(3)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage3 msg3_2;
@@ -397,7 +397,7 @@ message FaultyMyMessageA [id = 30003] {
     REQUIRE(0x28 == static_cast<uint8_t>(s.at(3)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage3 msg3_2;

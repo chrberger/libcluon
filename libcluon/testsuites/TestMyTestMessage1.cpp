@@ -22,7 +22,7 @@
 #include <string>
 
 #include "cluon/GenericMessage.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/MetaMessage.hpp"
@@ -378,7 +378,7 @@ message MyMessageA [id = 30003] {
     REQUIRE(0x28 == static_cast<uint8_t>(s.at(3)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage3 msg3_2;
@@ -414,7 +414,7 @@ message MyMessageA [id = 30003] {
         REQUIRE(0x28 == static_cast<uint8_t>(s2.at(3)));
 
         std::stringstream sstr2{s2};
-        cluon::MessageFromProtoDecoder protoDecoder2;
+        cluon::FromProtoVisitor protoDecoder2;
         protoDecoder2.decodeFrom(sstr2);
 
         testdata::MyTestMessage3 msg3_2_2;
@@ -484,7 +484,7 @@ message example.MyTestMessage1 [id = 30001] {
     std::string s = proto.encodedData();
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     cluon::MessageParser mp;
@@ -539,7 +539,7 @@ message example.MyTestMessage1 [id = 30001] {
         std::string s2 = proto2.encodedData();
 
         std::stringstream sstr2{s2};
-        cluon::MessageFromProtoDecoder protoDecoder2;
+        cluon::FromProtoVisitor protoDecoder2;
         protoDecoder2.decodeFrom(sstr2);
 
         src.accept(protoDecoder2);
@@ -603,7 +603,7 @@ message MyTest.Envelope [id = 1] {
     std::string s = proto.encodedData();
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     cluon::MessageParser mp;
@@ -638,10 +638,10 @@ message MyTest.Envelope [id = 1] {
         std::string s2 = proto2.encodedData();
 
         std::stringstream sstr2{s2};
-        cluon::MessageFromProtoDecoder protoDecoder2;
+        cluon::FromProtoVisitor protoDecoder2;
         protoDecoder2.decodeFrom(sstr2);
 
-        cluon::MessageFromProtoDecoder protoDecoder3;
+        cluon::FromProtoVisitor protoDecoder3;
         protoDecoder3 = protoDecoder2;
 
         env2.accept(protoDecoder3);

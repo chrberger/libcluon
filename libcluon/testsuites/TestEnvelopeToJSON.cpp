@@ -22,7 +22,7 @@
 #include <string>
 
 #include "cluon/EnvelopeToJSON.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
@@ -130,7 +130,7 @@ TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
         REQUIRE(0 == env2.sampleTimeStamp().microseconds());
 
         std::stringstream sstr{envelopeAsProto};
-        cluon::MessageFromProtoDecoder protoDecoder;
+        cluon::FromProtoVisitor protoDecoder;
         protoDecoder.decodeFrom(sstr);
 
         env2.accept(protoDecoder);

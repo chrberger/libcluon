@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 
 #include <cstring>
 
 namespace cluon {
 
-void MessageFromProtoDecoder::readBytesFromStream(std::istream &in,
+void FromProtoVisitor::readBytesFromStream(std::istream &in,
                                                   std::size_t bytesToReadFromStream,
                                                   std::vector<char> &buffer) noexcept {
     constexpr std::size_t CHUNK_SIZE{1024};
@@ -41,7 +41,7 @@ void MessageFromProtoDecoder::readBytesFromStream(std::istream &in,
     }
 }
 
-void MessageFromProtoDecoder::decodeFrom(std::istream &in) noexcept {
+void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
     // Reset internal states as this deserializer could be reused.
     m_buffer.str("");
     m_mapOfKeyValues.clear();
@@ -89,40 +89,40 @@ void MessageFromProtoDecoder::decodeFrom(std::istream &in) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-MessageFromProtoDecoder::ProtoKeyValue::ProtoKeyValue() noexcept
+FromProtoVisitor::ProtoKeyValue::ProtoKeyValue() noexcept
     : m_key{0}
     , m_type{ProtoConstants::VARINT}
     , m_length{0}
     , m_value{}
     , m_varIntValue{0} {}
 
-MessageFromProtoDecoder::ProtoKeyValue::ProtoKeyValue(uint32_t key, ProtoConstants type, uint64_t length) noexcept
+FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint32_t key, ProtoConstants type, uint64_t length) noexcept
     : m_key{key}
     , m_type{type}
     , m_length{length}
     , m_value(length)
     , m_varIntValue{0} {}
 
-MessageFromProtoDecoder::ProtoKeyValue::ProtoKeyValue(uint32_t key, uint64_t value) noexcept
+FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint32_t key, uint64_t value) noexcept
     : m_key{key}
     , m_type{ProtoConstants::VARINT}
     , m_length{0}
     , m_value{}
     , m_varIntValue{value} {}
 
-uint32_t MessageFromProtoDecoder::ProtoKeyValue::key() const noexcept {
+uint32_t FromProtoVisitor::ProtoKeyValue::key() const noexcept {
     return m_key;
 }
 
-ProtoConstants MessageFromProtoDecoder::ProtoKeyValue::type() const noexcept {
+ProtoConstants FromProtoVisitor::ProtoKeyValue::type() const noexcept {
     return m_type;
 }
 
-uint64_t MessageFromProtoDecoder::ProtoKeyValue::length() const noexcept {
+uint64_t FromProtoVisitor::ProtoKeyValue::length() const noexcept {
     return m_length;
 }
 
-uint64_t MessageFromProtoDecoder::ProtoKeyValue::valueAsVarInt() const noexcept {
+uint64_t FromProtoVisitor::ProtoKeyValue::valueAsVarInt() const noexcept {
     uint64_t retVal{0};
     if (type() == ProtoConstants::VARINT) {
         retVal = m_varIntValue;
@@ -130,7 +130,7 @@ uint64_t MessageFromProtoDecoder::ProtoKeyValue::valueAsVarInt() const noexcept 
     return retVal;
 }
 
-float MessageFromProtoDecoder::ProtoKeyValue::valueAsFloat() const noexcept {
+float FromProtoVisitor::ProtoKeyValue::valueAsFloat() const noexcept {
     float retVal{0};
     if (!m_value.empty() && (length() == sizeof(float)) && (m_value.size() == sizeof(float))
         && (type() == ProtoConstants::FOUR_BYTES)) {
@@ -139,7 +139,7 @@ float MessageFromProtoDecoder::ProtoKeyValue::valueAsFloat() const noexcept {
     return retVal;
 }
 
-double MessageFromProtoDecoder::ProtoKeyValue::valueAsDouble() const noexcept {
+double FromProtoVisitor::ProtoKeyValue::valueAsDouble() const noexcept {
     double retVal{0};
     if (!m_value.empty() && (length() == sizeof(double)) && (m_value.size() == sizeof(double))
         && (type() == ProtoConstants::EIGHT_BYTES)) {
@@ -148,7 +148,7 @@ double MessageFromProtoDecoder::ProtoKeyValue::valueAsDouble() const noexcept {
     return retVal;
 }
 
-std::string MessageFromProtoDecoder::ProtoKeyValue::valueAsString() const noexcept {
+std::string FromProtoVisitor::ProtoKeyValue::valueAsString() const noexcept {
     std::string retVal;
     if (!m_value.empty() && (length() > 0) && (type() == ProtoConstants::LENGTH_DELIMITED)) {
         // Create string from buffer.
@@ -157,13 +157,13 @@ std::string MessageFromProtoDecoder::ProtoKeyValue::valueAsString() const noexce
     return retVal;
 }
 
-std::vector<char> &MessageFromProtoDecoder::ProtoKeyValue::rawBuffer() noexcept {
+std::vector<char> &FromProtoVisitor::ProtoKeyValue::rawBuffer() noexcept {
     return m_value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-MessageFromProtoDecoder &MessageFromProtoDecoder::operator=(const MessageFromProtoDecoder &other) noexcept {
+FromProtoVisitor &FromProtoVisitor::operator=(const FromProtoVisitor &other) noexcept {
     m_buffer.str(other.m_buffer.str());
     m_mapOfKeyValues = other.m_mapOfKeyValues;
 
@@ -172,7 +172,7 @@ MessageFromProtoDecoder &MessageFromProtoDecoder::operator=(const MessageFromPro
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void MessageFromProtoDecoder::preVisit(uint32_t id,
+void FromProtoVisitor::preVisit(uint32_t id,
                                        const std::string &shortName,
                                        const std::string &longName) noexcept {
     (void)id;
@@ -180,9 +180,9 @@ void MessageFromProtoDecoder::preVisit(uint32_t id,
     (void)longName;
 }
 
-void MessageFromProtoDecoder::postVisit() noexcept {}
+void FromProtoVisitor::postVisit() noexcept {}
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -190,7 +190,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -199,7 +199,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -208,7 +208,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -217,7 +217,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -226,7 +226,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -235,7 +235,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -244,7 +244,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -253,7 +253,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -262,7 +262,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -270,7 +270,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -278,7 +278,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -286,7 +286,7 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
     }
 }
 
-void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
+void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
@@ -296,23 +296,23 @@ void MessageFromProtoDecoder::visit(uint32_t id, std::string &&typeName, std::st
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int8_t MessageFromProtoDecoder::fromZigZag8(uint8_t v) noexcept {
+int8_t FromProtoVisitor::fromZigZag8(uint8_t v) noexcept {
     return static_cast<int8_t>((v >> 1) ^ -(v & 1));
 }
 
-int16_t MessageFromProtoDecoder::fromZigZag16(uint16_t v) noexcept {
+int16_t FromProtoVisitor::fromZigZag16(uint16_t v) noexcept {
     return static_cast<int16_t>((v >> 1) ^ -(v & 1));
 }
 
-int32_t MessageFromProtoDecoder::fromZigZag32(uint32_t v) noexcept {
+int32_t FromProtoVisitor::fromZigZag32(uint32_t v) noexcept {
     return static_cast<int32_t>((v >> 1) ^ -(v & 1));
 }
 
-int64_t MessageFromProtoDecoder::fromZigZag64(uint64_t v) noexcept {
+int64_t FromProtoVisitor::fromZigZag64(uint64_t v) noexcept {
     return static_cast<int64_t>((v >> 1) ^ -(v & 1));
 }
 
-std::size_t MessageFromProtoDecoder::fromVarInt(std::istream &in, uint64_t &value) noexcept {
+std::size_t FromProtoVisitor::fromVarInt(std::istream &in, uint64_t &value) noexcept {
     value = 0;
 
     constexpr uint64_t MASK  = 0x7f;

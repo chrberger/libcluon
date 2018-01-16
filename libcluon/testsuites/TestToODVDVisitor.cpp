@@ -22,7 +22,7 @@
 
 #include "cluon/GenericMessage.hpp"
 #include "cluon/ToJSONVisitor.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/MetaMessage.hpp"
@@ -83,7 +83,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     auto listOfMetaMessages = retVal.first;
     REQUIRE(1 == listOfMetaMessages.size());
 
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     std::stringstream sstr{protoEncoded};
     protoDecoder.decodeFrom(sstr);
 
@@ -146,7 +146,7 @@ message testdata.MyTestMessage6 [ id = 30006 ] {
     auto listOfMetaMessages = retVal.first;
     REQUIRE(2 == listOfMetaMessages.size());
 
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     std::stringstream sstr{protoEncoded};
     protoDecoder.decodeFrom(sstr);
 

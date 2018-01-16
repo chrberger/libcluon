@@ -18,7 +18,7 @@
 #ifndef GENERICMESSAGE_HPP
 #define GENERICMESSAGE_HPP
 
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/MetaMessage.hpp"
 #include "cluon/any/any.hpp"
 #include "cluon/cluon.hpp"
@@ -57,7 +57,7 @@ GenericMessage's actual values.
 // protoEncodedData is provided from somewhere, i.e., via network for example
 std::string protoEncodedData = <...>
 std::stringstream sstr{protoEncodedData};
-cluon::MessageFromProtoDecoder protoDecoder;
+cluon::FromProtoVisitor protoDecoder;
 protoDecoder.decodeFrom(sstr);
 
 const char *messageSpecification = R"(
@@ -152,7 +152,7 @@ std::cout << j.json();
 // protoEncodedData is provided from somewhere, i.e., via network for example
 std::string protoEncodedData = <...>
 std::stringstream sstr{protoEncodedData};
-cluon::MessageFromProtoDecoder protoDecoder;
+cluon::FromProtoVisitor protoDecoder;
 protoDecoder.decodeFrom(sstr);
 
 const char *messageSpecification = R"(
