@@ -17,7 +17,7 @@
 
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/LCMToGenericMessage.hpp"
-#include "cluon/JSONVisitor.hpp"
+#include "cluon/ToJSONVisitor.hpp"
 
 #include "argh/argh.h"
 
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
             ADDRESS, PORT,
             [&l2GM = lcm2GM](std::string && data, std::string &&, std::chrono::system_clock::time_point &&) noexcept {
                 cluon::GenericMessage gm = l2GM.getGenericMessage(data);
-                cluon::JSONVisitor j;
+                cluon::ToJSONVisitor j;
                 gm.accept(j);
                 std::cout << j.json() << std::endl;
                 std::cout.flush();

@@ -17,7 +17,7 @@
 
 #include "cluon/EnvelopeToJSON.hpp"
 #include "cluon/GenericMessage.hpp"
-#include "cluon/JSONVisitor.hpp"
+#include "cluon/ToJSONVisitor.hpp"
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
 
@@ -84,8 +84,8 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             constexpr bool OUTER_CURLY_BRACES{false};
             // Ignore field 2 (= serializedData) as it will be replaced below.
             const std::map<uint32_t, bool> mask{{2, false}};
-            JSONVisitor jsonFromEnvelope{OUTER_CURLY_BRACES, mask};
-            envelope.accept(jsonFromEnvelope);
+            ToJSONVisitor envelopeToJSON{OUTER_CURLY_BRACES, mask};
+            envelope.accept(envelopeToJSON);
 
             std::stringstream sstr{envelope.serializedData()};
             cluon::MessageFromProtoDecoder protoDecoder;
@@ -101,13 +101,13 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             // Set values in the newly created GenericMessage from ProtoDecoder.
             gm.accept(protoDecoder);
 
-            JSONVisitor jsonFromPayload{OUTER_CURLY_BRACES};
-            gm.accept(jsonFromPayload);
+            ToJSONVisitor payloadToJSON{OUTER_CURLY_BRACES};
+            gm.accept(payloadToJSON);
 
             std::string tmp{payload.messageName()};
             std::replace(tmp.begin(), tmp.end(), '.', '_');
 
-            retVal = '{' + jsonFromEnvelope.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{' + jsonFromPayload.json()
+            retVal = '{' + envelopeToJSON.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{' + payloadToJSON.json()
                      + '}' + '}';
         }
     }

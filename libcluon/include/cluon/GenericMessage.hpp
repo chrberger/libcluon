@@ -139,7 +139,7 @@ const std::string{protoEncoder.encodedData()};
 GenericMessage gm;
 // gm is created using one of the aforementioned options.
 
-cluon::JSONVisitor j;
+cluon::ToJSONVisitor j;
 gm.accept(j);
 std::cout << j.json();
 \endcode
@@ -171,7 +171,7 @@ if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second) {
     gm.accept(protoDecoder);
 }
 
-cluon::JSONVisitor j;
+cluon::ToJSONVisitor j;
 gm.accept(j);
 std::cout << j.json();
 \endcode

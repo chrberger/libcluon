@@ -21,7 +21,7 @@
 #include <iostream>
 
 #include "cluon/GenericMessage.hpp"
-#include "cluon/JSONVisitor.hpp"
+#include "cluon/ToJSONVisitor.hpp"
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/MessageToProtoEncoder.hpp"
@@ -93,7 +93,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     // Set values in GenericMessage from ProtoDecoder.
     gm.accept(protoDecoder);
 
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm.accept(j);
 
     const char *JSON = R"({"attribute1":1,
@@ -156,7 +156,7 @@ message testdata.MyTestMessage6 [ id = 30006 ] {
     // Set values in GenericMessage from ProtoDecoder.
     gm.accept(protoDecoder);
 
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm.accept(j);
 
     const char *JSON = R"({"attribute1":{"attribute1":97}})";
