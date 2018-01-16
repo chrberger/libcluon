@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MESSAGETOLCMENCODER_HPP
-#define MESSAGETOLCMENCODER_HPP
+#ifndef TOLCMVISITOR_HPP
+#define TOLCMVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 
@@ -29,16 +29,16 @@ namespace cluon {
 /**
 This class encodes a given message in LCM format.
 */
-class LIBCLUON_API MessageToLCMEncoder {
+class LIBCLUON_API ToLCMVisitor {
    private:
-    MessageToLCMEncoder(const MessageToLCMEncoder &) = delete;
-    MessageToLCMEncoder(MessageToLCMEncoder &&)      = delete;
-    MessageToLCMEncoder &operator=(const MessageToLCMEncoder &) = delete;
-    MessageToLCMEncoder &operator=(MessageToLCMEncoder &&) = delete;
+    ToLCMVisitor(const ToLCMVisitor &) = delete;
+    ToLCMVisitor(ToLCMVisitor &&)      = delete;
+    ToLCMVisitor &operator=(const ToLCMVisitor &) = delete;
+    ToLCMVisitor &operator=(ToLCMVisitor &&) = delete;
 
    public:
-    MessageToLCMEncoder()  = default;
-    ~MessageToLCMEncoder() = default;
+    ToLCMVisitor()  = default;
+    ~ToLCMVisitor() = default;
 
     /**
      * @param withHash True if the hash value from the fields shall be included.
@@ -75,7 +75,7 @@ class LIBCLUON_API MessageToLCMEncoder {
         calculateHash(0);
 
         // No hash for the type but for name and dimension.
-        cluon::MessageToLCMEncoder nestedLCMEncoder;
+        cluon::ToLCMVisitor nestedLCMEncoder;
         value.accept(nestedLCMEncoder);
 
         constexpr bool WITH_HASH{false};
