@@ -23,9 +23,17 @@
 // clang-format off
 namespace cluon {
     enum class MsgPackConstants : uint8_t {
-        FIXMAP  = 0x80,
-        MAP16   = 0xde,
-        MAP32   = 0xdf, };
+        IS_FALSE    = 0xC2,
+        IS_TRUE     = 0xC3,
+        FIXSTR      = 0xA0,
+        FIXSTR_END  = 0xBF,
+        STR8        = 0xD9,
+        STR16       = 0xDA,
+        STR32       = 0xDB,
+        FIXMAP      = 0x80,
+        FIXMAP_END  = 0x8F,
+        MAP16       = 0xDE,
+        MAP32       = 0xDF, };
 }
 // clang-format on
 

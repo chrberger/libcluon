@@ -77,6 +77,10 @@ class LIBCLUON_API ToMsgPackVisitor {
     }
 
    private:
+    void encode(std::ostream &o, const std::string &s);
+
+   private:
+    uint32_t m_numberOfFields{0};
     std::stringstream m_buffer{""};
 };
 } // namespace cluon

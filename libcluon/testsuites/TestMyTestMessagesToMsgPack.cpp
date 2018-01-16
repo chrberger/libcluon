@@ -38,12 +38,41 @@ TEST_CASE("Testing MyTestMessage0.") {
     tmp.accept(msgPackEncoder);
 
     std::string s = msgPackEncoder.encodedData();
-//    REQUIRE(4 == s.size());
+    REQUIRE(26 == s.size());
 
-//    REQUIRE(0x8 == static_cast<uint8_t>(s.at(0)));
-//    REQUIRE(0x1 == static_cast<uint8_t>(s.at(1)));
-//    REQUIRE(0x10 == static_cast<uint8_t>(s.at(2)));
-//    REQUIRE(0x43 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x82 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xc3 == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(14)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(15)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(16)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(17)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(18)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(19)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(20)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(21)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(22)));
+    REQUIRE(0x32 == static_cast<uint8_t>(s.at(23)));
+    REQUIRE(0xa1 == static_cast<uint8_t>(s.at(24)));
+    REQUIRE(0x64 == static_cast<uint8_t>(s.at(25)));
+
+//int i = 0;
+//for(auto c : s) {
+////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
+//    std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));" << std::endl;
+//}
+//std::cout << std::endl;
 
     std::stringstream sstr{s};
     cluon::FromMsgPackVisitor msgPackDecoder;
