@@ -18,7 +18,7 @@
 #include "catch.hpp"
 
 #include "cluon/MessageFromProtoDecoder.hpp"
-#include "cluon/MessageToProtoEncoder.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
@@ -34,7 +34,7 @@ TEST_CASE("Testing MyTestMessage0.") {
 
     tmp.attribute2('C');
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp.accept(protoEncoder);
 
     std::string s = protoEncoder.encodedData();
@@ -66,7 +66,7 @@ TEST_CASE("Testing MyTestMessage2.") {
     tmp.attribute1(150);
     REQUIRE(150 == tmp.attribute1());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp.accept(protoEncoder);
 
     std::string s = protoEncoder.encodedData();
@@ -97,7 +97,7 @@ TEST_CASE("Testing MyTestMessage3.") {
     REQUIRE(123 == tmp.attribute1());
     REQUIRE(-123 == tmp.attribute2());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp.accept(protoEncoder);
 
     std::string s = protoEncoder.encodedData();
@@ -130,7 +130,7 @@ TEST_CASE("Testing MyTestMessage4.") {
     tmp.attribute1("testing");
     REQUIRE("testing" == tmp.attribute1());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp.accept(protoEncoder);
 
     std::string s = protoEncoder.encodedData();
@@ -197,7 +197,7 @@ TEST_CASE("Testing MyTestMessage5.") { // NOLINT
     REQUIRE(-50.4321 == Approx(tmp.attribute10()));
     REQUIRE("Hello cluon World!" == tmp.attribute11());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp.accept(protoEncoder);
 
     std::string s = protoEncoder.encodedData();
@@ -304,7 +304,7 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
 
     REQUIRE(150 == tmp6.attribute1().attribute1());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp6.accept(protoEncoder);
     std::string s = protoEncoder.encodedData();
 
@@ -344,7 +344,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     REQUIRE(12 == tmp7.attribute2());
     REQUIRE(13 == tmp7.attribute3().attribute1());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp7.accept(protoEncoder);
     std::string s = protoEncoder.encodedData();
 

@@ -22,7 +22,7 @@
 #include "cluon/GenericMessage.hpp"
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
-#include "cluon/MessageToProtoEncoder.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing MyTestMessage1.") {

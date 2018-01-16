@@ -24,7 +24,7 @@
 #include "cluon/ToJSONVisitor.hpp"
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
-#include "cluon/MessageToProtoEncoder.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/MetaMessage.hpp"
 #include "cluon/ToODVDVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
@@ -49,7 +49,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE("Hello World" == tmp.attribute13());
     REQUIRE("Hello Galaxy" == tmp.attribute14());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp.accept(protoEncoder);
     const std::string protoEncoded{protoEncoder.encodedData()};
 
@@ -122,7 +122,7 @@ TEST_CASE("Testing MyTestMessage6.") {
 
     REQUIRE(97 == tmp6.attribute1().attribute1());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp6.accept(protoEncoder);
     const std::string protoEncoded{protoEncoder.encodedData()};
 

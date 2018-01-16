@@ -23,7 +23,7 @@
 #include "cluon/ToJSONVisitor.hpp"
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
-#include "cluon/MessageToProtoEncoder.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing base64") {
@@ -318,7 +318,7 @@ message FaultyMyMessageA [id = 60006] {
     REQUIRE(10 == msg3.attribute1());
     REQUIRE(20 == msg3.attribute2());
 
-    cluon::MessageToProtoEncoder proto;
+    cluon::ToProtoVisitor proto;
     msg3.accept(proto);
     std::string s{proto.encodedData()};
 
@@ -386,7 +386,7 @@ message FaultyMyMessageA [id = 30003] {
     REQUIRE(10 == msg3.attribute1());
     REQUIRE(20 == msg3.attribute2());
 
-    cluon::MessageToProtoEncoder proto;
+    cluon::ToProtoVisitor proto;
     msg3.accept(proto);
     std::string s{proto.encodedData()};
 

@@ -24,7 +24,7 @@
 #include "cluon/GenericMessage.hpp"
 #include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
-#include "cluon/MessageToProtoEncoder.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/MetaMessage.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
@@ -367,7 +367,7 @@ message MyMessageA [id = 30003] {
     REQUIRE(10 == msg3.attribute1());
     REQUIRE(20 == msg3.attribute2());
 
-    cluon::MessageToProtoEncoder proto;
+    cluon::ToProtoVisitor proto;
     msg3.accept(proto);
     std::string s{proto.encodedData()};
 
@@ -404,7 +404,7 @@ message MyMessageA [id = 30003] {
 
     // Turn GenericMessage back into Proto.
     {
-        cluon::MessageToProtoEncoder proto2;
+        cluon::ToProtoVisitor proto2;
         gm.accept(proto2);
         std::string s2 = proto2.encodedData();
         REQUIRE(4 == s2.size());
@@ -479,7 +479,7 @@ message example.MyTestMessage1 [id = 30001] {
     REQUIRE("Hello World" == msg1.attribute13());
     REQUIRE("Hello Galaxy" == msg1.attribute14());
 
-    cluon::MessageToProtoEncoder proto;
+    cluon::ToProtoVisitor proto;
     msg1.accept(proto);
     std::string s = proto.encodedData();
 
@@ -534,7 +534,7 @@ message example.MyTestMessage1 [id = 30001] {
         REQUIRE("World, Hello" == src.attribute13());
         REQUIRE("Galaxy, Hello" == src.attribute14());
 
-        cluon::MessageToProtoEncoder proto2;
+        cluon::ToProtoVisitor proto2;
         gm.accept(proto2);
         std::string s2 = proto2.encodedData();
 
@@ -598,7 +598,7 @@ message MyTest.Envelope [id = 1] {
     REQUIRE(100 == env.sampleTimeStamp().seconds());
     REQUIRE(200 == env.sampleTimeStamp().microseconds());
 
-    cluon::MessageToProtoEncoder proto;
+    cluon::ToProtoVisitor proto;
     env.accept(proto);
     std::string s = proto.encodedData();
 
@@ -633,7 +633,7 @@ message MyTest.Envelope [id = 1] {
         REQUIRE(0 == env2.sampleTimeStamp().seconds());
         REQUIRE(0 == env2.sampleTimeStamp().microseconds());
 
-        cluon::MessageToProtoEncoder proto2;
+        cluon::ToProtoVisitor proto2;
         gm.accept(proto2);
         std::string s2 = proto2.encodedData();
 
