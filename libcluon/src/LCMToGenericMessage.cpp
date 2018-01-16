@@ -16,7 +16,7 @@
  */
 
 #include "cluon/LCMToGenericMessage.hpp"
-#include "cluon/MessageFromLCMDecoder.hpp"
+#include "cluon/FromLCMVisitor.hpp"
 #include "cluon/MessageParser.hpp"
 
 #include <array>
@@ -104,11 +104,11 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
                             // data[offset+i] marks now the beginning of the payload to be decoded.
                             std::stringstream sstr{data.substr(pos + 1)};
 
-                            cluon::MessageFromLCMDecoder lcmDecoder;
-                            lcmDecoder.decodeFrom(sstr);
+                            cluon::FromLCMVisitor fromLCM;
+                            fromLCM.decodeFrom(sstr);
 
                             gm.createFrom(m_scopeOfMetaMessages[CHANNEL_NAME], m_listOfMetaMessages);
-                            gm.accept(lcmDecoder);
+                            gm.accept(fromLCM);
                         }
                     }
                 }

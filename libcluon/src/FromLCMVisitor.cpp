@@ -21,7 +21,7 @@
 #endif
 // clang-format on
 
-#include "cluon/MessageFromLCMDecoder.hpp"
+#include "cluon/FromLCMVisitor.hpp"
 
 #include <cstring>
 #include <algorithm>
@@ -30,14 +30,14 @@
 
 namespace cluon {
 
-MessageFromLCMDecoder::MessageFromLCMDecoder() noexcept
+FromLCMVisitor::FromLCMVisitor() noexcept
     : m_buffer(m_internalBuffer) {}
 
-MessageFromLCMDecoder::MessageFromLCMDecoder(std::stringstream &in) noexcept
+FromLCMVisitor::FromLCMVisitor(std::stringstream &in) noexcept
     : m_expectedHash{0}
     , m_buffer(in) {}
 
-void MessageFromLCMDecoder::decodeFrom(std::istream &in) noexcept {
+void FromLCMVisitor::decodeFrom(std::istream &in) noexcept {
     // Reset internal states as this deserializer could be reused.
     m_buffer.clear();
     m_buffer.str("");
@@ -50,7 +50,7 @@ void MessageFromLCMDecoder::decodeFrom(std::istream &in) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void MessageFromLCMDecoder::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void FromLCMVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;
@@ -65,13 +65,13 @@ void MessageFromLCMDecoder::preVisit(uint32_t id, const std::string &shortName, 
     }
 }
 
-void MessageFromLCMDecoder::postVisit() noexcept {
+void FromLCMVisitor::postVisit() noexcept {
     if ((0 != m_expectedHash) && (m_expectedHash != hash())) {
-        std::cerr << "[cluon::MessageFromLCMDecoder] Hash mismatch - decoding might have failed" << std::endl; // LCOV_EXCL_LINE
+        std::cerr << "[cluon::FromLCMVisitor] Hash mismatch - decoding might have failed" << std::endl; // LCOV_EXCL_LINE
     }
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -80,7 +80,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     m_buffer.read(reinterpret_cast<char *>(&v), sizeof(bool));
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -89,7 +89,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     m_buffer.read(reinterpret_cast<char *>(&v), sizeof(char));
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -98,7 +98,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     m_buffer.read(reinterpret_cast<char *>(&v), sizeof(int8_t));
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -107,7 +107,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     m_buffer.read(reinterpret_cast<char *>(&v), sizeof(int8_t));
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -118,7 +118,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     v = static_cast<int16_t>(be16toh(_v));
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -129,7 +129,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     v = be16toh(_v);
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -140,7 +140,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     v = static_cast<int32_t>(be32toh(_v));
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -151,7 +151,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     v = be32toh(_v);
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -162,7 +162,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     v = static_cast<int64_t>(be64toh(_v));
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -173,7 +173,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     v = be64toh(_v);
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -185,7 +185,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     std::memmove(&v, &_v, sizeof(int32_t));
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -197,7 +197,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
     std::memmove(&v, &_v, sizeof(int64_t));
 }
 
-void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
+void FromLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)id;
     (void)typeName;
     (void)name;
@@ -230,7 +230,7 @@ void MessageFromLCMDecoder::visit(uint32_t id, std::string &&typeName, std::stri
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int64_t MessageFromLCMDecoder::hash() const noexcept {
+int64_t FromLCMVisitor::hash() const noexcept {
     // Apply ZigZag encoding for hash from this message's fields and depending
     // hashes for complex nested types.
     int64_t tmp{m_calculatedHash};
@@ -240,11 +240,11 @@ int64_t MessageFromLCMDecoder::hash() const noexcept {
     return hash;
 }
 
-void MessageFromLCMDecoder::calculateHash(char c) noexcept {
+void FromLCMVisitor::calculateHash(char c) noexcept {
     m_calculatedHash = ((m_calculatedHash << 8) ^ (m_calculatedHash >> 55)) + c;
 }
 
-void MessageFromLCMDecoder::calculateHash(const std::string &s) noexcept {
+void FromLCMVisitor::calculateHash(const std::string &s) noexcept {
     const std::string tmp{(s.length() > 255 ? s.substr(0, 255) : s)};
     const uint8_t length{static_cast<uint8_t>(tmp.length())};
     calculateHash(static_cast<char>(length));

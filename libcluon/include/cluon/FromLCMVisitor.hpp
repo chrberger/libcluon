@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MESSAGEFROMLCMDECODER_HPP
-#define MESSAGEFROMLCMDECODER_HPP
+#ifndef FROMLCMVISITOR_HPP
+#define FROMLCMVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 
@@ -30,17 +30,17 @@ namespace cluon {
 /**
 This class decodes a given message from LCM format.
 */
-class LIBCLUON_API MessageFromLCMDecoder {
+class LIBCLUON_API FromLCMVisitor {
    private:
-    MessageFromLCMDecoder(std::stringstream &in) noexcept;
-    MessageFromLCMDecoder(const MessageFromLCMDecoder &) = delete;
-    MessageFromLCMDecoder(MessageFromLCMDecoder &&)      = delete;
-    MessageFromLCMDecoder &operator=(const MessageFromLCMDecoder &) = delete;
-    MessageFromLCMDecoder &operator=(MessageFromLCMDecoder &&) = delete;
+    FromLCMVisitor(std::stringstream &in) noexcept;
+    FromLCMVisitor(const FromLCMVisitor &) = delete;
+    FromLCMVisitor(FromLCMVisitor &&)      = delete;
+    FromLCMVisitor &operator=(const FromLCMVisitor &) = delete;
+    FromLCMVisitor &operator=(FromLCMVisitor &&) = delete;
 
    public:
-    MessageFromLCMDecoder() noexcept;
-    ~MessageFromLCMDecoder() = default;
+    FromLCMVisitor() noexcept;
+    ~FromLCMVisitor() = default;
 
    public:
     /**
@@ -79,7 +79,7 @@ class LIBCLUON_API MessageFromLCMDecoder {
         calculateHash(name);
         calculateHash(0);
 
-        cluon::MessageFromLCMDecoder nestedLCMDecoder(m_buffer);
+        cluon::FromLCMVisitor nestedLCMDecoder(m_buffer);
         value.accept(nestedLCMDecoder);
 
         m_hashes.push_back(nestedLCMDecoder.hash());
