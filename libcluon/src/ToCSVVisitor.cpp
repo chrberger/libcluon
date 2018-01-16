@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,29 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/CSVVisitor.hpp"
+#include "cluon/ToCSVVisitor.hpp"
 
 #include <iomanip>
 #include <sstream>
 
 namespace cluon {
 
-CSVVisitor::CSVVisitor(char delimiter, bool withHeader) noexcept
-    : CSVVisitor::CSVVisitor("", delimiter, withHeader, false) {}
+ToCSVVisitor::ToCSVVisitor(char delimiter, bool withHeader) noexcept
+    : ToCSVVisitor::ToCSVVisitor("", delimiter, withHeader, false) {}
 
-CSVVisitor::CSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept
+ToCSVVisitor::ToCSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept
     : m_prefix(prefix)
     , m_delimiter(delimiter)
     , m_withHeader(withHeader)
     , m_isNested(isNested) {}
 
-void CSVVisitor::clear() noexcept {
+void ToCSVVisitor::clear() noexcept {
     m_bufferHeader.str("");
     m_bufferValues.str("");
     m_fillHeader = true;
 }
 
-std::string CSVVisitor::csv() const noexcept {
+std::string ToCSVVisitor::csv() const noexcept {
     std::stringstream tmp;
     if (m_withHeader) {
         tmp << m_bufferHeader.str();
@@ -47,13 +47,13 @@ std::string CSVVisitor::csv() const noexcept {
     return retVal;
 }
 
-void CSVVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void ToCSVVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;
 }
 
-void CSVVisitor::postVisit() noexcept {
+void ToCSVVisitor::postVisit() noexcept {
     if (m_fillHeader) {
         m_bufferHeader << (m_isNested ? "" : "\n");
     }
@@ -61,7 +61,7 @@ void CSVVisitor::postVisit() noexcept {
     m_bufferValues << (m_isNested ? "" : "\n");
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -70,7 +70,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -79,7 +79,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -88,7 +88,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << +v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -97,7 +97,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << +v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -106,7 +106,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -115,7 +115,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -124,7 +124,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -133,7 +133,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -142,7 +142,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -151,7 +151,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << v << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -160,7 +160,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << std::setprecision(7) << v << std::setprecision(6) << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {
@@ -169,7 +169,7 @@ void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, 
     m_bufferValues << std::setprecision(11) << v << std::setprecision(6) << m_delimiter;
 }
 
-void CSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
+void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)id;
     (void)typeName;
     if (m_fillHeader) {

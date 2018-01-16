@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef JSONVISITOR_HPP
-#define JSONVISITOR_HPP
+#ifndef TOCSVVISITOR_HPP
+#define TOCSVVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 
@@ -33,7 +33,7 @@ user-specified delimiters and optional column headers:
 MyMessage msg;
 // Set some values in msg.
 
-cluon::CSVVisitor csv{',', true};
+cluon::ToCSVVisitor csv{',', true};
 msg.accept(csv);
 
 std::cout << csv.csv() << std::endl;
@@ -43,12 +43,12 @@ Subsequent use of this visitor will append the data (please keep in mind to not
 change the visited messages in between as the generated CSV data will be messed
 up otherwise).
 */
-class LIBCLUON_API CSVVisitor {
+class LIBCLUON_API ToCSVVisitor {
    private:
-    CSVVisitor(const CSVVisitor &) = delete;
-    CSVVisitor(CSVVisitor &&)      = delete;
-    CSVVisitor &operator=(const CSVVisitor &) = delete;
-    CSVVisitor &operator=(CSVVisitor &&) = delete;
+    ToCSVVisitor(const ToCSVVisitor &) = delete;
+    ToCSVVisitor(ToCSVVisitor &&)      = delete;
+    ToCSVVisitor &operator=(const ToCSVVisitor &) = delete;
+    ToCSVVisitor &operator=(ToCSVVisitor &&) = delete;
 
    public:
     /**
@@ -58,7 +58,7 @@ class LIBCLUON_API CSVVisitor {
      * @param withHeader If true, the first line in the output contains the
      *        column headers.
      */
-    CSVVisitor(char delimiter = ';', bool withHeader = true) noexcept;
+    ToCSVVisitor(char delimiter = ';', bool withHeader = true) noexcept;
 
    protected:
     /**
@@ -70,7 +70,7 @@ class LIBCLUON_API CSVVisitor {
      *        column headers.
      * @param isNested If true, the returned CSV values do not have a trailing new line.
      */
-    CSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept;
+    ToCSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept;
 
    public:
     /**
@@ -109,7 +109,7 @@ class LIBCLUON_API CSVVisitor {
         (void)id;
         (void)typeName;
         constexpr bool IS_NESTED{true};
-        CSVVisitor csvVisitor(name, m_delimiter, m_withHeader, IS_NESTED);
+        ToCSVVisitor csvVisitor(name, m_delimiter, m_withHeader, IS_NESTED);
         value.accept(csvVisitor);
 
         if (m_fillHeader) {
