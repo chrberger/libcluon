@@ -82,10 +82,10 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(tmp2.attribute1());
     REQUIRE('c' == tmp2.attribute2());
 
-//    tmp2.accept(msgPackDecoder);
+    tmp2.accept(msgPackDecoder);
 
-//    REQUIRE(tmp2.attribute1() == tmp.attribute1());
-//    REQUIRE(tmp2.attribute2() == tmp.attribute2());
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+    REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
 
 //TEST_CASE("Testing MyTestMessage2.") {

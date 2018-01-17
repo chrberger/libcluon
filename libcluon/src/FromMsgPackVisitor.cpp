@@ -18,74 +18,140 @@
 #include "cluon/FromMsgPackVisitor.hpp"
 
 #include <cstring>
+#include <iostream>
+#include <vector>
 
 namespace cluon {
 
-//void FromMsgPackVisitor::readBytesFromStream(std::istream &in,
-//                                                  std::size_t bytesToReadFromStream,
-//                                                  std::vector<char> &buffer) noexcept {
-//    constexpr std::size_t CHUNK_SIZE{1024};
-//    std::streamsize bufferPosition{0};
+MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
+    MsgPackConstants formatFamily{MsgPackConstants::UNKNOWN_FORMAT};
 
-//    // Ensure buffer has enough space to hold the bytes.
-//    buffer.reserve(bytesToReadFromStream);
+    if (static_cast<uint8_t>(MsgPackConstants::IS_FALSE) == T) {
+        formatFamily = MsgPackConstants::BOOL_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::IS_TRUE) == T) {
+        formatFamily = MsgPackConstants::BOOL_FORMAT;
+    }
+    else if ( (static_cast<uint8_t>(MsgPackConstants::FIXSTR) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXSTR_END) > T) ) {
+        formatFamily = MsgPackConstants::STR_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::STR8) == T) {
+        formatFamily = MsgPackConstants::STR_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::STR16) == T) {
+        formatFamily = MsgPackConstants::STR_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::STR32) == T) {
+        formatFamily = MsgPackConstants::STR_FORMAT;
+    }
+    else if ( (static_cast<uint8_t>(MsgPackConstants::FIXMAP) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXMAP_END) > T) ) {
+        formatFamily = MsgPackConstants::MAP_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::MAP16) == T) {
+        formatFamily = MsgPackConstants::MAP_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) {
+        formatFamily = MsgPackConstants::MAP_FORMAT;
+    }
 
-//    while ((0 < bytesToReadFromStream) && in.good()) {
-//        // clang-format off
-//        in.read(&buffer[static_cast<std::size_t>(bufferPosition)], /* Flawfinder: ignore */ /* Cf. buffer.reserve(...) above.  */
-//                (bytesToReadFromStream > CHUNK_SIZE) ? CHUNK_SIZE : static_cast<std::streamsize>(bytesToReadFromStream));
-//        // clang-format on
-//        const std::streamsize EXTRACTED_BYTES{in.gcount()};
-//        bufferPosition += EXTRACTED_BYTES;
-//        bytesToReadFromStream -= static_cast<std::size_t>(EXTRACTED_BYTES);
-//    }
-//}
+    return formatFamily;
+}
+
+std::string FromMsgPackVisitor::readString(std::istream &in) noexcept {
+    std::string retVal{""};
+    if (in.good()) {
+        uint8_t c = static_cast<uint8_t>(in.get());
+        if (MsgPackConstants::STR_FORMAT == getFormatFamily(c)) {
+            // First, search for str opening token.
+            uint32_t length{0};
+            const uint8_t T = static_cast<uint8_t>(c);
+            if ( (static_cast<uint8_t>(MsgPackConstants::FIXSTR) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXSTR_END) > T) ) {
+                length = T - static_cast<uint8_t>(MsgPackConstants::FIXSTR);
+            }
+            else if (static_cast<uint8_t>(MsgPackConstants::STR8) == T) {
+                uint8_t _length{0};
+                in.read(reinterpret_cast<char*>(&_length), sizeof(uint8_t));
+                length = _length;
+            }
+            else if (static_cast<uint8_t>(MsgPackConstants::STR16) == T) {
+                uint16_t _length{0};
+                in.read(reinterpret_cast<char*>(&_length), sizeof(uint16_t));
+                length = be16toh(_length);
+            }
+            else if (static_cast<uint8_t>(MsgPackConstants::STR32) == T) {
+                in.read(reinterpret_cast<char*>(&length), sizeof(uint32_t));
+                length = be32toh(length);
+            }
+
+            if (0 < length) {
+                std::vector<char> buffer;
+                buffer.reserve(length);
+                in.read(&buffer[0], static_cast<std::streamsize>(length));
+                retVal = std::string(buffer.data(), length);
+            }
+        }
+    }
+    return retVal;
+}
+
+std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> FromMsgPackVisitor::readKeyValues(std::istream &in) noexcept {
+    std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> keyValues;
+    while (in.good()) {
+        uint8_t c = static_cast<uint8_t>(in.get());
+        if (MsgPackConstants::MAP_FORMAT == getFormatFamily(c)) {
+            // First, search for map opening token.
+            const uint8_t T = static_cast<uint8_t>(c);
+            uint32_t tokensToRead{0};
+            if ( (static_cast<uint8_t>(MsgPackConstants::FIXMAP) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXMAP_END) > T) ) {
+                tokensToRead = T - static_cast<uint8_t>(MsgPackConstants::FIXMAP);
+            }
+            else if (static_cast<uint8_t>(MsgPackConstants::MAP16) == T) {
+                uint16_t tokens{0};
+                in.read(reinterpret_cast<char*>(&tokens), sizeof(uint16_t));
+                tokensToRead = be16toh(tokens);
+            }
+            else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) {
+                in.read(reinterpret_cast<char*>(&tokensToRead), sizeof(uint32_t));
+                tokensToRead = be32toh(tokensToRead);
+            }
+
+            // Next, read pairs string/value.
+std::cout << "Reading " << tokensToRead << std::endl;
+            while (0 < tokensToRead) {
+                MsgPackKeyValue entry;
+                entry.m_key = readString(in);
+std::cout << "K = " << entry.m_key << std::endl;
+
+                // Read next byte and determine format family.
+                c = static_cast<uint8_t>(in.get());
+                entry.m_formatFamily = getFormatFamily(c);
+
+                if (MsgPackConstants::BOOL_FORMAT == entry.m_formatFamily) {
+                    entry.m_value = false;
+                    if (static_cast<uint8_t>(c) == static_cast<uint8_t>(MsgPackConstants::IS_TRUE)) {
+                        entry.m_value = true;
+                    }
+                    else if (static_cast<uint8_t>(c) == static_cast<uint8_t>(MsgPackConstants::IS_FALSE)) {
+                        entry.m_value = false;
+                    }
+                }
+                else if (MsgPackConstants::STR_FORMAT == entry.m_formatFamily) {
+                    in.unget(); // Last read character needs to be put back.
+                    entry.m_value = readString(in);
+                }
+
+                keyValues[entry.m_key] = entry;
+                tokensToRead--;
+            }
+        }
+    }
+    return keyValues;
+}
 
 void FromMsgPackVisitor::decodeFrom(std::istream &in) noexcept {
     (void)in;
-//    // Reset internal states as this deserializer could be reused.
-//    m_buffer.str("");
-//    m_mapOfKeyValues.clear();
 
-//    while (in.good()) {
-//        // First stage: Read keyFieldType (encoded as VarInt).
-//        uint64_t keyFieldType{0};
-//        std::size_t bytesRead{fromVarInt(in, keyFieldType)};
-
-//        if (bytesRead > 0) {
-//            // Succeeded to read keyFieldType entry; extract information.
-//            const uint32_t fieldId{static_cast<uint32_t>(keyFieldType >> 3)};
-//            const ProtoConstants protoType{static_cast<ProtoConstants>(keyFieldType & 0x7)};
-
-//            if (protoType == ProtoConstants::VARINT) {
-//                // Directly decode VarInt value.
-//                uint64_t value{0};
-//                fromVarInt(in, value);
-//                ProtoKeyValue pkv{fieldId, value};
-//                m_mapOfKeyValues[pkv.key()] = std::move(pkv);
-//            } else if (protoType == ProtoConstants::EIGHT_BYTES) {
-//                constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(double)};
-//                // Create map entry for Proto key/value here to avoid copying data later.
-//                ProtoKeyValue pkv{fieldId, ProtoConstants::EIGHT_BYTES, BYTES_TO_READ_FROM_STREAM};
-//                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, pkv.rawBuffer());
-//                m_mapOfKeyValues[pkv.key()] = std::move(pkv);
-//            } else if (protoType == ProtoConstants::LENGTH_DELIMITED) {
-//                uint64_t length{0};
-//                fromVarInt(in, length);
-//                const std::size_t BYTES_TO_READ_FROM_STREAM{static_cast<std::size_t>(length)};
-//                // Create map entry for Proto key/value here to avoid copying data later.
-//                ProtoKeyValue pkv{fieldId, ProtoConstants::LENGTH_DELIMITED, BYTES_TO_READ_FROM_STREAM};
-//                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, pkv.rawBuffer());
-//                m_mapOfKeyValues[pkv.key()] = std::move(pkv);
-//            } else if (protoType == ProtoConstants::FOUR_BYTES) {
-//                constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(float)};
-//                // Create map entry for Proto key/value here to avoid copying data later.
-//                ProtoKeyValue pkv{fieldId, ProtoConstants::FOUR_BYTES, BYTES_TO_READ_FROM_STREAM};
-//                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, pkv.rawBuffer());
-//                m_mapOfKeyValues[pkv.key()] = std::move(pkv);
-//            }
-//        }
-//    }
+    m_keyValues = readKeyValues(in);
 }
 
 void FromMsgPackVisitor::preVisit(uint32_t id,
@@ -101,17 +167,23 @@ void FromMsgPackVisitor::postVisit() noexcept {}
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)id;
     (void)typeName;
-    
-    (void)name;
-    (void)v;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = linb::any_cast<bool>(m_keyValues[name].m_value);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
 }
 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)id;
     (void)typeName;
-    
-    (void)name;
-    (void)v;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = linb::any_cast<std::string>(m_keyValues[name].m_value).at(0);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
 }
 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {

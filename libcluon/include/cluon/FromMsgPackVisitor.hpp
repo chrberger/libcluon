@@ -18,20 +18,40 @@
 #ifndef FROMMSGPACKVISITOR_HPP
 #define FROMMSGPACKVISITOR_HPP
 
-#include "cluon/ProtoConstants.hpp"
+#include "cluon/MsgPackConstants.hpp"
 #include "cluon/cluon.hpp"
+#include "cluon/any/any.hpp"
 
 #include <cstdint>
+#include <istream>
 #include <map>
-#include <sstream>
 #include <string>
-#include <vector>
 
 namespace cluon {
 /**
-This class decodes a given message from Proto format.
+This class decodes a given message from MsgPack format.
 */
 class LIBCLUON_API FromMsgPackVisitor {
+    /**
+     * This class represents a key/value in a MsgPack payload stream of key/values.
+     */
+    class MsgPackKeyValue {
+       private:
+        MsgPackKeyValue &operator=(MsgPackKeyValue &&) = delete;
+        MsgPackKeyValue(const MsgPackKeyValue &) = delete;
+ 
+       public:
+        MsgPackKeyValue() = default;
+        MsgPackKeyValue(MsgPackKeyValue &&) = default;
+        MsgPackKeyValue &operator=(const MsgPackKeyValue &) = default;
+       ~MsgPackKeyValue() = default;
+
+       public:
+        std::string m_key{""};
+        MsgPackConstants m_formatFamily{MsgPackConstants::BOOL_FORMAT};
+        linb::any m_value;
+    };
+
    private:
     FromMsgPackVisitor(const FromMsgPackVisitor &) = delete;
     FromMsgPackVisitor(FromMsgPackVisitor &&)      = delete;
@@ -82,7 +102,12 @@ class LIBCLUON_API FromMsgPackVisitor {
     }
 
    private:
-    std::stringstream m_buffer{""};
+    MsgPackConstants getFormatFamily(uint8_t T) noexcept;
+    std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> readKeyValues(std::istream &in) noexcept;
+    std::string readString(std::istream &in) noexcept;
+
+   private:
+    std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> m_keyValues{};
 };
 } // namespace cluon
 
