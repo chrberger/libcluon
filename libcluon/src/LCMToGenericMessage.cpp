@@ -25,22 +25,28 @@
 
 // clang-format off
 #ifdef WIN32
-    #undef be32toh
-    #define be32toh(x) __ntohl(x)
-
-    #include <cstdint>
-    #include <cstring>
-    uint32_t __ntohl(const uint32_t v) {
-        uint8_t d[4] = {};
-        std::memcpy(&d, &v, sizeof(d));
-
-        return ((uint32_t) d[3] << 0)
-             | ((uint32_t) d[2] << 8)
-             | ((uint32_t) d[1] << 16)
-             | ((uint32_t) d[0] << 24);
-    }
+    #include <Winsock2.h> // for htonl, htons
 #endif
 // clang-format on
+
+//// clang-format off
+//#ifdef WIN32
+//    #undef be32toh
+//    #define be32toh(x) __ntohl(x)
+
+//    #include <cstdint>
+//    #include <cstring>
+//    uint32_t __ntohl(const uint32_t v) {
+//        uint8_t d[4] = {};
+//        std::memcpy(&d, &v, sizeof(d));
+
+//        return ((uint32_t) d[3] << 0)
+//             | ((uint32_t) d[2] << 8)
+//             | ((uint32_t) d[1] << 16)
+//             | ((uint32_t) d[0] << 24);
+//    }
+//#endif
+//// clang-format on
 
 namespace cluon {
 
