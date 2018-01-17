@@ -15,6 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// clang-format off
+#ifdef WIN32
+    #include <Winsock2.h> // for htonl, htons
+#endif
+// clang-format on
+
 #include "cluon/ToMsgPackVisitor.hpp"
 
 #include <cstring>
