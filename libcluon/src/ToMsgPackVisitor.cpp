@@ -52,16 +52,16 @@ void ToMsgPackVisitor::encode(std::ostream &o, const std::string &s) {
                             (LENGTH <= 0xFFFF ? static_cast<uint8_t>(MsgPackConstants::STR16) : static_cast<uint8_t>(MsgPackConstants::STR32))
                           )
                         );
-    m_buffer.write(reinterpret_cast<const char*>(&v), sizeof(uint8_t));
+    o.write(reinterpret_cast<const char*>(&v), sizeof(uint8_t));
     if ( (LENGTH >= 32) && (LENGTH <= 0xFF) ) {
         uint16_t l = htobe16(static_cast<uint16_t>(LENGTH));
-        m_buffer.write(reinterpret_cast<const char*>(&l), sizeof(uint16_t));
+        o.write(reinterpret_cast<const char*>(&l), sizeof(uint16_t));
     }
     else if ( (LENGTH > 0xFF) && (LENGTH <= 0xFF) ) {
         uint32_t l = htobe32(LENGTH);
-        m_buffer.write(reinterpret_cast<const char*>(&l), sizeof(uint32_t));
+        o.write(reinterpret_cast<const char*>(&l), sizeof(uint32_t));
     }
-    m_buffer.write(s.c_str(), static_cast<std::streamsize>(LENGTH)); // LENGTH won't be negative.
+    o.write(s.c_str(), static_cast<std::streamsize>(LENGTH)); // LENGTH won't be negative.
 }
 
 void ToMsgPackVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
