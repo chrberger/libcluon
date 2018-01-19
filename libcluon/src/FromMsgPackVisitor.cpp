@@ -149,18 +149,18 @@ int64_t FromMsgPackVisitor::readInt(std::istream &in) noexcept {
             else if (static_cast<int8_t>(MsgPackConstants::INT16) == c) {
                 int16_t v{0};
                 in.read(reinterpret_cast<char*>(&v), sizeof(int16_t));
-                v = be16toh(v);
+                v = static_cast<int16_t>(be16toh(v));
                 retVal = static_cast<int64_t>(v);
             }
             else if (static_cast<int8_t>(MsgPackConstants::INT32) == c) {
                 int32_t v{0};
                 in.read(reinterpret_cast<char*>(&v), sizeof(int32_t));
-                v = be32toh(v);
+                v = static_cast<int32_t>(be32toh(v));
                 retVal = static_cast<int64_t>(v);
             }
             else if (static_cast<int8_t>(MsgPackConstants::INT64) == c) {
                 in.read(reinterpret_cast<char*>(&retVal), sizeof(int64_t));
-                retVal = be64toh(retVal);
+                retVal = static_cast<int64_t>(be64toh(retVal));
             }
         }
     }

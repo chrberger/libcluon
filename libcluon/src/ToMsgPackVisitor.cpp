@@ -126,21 +126,21 @@ void ToMsgPackVisitor::encodeInt(std::ostream &o, int64_t v) {
         const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT16);
         o.write(reinterpret_cast<const char*>(&t), sizeof(uint8_t));
         int16_t _v = static_cast<int16_t>(v);
-        _v = htobe16(_v);
+        _v = static_cast<int16_t>(htobe16(_v));
         o.write(reinterpret_cast<const char*>(&_v), sizeof(int16_t));
     }
     else if (-4294967295 <= v) {
         const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT32);
         o.write(reinterpret_cast<const char*>(&t), sizeof(uint8_t));
         int32_t _v = static_cast<int32_t>(v);
-        _v = htobe32(_v);
+        _v = static_cast<int32_t>(htobe32(_v));
         o.write(reinterpret_cast<const char*>(&_v), sizeof(int32_t));
     }
     else {
         const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT64);
         o.write(reinterpret_cast<const char*>(&t), sizeof(uint8_t));
         int64_t _v = static_cast<int64_t>(v);
-        _v = htobe64(_v);
+        _v = static_cast<int64_t>(htobe64(_v));
         o.write(reinterpret_cast<const char*>(&_v), sizeof(int64_t));
     }
 }
