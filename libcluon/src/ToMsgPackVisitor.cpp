@@ -213,16 +213,28 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)id;
     (void)typeName;
 
-    (void)name;
-    (void)v;
+    encode(m_buffer, name);
+    const uint8_t t = static_cast<uint8_t>(MsgPackConstants::FLOAT);
+    m_buffer.write(reinterpret_cast<const char*>(&t), sizeof(uint8_t));
+    uint32_t _v{0};
+    std::memmove(&_v, &v, sizeof(float));
+    _v = htobe32(_v);
+    m_buffer.write(reinterpret_cast<const char*>(&_v), sizeof(uint32_t));
+    m_numberOfFields++;
 }
 
 void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)id;
     (void)typeName;
 
-    (void)name;
-    (void)v;
+    encode(m_buffer, name);
+    const uint8_t t = static_cast<uint8_t>(MsgPackConstants::DOUBLE);
+    m_buffer.write(reinterpret_cast<const char*>(&t), sizeof(uint8_t));
+    uint64_t _v{0};
+    std::memmove(&_v, &v, sizeof(double));
+    _v = htobe64(_v);
+    m_buffer.write(reinterpret_cast<const char*>(&_v), sizeof(double));
+    m_numberOfFields++;
 }
 
 void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {

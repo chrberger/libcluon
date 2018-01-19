@@ -92,12 +92,6 @@ TEST_CASE("Testing MyTestMessage2 with v <= 0x7F.") {
     tmp.accept(msgPackEncoder);
 
     std::string s = msgPackEncoder.encodedData();
-//int i = 0;
-//for(auto c : s) {
-////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
-//    std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));" << std::endl;
-//}
-//std::cout << std::endl;
 
     REQUIRE(13 == s.size());
 
@@ -168,7 +162,7 @@ TEST_CASE("Testing MyTestMessage2 with v <= 0xFF.") {
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
 }
 
-TEST_CASE("Testing MyTestMessage2 with v <= 0xFFFF.") {
+TEST_CASE("Testing MyTestMessage8 with v <= 0xFFFF.") {
     testdata::MyTestMessage8 tmp;
     REQUIRE(123 == tmp.attribute1());
 
@@ -210,7 +204,7 @@ TEST_CASE("Testing MyTestMessage2 with v <= 0xFFFF.") {
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
 }
 
-TEST_CASE("Testing MyTestMessage2 with v <= 0xFFFFFFFF.") {
+TEST_CASE("Testing MyTestMessage8 with v <= 0xFFFFFFFF.") {
     testdata::MyTestMessage8 tmp;
     REQUIRE(123 == tmp.attribute1());
 
@@ -252,6 +246,76 @@ TEST_CASE("Testing MyTestMessage2 with v <= 0xFFFFFFFF.") {
     tmp2.accept(msgPackDecoder);
 
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
+}
+
+TEST_CASE("Testing MyTestMessage9.") {
+    testdata::MyTestMessage9 tmp;
+
+    tmp.attribute1(1.1f);
+    tmp.attribute2(1.23456789);
+    REQUIRE(1.1f == Approx(tmp.attribute1()));
+    REQUIRE(1.23456789 == Approx(tmp.attribute2()));
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+//int i = 0;
+//for(auto c : s) {
+////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
+//    std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));" << std::endl;
+//}
+//std::cout << std::endl;
+
+    REQUIRE(37 == s.size());
+
+    REQUIRE(0x82 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xca == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0x3f == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0x8c == static_cast<uint8_t>(s.at(14)));
+    REQUIRE(0xcc == static_cast<uint8_t>(s.at(15)));
+    REQUIRE(0xcd == static_cast<uint8_t>(s.at(16)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(17)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(18)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(19)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(20)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(21)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(22)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(23)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(24)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(25)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(26)));
+    REQUIRE(0x32 == static_cast<uint8_t>(s.at(27)));
+    REQUIRE(0xcb == static_cast<uint8_t>(s.at(28)));
+    REQUIRE(0x3f == static_cast<uint8_t>(s.at(29)));
+    REQUIRE(0xf3 == static_cast<uint8_t>(s.at(30)));
+    REQUIRE(0xc0 == static_cast<uint8_t>(s.at(31)));
+    REQUIRE(0xca == static_cast<uint8_t>(s.at(32)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(33)));
+    REQUIRE(0x83 == static_cast<uint8_t>(s.at(34)));
+    REQUIRE(0xde == static_cast<uint8_t>(s.at(35)));
+    REQUIRE(0x1b == static_cast<uint8_t>(s.at(36)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage9 tmp2;
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(1.1f == Approx(tmp2.attribute1()));
+    REQUIRE(1.23456789 == Approx(tmp2.attribute2()));
 }
 
 //TEST_CASE("Testing MyTestMessage3.") {

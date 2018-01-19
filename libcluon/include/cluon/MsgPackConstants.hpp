@@ -25,6 +25,8 @@ namespace cluon {
     enum class MsgPackConstants : uint16_t {
         IS_FALSE        = 0xC2,
         IS_TRUE         = 0xC3,
+        FLOAT           = 0xCA,
+        DOUBLE          = 0xCB,
         UINT8           = 0xCC,
         UINT16          = 0xCD,
         UINT32          = 0xCE,

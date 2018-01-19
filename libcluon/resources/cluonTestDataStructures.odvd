@@ -78,3 +78,8 @@ message testdata.MyTestMessage8 [id = 30008] {
     uint64 attribute1 [ default = 123, id = 1 ];
 }
 
+message testdata.MyTestMessage9 [id = 30009] {
+    float attribute1 [ default = -1.2345, id = 1 ];
+    double attribute2 [ default = -10.2345, id = 2 ];
+}
+

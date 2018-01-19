@@ -47,6 +47,12 @@ MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
     else if (static_cast<uint8_t>(MsgPackConstants::UINT64) == T) {
         formatFamily = MsgPackConstants::UINT_FORMAT;
     }
+    else if (static_cast<uint8_t>(MsgPackConstants::FLOAT) == T) {
+        formatFamily = MsgPackConstants::FLOAT_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::DOUBLE) == T) {
+        formatFamily = MsgPackConstants::FLOAT_FORMAT;
+    }
     else if ( (static_cast<uint8_t>(MsgPackConstants::FIXSTR) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXSTR_END) > T) ) {
         formatFamily = MsgPackConstants::STR_FORMAT;
     }
@@ -188,6 +194,24 @@ std::cout << "K = " << entry.m_key << std::endl;
                     in.unget(); // Last character needs to be put back to process the string correctly as it might encode its length.
                     entry.m_value = readUint(in);
                 }
+                else if (MsgPackConstants::FLOAT_FORMAT == entry.m_formatFamily) {
+                    if (static_cast<uint8_t>(c) == static_cast<uint8_t>(MsgPackConstants::FLOAT)) {
+                        uint32_t _v{0};
+                        in.read(reinterpret_cast<char*>(&_v), sizeof(uint32_t));
+                        _v = be32toh(_v);
+                        float v{0.0f};
+                        std::memmove(&v, &_v, sizeof(float));
+                        entry.m_value = v;
+                    }
+                    if (static_cast<uint8_t>(c) == static_cast<uint8_t>(MsgPackConstants::DOUBLE)) {
+                        uint64_t _v{0};
+                        in.read(reinterpret_cast<char*>(&_v), sizeof(uint64_t));
+                        _v = be64toh(_v);
+                        double v{0.0};
+                        std::memmove(&v, &_v, sizeof(double));
+                        entry.m_value = v;
+                    }
+                }
                 else if (MsgPackConstants::STR_FORMAT == entry.m_formatFamily) {
                     in.unget(); // Last character needs to be put back to process the string correctly as it might encode its length.
                     entry.m_value = readString(in);
@@ -318,17 +342,23 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)id;
     (void)typeName;
-    
-    (void)name;
-    (void)v;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = linb::any_cast<float>(m_keyValues[name].m_value);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
 }
 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)id;
     (void)typeName;
-    
-    (void)name;
-    (void)v;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = linb::any_cast<double>(m_keyValues[name].m_value);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
 }
 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
