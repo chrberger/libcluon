@@ -71,9 +71,15 @@ class LIBCLUON_API ToMsgPackVisitor {
         (void)id;
         (void)typeName;
 
-        (void)name;
-        cluon::ToMsgPackVisitor nestedMsgPackEncoder;
-        value.accept(nestedMsgPackEncoder);
+        encode(m_buffer, name);
+        {
+            cluon::ToMsgPackVisitor nestedMsgPackEncoder;
+            value.accept(nestedMsgPackEncoder);
+            const std::string tmp{nestedMsgPackEncoder.encodedData()};
+            const uint32_t LENGTH{static_cast<uint32_t>(tmp.size())};
+            m_buffer.write(tmp.c_str(), static_cast<std::streamsize>(LENGTH));
+        }
+        m_numberOfFields++;
     }
 
    private:

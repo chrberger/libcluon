@@ -38,10 +38,10 @@ class LIBCLUON_API FromMsgPackVisitor {
     class MsgPackKeyValue {
        private:
         MsgPackKeyValue &operator=(MsgPackKeyValue &&) = delete;
-        MsgPackKeyValue(const MsgPackKeyValue &) = delete;
  
        public:
         MsgPackKeyValue() = default;
+        MsgPackKeyValue(const MsgPackKeyValue &) = default;
         MsgPackKeyValue(MsgPackKeyValue &&) = default;
         MsgPackKeyValue &operator=(const MsgPackKeyValue &) = default;
        ~MsgPackKeyValue() = default;
@@ -58,10 +58,18 @@ class LIBCLUON_API FromMsgPackVisitor {
     FromMsgPackVisitor &operator=(FromMsgPackVisitor &&) = delete;
     FromMsgPackVisitor &operator=(const FromMsgPackVisitor &other) = delete;
 
+    /**
+     * Internal constructor to pass reference to preset key/values.
+     *
+     * @param preset Pre-filled key/value map to handled nested fields.
+     */
+    FromMsgPackVisitor(std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> &preset) noexcept;
+
    public:
-    FromMsgPackVisitor()  = default;
+    FromMsgPackVisitor() noexcept;
     ~FromMsgPackVisitor() = default;
 
+   public:
     /**
      * This method decodes a given istream into Proto.
      *
@@ -95,10 +103,14 @@ class LIBCLUON_API FromMsgPackVisitor {
         (void)id;
         (void)typeName;
 
-        (void)name;
-        cluon::FromMsgPackVisitor nestedMsgPackDecoder;
-//        nestedMsgPackDecoder.decodeFrom(m_buffer);
-        value.accept(nestedMsgPackDecoder);
+        if (0 < m_keyValues.count(name)) {
+            try {
+                std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> v = linb::any_cast<std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> >(m_keyValues[name].m_value);
+                cluon::FromMsgPackVisitor nestedMsgPackDecoder(v);
+                value.accept(nestedMsgPackDecoder);
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
+        }
     }
 
    private:
@@ -109,7 +121,8 @@ class LIBCLUON_API FromMsgPackVisitor {
     std::string readString(std::istream &in) noexcept;
 
    private:
-    std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> m_keyValues{};
+    std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> m_data{};
+    std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> &m_keyValues;
 };
 } // namespace cluon
 

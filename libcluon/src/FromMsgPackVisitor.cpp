@@ -29,6 +29,12 @@
 
 namespace cluon {
 
+FromMsgPackVisitor::FromMsgPackVisitor() noexcept
+    : m_keyValues{m_data} {}
+
+FromMsgPackVisitor::FromMsgPackVisitor(std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> &preset) noexcept
+    : m_keyValues{preset} {}
+
 MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
     MsgPackConstants formatFamily{MsgPackConstants::UNKNOWN_FORMAT};
 
@@ -274,6 +280,10 @@ std::cout << "K = " << entry.m_key << std::endl;
                 else if (MsgPackConstants::STR_FORMAT == entry.m_formatFamily) {
                     in.unget(); // Last character needs to be put back to process the string correctly as it might encode its length.
                     entry.m_value = readString(in);
+                }
+                else if (MsgPackConstants::MAP_FORMAT == entry.m_formatFamily) {
+                    in.unget(); // Last character needs to be put back to process the contained nested map correctly as it might encode its length.
+                    entry.m_value = readKeyValues(in);
                 }
 
                 keyValues[entry.m_key] = entry;

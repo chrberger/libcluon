@@ -826,36 +826,58 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(tmp2.attribute11() == tmp.attribute11());
 }
 
-//TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
-//    testdata::MyTestMessage6 tmp6;
+TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
+    testdata::MyTestMessage6 tmp6;
 
-//    REQUIRE(123 == tmp6.attribute1().attribute1());
+    REQUIRE(123 == tmp6.attribute1().attribute1());
 
-//    testdata::MyTestMessage2 tmp2;
-//    tmp6.attribute1(tmp2.attribute1(150));
+    testdata::MyTestMessage2 tmp2;
+    tmp6.attribute1(tmp2.attribute1(150));
 
-//    REQUIRE(150 == tmp6.attribute1().attribute1());
+    REQUIRE(150 == tmp6.attribute1().attribute1());
 
-//    cluon::ToMsgPackVisitor msgPackEncoder;
-//    tmp6.accept(msgPackEncoder);
-//    std::string s = msgPackEncoder.encodedData();
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp6.accept(msgPackEncoder);
+    std::string s = msgPackEncoder.encodedData();
 
-//    REQUIRE(5 == s.size());
-//    REQUIRE(0x1a == static_cast<uint8_t>(s.at(0)));
-//    REQUIRE(0x3 == static_cast<uint8_t>(s.at(1)));
-//    REQUIRE(0x8 == static_cast<uint8_t>(s.at(2)));
-//    REQUIRE(0x96 == static_cast<uint8_t>(s.at(3)));
-//    REQUIRE(0x1 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(26 == s.size());
 
-//    std::stringstream sstr{s};
-//    cluon::FromMsgPackVisitor msgPackDecoder;
-//    msgPackDecoder.decodeFrom(sstr);
+    REQUIRE(0x81 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0x81 == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(14)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(15)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(16)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(17)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(18)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(19)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(20)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(21)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(22)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(23)));
+    REQUIRE(0xcc == static_cast<uint8_t>(s.at(24)));
+    REQUIRE(0x96 == static_cast<uint8_t>(s.at(25)));
 
-//    testdata::MyTestMessage6 tmp6_2;
-//    REQUIRE(123 == tmp6_2.attribute1().attribute1());
-//    tmp6_2.accept(msgPackDecoder);
-//    REQUIRE(150 == tmp6_2.attribute1().attribute1());
-//}
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage6 tmp6_2;
+    REQUIRE(123 == tmp6_2.attribute1().attribute1());
+    tmp6_2.accept(msgPackDecoder);
+    REQUIRE(150 == tmp6_2.attribute1().attribute1());
+}
 
 //TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for serialization and deserialization.") {
 //    testdata::MyTestMessage7 tmp7;
