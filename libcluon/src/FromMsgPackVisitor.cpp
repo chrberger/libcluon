@@ -201,8 +201,16 @@ std::string FromMsgPackVisitor::readString(std::istream &in) noexcept {
             if (0 < length) {
                 std::vector<char> buffer;
                 buffer.reserve(length);
-                in.read(&buffer[0], static_cast<std::streamsize>(length));
-                retVal = std::string(buffer.data(), length);
+#ifdef WIN32
+                for (uint32_t i = 0; i < static_cast<uint32_t>(length); i++) {
+                    char c;
+                    in.get(c);
+                    buffer.push_back(c);
+                }
+#else
+                in.read(static_cast<char *>(&buffer[0]), static_cast<std::streamsize>(length));
+#endif
+                retVal = std::string(buffer.begin(), buffer.begin() + length);
             }
         }
     }
