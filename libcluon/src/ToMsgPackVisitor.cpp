@@ -24,6 +24,7 @@
 #include "cluon/ToMsgPackVisitor.hpp"
 
 #include <cstring>
+#include <iostream>
 
 namespace cluon {
 
@@ -76,7 +77,7 @@ void ToMsgPackVisitor::encode(std::ostream &o, const std::string &s) {
     o.write(s.c_str(), static_cast<std::streamsize>(LENGTH)); // LENGTH won't be negative.
 }
 
-void ToMsgPackVisitor::encode(std::ostream &o, uint64_t v) {
+void ToMsgPackVisitor::encodeUint(std::ostream &o, uint64_t v) {
     if (0x7f >= v) {
         const uint8_t _v = static_cast<uint8_t>(v);
         o.write(reinterpret_cast<const char*>(&_v), sizeof(uint8_t));
@@ -107,6 +108,40 @@ void ToMsgPackVisitor::encode(std::ostream &o, uint64_t v) {
         uint64_t _v = v;
         _v = htobe64(_v);
         o.write(reinterpret_cast<const char*>(&_v), sizeof(uint64_t));
+    }
+}
+
+void ToMsgPackVisitor::encodeInt(std::ostream &o, int64_t v) {
+    if (-31 <= v) {
+        int8_t _v = static_cast<int8_t>(v);
+        o.write(reinterpret_cast<const char*>(&_v), sizeof(int8_t));
+    }
+    else if (-255 <= v) {
+        const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT8);
+        o.write(reinterpret_cast<const char*>(&t), sizeof(uint8_t));
+        int8_t _v = static_cast<int8_t>(v);
+        o.write(reinterpret_cast<const char*>(&_v), sizeof(int8_t));
+    }
+    else if (-65535 <= v) {
+        const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT16);
+        o.write(reinterpret_cast<const char*>(&t), sizeof(uint8_t));
+        int16_t _v = static_cast<int16_t>(v);
+        _v = htobe16(_v);
+        o.write(reinterpret_cast<const char*>(&_v), sizeof(int16_t));
+    }
+    else if (-4294967295 <= v) {
+        const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT32);
+        o.write(reinterpret_cast<const char*>(&t), sizeof(uint8_t));
+        int32_t _v = static_cast<int32_t>(v);
+        _v = htobe32(_v);
+        o.write(reinterpret_cast<const char*>(&_v), sizeof(int32_t));
+    }
+    else {
+        const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT64);
+        o.write(reinterpret_cast<const char*>(&t), sizeof(uint8_t));
+        int64_t _v = static_cast<int64_t>(v);
+        _v = htobe64(_v);
+        o.write(reinterpret_cast<const char*>(&_v), sizeof(int64_t));
     }
 }
 
@@ -145,8 +180,9 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)id;
     (void)typeName;
 
-    (void)name;
-    (void)v;
+    encode(m_buffer, name);
+    encodeInt(m_buffer, v);
+    m_numberOfFields++;
 }
 
 void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
@@ -154,7 +190,7 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
 
     encode(m_buffer, name);
-    encode(m_buffer, v);
+    encodeUint(m_buffer, v);
     m_numberOfFields++;
 }
 
@@ -162,8 +198,9 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)id;
     (void)typeName;
 
-    (void)name;
-    (void)v;
+    encode(m_buffer, name);
+    encodeInt(m_buffer, v);
+    m_numberOfFields++;
 }
 
 void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
@@ -171,7 +208,7 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
 
     encode(m_buffer, name);
-    encode(m_buffer, v);
+    encodeUint(m_buffer, v);
     m_numberOfFields++;
 }
 
@@ -179,8 +216,9 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)id;
     (void)typeName;
 
-    (void)name;
-    (void)v;
+    encode(m_buffer, name);
+    encodeInt(m_buffer, v);
+    m_numberOfFields++;
 }
 
 void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
@@ -188,7 +226,7 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
 
     encode(m_buffer, name);
-    encode(m_buffer, v);
+    encodeUint(m_buffer, v);
     m_numberOfFields++;
 }
 
@@ -196,8 +234,9 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)id;
     (void)typeName;
 
-    (void)name;
-    (void)v;
+    encode(m_buffer, name);
+    encodeInt(m_buffer, v);
+    m_numberOfFields++;
 }
 
 void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
@@ -205,7 +244,7 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
 
     encode(m_buffer, name);
-    encode(m_buffer, v);
+    encodeUint(m_buffer, v);
     m_numberOfFields++;
 }
 

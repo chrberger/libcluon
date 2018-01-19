@@ -105,6 +105,7 @@ class LIBCLUON_API FromMsgPackVisitor {
     MsgPackConstants getFormatFamily(uint8_t T) noexcept;
     std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> readKeyValues(std::istream &in) noexcept;
     uint64_t readUint(std::istream &in) noexcept;
+    int64_t readInt(std::istream &in) noexcept;
     std::string readString(std::istream &in) noexcept;
 
    private:
