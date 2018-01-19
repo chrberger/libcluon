@@ -19,10 +19,10 @@
 #include <iostream>
 #include <string>
 
-#include "cluon/GenericMessage.hpp"
-#include "cluon/ToJSONVisitor.hpp"
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/GenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
+#include "cluon/ToJSONVisitor.hpp"
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 

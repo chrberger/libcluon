@@ -19,8 +19,8 @@
 #define FROMMSGPACKVISITOR_HPP
 
 #include "cluon/MsgPackConstants.hpp"
-#include "cluon/cluon.hpp"
 #include "cluon/any/any.hpp"
+#include "cluon/cluon.hpp"
 
 #include <cstdint>
 #include <istream>
@@ -38,13 +38,13 @@ class LIBCLUON_API FromMsgPackVisitor {
     class MsgPackKeyValue {
        private:
         MsgPackKeyValue &operator=(MsgPackKeyValue &&) = delete;
- 
+
        public:
-        MsgPackKeyValue() = default;
+        MsgPackKeyValue()                        = default;
         MsgPackKeyValue(const MsgPackKeyValue &) = default;
-        MsgPackKeyValue(MsgPackKeyValue &&) = default;
+        MsgPackKeyValue(MsgPackKeyValue &&)      = default;
         MsgPackKeyValue &operator=(const MsgPackKeyValue &) = default;
-       ~MsgPackKeyValue() = default;
+        ~MsgPackKeyValue()                                  = default;
 
        public:
         std::string m_key{""};
@@ -105,7 +105,9 @@ class LIBCLUON_API FromMsgPackVisitor {
 
         if (0 < m_keyValues.count(name)) {
             try {
-                std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> v = linb::any_cast<std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> >(m_keyValues[name].m_value);
+                std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> v
+                    = linb::any_cast<std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue>>(
+                        m_keyValues[name].m_value);
                 cluon::FromMsgPackVisitor nestedMsgPackDecoder(v);
                 value.accept(nestedMsgPackDecoder);
             } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE

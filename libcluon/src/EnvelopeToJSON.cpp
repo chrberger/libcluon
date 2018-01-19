@@ -16,10 +16,10 @@
  */
 
 #include "cluon/EnvelopeToJSON.hpp"
-#include "cluon/GenericMessage.hpp"
-#include "cluon/ToJSONVisitor.hpp"
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/GenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
+#include "cluon/ToJSONVisitor.hpp"
 
 #include <algorithm>
 #include <sstream>
@@ -107,8 +107,8 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             std::string tmp{payload.messageName()};
             std::replace(tmp.begin(), tmp.end(), '.', '_');
 
-            retVal = '{' + envelopeToJSON.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{' + payloadToJSON.json()
-                     + '}' + '}';
+            retVal = '{' + envelopeToJSON.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{' + payloadToJSON.json() + '}'
+                     + '}';
         }
     }
     return retVal;

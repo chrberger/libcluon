@@ -22,8 +22,8 @@
 namespace cluon {
 
 void FromProtoVisitor::readBytesFromStream(std::istream &in,
-                                                  std::size_t bytesToReadFromStream,
-                                                  std::vector<char> &buffer) noexcept {
+                                           std::size_t bytesToReadFromStream,
+                                           std::vector<char> &buffer) noexcept {
     constexpr std::size_t CHUNK_SIZE{1024};
     std::streamsize bufferPosition{0};
 
@@ -172,9 +172,7 @@ FromProtoVisitor &FromProtoVisitor::operator=(const FromProtoVisitor &other) noe
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void FromProtoVisitor::preVisit(uint32_t id,
-                                       const std::string &shortName,
-                                       const std::string &longName) noexcept {
+void FromProtoVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;

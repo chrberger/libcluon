@@ -20,13 +20,13 @@
 
 #include <iostream>
 
-#include "cluon/GenericMessage.hpp"
-#include "cluon/ToJSONVisitor.hpp"
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/GenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
-#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/MetaMessage.hpp"
+#include "cluon/ToJSONVisitor.hpp"
 #include "cluon/ToODVDVisitor.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing MyTestMessage1.") {

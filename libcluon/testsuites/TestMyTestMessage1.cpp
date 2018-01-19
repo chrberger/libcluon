@@ -21,11 +21,11 @@
 #include <sstream>
 #include <string>
 
-#include "cluon/GenericMessage.hpp"
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/GenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
-#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/MetaMessage.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
