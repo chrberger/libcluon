@@ -78,6 +78,7 @@ class LIBCLUON_API ToMsgPackVisitor {
 
    private:
     void encode(std::ostream &o, const std::string &s);
+    void encode(std::ostream &o, uint64_t v);
 
    private:
     uint32_t m_numberOfFields{0};

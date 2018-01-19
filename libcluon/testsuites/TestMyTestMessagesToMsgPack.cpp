@@ -67,13 +67,6 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(0xa1 == static_cast<uint8_t>(s.at(24)));
     REQUIRE(0x64 == static_cast<uint8_t>(s.at(25)));
 
-//int i = 0;
-//for(auto c : s) {
-////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
-//    std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));" << std::endl;
-//}
-//std::cout << std::endl;
-
     std::stringstream sstr{s};
     cluon::FromMsgPackVisitor msgPackDecoder;
     msgPackDecoder.decodeFrom(sstr);
@@ -88,34 +81,178 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
 
-//TEST_CASE("Testing MyTestMessage2.") {
-//    testdata::MyTestMessage2 tmp;
-//    REQUIRE(123 == tmp.attribute1());
+TEST_CASE("Testing MyTestMessage2 with v <= 0x7F.") {
+    testdata::MyTestMessage2 tmp;
+    REQUIRE(123 == tmp.attribute1());
 
-//    tmp.attribute1(150);
-//    REQUIRE(150 == tmp.attribute1());
+    tmp.attribute1(22);
+    REQUIRE(22 == tmp.attribute1());
 
-//    cluon::ToMsgPackVisitor protoEncoder;
-//    tmp.accept(protoEncoder);
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
 
-//    std::string s = protoEncoder.encodedData();
-//    REQUIRE(3 == s.size());
-
-//    REQUIRE(0x8 == static_cast<uint8_t>(s.at(0)));
-//    REQUIRE(0x96 == static_cast<uint8_t>(s.at(1)));
-//    REQUIRE(0x1 == static_cast<uint8_t>(s.at(2)));
-
-//    std::stringstream sstr{s};
-//    cluon::FromMsgPackVisitor protoDecoder;
-//    protoDecoder.decodeFrom(sstr);
-
-//    testdata::MyTestMessage2 tmp2;
-//    REQUIRE(123 == tmp2.attribute1());
-
-//    tmp2.accept(protoDecoder);
-
-//    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+    std::string s = msgPackEncoder.encodedData();
+//int i = 0;
+//for(auto c : s) {
+////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
+//    std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));" << std::endl;
 //}
+//std::cout << std::endl;
+
+    REQUIRE(13 == s.size());
+
+    REQUIRE(0x81 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0x16 == static_cast<uint8_t>(s.at(12)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage2 tmp2;
+    REQUIRE(123 == tmp2.attribute1());
+
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+}
+
+TEST_CASE("Testing MyTestMessage2 with v <= 0xFF.") {
+    testdata::MyTestMessage2 tmp;
+    REQUIRE(123 == tmp.attribute1());
+
+    tmp.attribute1(234);
+    REQUIRE(234 == tmp.attribute1());
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    REQUIRE(14 == s.size());
+
+    REQUIRE(0x81 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xCC == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0xEA == static_cast<uint8_t>(s.at(13)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage2 tmp2;
+    REQUIRE(123 == tmp2.attribute1());
+
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+}
+
+TEST_CASE("Testing MyTestMessage2 with v <= 0xFFFF.") {
+    testdata::MyTestMessage8 tmp;
+    REQUIRE(123 == tmp.attribute1());
+
+    tmp.attribute1(12345);
+    REQUIRE(12345 == tmp.attribute1());
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    REQUIRE(15 == s.size());
+
+    REQUIRE(0x81 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xCD == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0x30 == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0x39 == static_cast<uint8_t>(s.at(14)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage8 tmp2;
+    REQUIRE(123 == tmp2.attribute1());
+
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+}
+
+TEST_CASE("Testing MyTestMessage2 with v <= 0xFFFFFFFF.") {
+    testdata::MyTestMessage8 tmp;
+    REQUIRE(123 == tmp.attribute1());
+
+    tmp.attribute1(123456789);
+    REQUIRE(123456789 == tmp.attribute1());
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    REQUIRE(17 == s.size());
+
+    REQUIRE(0x81 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xCE == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0x07 == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0x5B == static_cast<uint8_t>(s.at(14)));
+    REQUIRE(0xCD == static_cast<uint8_t>(s.at(15)));
+    REQUIRE(0x15 == static_cast<uint8_t>(s.at(16)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage8 tmp2;
+    REQUIRE(123 == tmp2.attribute1());
+
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+}
 
 //TEST_CASE("Testing MyTestMessage3.") {
 //    testdata::MyTestMessage3 tmp;

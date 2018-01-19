@@ -32,6 +32,21 @@ MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
     else if (static_cast<uint8_t>(MsgPackConstants::IS_TRUE) == T) {
         formatFamily = MsgPackConstants::BOOL_FORMAT;
     }
+    else if (0x7F >= T) {
+        formatFamily = MsgPackConstants::UINT_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::UINT8) == T) {
+        formatFamily = MsgPackConstants::UINT_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::UINT16) == T) {
+        formatFamily = MsgPackConstants::UINT_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::UINT32) == T) {
+        formatFamily = MsgPackConstants::UINT_FORMAT;
+    }
+    else if (static_cast<uint8_t>(MsgPackConstants::UINT64) == T) {
+        formatFamily = MsgPackConstants::UINT_FORMAT;
+    }
     else if ( (static_cast<uint8_t>(MsgPackConstants::FIXSTR) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXSTR_END) > T) ) {
         formatFamily = MsgPackConstants::STR_FORMAT;
     }
@@ -55,6 +70,40 @@ MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
     }
 
     return formatFamily;
+}
+
+uint64_t FromMsgPackVisitor::readUint(std::istream &in) noexcept {
+    uint64_t retVal{0};
+    if (in.good()) {
+        uint8_t c = static_cast<uint8_t>(in.get());
+        if (MsgPackConstants::UINT_FORMAT == getFormatFamily(c)) {
+            if (0x7F >= c) {
+                retVal = static_cast<uint64_t>(c);
+            }
+            else if (static_cast<uint8_t>(MsgPackConstants::UINT8) == c) {
+                uint8_t v{0};
+                in.read(reinterpret_cast<char*>(&v), sizeof(uint8_t));
+                retVal = static_cast<uint64_t>(v);
+            }
+            else if (static_cast<uint8_t>(MsgPackConstants::UINT16) == c) {
+                uint16_t v{0};
+                in.read(reinterpret_cast<char*>(&v), sizeof(uint16_t));
+                v = be16toh(v);
+                retVal = static_cast<uint64_t>(v);
+            }
+            else if (static_cast<uint8_t>(MsgPackConstants::UINT32) == c) {
+                uint32_t v{0};
+                in.read(reinterpret_cast<char*>(&v), sizeof(uint32_t));
+                v = be32toh(v);
+                retVal = static_cast<uint64_t>(v);
+            }
+            else if (static_cast<uint8_t>(MsgPackConstants::UINT64) == c) {
+                in.read(reinterpret_cast<char*>(&retVal), sizeof(uint64_t));
+                retVal = be64toh(retVal);
+            }
+        }
+    }
+    return retVal;
 }
 
 std::string FromMsgPackVisitor::readString(std::istream &in) noexcept {
@@ -135,8 +184,12 @@ std::cout << "K = " << entry.m_key << std::endl;
                         entry.m_value = false;
                     }
                 }
+                else if (MsgPackConstants::UINT_FORMAT == entry.m_formatFamily) {
+                    in.unget(); // Last character needs to be put back to process the string correctly as it might encode its length.
+                    entry.m_value = readUint(in);
+                }
                 else if (MsgPackConstants::STR_FORMAT == entry.m_formatFamily) {
-                    in.unget(); // Last read character needs to be put back.
+                    in.unget(); // Last character needs to be put back to process the string correctly as it might encode its length.
                     entry.m_value = readString(in);
                 }
 
@@ -189,7 +242,7 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)id;
     (void)typeName;
-    
+
     (void)name;
     (void)v;
 }
@@ -197,9 +250,12 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)id;
     (void)typeName;
-    
-    (void)name;
-    (void)v;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = static_cast<uint8_t>(linb::any_cast<uint64_t>(m_keyValues[name].m_value));
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
 }
 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
@@ -213,9 +269,12 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)id;
     (void)typeName;
-    
-    (void)name;
-    (void)v;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = static_cast<uint16_t>(linb::any_cast<uint64_t>(m_keyValues[name].m_value));
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
 }
 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
@@ -229,9 +288,12 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)id;
     (void)typeName;
-    
-    (void)name;
-    (void)v;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = static_cast<uint32_t>(linb::any_cast<uint64_t>(m_keyValues[name].m_value));
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
 }
 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
@@ -245,9 +307,12 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)id;
     (void)typeName;
-    
-    (void)name;
-    (void)v;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = linb::any_cast<uint64_t>(m_keyValues[name].m_value);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
 }
 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
@@ -269,9 +334,13 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
 void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)id;
     (void)typeName;
-    
-    (void)name;
-    (void)v;
+
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = linb::any_cast<std::string>(m_keyValues[name].m_value);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
 }
 
 } // namespace cluon

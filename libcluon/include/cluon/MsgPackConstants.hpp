@@ -25,6 +25,10 @@ namespace cluon {
     enum class MsgPackConstants : uint16_t {
         IS_FALSE        = 0xC2,
         IS_TRUE         = 0xC3,
+        UINT8           = 0xCC,
+        UINT16          = 0xCD,
+        UINT32          = 0xCE,
+        UINT64          = 0xCF,
         FIXSTR          = 0xA0,
         FIXSTR_END      = 0xBF,
         STR8            = 0xD9,
@@ -36,10 +40,11 @@ namespace cluon {
         MAP32           = 0xDF,
         UNKNOWN_FORMAT  = 0xFF00,
         BOOL_FORMAT     = 0xFF01,
-        INT_FORMAT      = 0xFF02,
-        FLOAT_FORMAT    = 0xFF03,
-        STR_FORMAT      = 0xFF04,
-        MAP_FORMAT      = 0xFF05, // Indicating also nested types.
+        UINT_FORMAT     = 0xFF02,
+        INT_FORMAT      = 0xFF03,
+        FLOAT_FORMAT    = 0xFF04,
+        STR_FORMAT      = 0xFF05,
+        MAP_FORMAT      = 0xFF06, // Indicating also nested types.
    };
 }
 // clang-format on
