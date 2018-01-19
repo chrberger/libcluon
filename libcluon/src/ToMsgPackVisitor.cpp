@@ -26,8 +26,6 @@
 #include <cstring>
 #include <limits>
 
-#include <iostream>
-
 namespace cluon {
 
 std::string ToMsgPackVisitor::encodedData() const noexcept {
@@ -105,7 +103,6 @@ void ToMsgPackVisitor::encodeUint(std::ostream &o, uint64_t v) {
 }
 
 void ToMsgPackVisitor::encodeInt(std::ostream &o, int64_t v) {
-std::cout << __LINE__ << ", v = " << v << std::endl;
     if (-31 <= v) {
         int8_t _v = static_cast<int8_t>(v);
         o.write(reinterpret_cast<const char *>(&_v), sizeof(int8_t));

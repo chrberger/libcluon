@@ -22,7 +22,6 @@
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
-#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -436,13 +435,6 @@ TEST_CASE("Testing MyTestMessage10 with v = -123456.") {
     tmp.accept(msgPackEncoder);
 
     std::string s = msgPackEncoder.encodedData();
-
-//int i = 0;
-//for(auto c : s) {
-////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
-//    std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));" << std::endl;
-//}
-//std::cout << std::endl;
 
     REQUIRE(17 == s.size());
 
