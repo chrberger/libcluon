@@ -24,7 +24,6 @@
 #include "cluon/FromMsgPackVisitor.hpp"
 
 #include <cstring>
-#include <iostream>
 #include <vector>
 
 namespace cluon {
@@ -232,11 +231,9 @@ std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> FromMsgPackVisitor::r
             }
 
             // Next, read pairs string/value.
-std::cout << "Reading " << tokensToRead << std::endl;
             while (0 < tokensToRead) {
                 MsgPackKeyValue entry;
                 entry.m_key = readString(in);
-std::cout << "K = " << entry.m_key << std::endl;
 
                 // Read next byte and determine format family.
                 c = static_cast<uint8_t>(in.get());
@@ -289,6 +286,8 @@ std::cout << "K = " << entry.m_key << std::endl;
                 keyValues[entry.m_key] = entry;
                 tokensToRead--;
             }
+            // Stop processing further tokens (might be handled from outer decoder).
+            break;
         }
     }
     return keyValues;

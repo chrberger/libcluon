@@ -24,7 +24,6 @@
 #include "cluon/ToMsgPackVisitor.hpp"
 
 #include <cstring>
-#include <iostream>
 
 namespace cluon {
 
