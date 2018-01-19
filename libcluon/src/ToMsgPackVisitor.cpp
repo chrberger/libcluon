@@ -24,6 +24,9 @@
 #include "cluon/ToMsgPackVisitor.hpp"
 
 #include <cstring>
+#include <limits>
+
+#include <iostream>
 
 namespace cluon {
 
@@ -102,21 +105,22 @@ void ToMsgPackVisitor::encodeUint(std::ostream &o, uint64_t v) {
 }
 
 void ToMsgPackVisitor::encodeInt(std::ostream &o, int64_t v) {
+std::cout << __LINE__ << ", v = " << v << std::endl;
     if (-31 <= v) {
         int8_t _v = static_cast<int8_t>(v);
         o.write(reinterpret_cast<const char *>(&_v), sizeof(int8_t));
-    } else if (-255 <= v) {
+    } else if (std::numeric_limits<int8_t>::lowest() <= v) {
         const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT8);
         o.write(reinterpret_cast<const char *>(&t), sizeof(uint8_t));
         int8_t _v = static_cast<int8_t>(v);
         o.write(reinterpret_cast<const char *>(&_v), sizeof(int8_t));
-    } else if (-65535 <= v) {
+    } else if (std::numeric_limits<int16_t>::lowest() <= v) {
         const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT16);
         o.write(reinterpret_cast<const char *>(&t), sizeof(uint8_t));
         int16_t _v = static_cast<int16_t>(v);
         _v         = static_cast<int16_t>(htobe16(_v));
         o.write(reinterpret_cast<const char *>(&_v), sizeof(int16_t));
-    } else if (-4294967295 <= v) {
+    } else if (std::numeric_limits<int32_t>::lowest() <= v) {
         const uint8_t t = static_cast<uint8_t>(MsgPackConstants::INT32);
         o.write(reinterpret_cast<const char *>(&t), sizeof(uint8_t));
         int32_t _v = static_cast<int32_t>(v);
