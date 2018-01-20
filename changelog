@@ -1,3 +1,9 @@
+libcluon (0.0.33) xenial; urgency=low
+
+  * Added support for MsgPack
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 20 Jan 2018 08:36:09 +0100
+
 libcluon (0.0.32) xenial; urgency=low
 
   * Refactoring intermediate data representation for LCM; adding OD4toJSON and LCMtoJSON dumping tools with dynamic message resolving
