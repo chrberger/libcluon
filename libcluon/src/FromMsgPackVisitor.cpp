@@ -182,7 +182,7 @@ std::string FromMsgPackVisitor::readString(std::istream &in) noexcept {
 #else
                 in.read(static_cast<char *>(&buffer[0]), static_cast<std::streamsize>(length));
 #endif
-                retVal = std::string(buffer.begin(), buffer.begin() + length);
+                retVal = std::string(buffer.data(), length);
             }
         }
     }
