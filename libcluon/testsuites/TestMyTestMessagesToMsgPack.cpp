@@ -22,8 +22,8 @@
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
-#include <limits>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -306,8 +306,8 @@ TEST_CASE("Testing MyTestMessage8 with v > 0xFFFFFFFF.") {
     testdata::MyTestMessage8 tmp;
     REQUIRE(123 == tmp.attribute1());
 
-    tmp.attribute1(std::numeric_limits<uint64_t>::max()-1);
-    REQUIRE(std::numeric_limits<uint64_t>::max()-1 == tmp.attribute1());
+    tmp.attribute1(std::numeric_limits<uint64_t>::max() - 1);
+    REQUIRE(std::numeric_limits<uint64_t>::max() - 1 == tmp.attribute1());
 
     cluon::ToMsgPackVisitor msgPackEncoder;
     tmp.accept(msgPackEncoder);
@@ -572,8 +572,8 @@ TEST_CASE("Testing MyTestMessage10 with v = -123456.") {
 TEST_CASE("Testing MyTestMessage10 with v > -0xFFFFFFFF.") {
     testdata::MyTestMessage10 tmp;
 
-    tmp.attribute1(std::numeric_limits<int64_t>::lowest()+1);
-    REQUIRE(std::numeric_limits<int64_t>::lowest()+1 == tmp.attribute1());
+    tmp.attribute1(std::numeric_limits<int64_t>::lowest() + 1);
+    REQUIRE(std::numeric_limits<int64_t>::lowest() + 1 == tmp.attribute1());
 
     cluon::ToMsgPackVisitor msgPackEncoder;
     tmp.accept(msgPackEncoder);
@@ -722,8 +722,11 @@ TEST_CASE("Testing MyTestMessage4 larger than 0xbf.") {
     testdata::MyTestMessage4 tmp;
     REQUIRE(tmp.attribute1().empty());
 
-    tmp.attribute1("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12");
-    REQUIRE("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12" == tmp.attribute1());
+    tmp.attribute1("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHI"
+                   "JABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12");
+    REQUIRE("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEF"
+            "GHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12"
+            == tmp.attribute1());
 
     cluon::ToMsgPackVisitor msgPackEncoder;
     tmp.accept(msgPackEncoder);
@@ -948,7 +951,9 @@ TEST_CASE("Testing MyTestMessage4 larger than 0xbf.") {
 
     tmp2.accept(msgPackDecoder);
 
-    REQUIRE("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12" == tmp2.attribute1());
+    REQUIRE("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEF"
+            "GHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12"
+            == tmp2.attribute1());
 }
 
 TEST_CASE("Testing MyTestMessage4 of size 0xda.") {
@@ -956,9 +961,7 @@ TEST_CASE("Testing MyTestMessage4 of size 0xda.") {
     REQUIRE(tmp.attribute1().empty());
 
     std::string value;
-    for(uint16_t i = 0; i < std::numeric_limits<uint16_t>::max(); i++) {
-        value += "A";
-    }
+    for (uint16_t i = 0; i < std::numeric_limits<uint16_t>::max(); i++) { value += "A"; }
 
     tmp.attribute1(value);
     REQUIRE(value == tmp.attribute1());
@@ -988,9 +991,7 @@ TEST_CASE("Testing MyTestMessage4 of size 0xdb.") {
     REQUIRE(tmp.attribute1().empty());
 
     std::string value;
-    for(uint32_t i = 0; i < std::numeric_limits<uint16_t>::max()+2; i++) {
-        value += "A";
-    }
+    for (uint32_t i = 0; i < std::numeric_limits<uint16_t>::max() + 2; i++) { value += "A"; }
 
     tmp.attribute1(value);
     REQUIRE(value == tmp.attribute1());
