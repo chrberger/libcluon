@@ -51,7 +51,7 @@ MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
         formatFamily = MsgPackConstants::UINT_FORMAT;
     } else if (static_cast<uint8_t>(MsgPackConstants::UINT64) == T) {
         formatFamily = MsgPackConstants::UINT_FORMAT;
-    } else if ((0xE0 <= T) && (0xFF >= T)) {
+    } else if (0xE0 <= T) {
         formatFamily = MsgPackConstants::INT_FORMAT;
     } else if (static_cast<uint8_t>(MsgPackConstants::INT8) == T) {
         formatFamily = MsgPackConstants::INT_FORMAT;
@@ -121,7 +121,7 @@ int64_t FromMsgPackVisitor::readInt(std::istream &in) noexcept {
     if (in.good()) {
         int8_t c = static_cast<int8_t>(in.get());
         if (MsgPackConstants::INT_FORMAT == getFormatFamily(static_cast<uint8_t>(c))) {
-            if ((0xE0 <= static_cast<uint8_t>(c)) && (0xFF >= static_cast<uint8_t>(c))) {
+            if (0xE0 <= static_cast<uint8_t>(c)) {
                 retVal = static_cast<int64_t>(c);
             } else if (static_cast<int8_t>(MsgPackConstants::INT8) == c) {
                 int8_t v{0};

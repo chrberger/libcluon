@@ -160,7 +160,7 @@ TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
     constexpr char c{0x0D};
     sstr.write(&c, sizeof(char));
     sstr.write(reinterpret_cast<const char *>(&length), sizeof(uint32_t)); // NOLINT
-    sstr.write(&envelopeAsProto[0], static_cast<int64_t>(envelopeAsProto.size()));
+    sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
 
     const std::string output{sstr.str()};
 
@@ -315,7 +315,7 @@ TEST_CASE("Transform Envelope into JSON represention for complex payload.") {
     constexpr char c{0x0D};
     sstr.write(&c, sizeof(char));
     sstr.write(reinterpret_cast<const char *>(&length), sizeof(uint32_t)); // NOLINT
-    sstr.write(&envelopeAsProto[0], static_cast<int64_t>(envelopeAsProto.size()));
+    sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
 
     const std::string output{sstr.str()};
 
@@ -440,7 +440,7 @@ TEST_CASE("Transform Envelope into JSON represention for nested payloads.") {
     constexpr char c{0x0D};
     sstr.write(&c, sizeof(char));
     sstr.write(reinterpret_cast<const char *>(&length), sizeof(uint32_t)); // NOLINT
-    sstr.write(&envelopeAsProto[0], static_cast<int64_t>(envelopeAsProto.size()));
+    sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
 
     const std::string output{sstr.str()};
 
@@ -544,7 +544,7 @@ TEST_CASE("Transform Envelope into JSON represention for nested payloads with pu
     constexpr char c{0x0D};
     sstr.write(&c, sizeof(char));
     sstr.write(reinterpret_cast<const char *>(&length), sizeof(uint32_t)); // NOLINT
-    sstr.write(&envelopeAsProto[0], static_cast<int64_t>(envelopeAsProto.size()));
+    sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
 
     const std::string output{sstr.str()};
 

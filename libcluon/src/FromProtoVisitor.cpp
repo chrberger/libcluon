@@ -17,6 +17,7 @@
 
 #include "cluon/FromProtoVisitor.hpp"
 
+#include <cstddef>
 #include <cstring>
 
 namespace cluon {
@@ -100,7 +101,7 @@ FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint32_t key, ProtoConstants type
     : m_key{key}
     , m_type{type}
     , m_length{length}
-    , m_value(length)
+    , m_value(static_cast<std::size_t>(length))
     , m_varIntValue{0} {}
 
 FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint32_t key, uint64_t value) noexcept
@@ -152,7 +153,7 @@ std::string FromProtoVisitor::ProtoKeyValue::valueAsString() const noexcept {
     std::string retVal;
     if (!m_value.empty() && (length() > 0) && (type() == ProtoConstants::LENGTH_DELIMITED)) {
         // Create string from buffer.
-        retVal = std::string(m_value.data(), m_length);
+        retVal = std::string(m_value.data(), static_cast<std::size_t>(m_length));
     }
     return retVal;
 }

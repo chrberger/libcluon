@@ -31,7 +31,7 @@ namespace cluon {
 std::string ToMsgPackVisitor::encodedData() const noexcept {
     std::stringstream prefix;
     if (m_numberOfFields <= 0xF) {
-        const uint8_t pairs = static_cast<uint8_t>(MsgPackConstants::FIXMAP) + static_cast<uint8_t>(m_numberOfFields);
+        const uint8_t pairs = static_cast<uint8_t>(MsgPackConstants::FIXMAP) | static_cast<uint8_t>(m_numberOfFields);
         prefix.write(reinterpret_cast<const char *>(&pairs), sizeof(uint8_t));
     } else if ((m_numberOfFields > 0xF) && (m_numberOfFields <= 0xFFFF)) {
         const uint8_t pairs = static_cast<uint8_t>(MsgPackConstants::MAP16);
@@ -51,7 +51,7 @@ std::string ToMsgPackVisitor::encodedData() const noexcept {
 void ToMsgPackVisitor::encode(std::ostream &o, const std::string &s) {
     const uint32_t LENGTH{static_cast<uint32_t>(s.size())};
     if (LENGTH < 32) {
-        const uint8_t v = static_cast<uint8_t>(MsgPackConstants::FIXSTR) + static_cast<uint8_t>(LENGTH);
+        const uint8_t v = static_cast<uint8_t>(MsgPackConstants::FIXSTR) | static_cast<uint8_t>(LENGTH);
         o.write(reinterpret_cast<const char *>(&v), sizeof(uint8_t));
     } else if (LENGTH <= 0xFF) {
         const uint8_t v = static_cast<uint8_t>(MsgPackConstants::STR8);
