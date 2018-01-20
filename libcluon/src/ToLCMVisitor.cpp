@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,13 @@
 #endif
 // clang-format on
 
-#include "cluon/MessageToLCMEncoder.hpp"
+#include "cluon/ToLCMVisitor.hpp"
 
 #include <cstring>
 
 namespace cluon {
 
-std::string MessageToLCMEncoder::encodedData(bool withHash) const noexcept {
+std::string ToLCMVisitor::encodedData(bool withHash) const noexcept {
     int64_t _hash = hash();
     _hash         = static_cast<int64_t>(htobe64(_hash));
 
@@ -40,15 +40,15 @@ std::string MessageToLCMEncoder::encodedData(bool withHash) const noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void MessageToLCMEncoder::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void ToLCMVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;
 }
 
-void MessageToLCMEncoder::postVisit() noexcept {}
+void ToLCMVisitor::postVisit() noexcept {}
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -57,7 +57,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&v), sizeof(bool));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -66,7 +66,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&v), sizeof(char));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -75,7 +75,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&v), sizeof(int8_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -84,7 +84,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&v), sizeof(uint8_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -94,7 +94,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int16_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -104,7 +104,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int16_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -114,7 +114,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int32_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -124,7 +124,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int32_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -134,7 +134,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int64_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -144,7 +144,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int64_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -156,7 +156,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int32_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -168,7 +168,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
     m_buffer.write(reinterpret_cast<char *>(&_v), sizeof(int64_t));
 }
 
-void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
+void ToLCMVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)id;
     (void)typeName;
     calculateHash(name);
@@ -184,7 +184,7 @@ void MessageToLCMEncoder::visit(uint32_t id, std::string &&typeName, std::string
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int64_t MessageToLCMEncoder::hash() const noexcept {
+int64_t ToLCMVisitor::hash() const noexcept {
     // Apply ZigZag encoding for hash from this message's fields and depending
     // hashes for complex nested types.
     int64_t tmp{m_hash};
@@ -194,11 +194,11 @@ int64_t MessageToLCMEncoder::hash() const noexcept {
     return hash;
 }
 
-void MessageToLCMEncoder::calculateHash(char c) noexcept {
+void ToLCMVisitor::calculateHash(char c) noexcept {
     m_hash = ((m_hash << 8) ^ (m_hash >> 55)) + c;
 }
 
-void MessageToLCMEncoder::calculateHash(const std::string &s) noexcept {
+void ToLCMVisitor::calculateHash(const std::string &s) noexcept {
     const std::string tmp{(s.length() > 255 ? s.substr(0, 255) : s)};
     const uint8_t length{static_cast<uint8_t>(tmp.length())};
     calculateHash(static_cast<char>(length));

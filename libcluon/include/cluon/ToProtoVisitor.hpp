@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MESSAGEASPROTOENCODER_HPP
-#define MESSAGEASPROTOENCODER_HPP
+#ifndef TOPROTOVISITOR_HPP
+#define TOPROTOVISITOR_HPP
 
 #include "cluon/ProtoConstants.hpp"
 #include "cluon/cluon.hpp"
@@ -29,16 +29,16 @@ namespace cluon {
 /**
 This class encodes a given message in Proto format.
 */
-class LIBCLUON_API MessageToProtoEncoder {
+class LIBCLUON_API ToProtoVisitor {
    private:
-    MessageToProtoEncoder(const MessageToProtoEncoder &) = delete;
-    MessageToProtoEncoder(MessageToProtoEncoder &&)      = delete;
-    MessageToProtoEncoder &operator=(const MessageToProtoEncoder &) = delete;
-    MessageToProtoEncoder &operator=(MessageToProtoEncoder &&) = delete;
+    ToProtoVisitor(const ToProtoVisitor &) = delete;
+    ToProtoVisitor(ToProtoVisitor &&)      = delete;
+    ToProtoVisitor &operator=(const ToProtoVisitor &) = delete;
+    ToProtoVisitor &operator=(ToProtoVisitor &&) = delete;
 
    public:
-    MessageToProtoEncoder()  = default;
-    ~MessageToProtoEncoder() = default;
+    ToProtoVisitor()  = default;
+    ~ToProtoVisitor() = default;
 
     /**
      * @return Encoded data in Proto format.
@@ -72,7 +72,7 @@ class LIBCLUON_API MessageToProtoEncoder {
         (void)name;
 
         toVarInt(m_buffer, std::move(encodeKey(id, static_cast<uint8_t>(ProtoConstants::LENGTH_DELIMITED))));
-        cluon::MessageToProtoEncoder nestedProtoEncoder;
+        cluon::ToProtoVisitor nestedProtoEncoder;
         value.accept(nestedProtoEncoder);
         encode(m_buffer, std::move(nestedProtoEncoder.encodedData()));
     }

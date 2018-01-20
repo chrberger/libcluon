@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,13 @@
 
 #include <iostream>
 
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
-#include "cluon/JSONVisitor.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
-#include "cluon/MessageToProtoEncoder.hpp"
 #include "cluon/MetaMessage.hpp"
-#include "cluon/ODVDVisitor.hpp"
+#include "cluon/ToJSONVisitor.hpp"
+#include "cluon/ToODVDVisitor.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing MyTestMessage1.") {
@@ -49,11 +49,11 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE("Hello World" == tmp.attribute13());
     REQUIRE("Hello Galaxy" == tmp.attribute14());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp.accept(protoEncoder);
     const std::string protoEncoded{protoEncoder.encodedData()};
 
-    cluon::ODVDVisitor odvdVisitor;
+    cluon::ToODVDVisitor odvdVisitor;
     tmp.accept(odvdVisitor);
 
     const char *msg = R"(message testdata.MyTestMessage1 [ id = 30001 ] {
@@ -83,7 +83,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     auto listOfMetaMessages = retVal.first;
     REQUIRE(1 == listOfMetaMessages.size());
 
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     std::stringstream sstr{protoEncoded};
     protoDecoder.decodeFrom(sstr);
 
@@ -93,7 +93,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     // Set values in GenericMessage from ProtoDecoder.
     gm.accept(protoDecoder);
 
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm.accept(j);
 
     const char *JSON = R"({"attribute1":1,
@@ -122,11 +122,11 @@ TEST_CASE("Testing MyTestMessage6.") {
 
     REQUIRE(97 == tmp6.attribute1().attribute1());
 
-    cluon::MessageToProtoEncoder protoEncoder;
+    cluon::ToProtoVisitor protoEncoder;
     tmp6.accept(protoEncoder);
     const std::string protoEncoded{protoEncoder.encodedData()};
 
-    cluon::ODVDVisitor odvdVisitor;
+    cluon::ToODVDVisitor odvdVisitor;
     tmp6.accept(odvdVisitor);
 
     const char *msg = R"(message testdata.MyTestMessage2 [ id = 30002 ] {
@@ -146,7 +146,7 @@ message testdata.MyTestMessage6 [ id = 30006 ] {
     auto listOfMetaMessages = retVal.first;
     REQUIRE(2 == listOfMetaMessages.size());
 
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     std::stringstream sstr{protoEncoded};
     protoDecoder.decodeFrom(sstr);
 
@@ -156,7 +156,7 @@ message testdata.MyTestMessage6 [ id = 30006 ] {
     // Set values in GenericMessage from ProtoDecoder.
     gm.accept(protoDecoder);
 
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm.accept(j);
 
     const char *JSON = R"({"attribute1":{"attribute1":97}})";

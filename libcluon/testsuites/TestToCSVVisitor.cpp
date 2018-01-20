@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 #include "catch.hpp"
 #include <string>
 
-#include "cluon/CSVVisitor.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
-#include "cluon/MessageToProtoEncoder.hpp"
+#include "cluon/ToCSVVisitor.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing MyTestMessage1.") {
@@ -45,7 +45,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE("Hello World" == tmp.attribute13());
     REQUIRE("Hello Galaxy" == tmp.attribute14());
 
-    cluon::CSVVisitor csv;
+    cluon::ToCSVVisitor csv;
     tmp.accept(csv);
 
     const char *CSV
@@ -76,7 +76,7 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter.") {
     REQUIRE("Hello World" == tmp.attribute13());
     REQUIRE("Hello Galaxy" == tmp.attribute14());
 
-    cluon::CSVVisitor csv(',');
+    cluon::ToCSVVisitor csv(',');
     tmp.accept(csv);
 
     const char *CSV
@@ -107,7 +107,7 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and appending data.") {
     REQUIRE("Hello World" == tmp.attribute13());
     REQUIRE("Hello Galaxy" == tmp.attribute14());
 
-    cluon::CSVVisitor csv(',');
+    cluon::ToCSVVisitor csv(',');
 
     const char *CSV1
         = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
@@ -165,7 +165,7 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and no header.") {
     REQUIRE("Hello World" == tmp.attribute13());
     REQUIRE("Hello Galaxy" == tmp.attribute14());
 
-    cluon::CSVVisitor csv(',', false);
+    cluon::ToCSVVisitor csv(',', false);
     tmp.accept(csv);
 
     const char *CSV = R"(1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
@@ -182,7 +182,7 @@ TEST_CASE("Testing MyTestMessage6.") {
 
     REQUIRE(97 == tmp6.attribute1().attribute1());
 
-    cluon::CSVVisitor csv;
+    cluon::ToCSVVisitor csv;
     tmp6.accept(csv);
 
     const char *CSV = R"(attribute1.attribute1;
@@ -200,7 +200,7 @@ TEST_CASE("Testing MyTestMessage6 with ',' delimiter.") {
 
     REQUIRE(97 == tmp6.attribute1().attribute1());
 
-    cluon::CSVVisitor csv(',');
+    cluon::ToCSVVisitor csv(',');
     tmp6.accept(csv);
 
     const char *CSV = R"(attribute1.attribute1,
@@ -218,7 +218,7 @@ TEST_CASE("Testing MyTestMessage6 with ',' delimiter and no header.") {
 
     REQUIRE(97 == tmp6.attribute1().attribute1());
 
-    cluon::CSVVisitor csv(',', false);
+    cluon::ToCSVVisitor csv(',', false);
     tmp6.accept(csv);
 
     const char *CSV = R"(97,
@@ -235,7 +235,7 @@ TEST_CASE("Testing MyTestMessage6 with ',' delimiter and no header and appending
 
     REQUIRE(97 == tmp6.attribute1().attribute1());
 
-    cluon::CSVVisitor csv(',', false);
+    cluon::ToCSVVisitor csv(',', false);
 
     const char *CSV1 = R"(97,
 )";

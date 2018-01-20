@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,36 +15,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MESSAGETOLCMENCODER_HPP
-#define MESSAGETOLCMENCODER_HPP
+#ifndef TOCSVVISITOR_HPP
+#define TOCSVVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 
 #include <cstdint>
 #include <sstream>
 #include <string>
-#include <vector>
 
 namespace cluon {
 /**
-This class encodes a given message in LCM format.
+This class provides a visitor to transform a message into CSV with
+user-specified delimiters and optional column headers:
+
+\code{.cpp}
+MyMessage msg;
+// Set some values in msg.
+
+cluon::ToCSVVisitor csv{',', true};
+msg.accept(csv);
+
+std::cout << csv.csv() << std::endl;
+\endcode
+
+Subsequent use of this visitor will append the data (please keep in mind to not
+change the visited messages in between as the generated CSV data will be messed
+up otherwise).
 */
-class LIBCLUON_API MessageToLCMEncoder {
+class LIBCLUON_API ToCSVVisitor {
    private:
-    MessageToLCMEncoder(const MessageToLCMEncoder &) = delete;
-    MessageToLCMEncoder(MessageToLCMEncoder &&)      = delete;
-    MessageToLCMEncoder &operator=(const MessageToLCMEncoder &) = delete;
-    MessageToLCMEncoder &operator=(MessageToLCMEncoder &&) = delete;
+    ToCSVVisitor(const ToCSVVisitor &) = delete;
+    ToCSVVisitor(ToCSVVisitor &&)      = delete;
+    ToCSVVisitor &operator=(const ToCSVVisitor &) = delete;
+    ToCSVVisitor &operator=(ToCSVVisitor &&) = delete;
 
    public:
-    MessageToLCMEncoder()  = default;
-    ~MessageToLCMEncoder() = default;
+    /**
+     * Constructor.
+     *
+     * @param delimiter Delimiter character.
+     * @param withHeader If true, the first line in the output contains the
+     *        column headers.
+     */
+    ToCSVVisitor(char delimiter = ';', bool withHeader = true) noexcept;
+
+   protected:
+    /**
+     * Constructor for internal use.
+     *
+     * @param prefix Prefix to prepend per column header.
+     * @param delimiter Delimiter character.
+     * @param withHeader If true, the first line in the output contains the
+     *        column headers.
+     * @param isNested If true, the returned CSV values do not have a trailing new line.
+     */
+    ToCSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept;
+
+   public:
+    /**
+     * @return CSV-encoded data.
+     */
+    std::string csv() const noexcept;
 
     /**
-     * @param withHash True if the hash value from the fields shall be included.
-     * @return Encoded data in LCM format.
+     * This method clears the containing CSV data.
      */
-    std::string encodedData(bool withHash = true) const noexcept;
+    void clear() noexcept;
 
    public:
     // The following methods are provided to allow an instance of this class to
@@ -71,31 +108,25 @@ class LIBCLUON_API MessageToLCMEncoder {
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
         (void)id;
         (void)typeName;
-        calculateHash(name);
-        calculateHash(0);
+        constexpr bool IS_NESTED{true};
+        ToCSVVisitor csvVisitor(name, m_delimiter, m_withHeader, IS_NESTED);
+        value.accept(csvVisitor);
 
-        // No hash for the type but for name and dimension.
-        cluon::MessageToLCMEncoder nestedLCMEncoder;
-        value.accept(nestedLCMEncoder);
-
-        constexpr bool WITH_HASH{false};
-        const std::string s = nestedLCMEncoder.encodedData(WITH_HASH);
-        m_buffer.write(s.c_str(), static_cast<std::streamsize>(s.size()));
-
-        // Save this complex field's hash for later to compute final hash.
-        m_hashes.push_back(nestedLCMEncoder.hash());
+        if (m_fillHeader) {
+            m_bufferHeader << csvVisitor.m_bufferHeader.str();
+        }
+        m_bufferValues << csvVisitor.m_bufferValues.str();
     }
 
    private:
-    int64_t hash() const noexcept;
-    void calculateHash(char c) noexcept;
-    void calculateHash(const std::string &s) noexcept;
-
-   private:
-    int64_t m_hash{0x12345678};
-    std::stringstream m_buffer{""};
-    std::vector<int64_t> m_hashes{};
+    std::string m_prefix{};
+    char m_delimiter{';'};
+    bool m_withHeader{true};
+    bool m_isNested{false};
+    bool m_fillHeader{true};
+    std::stringstream m_bufferHeader{};
+    std::stringstream m_bufferValues{};
 };
-} // namespace cluon
 
+} // namespace cluon
 #endif

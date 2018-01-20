@@ -7,8 +7,8 @@
 // Updated for FreeBSD 10.1+, DragonFly 4.2+, NetBSD 6.1.5+, fixes for Win32,
 // and support for emscripten; Christian Berger.
 
-#ifndef PORTABLE_ENDIAN_HPP
-#define PORTABLE_ENDIAN_HPP
+#ifndef PORTABLEENDIAN_HPP
+#define PORTABLEENDIAN_HPP
 
 // clang-format off
 #if defined(__linux__) || defined(__CYGWIN__)

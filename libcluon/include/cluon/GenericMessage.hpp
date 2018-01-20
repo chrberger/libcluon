@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #ifndef GENERICMESSAGE_HPP
 #define GENERICMESSAGE_HPP
 
-#include "cluon/MessageFromProtoDecoder.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/MetaMessage.hpp"
 #include "cluon/any/any.hpp"
 #include "cluon/cluon.hpp"
@@ -57,7 +57,7 @@ GenericMessage's actual values.
 // protoEncodedData is provided from somewhere, i.e., via network for example
 std::string protoEncodedData = <...>
 std::stringstream sstr{protoEncodedData};
-cluon::MessageFromProtoDecoder protoDecoder;
+cluon::FromProtoVisitor protoDecoder;
 protoDecoder.decodeFrom(sstr);
 
 const char *messageSpecification = R"(
@@ -127,7 +127,7 @@ msg.accept(gm);
 GenericMessage gm;
 // gm is created using one of the aforementioned options.
 
-cluon::MessageToProtoEncoder protoEncoder;
+cluon::ToProtoVisitor protoEncoder;
 gm.accept(protoEncoder);
 const std::string{protoEncoder.encodedData()};
 \endcode
@@ -139,7 +139,7 @@ const std::string{protoEncoder.encodedData()};
 GenericMessage gm;
 // gm is created using one of the aforementioned options.
 
-cluon::JSONVisitor j;
+cluon::ToJSONVisitor j;
 gm.accept(j);
 std::cout << j.json();
 \endcode
@@ -152,7 +152,7 @@ std::cout << j.json();
 // protoEncodedData is provided from somewhere, i.e., via network for example
 std::string protoEncodedData = <...>
 std::stringstream sstr{protoEncodedData};
-cluon::MessageFromProtoDecoder protoDecoder;
+cluon::FromProtoVisitor protoDecoder;
 protoDecoder.decodeFrom(sstr);
 
 const char *messageSpecification = R"(
@@ -171,7 +171,7 @@ if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second) {
     gm.accept(protoDecoder);
 }
 
-cluon::JSONVisitor j;
+cluon::ToJSONVisitor j;
 gm.accept(j);
 std::cout << j.json();
 \endcode

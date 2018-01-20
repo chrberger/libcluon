@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef JSONVISITOR_HPP
-#define JSONVISITOR_HPP
+#ifndef TOJSONVISITOR_HPP
+#define TOJSONVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 
@@ -33,18 +33,18 @@ This class provides a visitor to transform a message into JSON:
 MyMessage msg;
 // Set some values in msg.
 
-cluon::JSONVisitor j;
+cluon::ToJSONVisitor j;
 msg.accept(j);
 
 std::cout << j.json() << std::endl;
 \endcode
 */
-class LIBCLUON_API JSONVisitor {
+class LIBCLUON_API ToJSONVisitor {
    private:
-    JSONVisitor(const JSONVisitor &) = delete;
-    JSONVisitor(JSONVisitor &&)      = delete;
-    JSONVisitor &operator=(const JSONVisitor &) = delete;
-    JSONVisitor &operator=(JSONVisitor &&) = delete;
+    ToJSONVisitor(const ToJSONVisitor &) = delete;
+    ToJSONVisitor(ToJSONVisitor &&)      = delete;
+    ToJSONVisitor &operator=(const ToJSONVisitor &) = delete;
+    ToJSONVisitor &operator=(ToJSONVisitor &&) = delete;
 
    public:
     /**
@@ -55,7 +55,7 @@ class LIBCLUON_API JSONVisitor {
      *             fields will be emitted; individual field identifiers
      *             can be masked setting them to false.
      */
-    JSONVisitor(bool withOuterCurlyBraces = true, const std::map<uint32_t, bool> &mask = {}) noexcept;
+    ToJSONVisitor(bool withOuterCurlyBraces = true, const std::map<uint32_t, bool> &mask = {}) noexcept;
 
     /**
      * @return JSON-encoded data.
@@ -87,7 +87,7 @@ class LIBCLUON_API JSONVisitor {
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
         (void)typeName;
         if ((0 == m_mask.count(id)) || m_mask[id]) {
-            JSONVisitor jsonVisitor;
+            ToJSONVisitor jsonVisitor;
             value.accept(jsonVisitor);
             m_buffer << '\"' << name << '\"' << ':' << jsonVisitor.json() << ',' << '\n';
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,15 @@
 #include <iostream>
 #include <string>
 
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
-#include "cluon/JSONVisitor.hpp"
-#include "cluon/MessageFromProtoDecoder.hpp"
 #include "cluon/MessageParser.hpp"
-#include "cluon/MessageToProtoEncoder.hpp"
+#include "cluon/ToJSONVisitor.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing base64") {
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
 
     REQUIRE("SGVsbG8gV29ybGQh" == j.encodeBase64("Hello World!"));
     REQUIRE("QUFBQQ==" == j.encodeBase64("AAAA"));
@@ -57,7 +57,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE("Hello World" == tmp.attribute13());
     REQUIRE("Hello Galaxy" == tmp.attribute14());
 
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     tmp.accept(j);
 
     const char *JSON = R"({"attribute1":1,
@@ -86,7 +86,7 @@ TEST_CASE("Testing MyTestMessage6.") {
 
     REQUIRE(97 == tmp6.attribute1().attribute1());
 
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     tmp6.accept(j);
 
     const char *JSON = R"({"attribute1":{"attribute1":97}})";
@@ -119,7 +119,7 @@ TEST_CASE("Testing MyTestMessage1 to GenericMessage to JSON.") {
     gm.createFrom<testdata::MyTestMessage1>(tmp);
 
     // Create a JSON representation from the generic message.
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm.accept(j);
 
     const char *JSON = R"({"attribute1":1,
@@ -240,7 +240,7 @@ TEST_CASE("Testing MyTestMessage6 to GenericMessage to JSON.") {
     gm.createFrom<testdata::MyTestMessage6>(tmp6);
 
     // Create a JSON representation from the generic message.
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm.accept(j);
 
     const char *JSON = R"({"attribute1":{"attribute1":97}})";
@@ -263,7 +263,7 @@ TEST_CASE("Testing MyTestMessage6 to GenericMessage to copy of GenericMessage to
     cluon::GenericMessage gm2{gm};
 
     // Create a JSON representation from the generic message.
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm2.accept(j);
 
     const char *JSON = R"({"attribute1":{"attribute1":97}})";
@@ -287,7 +287,7 @@ TEST_CASE("Testing MyTestMessage6 to GenericMessage to GenericMessage to JSON.")
     gm2.createFrom<cluon::GenericMessage>(gm);
 
     // Create a JSON representation from the generic message.
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm2.accept(j);
 
     const char *JSON = R"({"attribute1":{"attribute1":97}})";
@@ -318,7 +318,7 @@ message FaultyMyMessageA [id = 60006] {
     REQUIRE(10 == msg3.attribute1());
     REQUIRE(20 == msg3.attribute2());
 
-    cluon::MessageToProtoEncoder proto;
+    cluon::ToProtoVisitor proto;
     msg3.accept(proto);
     std::string s{proto.encodedData()};
 
@@ -329,7 +329,7 @@ message FaultyMyMessageA [id = 60006] {
     REQUIRE(0x28 == static_cast<uint8_t>(s.at(3)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage3 msg3_2;
@@ -354,7 +354,7 @@ message FaultyMyMessageA [id = 60006] {
     gm.accept(protoDecoder);
 
     // Create a JSON representation from the generic message.
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm.accept(j);
 
     const char *JSON = R"({"field1":"",
@@ -386,7 +386,7 @@ message FaultyMyMessageA [id = 30003] {
     REQUIRE(10 == msg3.attribute1());
     REQUIRE(20 == msg3.attribute2());
 
-    cluon::MessageToProtoEncoder proto;
+    cluon::ToProtoVisitor proto;
     msg3.accept(proto);
     std::string s{proto.encodedData()};
 
@@ -397,7 +397,7 @@ message FaultyMyMessageA [id = 30003] {
     REQUIRE(0x28 == static_cast<uint8_t>(s.at(3)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromProtoDecoder protoDecoder;
+    cluon::FromProtoVisitor protoDecoder;
     protoDecoder.decodeFrom(sstr);
 
     testdata::MyTestMessage3 msg3_2;
@@ -422,7 +422,7 @@ message FaultyMyMessageA [id = 30003] {
     gm.accept(protoDecoder);
 
     // Create a JSON representation from the generic message.
-    cluon::JSONVisitor j;
+    cluon::ToJSONVisitor j;
     gm.accept(j);
 
     const char *JSON = R"({"field1":"",

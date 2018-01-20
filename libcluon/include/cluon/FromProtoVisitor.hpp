@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MESSAGEFROMPROTODECODER_HPP
-#define MESSAGEFROMPROTODECODER_HPP
+#ifndef FROMPROTOVISITOR_HPP
+#define FROMPROTOVISITOR_HPP
 
 #include "cluon/ProtoConstants.hpp"
 #include "cluon/cluon.hpp"
@@ -31,7 +31,7 @@ namespace cluon {
 /**
 This class decodes a given message from Proto format.
 */
-class LIBCLUON_API MessageFromProtoDecoder {
+class LIBCLUON_API FromProtoVisitor {
     /**
      * This class represents an entry in a Proto payload stream.
      */
@@ -86,16 +86,16 @@ class LIBCLUON_API MessageFromProtoDecoder {
     };
 
    private:
-    MessageFromProtoDecoder(const MessageFromProtoDecoder &) = delete;
-    MessageFromProtoDecoder(MessageFromProtoDecoder &&)      = delete;
-    MessageFromProtoDecoder &operator=(MessageFromProtoDecoder &&) = delete;
+    FromProtoVisitor(const FromProtoVisitor &) = delete;
+    FromProtoVisitor(FromProtoVisitor &&)      = delete;
+    FromProtoVisitor &operator=(FromProtoVisitor &&) = delete;
 
    public:
-    MessageFromProtoDecoder()  = default;
-    ~MessageFromProtoDecoder() = default;
+    FromProtoVisitor()  = default;
+    ~FromProtoVisitor() = default;
 
    public:
-    MessageFromProtoDecoder &operator=(const MessageFromProtoDecoder &other) noexcept;
+    FromProtoVisitor &operator=(const FromProtoVisitor &other) noexcept;
 
     /**
      * This method decodes a given istream into Proto.
@@ -134,7 +134,7 @@ class LIBCLUON_API MessageFromProtoDecoder {
             const std::string s{m_mapOfKeyValues[id].valueAsString()};
 
             std::stringstream sstr{s};
-            cluon::MessageFromProtoDecoder nestedProtoDecoder;
+            cluon::FromProtoVisitor nestedProtoDecoder;
             nestedProtoDecoder.decodeFrom(sstr);
 
             value.accept(nestedProtoDecoder);

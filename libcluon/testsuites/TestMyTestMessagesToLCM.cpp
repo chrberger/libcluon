@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@
 
 #include "catch.hpp"
 
-#include "cluon/MessageFromLCMDecoder.hpp"
-#include "cluon/MessageToLCMEncoder.hpp"
+#include "cluon/FromLCMVisitor.hpp"
+#include "cluon/ToLCMVisitor.hpp"
 #include "cluon/LCMToGenericMessage.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
@@ -41,7 +41,7 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(!tmp.attribute1());
     REQUIRE('d' == tmp.attribute2());
 
-    cluon::MessageToLCMEncoder lcmEncoder;
+    cluon::ToLCMVisitor lcmEncoder;
     tmp.accept(lcmEncoder);
 
     const std::string s = lcmEncoder.encodedData();
@@ -59,14 +59,14 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(0x64 == static_cast<uint8_t>(s.at(9)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromLCMDecoder lcmDecoder;
-    lcmDecoder.decodeFrom(sstr);
+    cluon::FromLCMVisitor fromLCM;
+    fromLCM.decodeFrom(sstr);
 
     testdata::MyTestMessage0 tmp2;
     REQUIRE(tmp2.attribute1());
     REQUIRE('c' == tmp2.attribute2());
 
-    tmp2.accept(lcmDecoder);
+    tmp2.accept(fromLCM);
 
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
@@ -76,7 +76,7 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE('c' == tmp2_2.attribute2());
 
     // Re-using same decoder.
-    tmp2_2.accept(lcmDecoder);
+    tmp2_2.accept(fromLCM);
 
     REQUIRE(tmp2_2.attribute1() == tmp.attribute1());
     REQUIRE(tmp2_2.attribute2() == tmp.attribute2());
@@ -104,7 +104,7 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(!tmp.attribute1());
     REQUIRE('d' == tmp.attribute2());
 
-    cluon::MessageToLCMEncoder lcmEncoder;
+    cluon::ToLCMVisitor lcmEncoder;
     tmp.accept(lcmEncoder);
 
     std::string s = lcmEncoder.encodedData();
@@ -197,8 +197,8 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(0x0 == static_cast<uint8_t>(s.at(84)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromLCMDecoder lcmDecoder;
-    lcmDecoder.decodeFrom(sstr);
+    cluon::FromLCMVisitor fromLCM;
+    fromLCM.decodeFrom(sstr);
 
     testdata::MyTestMessage1 tmp2;
 
@@ -217,7 +217,7 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE("Hello World" == tmp2.attribute13());
     REQUIRE("Hello Galaxy" == tmp2.attribute14());
 
-    tmp2.accept(lcmDecoder);
+    tmp2.accept(fromLCM);
 
     REQUIRE(!tmp2.attribute1());
     REQUIRE('d' == tmp2.attribute2());
@@ -274,7 +274,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE(-50.4321 == Approx(tmp.attribute10()));
     REQUIRE("Hello cluon World!" == tmp.attribute11());
 
-    cluon::MessageToLCMEncoder lcmEncoder;
+    cluon::ToLCMVisitor lcmEncoder;
     tmp.accept(lcmEncoder);
 
     std::string s = lcmEncoder.encodedData();
@@ -356,8 +356,8 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE(0x0 == static_cast<uint8_t>(s.at(72)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromLCMDecoder lcmDecoder;
-    lcmDecoder.decodeFrom(sstr);
+    cluon::FromLCMVisitor fromLCM;
+    fromLCM.decodeFrom(sstr);
 
     testdata::MyTestMessage5 tmp2;
     REQUIRE(1 == tmp2.attribute1());
@@ -372,7 +372,7 @@ TEST_CASE("Testing MyTestMessage1.") {
     REQUIRE(-10.2345 == Approx(tmp2.attribute10()));
     REQUIRE("Hello World!" == tmp2.attribute11());
 
-    tmp2.accept(lcmDecoder);
+    tmp2.accept(fromLCM);
 
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
@@ -397,7 +397,7 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
 
     REQUIRE(150 == tmp6.attribute1().attribute1());
 
-    cluon::MessageToLCMEncoder lcmEncoder;
+    cluon::ToLCMVisitor lcmEncoder;
     tmp6.accept(lcmEncoder);
     std::string s = lcmEncoder.encodedData();
 
@@ -414,17 +414,17 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
     REQUIRE(0x96 == static_cast<uint8_t>(s.at(8)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromLCMDecoder lcmDecoder;
-    lcmDecoder.decodeFrom(sstr);
+    cluon::FromLCMVisitor fromLCM;
+    fromLCM.decodeFrom(sstr);
 
     testdata::MyTestMessage6 tmp6_2;
     REQUIRE(123 == tmp6_2.attribute1().attribute1());
-    tmp6_2.accept(lcmDecoder);
+    tmp6_2.accept(fromLCM);
     REQUIRE(150 == tmp6_2.attribute1().attribute1());
 
     testdata::MyTestMessage6 tmp6_2_2;
     REQUIRE(123 == tmp6_2_2.attribute1().attribute1());
-    tmp6_2_2.accept(lcmDecoder);
+    tmp6_2_2.accept(fromLCM);
     REQUIRE(150 == tmp6_2_2.attribute1().attribute1());
 }
 
@@ -447,7 +447,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     REQUIRE(12 == tmp7.attribute2());
     REQUIRE(13 == tmp7.attribute3().attribute1());
 
-    cluon::MessageToLCMEncoder lcmEncoder;
+    cluon::ToLCMVisitor lcmEncoder;
     tmp7.accept(lcmEncoder);
     std::string s = lcmEncoder.encodedData();
 
@@ -468,15 +468,15 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     REQUIRE(0xd == static_cast<uint8_t>(s.at(13)));
 
     std::stringstream sstr{s};
-    cluon::MessageFromLCMDecoder lcmDecoder;
-    lcmDecoder.decodeFrom(sstr);
+    cluon::FromLCMVisitor fromLCM;
+    fromLCM.decodeFrom(sstr);
 
     testdata::MyTestMessage7 tmp7_2;
     REQUIRE(123 == tmp7_2.attribute1().attribute1());
     REQUIRE(12345 == tmp7_2.attribute2());
     REQUIRE(123 == tmp7_2.attribute3().attribute1());
 
-    tmp7_2.accept(lcmDecoder);
+    tmp7_2.accept(fromLCM);
 
     REQUIRE(9 == tmp7_2.attribute1().attribute1());
     REQUIRE(12 == tmp7_2.attribute2());
@@ -508,7 +508,7 @@ message example.MyTestMessage0 [id = 12345] {
     REQUIRE(!tmp.attribute1());
     REQUIRE('e' == tmp.attribute2());
 
-    cluon::MessageToLCMEncoder lcmEncoder;
+    cluon::ToLCMVisitor lcmEncoder;
     tmp.accept(lcmEncoder);
 
     const std::string s = lcmEncoder.encodedData();
@@ -578,7 +578,7 @@ message testdata.MyTestMessage6 [id = 30006] {
 
     REQUIRE(150 == tmp6.attribute1().attribute1());
 
-    cluon::MessageToLCMEncoder lcmEncoder;
+    cluon::ToLCMVisitor lcmEncoder;
     tmp6.accept(lcmEncoder);
     std::string s = lcmEncoder.encodedData();
 

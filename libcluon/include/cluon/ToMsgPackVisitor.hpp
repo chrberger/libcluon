@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,40 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MESSAGEFROMLCMDECODER_HPP
-#define MESSAGEFROMLCMDECODER_HPP
+#ifndef TOMSGPACKVISITOR_HPP
+#define TOMSGPACKVISITOR_HPP
 
+#include "cluon/MsgPackConstants.hpp"
 #include "cluon/cluon.hpp"
 
 #include <cstdint>
-#include <istream>
 #include <sstream>
 #include <string>
-#include <vector>
 
 namespace cluon {
 /**
-This class decodes a given message from LCM format.
+This class encodes a given message in MsgPack format.
 */
-class LIBCLUON_API MessageFromLCMDecoder {
+class LIBCLUON_API ToMsgPackVisitor {
    private:
-    MessageFromLCMDecoder(std::stringstream &in) noexcept;
-    MessageFromLCMDecoder(const MessageFromLCMDecoder &) = delete;
-    MessageFromLCMDecoder(MessageFromLCMDecoder &&)      = delete;
-    MessageFromLCMDecoder &operator=(const MessageFromLCMDecoder &) = delete;
-    MessageFromLCMDecoder &operator=(MessageFromLCMDecoder &&) = delete;
+    ToMsgPackVisitor(const ToMsgPackVisitor &) = delete;
+    ToMsgPackVisitor(ToMsgPackVisitor &&)      = delete;
+    ToMsgPackVisitor &operator=(const ToMsgPackVisitor &) = delete;
+    ToMsgPackVisitor &operator=(ToMsgPackVisitor &&) = delete;
 
    public:
-    MessageFromLCMDecoder() noexcept;
-    ~MessageFromLCMDecoder() = default;
+    ToMsgPackVisitor()  = default;
+    ~ToMsgPackVisitor() = default;
 
-   public:
     /**
-     * This method decodes a given istream into LCM.
-     *
-     * @param in istream to decode.
+     * @return Encoded data in MsgPack format.
      */
-    void decodeFrom(std::istream &in) noexcept;
+    std::string encodedData() const noexcept;
 
    public:
     // The following methods are provided to allow an instance of this class to
@@ -75,27 +70,26 @@ class LIBCLUON_API MessageFromLCMDecoder {
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
         (void)id;
         (void)typeName;
-        // No hash for the type but for name and dimension.
-        calculateHash(name);
-        calculateHash(0);
 
-        cluon::MessageFromLCMDecoder nestedLCMDecoder(m_buffer);
-        value.accept(nestedLCMDecoder);
-
-        m_hashes.push_back(nestedLCMDecoder.hash());
+        encode(m_buffer, name);
+        {
+            cluon::ToMsgPackVisitor nestedMsgPackEncoder;
+            value.accept(nestedMsgPackEncoder);
+            const std::string tmp{nestedMsgPackEncoder.encodedData()};
+            const uint32_t LENGTH{static_cast<uint32_t>(tmp.size())};
+            m_buffer.write(tmp.c_str(), static_cast<std::streamsize>(LENGTH));
+        }
+        m_numberOfFields++;
     }
 
    private:
-    int64_t hash() const noexcept;
-    void calculateHash(char c) noexcept;
-    void calculateHash(const std::string &s) noexcept;
+    void encode(std::ostream &o, const std::string &s);
+    void encodeUint(std::ostream &o, uint64_t v);
+    void encodeInt(std::ostream &o, int64_t v);
 
    private:
-    int64_t m_calculatedHash{0x12345678};
-    int64_t m_expectedHash{0};
-    std::stringstream m_internalBuffer{""};
-    std::stringstream &m_buffer;
-    std::vector<int64_t> m_hashes{};
+    uint32_t m_numberOfFields{0};
+    std::stringstream m_buffer{""};
 };
 } // namespace cluon
 

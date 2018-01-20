@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,51 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ODVDVISITOR_HPP
-#define ODVDVISITOR_HPP
+#ifndef FROMLCMVISITOR_HPP
+#define FROMLCMVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 
 #include <cstdint>
-#include <regex>
+#include <istream>
 #include <sstream>
 #include <string>
 #include <vector>
 
 namespace cluon {
 /**
-This class provides a visitor to transform a message into its corresponding
-message specification in ODVD format:
-
-\code{.cpp}
-MyMessage msg;
-// Set some values in msg.
-
-cluon::ODVDVisitor odvd;
-msg.accept(odvd);
-
-const std::string generatedMessageSpecification{odvd.messageSpecification()};
-std::cout << generatedMessageSpecification << std::endl;
-
-cluon::MessageParser mp;
-auto retVal = mp.parse(generatedMessageSpecification);
-std::cout << (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
-\endcode
+This class decodes a given message from LCM format.
 */
-class LIBCLUON_API ODVDVisitor {
+class LIBCLUON_API FromLCMVisitor {
    private:
-    ODVDVisitor(const ODVDVisitor &) = delete;
-    ODVDVisitor(ODVDVisitor &&)      = delete;
-    ODVDVisitor &operator=(const ODVDVisitor &) = delete;
-    ODVDVisitor &operator=(ODVDVisitor &&) = delete;
+    FromLCMVisitor(std::stringstream &in) noexcept;
+    FromLCMVisitor(const FromLCMVisitor &) = delete;
+    FromLCMVisitor(FromLCMVisitor &&)      = delete;
+    FromLCMVisitor &operator=(const FromLCMVisitor &) = delete;
+    FromLCMVisitor &operator=(FromLCMVisitor &&) = delete;
 
    public:
-    ODVDVisitor() = default;
+    FromLCMVisitor() noexcept;
+    ~FromLCMVisitor() = default;
 
+   public:
     /**
-     * @return Message specification data.
+     * This method decodes a given istream into LCM.
+     *
+     * @param in istream to decode.
      */
-    std::string messageSpecification() const noexcept;
+    void decodeFrom(std::istream &in) noexcept;
 
    public:
     // The following methods are provided to allow an instance of this class to
@@ -84,22 +73,30 @@ class LIBCLUON_API ODVDVisitor {
 
     template <typename T>
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
-        try {
-            std::string tmp{std::regex_replace(typeName, std::regex("::"), ".")}; // NOLINT
+        (void)id;
+        (void)typeName;
+        // No hash for the type but for name and dimension.
+        calculateHash(name);
+        calculateHash(0);
 
-            ODVDVisitor odvdVisitor;
-            value.accept(odvdVisitor);
-            m_forwardDeclarations.emplace(m_forwardDeclarations.begin(), odvdVisitor.messageSpecification());
+        cluon::FromLCMVisitor nestedLCMDecoder(m_buffer);
+        value.accept(nestedLCMDecoder);
 
-            m_buffer << "    " << tmp << ' ' << name << " [ id = " << id << " ];" << '\n';
-        } catch (std::regex_error &) { // LCOV_EXCL_LINE
-        }
+        m_hashes.push_back(nestedLCMDecoder.hash());
     }
 
    private:
-    std::vector<std::string> m_forwardDeclarations{};
-    std::stringstream m_buffer{};
-};
+    int64_t hash() const noexcept;
+    void calculateHash(char c) noexcept;
+    void calculateHash(const std::string &s) noexcept;
 
+   private:
+    int64_t m_calculatedHash{0x12345678};
+    int64_t m_expectedHash{0};
+    std::stringstream m_internalBuffer{""};
+    std::stringstream &m_buffer;
+    std::vector<int64_t> m_hashes{};
+};
 } // namespace cluon
+
 #endif

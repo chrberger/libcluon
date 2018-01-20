@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Christian Berger
+ * Copyright (C) 2017-2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,73 +15,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef JSONVISITOR_HPP
-#define JSONVISITOR_HPP
+#ifndef TOODVDVISITOR_HPP
+#define TOODVDVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 
 #include <cstdint>
+#include <regex>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace cluon {
 /**
-This class provides a visitor to transform a message into CSV with
-user-specified delimiters and optional column headers:
+This class provides a visitor to transform a message into its corresponding
+message specification in ODVD format:
 
 \code{.cpp}
 MyMessage msg;
 // Set some values in msg.
 
-cluon::CSVVisitor csv{',', true};
-msg.accept(csv);
+cluon::ToODVDVisitor odvd;
+msg.accept(odvd);
 
-std::cout << csv.csv() << std::endl;
+const std::string generatedMessageSpecification{odvd.messageSpecification()};
+std::cout << generatedMessageSpecification << std::endl;
+
+cluon::MessageParser mp;
+auto retVal = mp.parse(generatedMessageSpecification);
+std::cout << (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
 \endcode
-
-Subsequent use of this visitor will append the data (please keep in mind to not
-change the visited messages in between as the generated CSV data will be messed
-up otherwise).
 */
-class LIBCLUON_API CSVVisitor {
+class LIBCLUON_API ToODVDVisitor {
    private:
-    CSVVisitor(const CSVVisitor &) = delete;
-    CSVVisitor(CSVVisitor &&)      = delete;
-    CSVVisitor &operator=(const CSVVisitor &) = delete;
-    CSVVisitor &operator=(CSVVisitor &&) = delete;
+    ToODVDVisitor(const ToODVDVisitor &) = delete;
+    ToODVDVisitor(ToODVDVisitor &&)      = delete;
+    ToODVDVisitor &operator=(const ToODVDVisitor &) = delete;
+    ToODVDVisitor &operator=(ToODVDVisitor &&) = delete;
 
    public:
-    /**
-     * Constructor.
-     *
-     * @param delimiter Delimiter character.
-     * @param withHeader If true, the first line in the output contains the
-     *        column headers.
-     */
-    CSVVisitor(char delimiter = ';', bool withHeader = true) noexcept;
-
-   protected:
-    /**
-     * Constructor for internal use.
-     *
-     * @param prefix Prefix to prepend per column header.
-     * @param delimiter Delimiter character.
-     * @param withHeader If true, the first line in the output contains the
-     *        column headers.
-     * @param isNested If true, the returned CSV values do not have a trailing new line.
-     */
-    CSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept;
-
-   public:
-    /**
-     * @return CSV-encoded data.
-     */
-    std::string csv() const noexcept;
+    ToODVDVisitor() = default;
 
     /**
-     * This method clears the containing CSV data.
+     * @return Message specification data.
      */
-    void clear() noexcept;
+    std::string messageSpecification() const noexcept;
 
    public:
     // The following methods are provided to allow an instance of this class to
@@ -106,26 +84,21 @@ class LIBCLUON_API CSVVisitor {
 
     template <typename T>
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
-        (void)id;
-        (void)typeName;
-        constexpr bool IS_NESTED{true};
-        CSVVisitor csvVisitor(name, m_delimiter, m_withHeader, IS_NESTED);
-        value.accept(csvVisitor);
+        try {
+            std::string tmp{std::regex_replace(typeName, std::regex("::"), ".")}; // NOLINT
 
-        if (m_fillHeader) {
-            m_bufferHeader << csvVisitor.m_bufferHeader.str();
+            ToODVDVisitor odvdVisitor;
+            value.accept(odvdVisitor);
+            m_forwardDeclarations.emplace(m_forwardDeclarations.begin(), odvdVisitor.messageSpecification());
+
+            m_buffer << "    " << tmp << ' ' << name << " [ id = " << id << " ];" << '\n';
+        } catch (std::regex_error &) { // LCOV_EXCL_LINE
         }
-        m_bufferValues << csvVisitor.m_bufferValues.str();
     }
 
    private:
-    std::string m_prefix{};
-    char m_delimiter{';'};
-    bool m_withHeader{true};
-    bool m_isNested{false};
-    bool m_fillHeader{true};
-    std::stringstream m_bufferHeader{};
-    std::stringstream m_bufferValues{};
+    std::vector<std::string> m_forwardDeclarations{};
+    std::stringstream m_buffer{};
 };
 
 } // namespace cluon

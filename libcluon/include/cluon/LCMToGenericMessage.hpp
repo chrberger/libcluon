@@ -43,7 +43,7 @@ class LIBCLUON_API LCMToGenericMessage {
 
     /**
      * This method sets the message specification to be used for
-     * interpreting a given Proto-encoded Envelope.
+     * interpreting a given LCM-encoded message.
      *
      * @param ms Message specification following the ODVD format.
      * @return -1 in case of invalid message specification; otherwise, number

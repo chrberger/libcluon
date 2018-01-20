@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2017  Christian Berger
+// Copyright (C) 2017-2018  Christian Berger
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -72,5 +72,18 @@ message testdata.MyTestMessage7 [id = 30007] {
     testdata.MyTestMessage2 attribute1 [ id = 1 ];
     uint32 attribute2 [ default = 12345, id = 2 ];
     testdata.MyTestMessage2 attribute3 [ id = 3 ];
+}
+
+message testdata.MyTestMessage8 [id = 30008] {
+    uint64 attribute1 [ default = 123, id = 1 ];
+}
+
+message testdata.MyTestMessage9 [id = 30009] {
+    float attribute1 [ default = -1.2345, id = 1 ];
+    double attribute2 [ default = -10.2345, id = 2 ];
+}
+
+message testdata.MyTestMessage10 [id = 30010] {
+    int64 attribute1 [ default = 123, id = 1 ];
 }
 

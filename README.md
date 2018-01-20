@@ -31,11 +31,12 @@ libcluon is a small and efficient library written in modern C++ library to _glue
 * Native implementation of [Protobuf](https://developers.google.com/protocol-buffers/) for data serialization & deserialization: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessagesToProto.cpp)
 * Native implementation of [LCM](http://lcm-proj.github.io/type_specification.html)/[ZCM](http://zerocm.github.io/zcm/) for data serialization & deserialization: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessagesToLCM.cpp)
 * Native implementation of [JSON](https://www.json.org/) export for messages: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestJSONVisitor.cpp#L28)
+* Native implementation of [MsgPack](https://msgpack.org/) for data serialization & deserialization: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessagesToMsgPack.cpp)
 * libcluon natively available for JavaScript via [Emscripten](https://github.com/kripken/emscripten): [libcluon.js](https://bintray.com/chrberger/libcluon/javascript#files)
 * Portable implementation of publish/subscribe communication (Linux, MacOSX, Windows): [Example](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestUDPReceiver.cpp#L111)
 * Intermediate Data Representation (IDR) enables flexible message transformations at runtime; for example: [Protobuf to JSON](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessage1.cpp#L348) or [OD4 to JSON](https://github.com/chrberger/libcluon/blob/master/libcluon/tools/cluon-OD4toJSON.cpp) or [LCM to JSON](https://github.com/chrberger/libcluon/blob/master/libcluon/tools/cluon-LCMtoJSON.cpp) at runtime without generating any data structures beforehand
-* Message self-reflection to extract portable message specifications at runtime: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestODVDVisitor.cpp#L32)
-* Message transformatiom into platform-independent CSV format: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestCSVVisitor.cpp#L28)
+* Message self-reflection to extract portable message specifications at runtime: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestToODVDVisitor.cpp#L32)
+* Message transformatiom into platform-independent CSV format: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestToCSVVisitor.cpp#L28)
 
 
 ## Dependencies
