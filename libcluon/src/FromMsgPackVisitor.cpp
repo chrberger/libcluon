@@ -151,7 +151,6 @@ std::string FromMsgPackVisitor::readString(std::istream &in) noexcept {
     if (in.good()) {
         uint8_t c = static_cast<uint8_t>(in.get());
         if (MsgPackConstants::STR_FORMAT == getFormatFamily(c)) {
-            // First, search for str opening token.
             uint32_t length{0};
             const uint8_t T = static_cast<uint8_t>(c);
             if ((static_cast<uint8_t>(MsgPackConstants::FIXSTR) <= T)
