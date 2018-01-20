@@ -22,6 +22,7 @@
 #include "cluon/cluon.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
+#include <limits>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -234,6 +235,54 @@ TEST_CASE("Testing MyTestMessage8 with v <= 0xFFFFFFFF.") {
     REQUIRE(0x5B == static_cast<uint8_t>(s.at(14)));
     REQUIRE(0xCD == static_cast<uint8_t>(s.at(15)));
     REQUIRE(0x15 == static_cast<uint8_t>(s.at(16)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage8 tmp2;
+    REQUIRE(123 == tmp2.attribute1());
+
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+}
+
+TEST_CASE("Testing MyTestMessage8 with v > 0xFFFFFFFF.") {
+    testdata::MyTestMessage8 tmp;
+    REQUIRE(123 == tmp.attribute1());
+
+    tmp.attribute1(std::numeric_limits<uint64_t>::max()-1);
+    REQUIRE(std::numeric_limits<uint64_t>::max()-1 == tmp.attribute1());
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    REQUIRE(21 == s.size());
+
+    REQUIRE(0x81 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xcf == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0xff == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0xff == static_cast<uint8_t>(s.at(14)));
+    REQUIRE(0xff == static_cast<uint8_t>(s.at(15)));
+    REQUIRE(0xff == static_cast<uint8_t>(s.at(16)));
+    REQUIRE(0xff == static_cast<uint8_t>(s.at(17)));
+    REQUIRE(0xff == static_cast<uint8_t>(s.at(18)));
+    REQUIRE(0xff == static_cast<uint8_t>(s.at(19)));
+    REQUIRE(0xfe == static_cast<uint8_t>(s.at(20)));
 
     std::stringstream sstr{s};
     cluon::FromMsgPackVisitor msgPackDecoder;
