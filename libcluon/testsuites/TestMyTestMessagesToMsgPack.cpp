@@ -951,6 +951,70 @@ TEST_CASE("Testing MyTestMessage4 larger than 0xbf.") {
     REQUIRE("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12" == tmp2.attribute1());
 }
 
+TEST_CASE("Testing MyTestMessage4 of size 0xda.") {
+    testdata::MyTestMessage4 tmp;
+    REQUIRE(tmp.attribute1().empty());
+
+    std::string value;
+    for(uint16_t i = 0; i < std::numeric_limits<uint16_t>::max(); i++) {
+        value += "A";
+    }
+
+    tmp.attribute1(value);
+    REQUIRE(value == tmp.attribute1());
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    REQUIRE(65550 == s.size());
+    REQUIRE(0xda == static_cast<uint8_t>(s.at(12)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage4 tmp2;
+    REQUIRE(tmp2.attribute1().empty());
+
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(value == tmp2.attribute1());
+}
+
+TEST_CASE("Testing MyTestMessage4 of size 0xdb.") {
+    testdata::MyTestMessage4 tmp;
+    REQUIRE(tmp.attribute1().empty());
+
+    std::string value;
+    for(uint32_t i = 0; i < std::numeric_limits<uint16_t>::max()+2; i++) {
+        value += "A";
+    }
+
+    tmp.attribute1(value);
+    REQUIRE(value == tmp.attribute1());
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    REQUIRE(65554 == s.size());
+    REQUIRE(0xdb == static_cast<uint8_t>(s.at(12)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage4 tmp2;
+    REQUIRE(tmp2.attribute1().empty());
+
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(value == tmp2.attribute1());
+}
+
 TEST_CASE("Testing MyTestMessage5.") {
     testdata::MyTestMessage5 tmp;
 
