@@ -81,6 +81,60 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
 
+TEST_CASE("Testing MyTestMessage0 with false value.") {
+    testdata::MyTestMessage0 tmp;
+    REQUIRE(tmp.attribute1());
+    REQUIRE('c' == tmp.attribute2());
+
+    tmp.attribute1(false).attribute2('d');
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+    REQUIRE(26 == s.size());
+
+    REQUIRE(0x82 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xc2 == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(14)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(15)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(16)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(17)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(18)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(19)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(20)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(21)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(22)));
+    REQUIRE(0x32 == static_cast<uint8_t>(s.at(23)));
+    REQUIRE(0xa1 == static_cast<uint8_t>(s.at(24)));
+    REQUIRE(0x64 == static_cast<uint8_t>(s.at(25)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage0 tmp2;
+    REQUIRE(tmp2.attribute1());
+    REQUIRE('c' == tmp2.attribute2());
+
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+    REQUIRE(tmp2.attribute2() == tmp.attribute2());
+}
+
 TEST_CASE("Testing MyTestMessage2 with v <= 0x7F.") {
     testdata::MyTestMessage2 tmp;
     REQUIRE(123 == tmp.attribute1());
@@ -515,6 +569,51 @@ TEST_CASE("Testing MyTestMessage10 with v = -123456.") {
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
 }
 
+TEST_CASE("Testing MyTestMessage10 with v > -0xFFFFFFFF.") {
+    testdata::MyTestMessage10 tmp;
+
+    tmp.attribute1(std::numeric_limits<int64_t>::lowest()+1);
+    REQUIRE(std::numeric_limits<int64_t>::lowest()+1 == tmp.attribute1());
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    REQUIRE(21 == s.size());
+
+    REQUIRE(0x81 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xd3 == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0x80 == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(14)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(15)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(16)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(17)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(18)));
+    REQUIRE(0x0 == static_cast<uint8_t>(s.at(19)));
+    REQUIRE(0x1 == static_cast<uint8_t>(s.at(20)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage10 tmp2;
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+}
+
 TEST_CASE("Testing MyTestMessage3.") {
     testdata::MyTestMessage3 tmp;
     REQUIRE(124 == tmp.attribute1());
@@ -617,6 +716,239 @@ TEST_CASE("Testing MyTestMessage4.") {
     tmp2.accept(msgPackDecoder);
 
     REQUIRE("testing" == tmp2.attribute1());
+}
+
+TEST_CASE("Testing MyTestMessage4 larger than 0xbf.") {
+    testdata::MyTestMessage4 tmp;
+    REQUIRE(tmp.attribute1().empty());
+
+    tmp.attribute1("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12");
+    REQUIRE("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12" == tmp.attribute1());
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    tmp.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    REQUIRE(206 == s.size());
+
+    REQUIRE(0x81 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xaa == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x61 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x62 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x75 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x74 == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0xd9 == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0xc0 == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(14)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(15)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(16)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(17)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(18)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(19)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(20)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(21)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(22)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(23)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(24)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(25)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(26)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(27)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(28)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(29)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(30)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(31)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(32)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(33)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(34)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(35)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(36)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(37)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(38)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(39)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(40)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(41)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(42)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(43)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(44)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(45)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(46)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(47)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(48)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(49)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(50)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(51)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(52)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(53)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(54)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(55)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(56)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(57)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(58)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(59)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(60)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(61)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(62)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(63)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(64)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(65)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(66)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(67)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(68)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(69)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(70)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(71)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(72)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(73)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(74)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(75)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(76)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(77)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(78)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(79)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(80)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(81)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(82)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(83)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(84)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(85)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(86)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(87)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(88)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(89)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(90)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(91)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(92)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(93)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(94)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(95)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(96)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(97)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(98)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(99)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(100)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(101)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(102)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(103)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(104)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(105)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(106)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(107)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(108)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(109)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(110)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(111)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(112)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(113)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(114)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(115)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(116)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(117)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(118)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(119)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(120)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(121)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(122)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(123)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(124)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(125)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(126)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(127)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(128)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(129)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(130)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(131)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(132)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(133)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(134)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(135)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(136)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(137)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(138)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(139)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(140)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(141)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(142)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(143)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(144)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(145)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(146)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(147)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(148)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(149)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(150)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(151)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(152)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(153)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(154)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(155)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(156)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(157)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(158)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(159)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(160)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(161)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(162)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(163)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(164)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(165)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(166)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(167)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(168)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(169)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(170)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(171)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(172)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(173)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(174)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(175)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(176)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(177)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(178)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(179)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(180)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(181)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(182)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(183)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(184)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(185)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(186)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(187)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(188)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(189)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(190)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(191)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(192)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(193)));
+    REQUIRE(0x41 == static_cast<uint8_t>(s.at(194)));
+    REQUIRE(0x42 == static_cast<uint8_t>(s.at(195)));
+    REQUIRE(0x43 == static_cast<uint8_t>(s.at(196)));
+    REQUIRE(0x44 == static_cast<uint8_t>(s.at(197)));
+    REQUIRE(0x45 == static_cast<uint8_t>(s.at(198)));
+    REQUIRE(0x46 == static_cast<uint8_t>(s.at(199)));
+    REQUIRE(0x47 == static_cast<uint8_t>(s.at(200)));
+    REQUIRE(0x48 == static_cast<uint8_t>(s.at(201)));
+    REQUIRE(0x49 == static_cast<uint8_t>(s.at(202)));
+    REQUIRE(0x4a == static_cast<uint8_t>(s.at(203)));
+    REQUIRE(0x31 == static_cast<uint8_t>(s.at(204)));
+    REQUIRE(0x32 == static_cast<uint8_t>(s.at(205)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage4 tmp2;
+    REQUIRE(tmp2.attribute1().empty());
+
+    tmp2.accept(msgPackDecoder);
+
+    REQUIRE("ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJ12" == tmp2.attribute1());
 }
 
 TEST_CASE("Testing MyTestMessage5.") {
