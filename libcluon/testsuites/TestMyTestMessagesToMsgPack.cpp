@@ -1445,19 +1445,7 @@ class SetValues {
     void preVisit(uint32_t, const std::string &, const std::string &) noexcept {}
     void postVisit() noexcept {}
 
-    void visit(uint32_t, std::string &&, std::string &&, bool &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, char &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, int8_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, uint8_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, int16_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, uint16_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, int32_t &) noexcept {}
     void visit(uint32_t, std::string &&, std::string &&, uint32_t &v) noexcept { v = value++; }
-    void visit(uint32_t, std::string &&, std::string &&, int64_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, uint64_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, float &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, double &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, std::string &) noexcept {}
 
     template <typename T>
     void visit(uint32_t &, std::string &&, std::string &&, T &) noexcept {}
@@ -1470,19 +1458,7 @@ class ValueSummarizer {
     void preVisit(uint32_t, const std::string &, const std::string &) noexcept {}
     void postVisit() noexcept {}
 
-    void visit(uint32_t, std::string &&, std::string &&, bool &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, char &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, int8_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, uint8_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, int16_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, uint16_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, int32_t &) noexcept {}
     void visit(uint32_t, std::string &&, std::string &&, uint32_t &v) noexcept { value += v; }
-    void visit(uint32_t, std::string &&, std::string &&, int64_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, uint64_t &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, float &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, double &) noexcept {}
-    void visit(uint32_t, std::string &&, std::string &&, std::string &) noexcept {}
 
     template <typename T>
     void visit(uint32_t &, std::string &&, std::string &&, T &) noexcept {}
