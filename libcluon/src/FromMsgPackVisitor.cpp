@@ -208,7 +208,7 @@ FromMsgPackVisitor::readKeyValues(std::istream &in) noexcept {
             } else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) { // LCOV_EXCL_LINE
                 // no test case due to performance reasons
                 in.read(reinterpret_cast<char *>(&tokensToRead), sizeof(uint32_t)); // LCOV_EXCL_LINE
-                tokensToRead = be32toh(tokensToRead); // LCOV_EXCL_LINE
+                tokensToRead = be32toh(tokensToRead);                               // LCOV_EXCL_LINE
             }
 
             // Next, read pairs string/value.
