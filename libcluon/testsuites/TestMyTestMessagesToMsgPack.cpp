@@ -1436,6 +1436,8 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     std::cout << buffer.str() << std::endl;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 class SetValues {
    public:
     uint32_t value{1000};
@@ -1458,7 +1460,7 @@ class SetValues {
     void visit(uint32_t, std::string &&, std::string &&, std::string &) noexcept {}
 
     template <typename T>
-    void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &) noexcept {}
+    void visit(uint32_t &, std::string &&, std::string &&, T &) noexcept {}
 };
 
 class ValueSummarizer {
@@ -1483,7 +1485,7 @@ class ValueSummarizer {
     void visit(uint32_t, std::string &&, std::string &&, std::string &) noexcept {}
 
     template <typename T>
-    void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &) noexcept {}
+    void visit(uint32_t &, std::string &&, std::string &&, T &) noexcept {}
 };
 
 TEST_CASE("Testing more than 0xF and less than 0xFFFF fields.") {
@@ -2002,12 +2004,4 @@ TEST_CASE("Testing more than 0xF and less than 0xFFFF fields.") {
     gm2.accept(vs);
 
     REQUIRE(32496 == vs.value);
-
-//int i = 0;
-//for(auto c : s) {
-////    std::cout << "0x" << std::hex << (uint32_t)(uint8_t)c << " ";
-//    std::cout << "REQUIRE(0x" << std::hex << (uint32_t)(uint8_t)c << " == static_cast<uint8_t>(s.at(" << std::dec << i++ << ")));" << std::endl;
-//}
-//std::cout << std::endl;
 }
-

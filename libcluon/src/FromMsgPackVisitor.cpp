@@ -79,8 +79,9 @@ MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
         formatFamily = MsgPackConstants::MAP_FORMAT;
     } else if (static_cast<uint8_t>(MsgPackConstants::MAP16) == T) {
         formatFamily = MsgPackConstants::MAP_FORMAT;
-    } else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) {
-        formatFamily = MsgPackConstants::MAP_FORMAT;
+    } else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) { // LCOV_EXCL_LINE
+        // no test case due to performance reasons
+        formatFamily = MsgPackConstants::MAP_FORMAT; // LCOV_EXCL_LINE
     }
 
     return formatFamily;
@@ -204,9 +205,10 @@ FromMsgPackVisitor::readKeyValues(std::istream &in) noexcept {
                 uint16_t tokens{0};
                 in.read(reinterpret_cast<char *>(&tokens), sizeof(uint16_t));
                 tokensToRead = be16toh(tokens);
-            } else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) {
-                in.read(reinterpret_cast<char *>(&tokensToRead), sizeof(uint32_t));
-                tokensToRead = be32toh(tokensToRead);
+            } else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) { // LCOV_EXCL_LINE
+                // no test case due to performance reasons
+                in.read(reinterpret_cast<char *>(&tokensToRead), sizeof(uint32_t)); // LCOV_EXCL_LINE
+                tokensToRead = be32toh(tokensToRead); // LCOV_EXCL_LINE
             }
 
             // Next, read pairs string/value.

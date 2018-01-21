@@ -38,11 +38,12 @@ std::string ToMsgPackVisitor::encodedData() const noexcept {
         prefix.write(reinterpret_cast<const char *>(&pairs), sizeof(uint8_t));
         uint16_t n = htobe16(static_cast<uint16_t>(m_numberOfFields));
         prefix.write(reinterpret_cast<const char *>(&n), sizeof(uint16_t));
-    } else if (m_numberOfFields > 0xFFFF) {
-        const uint8_t pairs = static_cast<uint8_t>(MsgPackConstants::MAP32);
-        prefix.write(reinterpret_cast<const char *>(&pairs), sizeof(uint8_t));
-        uint32_t n = htobe32(static_cast<uint32_t>(m_numberOfFields));
-        prefix.write(reinterpret_cast<const char *>(&n), sizeof(uint32_t));
+    } else if (m_numberOfFields > 0xFFFF) { // LCOV_EXCL_LINE
+        // no test case due to performance reasons
+        const uint8_t pairs = static_cast<uint8_t>(MsgPackConstants::MAP32); // LCOV_EXCL_LINE
+        prefix.write(reinterpret_cast<const char *>(&pairs), sizeof(uint8_t)); // LCOV_EXCL_LINE
+        uint32_t n = htobe32(static_cast<uint32_t>(m_numberOfFields)); // LCOV_EXCL_LINE
+        prefix.write(reinterpret_cast<const char *>(&n), sizeof(uint32_t)); // LCOV_EXCL_LINE
     }
     std::string s{prefix.str() + m_buffer.str()};
     return s;
