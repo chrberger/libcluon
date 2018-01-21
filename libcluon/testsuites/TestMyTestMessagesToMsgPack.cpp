@@ -1448,7 +1448,8 @@ class SetValues {
     void visit(uint32_t, std::string &&, std::string &&, uint32_t &v) noexcept { v = value++; }
 
     template <typename T>
-    void visit(uint32_t &, std::string &&, std::string &&, T &) noexcept {}
+    void visit(uint32_t &, std::string &&, std::string &&, T &) noexcept { // LCOV_EXCL_LINE
+    }
 };
 
 class ValueSummarizer {
@@ -1461,7 +1462,8 @@ class ValueSummarizer {
     void visit(uint32_t, std::string &&, std::string &&, uint32_t &v) noexcept { value += v; }
 
     template <typename T>
-    void visit(uint32_t &, std::string &&, std::string &&, T &) noexcept {}
+    void visit(uint32_t &, std::string &&, std::string &&, T &) noexcept { // LCOV_EXCL_LINE
+    }
 };
 
 TEST_CASE("Testing more than 0xF and less than 0xFFFF fields.") {
