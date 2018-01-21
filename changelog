@@ -1,3 +1,9 @@
+libcluon (0.0.35) xenial; urgency=low
+
+  * Improving test coverage
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 21 Jan 2018 17:54:11 +0100
+
 libcluon (0.0.34) xenial; urgency=low
 
   * Improved test cases
