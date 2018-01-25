@@ -172,6 +172,8 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cluon/any/any.hpp" DESTINA
 # Install message specification files.
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd" DESTINATION share/${PROJECT_NAME} COMPONENT lib${PROJECT_NAME})
 install(FILES "${CMAKE_BINARY_DIR}/cluonDataStructures.proto" DESTINATION share/${PROJECT_NAME} COMPONENT lib${PROJECT_NAME})
+# Install Findlibcluon.cmake.
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/libcluonConfig.cmake" DESTINATION lib/${CMAKE_LIBRARY_ARCHITECTURE}/cmake/lib${PROJECT_NAME} COMPONENT lib${PROJECT_NAME})
 
 ###############################################################################
 # Check superfluous include directives.
