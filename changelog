@@ -1,3 +1,9 @@
+libcluon (0.0.37) xenial; urgency=low
+
+  * Fix in libcluonConfig.cmake
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 25 Jan 2018 21:24:25 +0100
+
 libcluon (0.0.36) xenial; urgency=low
 
   * Adding libcluonConfig.cmake to automatically find libcluon on Linux/x86_64 systems
