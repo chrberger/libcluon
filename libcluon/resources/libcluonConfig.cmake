@@ -1,5 +1,4 @@
-# OpenDaVINCI - Portable middleware for distributed components.
-# Copyright (C) 2017  Christian Berger
+# Copyright (C) 2018  Christian Berger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
