@@ -26,6 +26,13 @@ FIND_LIBRARY(CLUON_LIBRARY
                     /usr/local/lib
                     /usr/local/lib64)
 
+FIND_LIBRARY(CLUON_STATIC_LIBRARY
+            NAMES   cluon-static
+            PATHS   /usr/lib
+                    /usr/lib64
+                    /usr/local/lib
+                    /usr/local/lib64)
+
 IF("${CLUON_INCLUDE_DIR}" STREQUAL "")
     MESSAGE(FATAL_ERROR "Could not find libcluon.")
 ELSE()
@@ -39,10 +46,11 @@ FIND_PACKAGE (Threads REQUIRED)
 ###########################################################################
 # Set linking libraries.
 SET(CLUON_LIBRARIES ${CLUON_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+SET(CLUON_STATIC_LIBRARIES ${CLUON_STATIC_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 SET(CLUON_INCLUDE_DIRS ${CLUON_INCLUDE_DIR})
 
 ###########################################################################
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(libcluon DEFAULT_MSG CLUON_LIBRARY CLUON_INCLUDE_DIR)
-MARK_AS_ADVANCED(CLUON_INCLUDE_DIR CLUON_LIBRARY)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(libcluon DEFAULT_MSG CLUON_LIBRARY CLUON_STATIC_LIBRARY CLUON_INCLUDE_DIR)
+MARK_AS_ADVANCED(CLUON_INCLUDE_DIR CLUON_LIBRARY CLUON_STATIC_LIBRARY)
 

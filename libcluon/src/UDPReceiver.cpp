@@ -99,7 +99,7 @@ UDPReceiver::UDPReceiver(
 
 #ifdef WIN32
         if (m_socket < 0) {
-            std::cerr << "[cluon::UDPSender] Error while creating socket: " << WSAGetLastError() << std::endl;
+            std::cerr << "[cluon::UDPReceiver] Error while creating socket: " << WSAGetLastError() << std::endl;
             WSACleanup();
         }
 #endif
@@ -183,7 +183,7 @@ UDPReceiver::~UDPReceiver() noexcept {
 
 void UDPReceiver::closeSocket(int errorCode) noexcept {
     if (0 != errorCode) {
-        std::cerr << "[cluon::UDPSender] Failed to perform socket operation: ";
+        std::cerr << "[cluon::UDPReceiver] Failed to perform socket operation: ";
 #ifdef WIN32
         std::cerr << errorCode << std::endl;
 #else
@@ -197,7 +197,7 @@ void UDPReceiver::closeSocket(int errorCode) noexcept {
             auto retVal = ::setsockopt(m_socket, IPPROTO_IP, IP_DROP_MEMBERSHIP, reinterpret_cast<char *>(&m_mreq), sizeof(m_mreq)); // NOLINT
             // clang-format on
             if (0 > retVal) {                                                                       // LCOV_EXCL_LINE
-                std::cerr << "[cluon::UDPSender] Failed to drop multicast membership" << std::endl; // LCOV_EXCL_LINE
+                std::cerr << "[cluon::UDPReceiver] Failed to drop multicast membership" << std::endl; // LCOV_EXCL_LINE
             }
         }
 
