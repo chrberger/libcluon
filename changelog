@@ -1,3 +1,9 @@
+libcluon (0.0.38) xenial; urgency=low
+
+  * Finding libcluon-static explicitly
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 30 Jan 2018 11:22:06 +0100
+
 libcluon (0.0.37) xenial; urgency=low
 
   * Fix in libcluonConfig.cmake
