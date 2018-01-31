@@ -248,6 +248,12 @@ class LIBCLUON_API GenericMessage {
     GenericMessage(const GenericMessage &) = default;
     GenericMessage &operator=(const GenericMessage &) = default;
 
+   public:
+    uint32_t ID();
+    const std::string ShortName();
+    const std::string LongName();
+
+   public:
     /**
      * This methods creates this GenericMessage from a given concrete message.
      *

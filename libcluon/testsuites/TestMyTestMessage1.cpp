@@ -399,6 +399,11 @@ message MyMessageA [id = 30003] {
 
     cluon::GenericMessage gm;
     gm.createFrom(m, listOfMessages);
+
+    REQUIRE(30003 == gm.ID());
+    REQUIRE("MyMessageA" == gm.ShortName());
+    REQUIRE("MyMessageA" == gm.LongName());
+
     // Set values in GenericMessage from ProtoDecoder.
     gm.accept(protoDecoder);
 
@@ -498,6 +503,11 @@ message example.MyTestMessage1 [id = 30001] {
 
     cluon::GenericMessage gm;
     gm.createFrom(m, listOfMessages);
+
+    REQUIRE(30001 == gm.ID());
+    REQUIRE("MyTestMessage1" == gm.ShortName());
+    REQUIRE("example.MyTestMessage1" == gm.LongName());
+
     // Set values in GenericMessage from ProtoDecoder.
     gm.accept(protoDecoder);
 

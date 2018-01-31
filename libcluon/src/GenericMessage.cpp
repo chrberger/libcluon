@@ -17,6 +17,10 @@
 
 #include "cluon/GenericMessage.hpp"
 
+#include <istream>
+#include <iterator>
+#include <regex>
+
 namespace cluon {
 
 void GenericMessage::GenericMessageVisitor::preVisit(uint32_t id,
@@ -212,6 +216,23 @@ std::map<uint32_t, linb::any> GenericMessage::GenericMessageVisitor::intermediat
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+uint32_t GenericMessage::ID() {
+    return m_metaMessage.messageIdentifier();
+}
+
+const std::string GenericMessage::ShortName() {
+    std::string tmp{LongName()};
+    std::replace(tmp.begin(), tmp.end(), '.', ' ');
+    std::istringstream sstr{tmp};
+    std::vector<std::string> tokens{std::istream_iterator<std::string>(sstr), std::istream_iterator<std::string>()};
+
+    return tokens.back();
+}
+
+const std::string GenericMessage::LongName() {
+    return m_metaMessage.packageName() + (!m_metaMessage.packageName().empty() ? "." : "") + m_metaMessage.messageName();
+}
 
 void GenericMessage::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
