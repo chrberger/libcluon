@@ -80,7 +80,7 @@ MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
     } else if (static_cast<uint8_t>(MsgPackConstants::MAP16) == T) {
         formatFamily = MsgPackConstants::MAP_FORMAT;
     } else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) { // LCOV_EXCL_LINE
-        formatFamily = MsgPackConstants::MAP_FORMAT; // LCOV_EXCL_LINE
+        formatFamily = MsgPackConstants::MAP_FORMAT;                 // LCOV_EXCL_LINE
     }
 
     return formatFamily;
@@ -204,7 +204,7 @@ FromMsgPackVisitor::readKeyValues(std::istream &in) noexcept {
                 uint16_t tokens{0};
                 in.read(reinterpret_cast<char *>(&tokens), sizeof(uint16_t));
                 tokensToRead = be16toh(tokens);
-            } else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) { // LCOV_EXCL_LINE
+            } else if (static_cast<uint8_t>(MsgPackConstants::MAP32) == T) {        // LCOV_EXCL_LINE
                 in.read(reinterpret_cast<char *>(&tokensToRead), sizeof(uint32_t)); // LCOV_EXCL_LINE
                 tokensToRead = be32toh(tokensToRead);                               // LCOV_EXCL_LINE
             }

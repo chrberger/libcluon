@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/UDPReceiver.hpp"
+#include "cluon/OD4Session.hpp"
 #include "cluon/EnvelopeToJSON.hpp"
 
 #include "argh/argh.h"
@@ -38,9 +38,6 @@ int main(int argc, char **argv) {
         std::cerr << "Examples: " << PROGRAM << " 111" << std::endl;
         std::cerr << "          " << PROGRAM << " --odvd=MyMessages.odvd 111" << std::endl;
     } else {
-        const std::string ADDRESS{"225.0.0." + CID};
-        constexpr uint16_t PORT{12175};
-
         std::string odvdFile;
         commandline({"--odvd"}) >> odvdFile;
 
@@ -53,15 +50,14 @@ int main(int argc, char **argv) {
             }
         }
 
-        cluon::UDPReceiver receiver(
-            ADDRESS, PORT,
-            [&e2J = envelopeToJSON](std::string && data, std::string &&, std::chrono::system_clock::time_point &&) noexcept {
-                std::cout << e2J.getJSONFromProtoEncodedEnvelope(data) << std::endl;
+        cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(CID)),
+            [&e2J = envelopeToJSON](cluon::data::Envelope &&envelope) noexcept {
+                std::cout << e2J.getJSONFromEnvelope(envelope) << std::endl;
                 std::cout.flush();
             });
 
         using namespace std::literals::chrono_literals; // NOLINT
-        while (receiver.isRunning()) {
+        while (od4Session.isRunning()) {
             std::this_thread::sleep_for(1s);
         }
         retVal = 0;

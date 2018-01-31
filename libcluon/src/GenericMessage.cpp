@@ -231,7 +231,8 @@ const std::string GenericMessage::ShortName() {
 }
 
 const std::string GenericMessage::LongName() {
-    return m_metaMessage.packageName() + (!m_metaMessage.packageName().empty() ? "." : "") + m_metaMessage.messageName();
+    return m_metaMessage.packageName() + (!m_metaMessage.packageName().empty() ? "." : "")
+           + m_metaMessage.messageName();
 }
 
 void GenericMessage::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {

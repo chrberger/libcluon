@@ -196,7 +196,7 @@ void UDPReceiver::closeSocket(int errorCode) noexcept {
             // clang-format off
             auto retVal = ::setsockopt(m_socket, IPPROTO_IP, IP_DROP_MEMBERSHIP, reinterpret_cast<char *>(&m_mreq), sizeof(m_mreq)); // NOLINT
             // clang-format on
-            if (0 > retVal) {                                                                       // LCOV_EXCL_LINE
+            if (0 > retVal) {                                                                         // LCOV_EXCL_LINE
                 std::cerr << "[cluon::UDPReceiver] Failed to drop multicast membership" << std::endl; // LCOV_EXCL_LINE
             }
         }

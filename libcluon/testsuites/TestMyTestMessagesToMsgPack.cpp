@@ -1432,4 +1432,3 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
                   []() {});
     std::cout << buffer.str() << std::endl;
 }
-
