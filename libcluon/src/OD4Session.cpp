@@ -18,6 +18,7 @@
 #include "cluon/OD4Session.hpp"
 #include "cluon/FromProtoVisitor.hpp"
 
+#include <array>
 #include <iostream>
 #include <sstream>
 
