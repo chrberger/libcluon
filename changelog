@@ -1,3 +1,9 @@
+libcluon (0.0.39) xenial; urgency=low
+
+  * Adding an interface to OpenDaVINCIv4 sessions
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 01 Feb 2018 21:50:10 +0100
+
 libcluon (0.0.38) xenial; urgency=low
 
   * Finding libcluon-static explicitly
