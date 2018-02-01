@@ -60,7 +60,7 @@ class LIBCLUON_API OD4Session {
 
         cluon::data::Envelope envelope;
         {
-            envelope.dataType(message.ID());
+            envelope.dataType(static_cast<int32_t>(message.ID()));
             message.accept(protoEncoder);
             envelope.serializedData(protoEncoder.encodedData());
             //            envelope.sent(now);
