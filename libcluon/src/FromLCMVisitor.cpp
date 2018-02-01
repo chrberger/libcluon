@@ -67,8 +67,7 @@ void FromLCMVisitor::preVisit(uint32_t id, const std::string &shortName, const s
 
 void FromLCMVisitor::postVisit() noexcept {
     if ((0 != m_expectedHash) && (m_expectedHash != hash())) {
-        std::cerr << "[cluon::FromLCMVisitor] Hash mismatch - decoding might have failed"
-                  << std::endl; // LCOV_EXCL_LINE
+        std::cerr << "[cluon::FromLCMVisitor] Hash mismatch - decoding might have failed" << std::endl; // LCOV_EXCL_LINE
     }
 }
 
