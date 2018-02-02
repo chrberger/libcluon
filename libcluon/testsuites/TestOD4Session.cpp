@@ -17,8 +17,8 @@
 
 #include "catch.hpp"
 
-#include "cluon/OD4Session.hpp"
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/OD4Session.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
 #include <atomic>
@@ -43,7 +43,10 @@ TEST_CASE("Create OD4 session and transmit data.") {
     cluon::data::Envelope reply;
     REQUIRE(0 == reply.dataType());
 
-    cluon::OD4Session od4(79, [&reply, &replyReceived](cluon::data::Envelope &&envelope){ reply = envelope; replyReceived = true; });
+    cluon::OD4Session od4(79, [&reply, &replyReceived](cluon::data::Envelope &&envelope) {
+        reply         = envelope;
+        replyReceived = true;
+    });
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
 
@@ -69,4 +72,3 @@ TEST_CASE("Create OD4 session and transmit data.") {
     REQUIRE(1 == tsResponse.seconds());
     REQUIRE(2 == tsResponse.microseconds());
 }
-
