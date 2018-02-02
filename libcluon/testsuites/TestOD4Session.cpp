@@ -26,6 +26,18 @@
 #include <sstream>
 #include <thread>
 
+TEST_CASE("Create OD4 session without lambda.") {
+    cluon::OD4Session od4(78);
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    cluon::data::TimeStamp tsRequest;
+    tsRequest.seconds(1).microseconds(2);
+    od4.send(tsRequest);
+}
+
 TEST_CASE("Create OD4 session and transmit data.") {
     std::atomic<bool> replyReceived{false};
     cluon::data::Envelope reply;
