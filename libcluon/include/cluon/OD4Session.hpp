@@ -18,6 +18,7 @@
 #ifndef OD4SESSION_HPP
 #define OD4SESSION_HPP
 
+#include "cluon/Time.hpp"
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/UDPSender.hpp"
@@ -52,10 +53,23 @@ class LIBCLUON_API OD4Session {
     OD4Session &operator=(OD4Session &&) = delete;
 
    public:
+    /**
+     * Constructor.
+     *
+     * @param CID OpenDaVINCI v4 session identifier [1 .. 254]
+     * @param delegate Function to call on newly arriving Envelopes.
+     */
     OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&envelope)> delegate = nullptr) noexcept;
 
+    /**
+     * This method will send a given message to this OpenDaVINCI v4 session.
+     *
+     * @param message Message to be sent.
+     * @param sampleTimeStamp Time point when this sample to be sent was captured (default = sent time point).
+     * @param senderStamp Optional sender stamp (default = 0).
+     */
     template <typename T>
-    void send(T &message, uint32_t senderStamp = 0) noexcept {
+    void send(T &message, const cluon::data::TimeStamp &sampleTimeStamp = cluon::data::TimeStamp(), uint32_t senderStamp = 0) noexcept {
         cluon::ToProtoVisitor protoEncoder;
 
         cluon::data::Envelope envelope;
@@ -63,20 +77,29 @@ class LIBCLUON_API OD4Session {
             envelope.dataType(static_cast<int32_t>(message.ID()));
             message.accept(protoEncoder);
             envelope.serializedData(protoEncoder.encodedData());
-            //            envelope.sent(now);
-            //            envelope.sampleTimeStamp(now);
+            envelope.sent(cluon::now());
+            envelope.sampleTimeStamp((0 == (sampleTimeStamp.seconds() + sampleTimeStamp.microseconds())) ? envelope.sent() : sampleTimeStamp);
             envelope.senderStamp(senderStamp);
         }
 
-        sendInternal(std::move(envelope));
+        sendInternal(std::move(serializeAsOD4Container(std::move(envelope))));
     }
 
    public:
     bool isRunning() noexcept;
 
+    /**
+     * This method transforms a given Envelope to a string representation to be
+     * sent to an OpenDaVINCI session.
+     *
+     * @param envelope Envelope with payload to be sent.
+     * @return String representation of the Envelope to be sent to OpenDaVINCI v4.
+     */
+    std::string serializeAsOD4Container(cluon::data::Envelope &&envelope) noexcept;
+
    private:
     void callback(std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) noexcept;
-    void sendInternal(cluon::data::Envelope &&envelope) noexcept;
+    void sendInternal(std::string &&dataToSend) noexcept;
 
    private:
     cluon::UDPReceiver m_receiver;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/UDPReceiver.hpp"
+#include "cluon/OD4Session.hpp"
 
 #include <iostream>
 #include <string>
@@ -29,19 +29,16 @@ int main(int argc, char **argv) {
                   << " dumps Containers received from an OpenDaVINCI v4 session to stdout." << std::endl;
         std::cerr << "Usage:   " << PROGRAM << " CID" << std::endl;
         std::cerr << "Example: " << PROGRAM << " 111" << std::endl;
-    } else {
-        const std::string ADDRESS{"225.0.0." + std::string(argv[1])}; // NOLINT
-        constexpr uint16_t PORT{12175};
-
-        cluon::UDPReceiver receiver(
-            ADDRESS, PORT,
-            [](std::string && data, std::string &&, std::chrono::system_clock::time_point &&) noexcept {
-                std::cout << data;
+    }
+    else {
+        cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(std::string(argv[1]))),
+            [&od4 = od4Session](cluon::data::Envelope &&envelope) noexcept {
+                std::cout << od4.serializeAsOD4Container(std::move(envelope));
                 std::cout.flush();
             });
 
         using namespace std::literals::chrono_literals; // NOLINT
-        while (receiver.isRunning()) {
+        while (od4Session.isRunning()) {
             std::this_thread::sleep_for(1s);
         }
         retVal = 0;

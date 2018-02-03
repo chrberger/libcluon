@@ -17,6 +17,7 @@
 
 #include "cluon/OD4Session.hpp"
 #include "cluon/EnvelopeToJSON.hpp"
+#include "cluon/Time.hpp"
 
 #include "argh/argh.h"
 
@@ -52,6 +53,7 @@ int main(int argc, char **argv) {
 
         cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(CID)),
             [&e2J = envelopeToJSON](cluon::data::Envelope &&envelope) noexcept {
+                envelope.received(cluon::now());
                 std::cout << e2J.getJSONFromEnvelope(envelope) << std::endl;
                 std::cout.flush();
             });

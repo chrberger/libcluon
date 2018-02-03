@@ -83,7 +83,7 @@ void OD4Session::callback(std::string &&data,
     }
 }
 
-void OD4Session::sendInternal(cluon::data::Envelope &&envelope) noexcept {
+std::string OD4Session::serializeAsOD4Container(cluon::data::Envelope &&envelope) noexcept {
     std::string dataToSend;
     {
         cluon::ToProtoVisitor protoEncoder;
@@ -106,6 +106,10 @@ void OD4Session::sendInternal(cluon::data::Envelope &&envelope) noexcept {
         sstr.write(tmp.data(), static_cast<std::streamsize>(tmp.size()));
         dataToSend = sstr.str();
     }
+    return dataToSend;
+}
+
+void OD4Session::sendInternal(std::string &&dataToSend) noexcept {
     m_sender.send(std::move(dataToSend));
 }
 
