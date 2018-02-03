@@ -1,3 +1,9 @@
+libcluon (0.0.40) xenial; urgency=low
+
+  * Added interface to send/receive from OpenDaVINCIv4 sessions
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 03 Feb 2018 23:37:46 +0100
+
 libcluon (0.0.39) xenial; urgency=low
 
   * Adding an interface to OpenDaVINCIv4 sessions
