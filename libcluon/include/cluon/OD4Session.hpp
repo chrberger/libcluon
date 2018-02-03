@@ -82,7 +82,7 @@ class LIBCLUON_API OD4Session {
             envelope.senderStamp(senderStamp);
         }
 
-        sendInternal(std::move(serializeAsOD4Container(std::move(envelope))));
+        sendInternal(serializeAsOD4Container(std::move(envelope)));
     }
 
    public:
