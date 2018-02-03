@@ -32,8 +32,8 @@ int main(int argc, char **argv) {
     }
     else {
         cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(std::string(argv[1]))),
-            [&](cluon::data::Envelope &&envelope) noexcept {
-                std::cout << od4Session.serializeAsOD4Container(std::move(envelope));
+            [](cluon::data::Envelope &&envelope) noexcept {
+                std::cout << cluon::OD4Session::serializeAsOD4Container(std::move(envelope));
                 std::cout.flush();
             });
 

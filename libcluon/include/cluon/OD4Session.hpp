@@ -82,7 +82,7 @@ class LIBCLUON_API OD4Session {
             envelope.senderStamp(senderStamp);
         }
 
-        sendInternal(serializeAsOD4Container(std::move(envelope)));
+        sendInternal(cluon::OD4Session::serializeAsOD4Container(std::move(envelope)));
     }
 
    public:
@@ -95,7 +95,7 @@ class LIBCLUON_API OD4Session {
      * @param envelope Envelope with payload to be sent.
      * @return String representation of the Envelope to be sent to OpenDaVINCI v4.
      */
-    std::string serializeAsOD4Container(cluon::data::Envelope &&envelope) noexcept;
+    static std::string serializeAsOD4Container(cluon::data::Envelope &&envelope) noexcept;
 
    private:
     void callback(std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) noexcept;
