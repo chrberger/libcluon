@@ -156,7 +156,8 @@ cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"argh\//\/\/#inclu
 cd tmp.headeronly && \
     git clone --branch gh-pages --depth 1 git@github.com:chrberger/libcluon.git && \
     cp -r cluon-complete.hpp libcluon/cluon-complete-v${RELEASE_VERSION}.hpp && \
-    cd libcluon && git add -f cluon-complete-v${RELEASE_VERSION}.hpp && git commit -s -m "Updated header-only" && git push origin gh-pages
+    cp -r cluon-complete.hpp libcluon/cluon-complete.hpp && \
+    cd libcluon && git add -f cluon-complete-v${RELEASE_VERSION}.hpp cluon-complete.hpp && git commit -s -m "Updated header-only" && git push origin gh-pages
 
 cd $OLDPWD && rm -fr tmp.headeronly
 
