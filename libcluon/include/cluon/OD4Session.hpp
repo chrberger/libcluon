@@ -77,7 +77,7 @@ class LIBCLUON_API OD4Session {
             envelope.dataType(static_cast<int32_t>(message.ID()));
             message.accept(protoEncoder);
             envelope.serializedData(protoEncoder.encodedData());
-            envelope.sent(cluon::now());
+            envelope.sent(cluon::time::now());
             envelope.sampleTimeStamp((0 == (sampleTimeStamp.seconds() + sampleTimeStamp.microseconds())) ? envelope.sent() : sampleTimeStamp);
             envelope.senderStamp(senderStamp);
         }

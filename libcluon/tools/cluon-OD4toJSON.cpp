@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
         cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(CID)),
             [&e2J = envelopeToJSON](cluon::data::Envelope &&envelope) noexcept {
-                envelope.received(cluon::now());
+                envelope.received(cluon::time::now());
                 std::cout << e2J.getJSONFromEnvelope(envelope) << std::endl;
                 std::cout.flush();
             });

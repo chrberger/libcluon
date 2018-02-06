@@ -22,6 +22,7 @@
 #include <chrono>
 
 namespace cluon {
+namespace time {
 
 /**
  * @return TimeStamp of now.
@@ -47,6 +48,7 @@ inline cluon::data::TimeStamp now() noexcept {
     return now;
 }
 
+} // namespace time
 } // namespace cluon
 
 #endif

@@ -23,12 +23,12 @@
 #include <thread>
 
 TEST_CASE("Test Time.") {
-    cluon::data::TimeStamp before{cluon::now()};
+    cluon::data::TimeStamp before{cluon::time::now()};
 
     using namespace std::literals::chrono_literals; // NOLINT
     std::this_thread::sleep_for(1s);
 
-    cluon::data::TimeStamp after{cluon::now()};
+    cluon::data::TimeStamp after{cluon::time::now()};
 
     REQUIRE((after.seconds()+after.microseconds()) > (before.seconds()+before.microseconds()));
 }
