@@ -28,7 +28,7 @@ namespace cluon {
  * @return Extract a given Envelope's payload into the desired type.
  */
 template<typename T>
-inline T extractPayloadFromEnvelope(cluon::data::Envelope &&envelope) noexcept {
+inline T extractMessage(cluon::data::Envelope &&envelope) noexcept {
     cluon::FromProtoVisitor decoder;
 
     std::stringstream sstr(envelope.serializedData());
