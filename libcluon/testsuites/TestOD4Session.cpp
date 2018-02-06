@@ -17,6 +17,7 @@
 
 #include "catch.hpp"
 
+#include "cluon/Envelope.hpp"
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/OD4Session.hpp"
 #include "cluon/cluonDataStructures.hpp"
@@ -60,15 +61,12 @@ TEST_CASE("Create OD4 session and transmit data.") {
     do { std::this_thread::sleep_for(1ms); } while (!replyReceived);
 
     REQUIRE(reply.dataType() == cluon::data::TimeStamp::ID());
-    std::stringstream sstr{reply.serializedData()};
-    cluon::FromProtoVisitor decoder;
-    decoder.decodeFrom(sstr);
 
     cluon::data::TimeStamp tsResponse;
     REQUIRE(0 == tsResponse.seconds());
     REQUIRE(0 == tsResponse.microseconds());
 
-    tsResponse.accept(decoder);
+    tsResponse = cluon::extractPayloadFromEnvelope<cluon::data::TimeStamp>(std::move(reply));
     REQUIRE(1 == tsResponse.seconds());
     REQUIRE(2 == tsResponse.microseconds());
 }
