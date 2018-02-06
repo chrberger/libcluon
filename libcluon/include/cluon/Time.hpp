@@ -37,9 +37,9 @@ inline cluon::data::TimeStamp now() noexcept {
         typedef std::chrono::duration<int32_t> seconds_type;
         typedef std::chrono::duration<int64_t, std::micro> microseconds_type;
 
-        auto duration = tp.time_since_epoch();
-        seconds_type s = std::chrono::duration_cast<seconds_type>(duration);
-        microseconds_type us = std::chrono::duration_cast<microseconds_type>(duration);
+        auto duration                = tp.time_since_epoch();
+        seconds_type s               = std::chrono::duration_cast<seconds_type>(duration);
+        microseconds_type us         = std::chrono::duration_cast<microseconds_type>(duration);
         microseconds_type partial_us = us - std::chrono::duration_cast<microseconds_type>(s);
 
         now.seconds(s.count()).microseconds(static_cast<int32_t>(partial_us.count()));

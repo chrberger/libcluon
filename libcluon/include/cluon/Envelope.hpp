@@ -18,8 +18,8 @@
 #ifndef ENVELOPE_HPP
 #define ENVELOPE_HPP
 
-#include "cluon/cluonDataStructures.hpp"
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/cluonDataStructures.hpp"
 #include <sstream>
 
 namespace cluon {
@@ -27,7 +27,7 @@ namespace cluon {
 /**
  * @return Extract a given Envelope's payload into the desired type.
  */
-template<typename T>
+template <typename T>
 inline T extractMessage(cluon::data::Envelope &&envelope) noexcept {
     cluon::FromProtoVisitor decoder;
 

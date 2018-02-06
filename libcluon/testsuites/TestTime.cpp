@@ -30,5 +30,5 @@ TEST_CASE("Test Time.") {
 
     cluon::data::TimeStamp after{cluon::time::now()};
 
-    REQUIRE((after.seconds()+after.microseconds()) > (before.seconds()+before.microseconds()));
+    REQUIRE((after.seconds() + after.microseconds()) > (before.seconds() + before.microseconds()));
 }

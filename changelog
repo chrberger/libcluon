@@ -1,3 +1,9 @@
+libcluon (0.0.41) xenial; urgency=low
+
+  * cluon::time::now() and cluon::extractMessage<T>(cluon::data::Envelope&&) functions added
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 06 Feb 2018 18:52:12 +0100
+
 libcluon (0.0.40) xenial; urgency=low
 
   * Added interface to send/receive from OpenDaVINCIv4 sessions
