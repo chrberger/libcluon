@@ -26,7 +26,7 @@ libcluon is a small and efficient library written in modern C++ library to _glue
 
 
 ## Features
-* Available as [header-only, single-file distribution](https://chrberger.github.io/libcluon/cluon-complete.hpp) - just drop in your project, `#include "cluon-complete.hpp"`, and compile with modern C++ compiler (C++14 or newer)
+* Available as [header-only, single-file distribution](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) - just drop in your project, `#include "cluon-complete.hpp"`, and compile with modern C++ compiler (C++14 or newer)
 * Written in highly portable and high quality C++14
 * Message compiler produces fully self-contained messages that do only depend on C++14 - external libraries are not needed allowing easy embedding into existing projects
 * Native implementation of [Protobuf](https://developers.google.com/protocol-buffers/) for data serialization & deserialization: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessagesToProto.cpp)
