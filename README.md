@@ -13,6 +13,8 @@
 
 libcluon is a small and efficient library written in modern C++ library to _glue_ distributed software components together - in a _clever_ way - simply: cluon. Its name is inspired by gluon, an [elementary particle acting as exchange particle](https://en.wikipedia.org/wiki/Gluon).
 
+libcluon is available as single-file, header-only library - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"`, and compile your project with a modern C++ compiler (C++14 or newer)
+
 ## Table of Contents
 * [Features](#features)
 * [Dependencies](#dependencies)
@@ -27,6 +29,7 @@ libcluon is a small and efficient library written in modern C++ library to _glue
 
 ## Features
 * Written in highly portable and high quality C++14
+* **Available as header-only, single-file distribution - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"`, and compile your project with a modern C++ compiler (C++14 or newer)**
 * Message compiler produces fully self-contained messages that do only depend on C++14 - external libraries are not needed allowing easy embedding into existing projects
 * Native implementation of [Protobuf](https://developers.google.com/protocol-buffers/) for data serialization & deserialization: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessagesToProto.cpp)
 * Native implementation of [LCM](http://lcm-proj.github.io/type_specification.html)/[ZCM](http://zerocm.github.io/zcm/) for data serialization & deserialization: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessagesToLCM.cpp)
@@ -40,15 +43,18 @@ libcluon is a small and efficient library written in modern C++ library to _glue
 
 
 ## Dependencies
-All you need is a C++14-compliant compiler (we are testing with Clang 5.0, GCC 5.4, GCC 6.0, GCC 7.2, Xcode 9.1, and Visual Studio 14 (MSVC 19.0)) as the project ships the following dependencies as part of the source distribution:
+No dependencies! All you need is a C++14-compliant compiler (we are testing with Clang 5.0, GCC 5.4, GCC 6.0, GCC 7.2, Xcode 9.1, and Visual Studio 14 (MSVC 19.0)) as the project ships the following dependencies as part of the source distribution:
 
-* [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.0.1) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/buildtools/xUnit)
+* [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.1.1) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/buildtools/xUnit)
 * [kainjow/Mustache v3.1](https://github.com/kainjow/Mustache/releases/tag/v3.1) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/Mustache)
 * [thelink2012/any](https://github.com/thelink2012/any) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/cluon/any)
 * [adishavit/argh v1.2.0](https://github.com/adishavit/argh/releases/tag/v1.2.0) - [![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/argh)
 * [yhirose/cpp-peglib](https://github.com/yhirose/cpp-peglib) - [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/cpp-peglib)
 
 ## Installation
+### Installation as single-file, header-only library
+libcluon is provided as header-only, single-file library as well - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"` where you want to use libcluon, and compile your project with a modern C++ compiler (C++14 or newer)
+
 ### Installation on Ubuntu 16.04 LTS
 We are providing pre-compiled binaries for Ubuntu 16.04 LTS (Xenial Xerus) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
 
@@ -122,7 +128,6 @@ We are happy to receive your PRs to accelerate libcluon's development; before co
 
 
 ## License
-
 * This project is released under the terms of the GNU GPLv3 License - [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg
 )](https://www.gnu.org/licenses/gpl-3.0.txt)
 * The auto-generated code for libcluon.js is released under the terms of the MIT License - [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
