@@ -101,8 +101,8 @@ cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 #ifndef IMPLEMENTATIONS_FOR_MESSAGES
 #define IMPLEMENTATIONS_FOR_MESSAGES
 EOF
-docker run --rm -v $PWD/libcluon/resources/cluonDataStructures.odvd:/opt/cluonDataStructures.odvd chrberger/cluon cluon-msc --cpp-sources /opt/cluonDataStructures.odvd >> tmp.headeronly/cluon-complete.hpp
-cat <<EOF >> tmp.headeronly/cluon-complete.hpp
+docker run --rm -v $PWD/libcluon/resources/cluonDataStructures.odvd:/opt/cluonDataStructures.odvd chrberger/cluon cluon-msc --cpp-sources /opt/cluonDataStructures.odvd >> tmp.headeronly/cluon-complete.cpp
+cat <<EOF >> tmp.headeronly/cluon-complete.cpp
 #endif
 EOF
 
@@ -134,7 +134,6 @@ for i in \
 cat libcluon/include/$i >> tmp.headeronly/cluon-complete.hpp
 done
 
-# TODO: Inline!
 cat <<EOF >> tmp.headeronly/cluon-complete.cpp
 #ifndef BEGIN_HEADER_ONLY_IMPLEMENTATION
 #define BEGIN_HEADER_ONLY_IMPLEMENTATION
@@ -162,6 +161,9 @@ done
 cat <<EOF >> tmp.headeronly/cluon-complete.cpp
 #endif
 EOF
+
+# Making method definitions inline.
+cat tmp.headeronly/cluon-complete.cpp | sed -e 's/\(^[^\ \}\#\/\\].*::.*\)/inline\ \1/g' >> tmp.headeronly/cluon-complete.hpp
 
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"cluon\//\/\/#include\ \"cluon\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"cpp-peglib\//\/\/#include\ \"cpp-peglib\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
