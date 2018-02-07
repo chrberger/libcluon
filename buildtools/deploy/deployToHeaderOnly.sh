@@ -96,7 +96,15 @@ cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 EOF
 
 docker pull chrberger/cluon
-docker run --rm -v $PWD/libcluon/resources/cluonDataStructures.odvd:/opt/cluonDataStructures.odvd chrberger/cluon cluon-msc --cpp-headers --cpp-sources /opt/cluonDataStructures.odvd >> tmp.headeronly/cluon-complete.hpp
+docker run --rm -v $PWD/libcluon/resources/cluonDataStructures.odvd:/opt/cluonDataStructures.odvd chrberger/cluon cluon-msc --cpp-headers /opt/cluonDataStructures.odvd >> tmp.headeronly/cluon-complete.hpp
+cat <<EOF >> tmp.headeronly/cluon-complete.hpp
+#ifndef IMPLEMENTATIONS_FOR_MESSAGES
+#define IMPLEMENTATIONS_FOR_MESSAGES
+EOF
+docker run --rm -v $PWD/libcluon/resources/cluonDataStructures.odvd:/opt/cluonDataStructures.odvd chrberger/cluon cluon-msc --cpp-sources /opt/cluonDataStructures.odvd >> tmp.headeronly/cluon-complete.hpp
+cat <<EOF >> tmp.headeronly/cluon-complete.hpp
+#endif
+EOF
 
 for i in \
     cluon/Time.hpp \
@@ -126,6 +134,11 @@ for i in \
 cat libcluon/include/$i >> tmp.headeronly/cluon-complete.hpp
 done
 
+# TODO: Inline!
+cat <<EOF >> tmp.headeronly/cluon-complete.cpp
+#ifndef BEGIN_HEADER_ONLY_IMPLEMENTATION
+#define BEGIN_HEADER_ONLY_IMPLEMENTATION
+EOF
 for i in \
     MetaMessage.cpp \
     MessageParser.cpp \
@@ -144,8 +157,11 @@ for i in \
     OD4Session.cpp \
     ToODVDVisitor.cpp \
     EnvelopeToJSON.cpp; do
-cat libcluon/src/$i >> tmp.headeronly/cluon-complete.hpp
+cat libcluon/src/$i >> tmp.headeronly/cluon-complete.cpp
 done
+cat <<EOF >> tmp.headeronly/cluon-complete.cpp
+#endif
+EOF
 
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"cluon\//\/\/#include\ \"cluon\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"cpp-peglib\//\/\/#include\ \"cpp-peglib\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
@@ -153,10 +169,17 @@ cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"argh\//\/\/#inclu
 
 ################################################################################
 
+x=5
+while [ $x -gt 0 ]; do
+    echo "Still waiting (${x}s) before pushing headeronly - stop me now if not wanted..."
+    sleep 1
+    x=$(( $x - 1 ))
+done
+
 cd tmp.headeronly && \
     git clone --branch gh-pages --depth 1 git@github.com:chrberger/libcluon.git && \
-    cp -r cluon-complete.hpp libcluon/cluon-complete-v${RELEASE_VERSION}.hpp && \
-    cp -r cluon-complete.hpp libcluon/cluon-complete.hpp && \
+    cp -r cluon-complete.hpp libcluon/headeronly/cluon-complete-v${RELEASE_VERSION}.hpp && \
+    cp -r cluon-complete.hpp libcluon/headeronly/cluon-complete.hpp && \
     cd libcluon && git add -f cluon-complete-v${RELEASE_VERSION}.hpp cluon-complete.hpp && git commit -s -m "Updated header-only" && git push origin gh-pages
 
 cd $OLDPWD && rm -fr tmp.headeronly
