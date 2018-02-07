@@ -121,8 +121,9 @@ make install
 * [API Documentation](https://chrberger.github.io/libcluon/)
 * [How to send data via a UDP socket](docs/cluon-UDPSender.md)
 * [How to receive data via a UDP socket](docs/cluon-UDPReceiver.md)
-* [Example: Sending and receiving data via UDP (online C++ compiler)](https://wandbox.org/permlink/3bWexUDo6OqxDCBE)
-* [Example: Timestamping (online C++ compiler)](https://wandbox.org/permlink/HVLDReiIrXJxhMZd)
+* [Example: Timestamping (using an online C++ compiler)](https://wandbox.org/permlink/HVLDReiIrXJxhMZd)
+* [Example: Sending and receiving data via UDP (using an online C++ compiler)](https://wandbox.org/permlink/3bWexUDo6OqxDCBE)
+* [Example: Encoding and decoding using libcluon's native Protobuf (using an online C++ compiler)](https://wandbox.org/permlink/7tQ7JJdUmOXpTB5G)
 
 
 ## Contributing
