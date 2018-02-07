@@ -180,9 +180,10 @@ done
 
 cd tmp.headeronly && \
     git clone --branch gh-pages --depth 1 git@github.com:chrberger/libcluon.git && \
+    mkdir -p libcluon/headeronly && \
     cp -r cluon-complete.hpp libcluon/headeronly/cluon-complete-v${RELEASE_VERSION}.hpp && \
     cp -r cluon-complete.hpp libcluon/headeronly/cluon-complete.hpp && \
-    cd libcluon && git add -f cluon-complete-v${RELEASE_VERSION}.hpp cluon-complete.hpp && git commit -s -m "Updated header-only" && git push origin gh-pages
+    cd libcluon && git add -f headeronly/cluon-complete-v${RELEASE_VERSION}.hpp headeronly/cluon-complete.hpp && git commit -s -m "Updated header-only" && git push origin gh-pages
 
 cd $OLDPWD && rm -fr tmp.headeronly
 
