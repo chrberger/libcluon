@@ -22,8 +22,7 @@ MetaMessage::MetaField::MetaFieldDataTypes MetaMessage::MetaField::fieldDataType
     return m_fieldDataType;
 }
 
-MetaMessage::MetaField &
-MetaMessage::MetaField::fieldDataType(const MetaMessage::MetaField::MetaFieldDataTypes &v) noexcept {
+MetaMessage::MetaField &MetaMessage::MetaField::fieldDataType(const MetaMessage::MetaField::MetaFieldDataTypes &v) noexcept {
     m_fieldDataType = v;
     return *this;
 }

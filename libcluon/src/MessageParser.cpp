@@ -29,8 +29,7 @@
 
 namespace cluon {
 
-std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes>
-MessageParser::parse(const std::string &input) {
+std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> MessageParser::parse(const std::string &input) {
     const char *grammarMessageSpecificationLanguage = R"(
         MESSAGES_SPECIFICATION      <- PACKAGE_DECLARATION? MESSAGE_DECLARATION*
         PACKAGE_DECLARATION         <- 'package' PACKAGE_IDENTIFIER ';'

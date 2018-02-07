@@ -188,8 +188,7 @@ std::string FromMsgPackVisitor::readString(std::istream &in) noexcept {
     return retVal;
 }
 
-std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue>
-FromMsgPackVisitor::readKeyValues(std::istream &in) noexcept {
+std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> FromMsgPackVisitor::readKeyValues(std::istream &in) noexcept {
     std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> keyValues;
     while (in.good()) {
         uint8_t c = static_cast<uint8_t>(in.get());
