@@ -1,3 +1,9 @@
+libcluon (0.0.43) xenial; urgency=low
+
+  * Fix for MsgPack encoding/decoding
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 08 Feb 2018 13:39:57 +0100
+
 libcluon (0.0.42) xenial; urgency=low
 
   * single-file, header-only distribution of libcluon
