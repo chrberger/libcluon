@@ -31,7 +31,7 @@ if [ -d api ]; then
     git clone --branch gh-pages --depth 1 git@github.com:chrberger/libcluon.git && \
     cd libcluon && \
     git checkout gh-pages && \
-    git rm -rf * && git reset -- alpine && git checkout -- alpine && git commit -m "Cleaning" -a -s && git push origin gh-pages && cp ../html/* . && touch .nojekyll && git add * && git add .nojekyll && git commit -m "Documentation for v$RELEASE_VERSION" -a -s && git push origin gh-pages && \
+    git rm -rf * && git reset -- alpine && git checkout -- alpine && git reset -- headeronly && git checkout -- headeronly && git commit -m "Cleaning" -a -s && git push origin gh-pages && cp ../html/* . && touch .nojekyll && git add * && git add .nojekyll && git commit -m "Documentation for v$RELEASE_VERSION" -a -s && git push origin gh-pages && \
     cd ../.. && \
     rm -fr api
 fi
