@@ -212,7 +212,6 @@ std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> FromMsgPackVisitor::r
             while (0 < tokensToRead) {
                 MsgPackKeyValue entry;
                 entry.m_key = readString(in);
-
                 // Read next byte and determine format family.
                 c                    = static_cast<uint8_t>(in.get());
                 entry.m_formatFamily = getFormatFamily(c);
@@ -311,7 +310,12 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
     if (0 < m_keyValues.count(name)) {
         try {
             v = static_cast<int8_t>(linb::any_cast<int64_t>(m_keyValues[name].m_value));
-        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        } catch (const linb::bad_any_cast &) {
+            // A positive value was stored.
+            try {
+                v = static_cast<int8_t>(linb::any_cast<uint64_t>(m_keyValues[name].m_value));
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
         }
     }
 }
@@ -333,7 +337,12 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
     if (0 < m_keyValues.count(name)) {
         try {
             v = static_cast<int16_t>(linb::any_cast<int64_t>(m_keyValues[name].m_value));
-        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        } catch (const linb::bad_any_cast &) {
+            // A positive value was stored.
+            try {
+                v = static_cast<int16_t>(linb::any_cast<uint64_t>(m_keyValues[name].m_value));
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
         }
     }
 }
@@ -355,7 +364,12 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
     if (0 < m_keyValues.count(name)) {
         try {
             v = static_cast<int32_t>(linb::any_cast<int64_t>(m_keyValues[name].m_value));
-        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        } catch (const linb::bad_any_cast &) {
+            // A positive value was stored.
+            try {
+                v = static_cast<int32_t>(linb::any_cast<uint64_t>(m_keyValues[name].m_value));
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
         }
     }
 }
@@ -377,7 +391,12 @@ void FromMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string 
     if (0 < m_keyValues.count(name)) {
         try {
             v = linb::any_cast<int64_t>(m_keyValues[name].m_value);
-        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        } catch (const linb::bad_any_cast &) {
+            // A positive value was stored.
+            try {
+                v = static_cast<int64_t>(linb::any_cast<uint64_t>(m_keyValues[name].m_value));
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
         }
     }
 }

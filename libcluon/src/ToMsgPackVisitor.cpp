@@ -169,7 +169,7 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
 
     encode(m_buffer, name);
-    encodeInt(m_buffer, v);
+    (v < 0) ? encodeInt(m_buffer, v) : encodeUint(m_buffer, static_cast<uint8_t>(v));
     m_numberOfFields++;
 }
 
@@ -187,7 +187,7 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
 
     encode(m_buffer, name);
-    encodeInt(m_buffer, v);
+    (v < 0) ? encodeInt(m_buffer, v) : encodeUint(m_buffer, static_cast<uint16_t>(v));
     m_numberOfFields++;
 }
 
@@ -205,7 +205,7 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
 
     encode(m_buffer, name);
-    encodeInt(m_buffer, v);
+    (v < 0) ? encodeInt(m_buffer, v) : encodeUint(m_buffer, static_cast<uint32_t>(v));
     m_numberOfFields++;
 }
 
@@ -223,7 +223,7 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
 
     encode(m_buffer, name);
-    encodeInt(m_buffer, v);
+    (v < 0) ? encodeInt(m_buffer, v) : encodeUint(m_buffer, static_cast<uint64_t>(v));
     m_numberOfFields++;
 }
 

@@ -20,12 +20,119 @@
 #include "cluon/FromMsgPackVisitor.hpp"
 #include "cluon/ToMsgPackVisitor.hpp"
 #include "cluon/cluon.hpp"
+#include "cluon/cluonDataStructures.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
 #include <iostream>
 #include <limits>
 #include <sstream>
 #include <string>
+
+TEST_CASE("Testing TimeStamp-1.") {
+    cluon::data::TimeStamp ts1;
+    REQUIRE(ts1.seconds() == 0);
+    REQUIRE(ts1.microseconds() == 0);
+
+    ts1.seconds(123).microseconds(456);
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    ts1.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+    REQUIRE(26 == s.size());
+
+    REQUIRE(0x82 == static_cast<uint8_t>(s.at(0)));
+    REQUIRE(0xa7 == static_cast<uint8_t>(s.at(1)));
+    REQUIRE(0x73 == static_cast<uint8_t>(s.at(2)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(3)));
+    REQUIRE(0x63 == static_cast<uint8_t>(s.at(4)));
+    REQUIRE(0x6f == static_cast<uint8_t>(s.at(5)));
+    REQUIRE(0x6e == static_cast<uint8_t>(s.at(6)));
+    REQUIRE(0x64 == static_cast<uint8_t>(s.at(7)));
+    REQUIRE(0x73 == static_cast<uint8_t>(s.at(8)));
+    REQUIRE(0x7b == static_cast<uint8_t>(s.at(9)));
+    REQUIRE(0xac == static_cast<uint8_t>(s.at(10)));
+    REQUIRE(0x6d == static_cast<uint8_t>(s.at(11)));
+    REQUIRE(0x69 == static_cast<uint8_t>(s.at(12)));
+    REQUIRE(0x63 == static_cast<uint8_t>(s.at(13)));
+    REQUIRE(0x72 == static_cast<uint8_t>(s.at(14)));
+    REQUIRE(0x6f == static_cast<uint8_t>(s.at(15)));
+    REQUIRE(0x73 == static_cast<uint8_t>(s.at(16)));
+    REQUIRE(0x65 == static_cast<uint8_t>(s.at(17)));
+    REQUIRE(0x63 == static_cast<uint8_t>(s.at(18)));
+    REQUIRE(0x6f == static_cast<uint8_t>(s.at(19)));
+    REQUIRE(0x6e == static_cast<uint8_t>(s.at(20)));
+    REQUIRE(0x64 == static_cast<uint8_t>(s.at(21)));
+    REQUIRE(0x73 == static_cast<uint8_t>(s.at(22)));
+    REQUIRE(0xcd == static_cast<uint8_t>(s.at(23)));
+    REQUIRE(0x1 == static_cast<uint8_t>(s.at(24)));
+    REQUIRE(0xc8 == static_cast<uint8_t>(s.at(25)));
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    cluon::data::TimeStamp ts2;
+    REQUIRE(ts2.seconds() == 0);
+    REQUIRE(ts2.microseconds() == 0);
+
+    ts2.accept(msgPackDecoder);
+
+    REQUIRE(ts2.seconds() == ts1.seconds());
+    REQUIRE(ts2.microseconds() == ts1.microseconds());
+}
+
+TEST_CASE("Testing TimeStamp-2.") {
+    cluon::data::TimeStamp ts1;
+    REQUIRE(ts1.seconds() == 0);
+    REQUIRE(ts1.microseconds() == 0);
+
+    ts1.seconds(123).microseconds(121);
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    ts1.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    cluon::data::TimeStamp ts2;
+    REQUIRE(ts2.seconds() == 0);
+    REQUIRE(ts2.microseconds() == 0);
+
+    ts2.accept(msgPackDecoder);
+
+    REQUIRE(ts2.seconds() == ts1.seconds());
+    REQUIRE(ts2.microseconds() == ts1.microseconds());
+}
+
+TEST_CASE("Testing TimeStamp-3.") {
+    cluon::data::TimeStamp ts1;
+    REQUIRE(ts1.seconds() == 0);
+    REQUIRE(ts1.microseconds() == 0);
+
+    ts1.seconds(123).microseconds(65321);
+
+    cluon::ToMsgPackVisitor msgPackEncoder;
+    ts1.accept(msgPackEncoder);
+
+    std::string s = msgPackEncoder.encodedData();
+
+    std::stringstream sstr{s};
+    cluon::FromMsgPackVisitor msgPackDecoder;
+    msgPackDecoder.decodeFrom(sstr);
+
+    cluon::data::TimeStamp ts2;
+    REQUIRE(ts2.seconds() == 0);
+    REQUIRE(ts2.microseconds() == 0);
+
+    ts2.accept(msgPackDecoder);
+
+    REQUIRE(ts2.seconds() == ts1.seconds());
+    REQUIRE(ts2.microseconds() == ts1.microseconds());
+}
 
 TEST_CASE("Testing MyTestMessage0.") {
     testdata::MyTestMessage0 tmp;
