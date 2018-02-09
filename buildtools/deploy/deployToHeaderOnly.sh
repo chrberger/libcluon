@@ -134,6 +134,7 @@ for i in \
 cat libcluon/include/$i >> tmp.headeronly/cluon-complete.hpp
 done
 
+
 cat <<EOF >> tmp.headeronly/cluon-complete.cpp
 #ifndef BEGIN_HEADER_ONLY_IMPLEMENTATION
 #define BEGIN_HEADER_ONLY_IMPLEMENTATION
@@ -165,9 +166,33 @@ EOF
 # Making method definitions inline.
 cat tmp.headeronly/cluon-complete.cpp | sed -e 's/\(^[^\ \}\#\/\\].*::.*\)/inline\ \1/g' >> tmp.headeronly/cluon-complete.hpp
 
+cat <<EOF >> tmp.headeronly/cluon-complete.hpp
+#ifdef HAVE_CLUON_MSC
+EOF
+cat libcluon/thirdparty/Mustache/mustache.hpp >> tmp.headeronly/cluon-complete.hpp
+
+for i in \
+    cluon/MetaMessageToCPPTransformator.hpp \
+    cluon/MetaMessageToProtoTransformator.hpp; do
+cat libcluon/include/$i >> tmp.headeronly/cluon-complete.hpp
+done
+
+for i in \
+    MetaMessageToCPPTransformator.cpp \
+    MetaMessageToProtoTransformator.cpp; do
+cat libcluon/src/$i >> tmp.headeronly/cluon-complete.hpp
+done
+
+cat libcluon/tools/cluon-msc.cpp >> tmp.headeronly/cluon-complete.hpp
+
+cat <<EOF >> tmp.headeronly/cluon-complete.hpp
+#endif
+EOF
+
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"cluon\//\/\/#include\ \"cluon\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"cpp-peglib\//\/\/#include\ \"cpp-peglib\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"argh\//\/\/#include\ \"argh\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
+cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"Mustache\//\/\/#include\ \"Mustache\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
 
 ################################################################################
 
