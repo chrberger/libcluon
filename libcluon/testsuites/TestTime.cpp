@@ -32,3 +32,16 @@ TEST_CASE("Test Time.") {
 
     REQUIRE((after.seconds() + after.microseconds()) > (before.seconds() + before.microseconds()));
 }
+
+TEST_CASE("Test convert Time.") {
+    cluon::data::TimeStamp before{cluon::time::now()};
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    std::this_thread::sleep_for(1s);
+
+    std::chrono::system_clock::time_point after = std::chrono::system_clock::now();
+
+    cluon::data::TimeStamp after2 = cluon::time::convert(after);
+
+    REQUIRE((after2.seconds() + after2.microseconds()) > (before.seconds() + before.microseconds()));
+}

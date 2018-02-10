@@ -25,28 +25,32 @@ namespace cluon {
 namespace time {
 
 /**
+ * @return TimeStamp of converted chrono::time_point.
+ */
+inline cluon::data::TimeStamp convert(const std::chrono::system_clock::time_point &tp) noexcept {
+    cluon::data::TimeStamp timeStamp;
+
+    // Transform chrono time representation to same behavior as gettimeofday.
+    typedef std::chrono::duration<int32_t> seconds_type;
+    typedef std::chrono::duration<int64_t, std::micro> microseconds_type;
+
+    auto duration                = tp.time_since_epoch();
+    seconds_type s               = std::chrono::duration_cast<seconds_type>(duration);
+    microseconds_type us         = std::chrono::duration_cast<microseconds_type>(duration);
+    microseconds_type partial_us = us - std::chrono::duration_cast<microseconds_type>(s);
+
+    timeStamp.seconds(s.count()).microseconds(static_cast<int32_t>(partial_us.count()));
+
+    return timeStamp;
+}
+
+/**
  * @return TimeStamp of now.
  */
 inline cluon::data::TimeStamp now() noexcept {
-    cluon::data::TimeStamp now;
-
-    {
-        std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
-
-        // Transform chrono time representation to same behavior as gettimeofday.
-        typedef std::chrono::duration<int32_t> seconds_type;
-        typedef std::chrono::duration<int64_t, std::micro> microseconds_type;
-
-        auto duration                = tp.time_since_epoch();
-        seconds_type s               = std::chrono::duration_cast<seconds_type>(duration);
-        microseconds_type us         = std::chrono::duration_cast<microseconds_type>(duration);
-        microseconds_type partial_us = us - std::chrono::duration_cast<microseconds_type>(s);
-
-        now.seconds(s.count()).microseconds(static_cast<int32_t>(partial_us.count()));
-    }
-
-    return now;
+    return convert(std::chrono::system_clock::now());
 }
+
 
 } // namespace time
 } // namespace cluon
