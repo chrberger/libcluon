@@ -1,3 +1,9 @@
+libcluon (0.0.45) xenial; urgency=low
+
+  * Added chrono time point conversion
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 10 Feb 2018 12:33:29 +0100
+
 libcluon (0.0.44) xenial; urgency=low
 
   * Adding cluon-msc to cluon-complete.hpp
