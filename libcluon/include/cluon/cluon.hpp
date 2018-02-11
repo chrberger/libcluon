@@ -61,9 +61,16 @@
 // clang-format on
 
 #include "cluon/PortableEndian.hpp"
+#include <map>
 #include <string>
 
 namespace cluon {
+
+/**
+ * @return Map for command line parameters passed as --key=value into key->values.
+ */
+std::map<std::string, std::string> getCommandlineArguments(int32_t argc, char **argv) noexcept;
+
 /**
  * @return std::string without trailing whitespace characters.
  */
