@@ -1,3 +1,9 @@
+libcluon (0.0.46) xenial; urgency=low
+
+  * Added interface to parse and extract commandline arguments
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 11 Feb 2018 21:33:56 +0100
+
 libcluon (0.0.45) xenial; urgency=low
 
   * Added chrono time point conversion
