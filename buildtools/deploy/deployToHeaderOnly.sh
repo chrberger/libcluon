@@ -33,52 +33,9 @@ cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 //
 EOF
 
-
 # thirdparty/cluon/any/any.hpp --> remove #pragma once
 # thirdparty/cpp-peglib/peglib.h
 # thirdparty/argh/argh.h --> remove #pragma once + header guards
-# cluon/cluonDataStructures.hpp
-# cluon/Time.hpp
-# cluon/PortableEndian.hpp
-# cluon/cluon.hpp
-# cluon/MetaMessage.hpp
-# cluon/MessageParser.hpp
-# cluon/UDPPacketSizeConstraints.hpp
-# cluon/UDPSender.hpp
-# cluon/UDPReceiver.hpp
-# cluon/ProtoConstants.hpp
-# cluon/ToProtoVisitor.hpp
-# cluon/FromProtoVisitor.hpp
-# cluon/FromLCMVisitor.hpp
-# cluon/MsgPackConstants.hpp
-# cluon/FromMsgPackVisitor.hpp
-# cluon/ToJSONVisitor.hpp
-# cluon/ToCSVVisitor.hpp
-# cluon/ToLCMVisitor.hpp
-# cluon/ToODVDVisitor.hpp
-# cluon/ToMsgPackVisitor.hpp
-# cluon/EnvelopeToJSON.hpp
-# cluon/Envelope.hpp
-# cluon/GenericMessage.hpp
-# cluon/LCMToGenericMessage.hpp
-# cluon/OD4Session.hpp
-# MetaMessage.cpp
-# MessageParser.cpp
-# UDPSender.cpp
-# UDPReceiver.cpp
-# ToProtoVisitor.cpp
-# FromProtoVisitor.cpp
-# FromLCMVisitor.cpp
-# FromMsgPackVisitor.cpp
-# GenericMessage.cpp
-# ToJSONVisitor.cpp
-# ToCSVVisitor.cpp
-# ToLCMVisitor.cpp
-# LCMToGenericMessage.cpp
-# ToMsgPackVisitor.cpp
-# OD4Session.cpp
-# ToODVDVisitor.cpp
-# EnvelopeToJSON.cpp
 
 cat libcluon/thirdparty/cluon/any/any.hpp >> tmp.headeronly/cluon-complete.hpp
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#pragma/\/\/#pragma/g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
@@ -140,6 +97,7 @@ cat <<EOF >> tmp.headeronly/cluon-complete.cpp
 #define BEGIN_HEADER_ONLY_IMPLEMENTATION
 EOF
 for i in \
+    cluon.cpp \
     MetaMessage.cpp \
     MessageParser.cpp \
     UDPSender.cpp \
