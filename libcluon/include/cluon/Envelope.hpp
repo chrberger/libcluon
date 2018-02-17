@@ -56,8 +56,7 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
                 buffer.reserve(LENGTH);
                 retVal = static_cast<int32_t>(LENGTH) == in.readsome(&buffer[0], static_cast<std::streamsize>(LENGTH));
                 if (retVal) {
-                    std::stringstream sstr;
-                    sstr.rdbuf()->pubsetbuf(&buffer[0], static_cast<std::streamsize>(LENGTH)); // Avoid duplicating the read data.
+                    std::stringstream sstr(std::string(&buffer[0], LENGTH));
                     cluon::FromProtoVisitor protoDecoder;
                     protoDecoder.decodeFrom(sstr);
                     env.accept(protoDecoder);
