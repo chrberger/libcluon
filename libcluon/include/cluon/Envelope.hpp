@@ -49,14 +49,36 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
         constexpr uint8_t OD4_HEADER_SIZE{5};
         std::vector<char> buffer;
         buffer.reserve(OD4_HEADER_SIZE);
+#ifdef WIN32
+        buffer.clear();
+        retVal = true;
+        for (uint8_t i{0}; i < OD4_HEADER_SIZE; i++) {
+            char c;
+            in.get(c);
+            retVal &= in.good();
+            buffer.push_back(c);
+        }
+        if (retVal) {
+#else
         if (OD4_HEADER_SIZE == in.readsome(&buffer[0], OD4_HEADER_SIZE)) {
+#endif
             if (   (0x0D == static_cast<uint8_t>(buffer[0]))
                 && (0xA4 == static_cast<uint8_t>(buffer[1]))) {
                 const uint32_t LENGTH{le32toh(*reinterpret_cast<uint32_t*>(&buffer[1])) >> 8};
                 buffer.reserve(LENGTH);
+#ifdef WIN32
+                buffer.clear();
+                for (uint8_t i{0}; i < LENGTH; i++) {
+                    char c;
+                    in.get(c);
+                    retVal &= in.good();
+                    buffer.push_back(c);
+                }
+#else
                 retVal = static_cast<int32_t>(LENGTH) == in.readsome(&buffer[0], static_cast<std::streamsize>(LENGTH));
+#endif
                 if (retVal) {
-                    std::stringstream sstr(std::string(&buffer[0], LENGTH));
+                    std::stringstream sstr(std::string(buffer.begin(), buffer.begin() + LENGTH));
                     cluon::FromProtoVisitor protoDecoder;
                     protoDecoder.decodeFrom(sstr);
                     env.accept(protoDecoder);
