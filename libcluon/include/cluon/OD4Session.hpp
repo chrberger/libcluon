@@ -62,6 +62,13 @@ class LIBCLUON_API OD4Session {
     OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&envelope)> delegate = nullptr) noexcept;
 
     /**
+     * This method will send a given Envelope to this OpenDaVINCI v4 session.
+     *
+     * @param envelope to be sent.
+     */
+    void send(cluon::data::Envelope &&envelope) noexcept;
+
+    /**
      * This method will send a given message to this OpenDaVINCI v4 session.
      *
      * @param message Message to be sent.
@@ -86,7 +93,7 @@ class LIBCLUON_API OD4Session {
             envelope.senderStamp(senderStamp);
         }
 
-        sendInternal(cluon::OD4Session::serializeAsOD4Container(std::move(envelope)));
+        send(std::move(envelope));
     }
 
    public:

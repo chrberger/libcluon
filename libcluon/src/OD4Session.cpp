@@ -83,6 +83,10 @@ void OD4Session::callback(std::string &&data,
     }
 }
 
+void OD4Session::send(cluon::data::Envelope &&envelope) noexcept {
+    sendInternal(cluon::OD4Session::serializeAsOD4Container(std::move(envelope)));
+}
+
 std::string OD4Session::serializeAsOD4Container(cluon::data::Envelope &&envelope) noexcept {
     std::string dataToSend;
     {

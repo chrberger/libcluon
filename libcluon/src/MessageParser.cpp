@@ -56,7 +56,7 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
 
         MESSAGE_TYPE                <- < IDENTIFIER ('.' IDENTIFIER)* >
 
-        IDENTIFIER                  <- < [a-zA-Z][a-zA-Z0-9]* >
+        IDENTIFIER                  <- < [a-zA-Z][a-zA-Z0-9_]* >
         DIGIT                       <- < [0-9] >
         NATURAL_NUMBER              <- < [1-9] DIGIT* >
         FLOAT_NUMBER                <- < ('+' / '-')? DIGIT DIGIT* (('.') DIGIT*)? >
