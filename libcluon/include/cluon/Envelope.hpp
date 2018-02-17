@@ -24,6 +24,7 @@
 #include <cstring>
 #include <istream>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 #include <iostream>
@@ -31,25 +32,32 @@
 namespace cluon {
 
 /**
- * This method extracts an Envelope from the given istream.
+ * This method extracts an Envelope from the given istream that holds bytes in
+ * format:
+ *
+ *    0x0D 0xA4 LEN0 LEN1 LEN2 Proto-encoded cluon::data::Envelope
+ *
+ * 0xA4 LEN0 LEN1 LEN2 are little Endian.
  *
  * @param in Stream to read from.
  * @return cluon::data::Envelope.
  */
-inline cluon::data::Envelope extractEnvelope(std::istream &in) noexcept {
+inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) noexcept {
+    bool retVal{false};
     cluon::data::Envelope env;
     if (in.good()) {
         constexpr uint8_t OD4_HEADER_SIZE{5};
         std::vector<char> buffer;
         buffer.reserve(OD4_HEADER_SIZE);
-        if (OD4_HEADER_SIZE == in.readsome(&buffer[0], OD4_HEADER_SIZE)) {
-            const uint32_t LENGTH{le32toh(*reinterpret_cast<uint32_t*>(&buffer[1])) >> 8};
+        if (OD4_HEADER_SIZE == in.readsome(buffer.data(), OD4_HEADER_SIZE)) {
             if (   (0x0D == static_cast<uint8_t>(buffer[0])) 
                 && (0xA4 == static_cast<uint8_t>(buffer[1]))) {
+                const uint32_t LENGTH{le32toh(*reinterpret_cast<uint32_t*>(&buffer[1])) >> 8};
                 buffer.reserve(LENGTH);
-                if (LENGTH == in.readsome(&buffer[0], LENGTH)) {
+                retVal = LENGTH == in.readsome(buffer.data(), LENGTH);
+                if (retVal) {
                     std::stringstream sstr;
-                    sstr.rdbuf()->pubsetbuf(&buffer[0], LENGTH); // Avoid duplicating the read data.
+                    sstr.rdbuf()->pubsetbuf(buffer.data(), LENGTH); // Avoid duplicating the read data.
                     cluon::FromProtoVisitor protoDecoder;
                     protoDecoder.decodeFrom(sstr);
                     env.accept(protoDecoder);
@@ -57,7 +65,7 @@ inline cluon::data::Envelope extractEnvelope(std::istream &in) noexcept {
             }
         }
     }
-    return env;
+    return std::make_pair(retVal, env);
 }
 
 /**

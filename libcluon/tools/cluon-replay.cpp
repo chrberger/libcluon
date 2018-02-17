@@ -51,14 +51,16 @@ int main(int argc, char **argv) {
             if (fin.good()) {
                 int32_t oldTimeStampInMicroseconds{0};
                 while (fin.good()) {
-                    cluon::data::Envelope envelope{cluon::extractEnvelope(fin)};
-                    if (envelope.dataType() > 0) {
-                        const auto SENT{envelope.sent()};
-                        const int32_t CURRENT_TIMESTAMP_IN_MICROSECONDS{(SENT.seconds()*1000*1000 + SENT.microseconds())};
-                        const int32_t DELAY = CURRENT_TIMESTAMP_IN_MICROSECONDS - oldTimeStampInMicroseconds;
-                        std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(DELAY > 0 ? DELAY : 0));
-                        od4.send(std::move(envelope));
-                        oldTimeStampInMicroseconds = CURRENT_TIMESTAMP_IN_MICROSECONDS;
+                    auto retVal{cluon::extractEnvelope(fin)};
+                    if (retVal.first) {
+                        if (retVal.second.dataType() > 0) {
+                            const auto SENT{retVal.second.sent()};
+                            const int32_t CURRENT_TIMESTAMP_IN_MICROSECONDS{(SENT.seconds()*1000*1000 + SENT.microseconds())};
+                            const int32_t DELAY = CURRENT_TIMESTAMP_IN_MICROSECONDS - oldTimeStampInMicroseconds;
+                            std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(DELAY > 0 ? DELAY : 0));
+                            od4.send(std::move(retVal.second));
+                            oldTimeStampInMicroseconds = CURRENT_TIMESTAMP_IN_MICROSECONDS;
+                        }
                     }
                 }
             }

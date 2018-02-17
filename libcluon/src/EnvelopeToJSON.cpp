@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "cluon/Envelope.hpp"
 #include "cluon/EnvelopeToJSON.hpp"
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
@@ -45,33 +46,34 @@ int32_t EnvelopeToJSON::setMessageSpecification(const std::string &ms) noexcept 
 std::string EnvelopeToJSON::getJSONFromProtoEncodedEnvelope(const std::string &protoEncodedEnvelope) noexcept {
     std::string retVal{"{}"};
     if (!m_listOfMetaMessages.empty()) {
+        cluon::data::Envelope envelope;
+        std::stringstream sstr(protoEncodedEnvelope);
         constexpr uint8_t OD4_HEADER_SIZE{5};
-        if (OD4_HEADER_SIZE <= protoEncodedEnvelope.size()) {
-            // First, test for OD4-header that might be optional.
-            char byte0{protoEncodedEnvelope.at(0)};
-            char byte1{protoEncodedEnvelope.at(1)};
-            uint32_t length{0};
-            {
-                std::stringstream sstr{std::string(&protoEncodedEnvelope[1], 4)};
-                sstr.read(reinterpret_cast<char *>(&length), sizeof(uint32_t)); /* Flawfinder: ignore */ // NOLINT
-                length = le32toh(length);
-                length >>= 8;
+        if (OD4_HEADER_SIZE < protoEncodedEnvelope.size()) {
+            // Try decoding complete OD4-encoded Envelope including header.
+            constexpr uint8_t byte0{0x0D};
+            constexpr uint8_t byte1{0xA4};
+            if ( (static_cast<uint8_t>(protoEncodedEnvelope.at(0)) == byte0) && (static_cast<uint8_t>(protoEncodedEnvelope.at(1)) == byte1) ) {
+                uint32_t length = (*reinterpret_cast<const uint32_t*>(protoEncodedEnvelope.data()+1));
+                length = le32toh(length) >> 8;
+                if ((OD4_HEADER_SIZE + length) == protoEncodedEnvelope.size()) {
+                    auto result{extractEnvelope(sstr)};
+                    if (result.first) {
+                        envelope = result.second;
+                    }
+                }
             }
-            std::string input{protoEncodedEnvelope};
-            if ((0x0D == static_cast<uint8_t>(byte0)) && (0xA4 == static_cast<uint8_t>(byte1))
-                && (length == protoEncodedEnvelope.size() - OD4_HEADER_SIZE)) {
-                input = protoEncodedEnvelope.substr(OD4_HEADER_SIZE);
-            }
+        }
 
-            cluon::data::Envelope env;
-
-            std::stringstream sstr{input};
+        if (0 == envelope.dataType()) {
+            // Directly decoding complete OD4 container failed, try decoding
+            // without header.
             cluon::FromProtoVisitor protoDecoder;
             protoDecoder.decodeFrom(sstr);
-            env.accept(protoDecoder);
-
-            retVal = getJSONFromEnvelope(env);
+            envelope.accept(protoDecoder);
         }
+
+        retVal = getJSONFromEnvelope(envelope);
     }
     return retVal;
 }
