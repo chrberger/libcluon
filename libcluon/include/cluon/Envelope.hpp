@@ -49,15 +49,15 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
         constexpr uint8_t OD4_HEADER_SIZE{5};
         std::vector<char> buffer;
         buffer.reserve(OD4_HEADER_SIZE);
-        if (OD4_HEADER_SIZE == in.readsome(buffer.data(), OD4_HEADER_SIZE)) {
+        if (OD4_HEADER_SIZE == in.readsome(&buffer[0], OD4_HEADER_SIZE)) {
             if (   (0x0D == static_cast<uint8_t>(buffer[0])) 
                 && (0xA4 == static_cast<uint8_t>(buffer[1]))) {
                 const uint32_t LENGTH{le32toh(*reinterpret_cast<uint32_t*>(&buffer[1])) >> 8};
                 buffer.reserve(LENGTH);
-                retVal = LENGTH == in.readsome(buffer.data(), static_cast<std::streamsize>(LENGTH));
+                retVal = LENGTH == in.readsome(&buffer[0], static_cast<std::streamsize>(LENGTH));
                 if (retVal) {
                     std::stringstream sstr;
-                    sstr.rdbuf()->pubsetbuf(buffer.data(), static_cast<std::streamsize>(LENGTH)); // Avoid duplicating the read data.
+                    sstr.rdbuf()->pubsetbuf(&buffer[0], static_cast<std::streamsize>(LENGTH)); // Avoid duplicating the read data.
                     cluon::FromProtoVisitor protoDecoder;
                     protoDecoder.decodeFrom(sstr);
                     env.accept(protoDecoder);
