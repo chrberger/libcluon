@@ -1,3 +1,9 @@
+libcluon (0.0.47) xenial; urgency=low
+
+  * cluon-replay
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 17 Feb 2018 22:02:33 +0100
+
 libcluon (0.0.46) xenial; urgency=low
 
   * Added interface to parse and extract commandline arguments
