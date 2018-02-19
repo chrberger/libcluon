@@ -1,3 +1,9 @@
+libcluon (0.0.48) xenial; urgency=low
+
+  * Harmonized commandline interface for cluon-OD4toStdout and cluon-OD4toJSON
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 19 Feb 2018 09:49:54 +0100
+
 libcluon (0.0.47) xenial; urgency=low
 
   * cluon-replay
