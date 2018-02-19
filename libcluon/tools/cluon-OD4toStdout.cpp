@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "cluon/cluon.hpp"
 #include "cluon/OD4Session.hpp"
 
 #include <iostream>
@@ -24,14 +25,16 @@
 int main(int argc, char **argv) {
     int retVal{1};
     const std::string PROGRAM{argv[0]}; // NOLINT
-    if (2 != argc) {
+    auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
+    if (0 == commandlineArguments.count("cid")) {
         std::cerr << PROGRAM
                   << " dumps Containers received from an OpenDaVINCI v4 session to stdout." << std::endl;
-        std::cerr << "Usage:   " << PROGRAM << " CID" << std::endl;
-        std::cerr << "Example: " << PROGRAM << " 111" << std::endl;
+        std::cerr << "Usage:   " << PROGRAM << " --cid=<OpenDaVINCI session>" << std::endl;
+        std::cerr << "Example: " << PROGRAM << " --cid=111" << std::endl;
     }
     else {
-        cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(std::string(argv[1]))),
+        // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
+        cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])),
             [](cluon::data::Envelope &&envelope) noexcept {
                 std::cout << cluon::OD4Session::serializeAsOD4Container(std::move(envelope));
                 std::cout.flush();

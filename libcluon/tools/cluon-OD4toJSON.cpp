@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "cluon/cluon.hpp"
 #include "cluon/OD4Session.hpp"
 #include "cluon/EnvelopeToJSON.hpp"
 #include "cluon/Time.hpp"
-
-#include "argh/argh.h"
 
 #include <fstream>
 #include <iostream>
@@ -30,18 +29,15 @@
 int main(int argc, char **argv) {
     int retVal{1};
     const std::string PROGRAM{argv[0]}; // NOLINT
-    argh::parser commandline{argc, argv};
-    std::string CID{commandline.pos_args().back()};
-    if (std::string::npos != CID.find(PROGRAM)) {
+    auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
+    if (0 == commandlineArguments.count("cid")) {
         std::cerr << PROGRAM
                   << " dumps Containers received from an OpenDaVINCI v4 session to stdout in JSON format using an optionally supplied ODVD message specification file." << std::endl;
-        std::cerr << "Usage:    " << PROGRAM << " [--odvd=<ODVD message specification file>] CID" << std::endl;
-        std::cerr << "Examples: " << PROGRAM << " 111" << std::endl;
-        std::cerr << "          " << PROGRAM << " --odvd=MyMessages.odvd 111" << std::endl;
+        std::cerr << "Usage:    " << PROGRAM << " [--odvd=<ODVD message specification file>] --cid=<OpenDaVINCI session>" << std::endl;
+        std::cerr << "Examples: " << PROGRAM << " --cid=111" << std::endl;
+        std::cerr << "          " << PROGRAM << " --odvd=MyMessages.odvd --cid=111" << std::endl;
     } else {
-        std::string odvdFile;
-        commandline({"--odvd"}) >> odvdFile;
-
+        std::string odvdFile{commandlineArguments["odvd"]};
         cluon::EnvelopeToJSON envelopeToJSON;
         if (!odvdFile.empty()) {
             std::fstream fin{odvdFile, std::ios::in};
@@ -51,7 +47,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(CID)),
+        cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])),
             [&e2J = envelopeToJSON](cluon::data::Envelope &&envelope) noexcept {
                 envelope.received(cluon::time::now());
                 std::cout << e2J.getJSONFromEnvelope(envelope) << std::endl;
