@@ -105,6 +105,9 @@ int main(int argc, char **argv) {
             }
         }
     }
+    else {
+        std::cerr << "[" << PROGRAM << "] Could not find '" << inputFilename << "'." << std::endl;
+    }
 
     return retVal;
 }

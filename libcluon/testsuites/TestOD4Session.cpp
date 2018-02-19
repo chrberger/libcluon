@@ -39,7 +39,7 @@ TEST_CASE("Create OD4 session without lambda.") {
     od4.send(tsRequest);
 }
 
-TEST_CASE("Create OD4 session and transmit data.") {
+TEST_CASE("Create OD4 session and transmit data no sample time stamp.") {
     std::atomic<bool> replyReceived{false};
     cluon::data::Envelope reply;
     REQUIRE(0 == reply.dataType());
@@ -65,6 +65,44 @@ TEST_CASE("Create OD4 session and transmit data.") {
     cluon::data::TimeStamp tsResponse;
     REQUIRE(0 == tsResponse.seconds());
     REQUIRE(0 == tsResponse.microseconds());
+
+    tsResponse = cluon::extractMessage<cluon::data::TimeStamp>(std::move(reply));
+    REQUIRE(1 == tsResponse.seconds());
+    REQUIRE(2 == tsResponse.microseconds());
+}
+
+TEST_CASE("Create OD4 session and transmit data with sample time stamp.") {
+    std::atomic<bool> replyReceived{false};
+    cluon::data::Envelope reply;
+    REQUIRE(0 == reply.dataType());
+
+    cluon::OD4Session od4(79, [&reply, &replyReceived](cluon::data::Envelope &&envelope) {
+        reply         = envelope;
+        replyReceived = true;
+    });
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    cluon::data::TimeStamp tsSampleTime;
+    tsSampleTime.seconds(10).microseconds(20);
+
+    cluon::data::TimeStamp tsRequest;
+    tsRequest.seconds(1).microseconds(2);
+    od4.send(tsRequest, tsSampleTime);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!replyReceived);
+
+    REQUIRE(reply.dataType() == cluon::data::TimeStamp::ID());
+
+    cluon::data::TimeStamp tsResponse;
+    REQUIRE(0 == tsResponse.seconds());
+    REQUIRE(0 == tsResponse.microseconds());
+
+    REQUIRE(10 == reply.sampleTimeStamp().seconds());
+    REQUIRE(20 == reply.sampleTimeStamp().microseconds());
 
     tsResponse = cluon::extractMessage<cluon::data::TimeStamp>(std::move(reply));
     REQUIRE(1 == tsResponse.seconds());
