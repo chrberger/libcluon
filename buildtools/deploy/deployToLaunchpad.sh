@@ -80,32 +80,32 @@ Upstream-Name: libcluon
 Source: https://github.com/chrberger/libcluon
 
 Files: *
-Copyright: 2017 Christian Berger <christian.berger@gu.se>
+Copyright: 2017-18 Christian Berger <christian.berger@gu.se>
 License: GPL-3.0+
 
 Files: debian/*
-Copyright: 2017 Christian Berger <christian.berger@gu.se>
+Copyright: 2017-18 Christian Berger <christian.berger@gu.se>
 License: GPL-3.0+
 
 Files: buildtools/xUnit/*
-Copyright: 2017 Two Blue Cubes Ltd. All rights reserved.
+Copyright: 2017-18 Two Blue Cubes Ltd. All rights reserved.
 License: Boost-1.0
 
 Files:
 Files: libcluon/thirdparty/argh/*
-Copyright: Copyright (c) 2016 Adi Shavit. All rights reserved.
+Copyright: Copyright (c) 2016-18 Adi Shavit. All rights reserved.
 License: BSD-3-Clause
 
 Files: libcluon/thirdparty/cpp-peglib/*
-Copyright: Copyright (c) 2015-17 Yuji Hirose. All rights reserved.
+Copyright: Copyright (c) 2015-18 Yuji Hirose. All rights reserved.
 License: MIT
 
 Files: libcluon/thirdparty/Mustache/*
-Copyright: Copyright 2015-2017 Kevin Wojniak.
+Copyright: Copyright 2015-2018 Kevin Wojniak.
 License: Boost-1.0
 
 Files: libcluon/thirdparty/cluon/any/*
-Copyright: Copyright (c) 2016 Denilson das Mercês Amorim.
+Copyright: Copyright (c) 2016-18 Denilson das Mercês Amorim.
 License: Boost-1.0
 
 
