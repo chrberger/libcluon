@@ -47,9 +47,7 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
     std::vector<int> sendToAddressTokens{std::istream_iterator<int>(sstr), std::istream_iterator<int>()};
 
     if (!sendToAddress.empty() && (4 == sendToAddressTokens.size())
-        && !(std::end(sendToAddressTokens)
-             != std::find_if(
-                    sendToAddressTokens.begin(), sendToAddressTokens.end(), [](int a) { return (a < 0) || (a > 255); }))
+        && !(std::end(sendToAddressTokens) != std::find_if(sendToAddressTokens.begin(), sendToAddressTokens.end(), [](int a) { return (a < 0) || (a > 255); }))
         && (0 < sendToPort)) {
         ::memset(&m_sendToAddress, 0, sizeof(m_sendToAddress));
         m_sendToAddress.sin_addr.s_addr = ::inet_addr(sendToAddress.c_str());

@@ -148,8 +148,7 @@ void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
 
     encode(m_buffer, name);
-    const uint8_t value
-        = (v ? static_cast<uint8_t>(MsgPackConstants::IS_TRUE) : static_cast<uint8_t>(MsgPackConstants::IS_FALSE));
+    const uint8_t value = (v ? static_cast<uint8_t>(MsgPackConstants::IS_TRUE) : static_cast<uint8_t>(MsgPackConstants::IS_FALSE));
     m_buffer.write(reinterpret_cast<const char *>(&value), sizeof(uint8_t));
     m_numberOfFields++;
 }

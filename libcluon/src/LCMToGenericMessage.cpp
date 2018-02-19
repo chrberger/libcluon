@@ -94,7 +94,7 @@ cluon::GenericMessage LCMToGenericMessage::getGenericMessage(const std::string &
                     offset += 4;
 
                     const std::string::size_type START_POSITION = offset;
-                    std::string::size_type pos = data.find('\0', START_POSITION); // Extract channel name.
+                    std::string::size_type pos                  = data.find('\0', START_POSITION); // Extract channel name.
                     if (std::string::npos != pos) {
                         const std::string CHANNEL_NAME(data.substr(START_POSITION, (pos - START_POSITION)));
 

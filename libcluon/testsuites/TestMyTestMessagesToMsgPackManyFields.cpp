@@ -61,9 +61,7 @@ TEST_CASE("Testing more than 0xF and less than 0xFFFF fields.") {
     std::stringstream msg;
 
     msg << "message MyTestMessage [id = 1] {" << std::endl;
-    for (uint32_t i{0}; i < 32; i++) {
-        msg << "    uint32 attribute" << (i + 1) << " [ default = " << i << ", id = " << (i + 1) << " ];" << std::endl;
-    }
+    for (uint32_t i{0}; i < 32; i++) { msg << "    uint32 attribute" << (i + 1) << " [ default = " << i << ", id = " << (i + 1) << " ];" << std::endl; }
     msg << "}" << std::endl;
 
     cluon::MessageParser mp;

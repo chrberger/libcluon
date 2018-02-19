@@ -22,9 +22,7 @@
 
 namespace cluon {
 
-void FromProtoVisitor::readBytesFromStream(std::istream &in,
-                                           std::size_t bytesToReadFromStream,
-                                           std::vector<char> &buffer) noexcept {
+void FromProtoVisitor::readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, std::vector<char> &buffer) noexcept {
     constexpr std::size_t CHUNK_SIZE{1024};
     std::streamsize bufferPosition{0};
 
@@ -133,8 +131,7 @@ uint64_t FromProtoVisitor::ProtoKeyValue::valueAsVarInt() const noexcept {
 
 float FromProtoVisitor::ProtoKeyValue::valueAsFloat() const noexcept {
     float retVal{0};
-    if (!m_value.empty() && (length() == sizeof(float)) && (m_value.size() == sizeof(float))
-        && (type() == ProtoConstants::FOUR_BYTES)) {
+    if (!m_value.empty() && (length() == sizeof(float)) && (m_value.size() == sizeof(float)) && (type() == ProtoConstants::FOUR_BYTES)) {
         std::memmove(&retVal, &m_value[0], sizeof(float));
     }
     return retVal;
@@ -142,8 +139,7 @@ float FromProtoVisitor::ProtoKeyValue::valueAsFloat() const noexcept {
 
 double FromProtoVisitor::ProtoKeyValue::valueAsDouble() const noexcept {
     double retVal{0};
-    if (!m_value.empty() && (length() == sizeof(double)) && (m_value.size() == sizeof(double))
-        && (type() == ProtoConstants::EIGHT_BYTES)) {
+    if (!m_value.empty() && (length() == sizeof(double)) && (m_value.size() == sizeof(double)) && (type() == ProtoConstants::EIGHT_BYTES)) {
         std::memmove(&retVal, &m_value[0], sizeof(double));
     }
     return retVal;

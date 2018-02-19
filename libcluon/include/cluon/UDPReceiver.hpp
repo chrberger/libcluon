@@ -92,8 +92,7 @@ class LIBCLUON_API UDPReceiver {
      */
     UDPReceiver(const std::string &receiveFromAddress,
                 uint16_t receiveFromPort,
-                std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)>
-                    delegate) noexcept;
+                std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate) noexcept;
     ~UDPReceiver() noexcept;
 
     /**

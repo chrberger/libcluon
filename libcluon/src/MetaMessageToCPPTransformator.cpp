@@ -283,29 +283,20 @@ void MetaMessageToCPPTransformator::visit(const MetaMessage &mm) noexcept {
             messageName     = mm.messageName().substr(pos + 1);
         }
 
-        const std::string completePackageName
-            = mm.packageName() + (!mm.packageName().empty() && !namespacePrefix.empty() ? "." : "") + namespacePrefix;
-        const std::string completePackageNameWithColonSeparators{
-            std::regex_replace(completePackageName, std::regex("\\."), "::")}; // NOLINT
-        const std::string namespaceHeader{
-            std::regex_replace(completePackageName, std::regex("\\."), " { namespace ")}; // NOLINT
+        const std::string completePackageName = mm.packageName() + (!mm.packageName().empty() && !namespacePrefix.empty() ? "." : "") + namespacePrefix;
+        const std::string completePackageNameWithColonSeparators{std::regex_replace(completePackageName, std::regex("\\."), "::")}; // NOLINT
+        const std::string namespaceHeader{std::regex_replace(completePackageName, std::regex("\\."), " { namespace ")};             // NOLINT
         const std::string namespaceFooter(
-            static_cast<uint32_t>(std::count(std::begin(namespaceHeader), std::end(namespaceHeader), '{'))
-                + (!namespaceHeader.empty() ? 1 : 0),
-            '}');
+            static_cast<uint32_t>(std::count(std::begin(namespaceHeader), std::end(namespaceHeader), '{')) + (!namespaceHeader.empty() ? 1 : 0), '}');
         std::string headerGuard{std::regex_replace(completePackageName, std::regex("\\."), "_")}; // NOLINT
         headerGuard += (!headerGuard.empty() ? +"_" : "") + messageName;
-        std::transform(std::begin(headerGuard), std::end(headerGuard), std::begin(headerGuard), [](unsigned char c) {
-            return ::toupper(c);
-        });
+        std::transform(std::begin(headerGuard), std::end(headerGuard), std::begin(headerGuard), [](unsigned char c) { return ::toupper(c); });
 
         dataToBeRendered.set("%HEADER_GUARD%", headerGuard);
-        dataToBeRendered.set("%NAMESPACE_OPENING%",
-                             (!namespaceHeader.empty() ? "namespace " + namespaceHeader + " {" : ""));
+        dataToBeRendered.set("%NAMESPACE_OPENING%", (!namespaceHeader.empty() ? "namespace " + namespaceHeader + " {" : ""));
         dataToBeRendered.set("%COMPLETEPACKAGENAME%", completePackageName + (!completePackageName.empty() ? "." : ""));
         dataToBeRendered.set("%COMPLETEPACKAGENAME_WITH_COLON_SEPARATORS%",
-                             completePackageNameWithColonSeparators
-                                 + (!completePackageNameWithColonSeparators.empty() ? "::" : ""));
+                             completePackageNameWithColonSeparators + (!completePackageNameWithColonSeparators.empty() ? "::" : ""));
         dataToBeRendered.set("%MESSAGE%", messageName);
         dataToBeRendered.set("%NAMESPACE_CLOSING%", namespaceFooter);
         dataToBeRendered.set("%IDENTIFIER%", std::to_string(mm.messageIdentifier()));
@@ -317,24 +308,20 @@ void MetaMessageToCPPTransformator::visit(const MetaMessage &mm) noexcept {
             if (MetaMessage::MetaField::MESSAGE_T != e.fieldDataType()) {
                 fieldEntry.set("%TYPE%", typeToTypeStringMap[e.fieldDataType()]);
 
-                const std::string defaultInitializatioValue{(e.defaultInitializationValue().empty()
-                                                                 ? typeToDefaultInitizationValueMap[e.fieldDataType()]
-                                                                 : e.defaultInitializationValue())};
+                const std::string defaultInitializatioValue{
+                    (e.defaultInitializationValue().empty() ? typeToDefaultInitizationValueMap[e.fieldDataType()] : e.defaultInitializationValue())};
                 fieldEntry.set("%FIELD_DEFAULT_INITIALIZATION_VALUE%", defaultInitializatioValue);
 
                 std::string initializerSuffix;
                 if (e.fieldDataType() == MetaMessage::MetaField::FLOAT_T) {
                     initializerSuffix = "f"; // suffix for float types.
-                } else if (e.fieldDataType() == MetaMessage::MetaField::STRING_T
-                           || e.fieldDataType() == MetaMessage::MetaField::BYTES_T) {
+                } else if (e.fieldDataType() == MetaMessage::MetaField::STRING_T || e.fieldDataType() == MetaMessage::MetaField::BYTES_T) {
                     initializerSuffix = "s"; // suffix to enforce std::string initialization.
                 }
                 fieldEntry.set("%INITIALIZER_SUFFIX%", initializerSuffix);
             } else {
-                const std::string tmp{mm.packageName() + (!mm.packageName().empty() ? "." : "")
-                                      + e.fieldDataTypeName()};
-                const std::string completeDataTypeNameWithDoubleColons{
-                    std::regex_replace(tmp, std::regex("\\."), "::")}; // NOLINT
+                const std::string tmp{mm.packageName() + (!mm.packageName().empty() ? "." : "") + e.fieldDataTypeName()};
+                const std::string completeDataTypeNameWithDoubleColons{std::regex_replace(tmp, std::regex("\\."), "::")}; // NOLINT
 
                 fieldEntry.set("%TYPE%", completeDataTypeNameWithDoubleColons);
             }

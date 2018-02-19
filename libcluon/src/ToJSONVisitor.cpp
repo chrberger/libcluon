@@ -30,8 +30,7 @@ std::string ToJSONVisitor::json() const noexcept {
     const std::string tmp{m_buffer.str()};
     std::string retVal{"{}"};
     if (2 < tmp.size()) {
-        retVal = {(m_withOuterCurlyBraces ? "{" : "") + tmp.substr(0, tmp.size() - 2)
-                  + (m_withOuterCurlyBraces ? "}" : "")};
+        retVal = {(m_withOuterCurlyBraces ? "{" : "") + tmp.substr(0, tmp.size() - 2) + (m_withOuterCurlyBraces ? "}" : "")};
     }
     return retVal;
 }

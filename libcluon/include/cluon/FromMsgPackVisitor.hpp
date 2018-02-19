@@ -106,8 +106,7 @@ class LIBCLUON_API FromMsgPackVisitor {
         if (0 < m_keyValues.count(name)) {
             try {
                 std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> v
-                    = linb::any_cast<std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue>>(
-                        m_keyValues[name].m_value);
+                    = linb::any_cast<std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue>>(m_keyValues[name].m_value);
                 cluon::FromMsgPackVisitor nestedMsgPackDecoder(v);
                 value.accept(nestedMsgPackDecoder);
             } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE

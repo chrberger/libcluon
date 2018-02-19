@@ -33,9 +33,7 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
     , m_sender{"225.0.0." + std::to_string(CID), 12175}
     , m_delegate(delegate) {}
 
-void OD4Session::callback(std::string &&data,
-                          std::string &&from,
-                          std::chrono::system_clock::time_point &&timepoint) noexcept {
+void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) noexcept {
     cluon::data::TimeStamp receivedAt;
     {
         // Transform chrono time representation to same behavior as gettimeofday.
@@ -64,8 +62,7 @@ void OD4Session::callback(std::string &&data,
                 length >>= 8;
             }
             std::string input;
-            if ((0x0D == static_cast<uint8_t>(byte0)) && (0xA4 == static_cast<uint8_t>(byte1))
-                && (length == protoEncodedEnvelope.size() - OD4_HEADER_SIZE)) {
+            if ((0x0D == static_cast<uint8_t>(byte0)) && (0xA4 == static_cast<uint8_t>(byte1)) && (length == protoEncodedEnvelope.size() - OD4_HEADER_SIZE)) {
                 cluon::data::Envelope env;
                 {
                     std::stringstream sstr{protoEncodedEnvelope.substr(OD4_HEADER_SIZE)};
@@ -78,8 +75,8 @@ void OD4Session::callback(std::string &&data,
             }
         }
     } else {
-        std::cout << "[cluon::OD4Session] Received " << data.size() << " bytes from " << from << " at "
-                  << receivedAt.seconds() << "." << receivedAt.microseconds() << "." << std::endl;
+        std::cout << "[cluon::OD4Session] Received " << data.size() << " bytes from " << from << " at " << receivedAt.seconds() << "."
+                  << receivedAt.microseconds() << "." << std::endl;
     }
 }
 

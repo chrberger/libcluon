@@ -59,7 +59,7 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
             buffer.push_back(c);                       // LCOV_EXCL_LINE
         }
         if (retVal) { // LCOV_EXCL_LINE
-#else
+#else // LCOV_EXCL_LINE
         if (OD4_HEADER_SIZE == in.readsome(&buffer[0], OD4_HEADER_SIZE)) {
 #endif
             if ((0x0D == static_cast<uint8_t>(buffer[0])) && (0xA4 == static_cast<uint8_t>(buffer[1]))) {
@@ -73,12 +73,11 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
                     retVal &= in.good();              // LCOV_EXCL_LINE
                     buffer.push_back(c);              // LCOV_EXCL_LINE
                 }
-#else
+#else // LCOV_EXCL_LINE
                 retVal = static_cast<int32_t>(LENGTH) == in.readsome(&buffer[0], static_cast<std::streamsize>(LENGTH));
 #endif
                 if (retVal) {
-                    std::stringstream sstr(
-                        std::string(buffer.begin(), buffer.begin() + static_cast<std::streamsize>(LENGTH)));
+                    std::stringstream sstr(std::string(buffer.begin(), buffer.begin() + static_cast<std::streamsize>(LENGTH)));
                     cluon::FromProtoVisitor protoDecoder;
                     protoDecoder.decodeFrom(sstr);
                     env.accept(protoDecoder);

@@ -331,9 +331,8 @@ TEST_CASE("Testing MyTestMessage1 with visitor to summarize values.") {
     REQUIRE(4 == val);
 
     val = 0;
-    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
-               [&es, &val](uint32_t, std::string &&, std::string &&, auto a) { es.sum(&val, a); },
-               []() {});
+    tmp.accept(
+        [](uint32_t, const std::string &, const std::string &) {}, [&es, &val](uint32_t, std::string &&, std::string &&, auto a) { es.sum(&val, a); }, []() {});
 
     REQUIRE(4 == val);
 

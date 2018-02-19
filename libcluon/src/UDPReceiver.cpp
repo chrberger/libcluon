@@ -43,10 +43,9 @@
 
 namespace cluon {
 
-UDPReceiver::UDPReceiver(
-    const std::string &receiveFromAddress,
-    uint16_t receiveFromPort,
-    std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate) noexcept
+UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
+                         uint16_t receiveFromPort,
+                         std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate) noexcept
     : m_receiveFromAddress()
     , m_mreq()
     , m_readFromSocketThread()
@@ -59,14 +58,11 @@ UDPReceiver::UDPReceiver(
 
     if ((!receiveFromAddress.empty()) && (4 == receiveFromAddressTokens.size())
         && !(std::end(receiveFromAddressTokens)
-             != std::find_if(receiveFromAddressTokens.begin(),
-                             receiveFromAddressTokens.end(),
-                             [](int a) { return (a < 0) || (a > 255); }))
+             != std::find_if(receiveFromAddressTokens.begin(), receiveFromAddressTokens.end(), [](int a) { return (a < 0) || (a > 255); }))
         && (0 < receiveFromPort)) {
         // Check for valid IP address.
         struct sockaddr_in tmpSocketAddress {};
-        const bool isValid = (0 < ::inet_pton(AF_INET, receiveFromAddress.c_str(), &(tmpSocketAddress.sin_addr)))
-                             && (224 > receiveFromAddressTokens[0]);
+        const bool isValid = (0 < ::inet_pton(AF_INET, receiveFromAddress.c_str(), &(tmpSocketAddress.sin_addr))) && (224 > receiveFromAddressTokens[0]);
 
         // Check for UDP multicast, i.e., IP address range [225.0.0.1 - 239.255.255.255].
         m_isMulticast = (((224 < receiveFromAddressTokens[0]) && (receiveFromAddressTokens[0] <= 239))
@@ -79,8 +75,7 @@ UDPReceiver::UDPReceiver(
         // According to http://www.sockets.com/err_lst1.htm, the binding is
         // different on Windows opposed to POSIX when using the real address
         // here; thus, we need to use INADDR_ANY.
-        m_receiveFromAddress.sin_addr.s_addr
-            = (m_isMulticast ? htonl(INADDR_ANY) : ::inet_addr(receiveFromAddress.c_str()));
+        m_receiveFromAddress.sin_addr.s_addr = (m_isMulticast ? htonl(INADDR_ANY) : ::inet_addr(receiveFromAddress.c_str()));
 #else
         m_receiveFromAddress.sin_addr.s_addr = ::inet_addr(receiveFromAddress.c_str());
 #endif
@@ -283,8 +278,7 @@ void UDPReceiver::readFromSocket() noexcept {
                             &((reinterpret_cast<struct sockaddr_in *>(&remote))->sin_addr), // NOLINT
                             remoteAddress.data(),
                             remoteAddress.max_size());
-                const uint16_t RECVFROM_PORT{
-                    ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
+                const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
 
                 // Call delegate.
                 m_delegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)),

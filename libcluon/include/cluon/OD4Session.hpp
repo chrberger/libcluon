@@ -76,9 +76,7 @@ class LIBCLUON_API OD4Session {
      * @param senderStamp Optional sender stamp (default = 0).
      */
     template <typename T>
-    void send(T &message,
-              const cluon::data::TimeStamp &sampleTimeStamp = cluon::data::TimeStamp(),
-              uint32_t senderStamp                          = 0) noexcept {
+    void send(T &message, const cluon::data::TimeStamp &sampleTimeStamp = cluon::data::TimeStamp(), uint32_t senderStamp = 0) noexcept {
         cluon::ToProtoVisitor protoEncoder;
 
         cluon::data::Envelope envelope;
@@ -87,9 +85,7 @@ class LIBCLUON_API OD4Session {
             message.accept(protoEncoder);
             envelope.serializedData(protoEncoder.encodedData());
             envelope.sent(cluon::time::now());
-            envelope.sampleTimeStamp((0 == (sampleTimeStamp.seconds() + sampleTimeStamp.microseconds()))
-                                         ? envelope.sent()
-                                         : sampleTimeStamp);
+            envelope.sampleTimeStamp((0 == (sampleTimeStamp.seconds() + sampleTimeStamp.microseconds())) ? envelope.sent() : sampleTimeStamp);
             envelope.senderStamp(senderStamp);
         }
 

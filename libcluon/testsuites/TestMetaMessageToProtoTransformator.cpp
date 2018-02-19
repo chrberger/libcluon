@@ -912,8 +912,7 @@ message ABC_DEF_MyMessage2 {
     //    std::cout << t.content(false) << std::endl;
 }
 
-TEST_CASE(
-    "Transforming two messages with cross-referenced type and sub message name and package name with sub-package.") {
+TEST_CASE("Transforming two messages with cross-referenced type and sub message name and package name with sub-package.") {
     const char *input            = R"(
 package ABC.GHI;
 message DEF.MyMessage1 [id = 1] {

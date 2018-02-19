@@ -65,8 +65,7 @@ MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
         formatFamily = MsgPackConstants::FLOAT_FORMAT;
     } else if (static_cast<uint8_t>(MsgPackConstants::DOUBLE) == T) {
         formatFamily = MsgPackConstants::FLOAT_FORMAT;
-    } else if ((static_cast<uint8_t>(MsgPackConstants::FIXSTR) <= T)
-               && (static_cast<uint8_t>(MsgPackConstants::FIXSTR_END) > T)) {
+    } else if ((static_cast<uint8_t>(MsgPackConstants::FIXSTR) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXSTR_END) > T)) {
         formatFamily = MsgPackConstants::STR_FORMAT;
     } else if (static_cast<uint8_t>(MsgPackConstants::STR8) == T) {
         formatFamily = MsgPackConstants::STR_FORMAT;
@@ -74,8 +73,7 @@ MsgPackConstants FromMsgPackVisitor::getFormatFamily(uint8_t T) noexcept {
         formatFamily = MsgPackConstants::STR_FORMAT;
     } else if (static_cast<uint8_t>(MsgPackConstants::STR32) == T) {
         formatFamily = MsgPackConstants::STR_FORMAT;
-    } else if ((static_cast<uint8_t>(MsgPackConstants::FIXMAP) <= T)
-               && (static_cast<uint8_t>(MsgPackConstants::FIXMAP_END) > T)) {
+    } else if ((static_cast<uint8_t>(MsgPackConstants::FIXMAP) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXMAP_END) > T)) {
         formatFamily = MsgPackConstants::MAP_FORMAT;
     } else if (static_cast<uint8_t>(MsgPackConstants::MAP16) == T) {
         formatFamily = MsgPackConstants::MAP_FORMAT;
@@ -153,8 +151,7 @@ std::string FromMsgPackVisitor::readString(std::istream &in) noexcept {
         if (MsgPackConstants::STR_FORMAT == getFormatFamily(c)) {
             uint32_t length{0};
             const uint8_t T = static_cast<uint8_t>(c);
-            if ((static_cast<uint8_t>(MsgPackConstants::FIXSTR) <= T)
-                && (static_cast<uint8_t>(MsgPackConstants::FIXSTR_END) > T)) {
+            if ((static_cast<uint8_t>(MsgPackConstants::FIXSTR) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXSTR_END) > T)) {
                 length = T - static_cast<uint8_t>(MsgPackConstants::FIXSTR);
             } else if (static_cast<uint8_t>(MsgPackConstants::STR8) == T) {
                 uint8_t _length{0};
@@ -196,8 +193,7 @@ std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> FromMsgPackVisitor::r
             // First, search for map opening token.
             const uint8_t T = static_cast<uint8_t>(c);
             uint32_t tokensToRead{0};
-            if ((static_cast<uint8_t>(MsgPackConstants::FIXMAP) <= T)
-                && (static_cast<uint8_t>(MsgPackConstants::FIXMAP_END) > T)) {
+            if ((static_cast<uint8_t>(MsgPackConstants::FIXMAP) <= T) && (static_cast<uint8_t>(MsgPackConstants::FIXMAP_END) > T)) {
                 tokensToRead = T - static_cast<uint8_t>(MsgPackConstants::FIXMAP);
             } else if (static_cast<uint8_t>(MsgPackConstants::MAP16) == T) {
                 uint16_t tokens{0};

@@ -92,17 +92,12 @@ void MetaMessageToProtoTransformator::visit(const MetaMessage &mm) noexcept {
     std::string packageNameWithUnderscores{mm.packageName()};
     std::replace(packageNameWithUnderscores.begin(), packageNameWithUnderscores.end(), '.', '_');
     const std::string completePackageNameWithNamespacePrefix
-        = packageNameWithUnderscores + (!packageNameWithUnderscores.empty() && !namespacePrefix.empty() ? "." : "")
-          + namespacePrefix;
+        = packageNameWithUnderscores + (!packageNameWithUnderscores.empty() && !namespacePrefix.empty() ? "." : "") + namespacePrefix;
 
     std::string completePackageNameWithNamespacePrefixWithUnderscores{completePackageNameWithNamespacePrefix};
-    std::replace(completePackageNameWithNamespacePrefixWithUnderscores.begin(),
-                 completePackageNameWithNamespacePrefixWithUnderscores.end(),
-                 '.',
-                 '_');
+    std::replace(completePackageNameWithNamespacePrefixWithUnderscores.begin(), completePackageNameWithNamespacePrefixWithUnderscores.end(), '.', '_');
     const std::string completeMessageNameWithUnderscores
-        = completePackageNameWithNamespacePrefixWithUnderscores
-          + (!completePackageNameWithNamespacePrefixWithUnderscores.empty() ? +"_" : "") + messageName;
+        = completePackageNameWithNamespacePrefixWithUnderscores + (!completePackageNameWithNamespacePrefixWithUnderscores.empty() ? +"_" : "") + messageName;
 
     dataToBeRendered.set("%MESSAGE_IDENTIFIER%", std::to_string(mm.messageIdentifier()));
     dataToBeRendered.set("%MESSAGE%", completeMessageNameWithUnderscores);

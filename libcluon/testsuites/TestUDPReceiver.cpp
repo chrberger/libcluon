@@ -70,8 +70,7 @@ TEST_CASE("Creating UDPReceiver and receive data.") {
     cluon::UDPReceiver ur3(
         "127.0.0.1",
         1237,
-        [&hasDataReceived, &data, &sender, &timestamp ](
-            std::string && d, std::string && s, std::chrono::system_clock::time_point && ts) noexcept {
+        [&hasDataReceived, &data, &sender, &timestamp ](std::string && d, std::string && s, std::chrono::system_clock::time_point && ts) noexcept {
             data      = std::move(d);
             sender    = std::move(s);
             timestamp = ts;
@@ -116,13 +115,11 @@ TEST_CASE("Testing multicast with 226.x.y.z address.") {
     REQUIRE(data.empty());
     REQUIRE(!hasDataReceived);
 
-    cluon::UDPReceiver ur4("226.0.0.226",
-                           1238,
-                           [&hasDataReceived, &data ](
-                               std::string && d, std::string &&, std::chrono::system_clock::time_point &&) noexcept {
-                               data = std::move(d);
-                               hasDataReceived.store(true);
-                           });
+    cluon::UDPReceiver ur4(
+        "226.0.0.226", 1238, [&hasDataReceived, &data ](std::string && d, std::string &&, std::chrono::system_clock::time_point &&) noexcept {
+            data = std::move(d);
+            hasDataReceived.store(true);
+        });
     REQUIRE(ur4.isRunning());
 
     // Setup UDPSender.

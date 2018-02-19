@@ -53,8 +53,7 @@ std::string EnvelopeToJSON::getJSONFromProtoEncodedEnvelope(const std::string &p
             // Try decoding complete OD4-encoded Envelope including header.
             constexpr uint8_t byte0{0x0D};
             constexpr uint8_t byte1{0xA4};
-            if ((static_cast<uint8_t>(protoEncodedEnvelope.at(0)) == byte0)
-                && (static_cast<uint8_t>(protoEncodedEnvelope.at(1)) == byte1)) {
+            if ((static_cast<uint8_t>(protoEncodedEnvelope.at(0)) == byte0) && (static_cast<uint8_t>(protoEncodedEnvelope.at(1)) == byte1)) {
                 uint32_t length = (*reinterpret_cast<const uint32_t *>(protoEncodedEnvelope.data() + 1));
                 length          = le32toh(length) >> 8;
                 if ((OD4_HEADER_SIZE + length) == protoEncodedEnvelope.size()) {
@@ -110,8 +109,7 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             std::string tmp{payload.messageName()};
             std::replace(tmp.begin(), tmp.end(), '.', '_');
 
-            retVal = '{' + envelopeToJSON.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{' + payloadToJSON.json() + '}'
-                     + '}';
+            retVal = '{' + envelopeToJSON.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{' + payloadToJSON.json() + '}' + '}';
         }
     }
     return retVal;

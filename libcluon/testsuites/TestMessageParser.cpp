@@ -844,8 +844,7 @@ message myMessageB [id = 17] {
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::DUPLICATE_IDENTIFIERS == mp.parse(std::string(tmp)).second);
 }
 
-TEST_CASE(
-    "Parsing message statement with duplicated message identifiers in set of three messages (A) with package name.") {
+TEST_CASE("Parsing message statement with duplicated message identifiers in set of three messages (A) with package name.") {
     cluon::MessageParser mp;
 
     const char *tmp = R"(
@@ -865,8 +864,7 @@ message myMessageC [id = 23] {
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::DUPLICATE_IDENTIFIERS == mp.parse(std::string(tmp)).second);
 }
 
-TEST_CASE(
-    "Parsing message statement with duplicated message identifiers in set of three messages (B) with package name.") {
+TEST_CASE("Parsing message statement with duplicated message identifiers in set of three messages (B) with package name.") {
     cluon::MessageParser mp;
 
     const char *tmp = R"(
@@ -886,8 +884,7 @@ message myMessageC [id = 14] {
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::DUPLICATE_IDENTIFIERS == mp.parse(std::string(tmp)).second);
 }
 
-TEST_CASE(
-    "Parsing message statement with duplicated message identifiers in set of three messages (C) with package name.") {
+TEST_CASE("Parsing message statement with duplicated message identifiers in set of three messages (C) with package name.") {
     cluon::MessageParser mp;
 
     const char *tmp = R"(
