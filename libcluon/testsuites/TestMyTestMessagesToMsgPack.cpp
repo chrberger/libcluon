@@ -1413,7 +1413,7 @@ TEST_CASE("Testing MyTestMessage5 with positive intX values.") {
     REQUIRE(20003 == tmp.attribute6());
     REQUIRE(54321 == tmp.attribute7());
     REQUIRE(44321 == tmp.attribute8());
-    REQUIRE(-   5.4321f == Approx(tmp.attribute9()));
+    REQUIRE(-5.4321f == Approx(tmp.attribute9()));
     REQUIRE(-50.4321 == Approx(tmp.attribute10()));
     REQUIRE("Hello cluon World!" == tmp.attribute11());
 

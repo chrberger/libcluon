@@ -51,7 +51,6 @@ inline cluon::data::TimeStamp now() noexcept {
     return convert(std::chrono::system_clock::now());
 }
 
-
 } // namespace time
 } // namespace cluon
 

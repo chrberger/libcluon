@@ -49,36 +49,36 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
         constexpr uint8_t OD4_HEADER_SIZE{5};
         std::vector<char> buffer;
         buffer.reserve(OD4_HEADER_SIZE);
-#ifdef WIN32            // LCOV_EXCL_LINE
-        buffer.clear(); // LCOV_EXCL_LINE
-        retVal = true;  // LCOV_EXCL_LINE
-        for (uint8_t i{0}; i < OD4_HEADER_SIZE; i++) {  // LCOV_EXCL_LINE
-            char c;                 // LCOV_EXCL_LINE
-            in.get(c);              // LCOV_EXCL_LINE
-            retVal &= in.good();    // LCOV_EXCL_LINE
-            buffer.push_back(c);    // LCOV_EXCL_LINE
+#ifdef WIN32                                           // LCOV_EXCL_LINE
+        buffer.clear();                                // LCOV_EXCL_LINE
+        retVal = true;                                 // LCOV_EXCL_LINE
+        for (uint8_t i{0}; i < OD4_HEADER_SIZE; i++) { // LCOV_EXCL_LINE
+            char c;                                    // LCOV_EXCL_LINE
+            in.get(c);                                 // LCOV_EXCL_LINE
+            retVal &= in.good();                       // LCOV_EXCL_LINE
+            buffer.push_back(c);                       // LCOV_EXCL_LINE
         }
-        if (retVal) {               // LCOV_EXCL_LINE
+        if (retVal) { // LCOV_EXCL_LINE
 #else
         if (OD4_HEADER_SIZE == in.readsome(&buffer[0], OD4_HEADER_SIZE)) {
 #endif
-            if (   (0x0D == static_cast<uint8_t>(buffer[0]))
-                && (0xA4 == static_cast<uint8_t>(buffer[1]))) {
-                const uint32_t LENGTH{le32toh(*reinterpret_cast<uint32_t*>(&buffer[1])) >> 8};
+            if ((0x0D == static_cast<uint8_t>(buffer[0])) && (0xA4 == static_cast<uint8_t>(buffer[1]))) {
+                const uint32_t LENGTH{le32toh(*reinterpret_cast<uint32_t *>(&buffer[1])) >> 8};
                 buffer.reserve(LENGTH);
-#ifdef WIN32    // LCOV_EXCL_LINE
-                buffer.clear(); // LCOV_EXCL_LINE
-                for (uint8_t i{0}; i < LENGTH; i++) {   // LCOV_EXCL_LINE
-                    char c;                 // LCOV_EXCL_LINE
-                    in.get(c);              // LCOV_EXCL_LINE
-                    retVal &= in.good();    // LCOV_EXCL_LINE
-                    buffer.push_back(c);    // LCOV_EXCL_LINE
+#ifdef WIN32                                          // LCOV_EXCL_LINE
+                buffer.clear();                       // LCOV_EXCL_LINE
+                for (uint8_t i{0}; i < LENGTH; i++) { // LCOV_EXCL_LINE
+                    char c;                           // LCOV_EXCL_LINE
+                    in.get(c);                        // LCOV_EXCL_LINE
+                    retVal &= in.good();              // LCOV_EXCL_LINE
+                    buffer.push_back(c);              // LCOV_EXCL_LINE
                 }
 #else
                 retVal = static_cast<int32_t>(LENGTH) == in.readsome(&buffer[0], static_cast<std::streamsize>(LENGTH));
 #endif
                 if (retVal) {
-                    std::stringstream sstr(std::string(buffer.begin(), buffer.begin() + static_cast<std::streamsize>(LENGTH)));
+                    std::stringstream sstr(
+                        std::string(buffer.begin(), buffer.begin() + static_cast<std::streamsize>(LENGTH)));
                     cluon::FromProtoVisitor protoDecoder;
                     protoDecoder.decodeFrom(sstr);
                     env.accept(protoDecoder);

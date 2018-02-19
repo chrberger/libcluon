@@ -25,20 +25,13 @@ std::map<std::string, std::string> getCommandlineArguments(int32_t argc, char **
     argh::parser commandline{argc, argv};
     std::map<std::string, std::string> retVal;
 
-    for(auto &positionalArgument : commandline.pos_args()) {
-        retVal[positionalArgument] = "";
-    }
+    for (auto &positionalArgument : commandline.pos_args()) { retVal[positionalArgument] = ""; }
 
-    for(auto &flag : commandline.flags()) {
-        retVal[flag] = "1";
-    }
+    for (auto &flag : commandline.flags()) { retVal[flag] = "1"; }
 
-    for(auto &parameter : commandline.params()) {
-        retVal[parameter.first] = parameter.second;
-    }
+    for (auto &parameter : commandline.params()) { retVal[parameter.first] = parameter.second; }
 
     return retVal;
 }
 
 } // namespace cluon
-

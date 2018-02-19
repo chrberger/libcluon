@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/Envelope.hpp"
 #include "cluon/EnvelopeToJSON.hpp"
+#include "cluon/Envelope.hpp"
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
@@ -53,9 +53,10 @@ std::string EnvelopeToJSON::getJSONFromProtoEncodedEnvelope(const std::string &p
             // Try decoding complete OD4-encoded Envelope including header.
             constexpr uint8_t byte0{0x0D};
             constexpr uint8_t byte1{0xA4};
-            if ( (static_cast<uint8_t>(protoEncodedEnvelope.at(0)) == byte0) && (static_cast<uint8_t>(protoEncodedEnvelope.at(1)) == byte1) ) {
-                uint32_t length = (*reinterpret_cast<const uint32_t*>(protoEncodedEnvelope.data()+1));
-                length = le32toh(length) >> 8;
+            if ((static_cast<uint8_t>(protoEncodedEnvelope.at(0)) == byte0)
+                && (static_cast<uint8_t>(protoEncodedEnvelope.at(1)) == byte1)) {
+                uint32_t length = (*reinterpret_cast<const uint32_t *>(protoEncodedEnvelope.data() + 1));
+                length          = le32toh(length) >> 8;
                 if ((OD4_HEADER_SIZE + length) == protoEncodedEnvelope.size()) {
                     auto result{extractEnvelope(sstr)};
                     if (result.first) {

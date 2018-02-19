@@ -25,8 +25,8 @@ TEST_CASE("Test empty commandline parsing.") {
     std::string argv0("myBinary");
     int32_t argc = 1;
     char **argv;
-    argv = new char*[1];
-    argv[0] = const_cast<char*>(argv0.c_str());
+    argv    = new char *[1];
+    argv[0] = const_cast<char *>(argv0.c_str());
 
     auto retVal = cluon::getCommandlineArguments(argc, argv);
     REQUIRE(1 == retVal.size());
@@ -40,11 +40,11 @@ TEST_CASE("Test non-empty commandline parsing.") {
     std::string argv3("--verbose");
     int32_t argc = 4;
     char **argv;
-    argv = new char*[4];
-    argv[0] = const_cast<char*>(argv0.c_str());
-    argv[1] = const_cast<char*>(argv1.c_str());
-    argv[2] = const_cast<char*>(argv2.c_str());
-    argv[3] = const_cast<char*>(argv3.c_str());
+    argv    = new char *[4];
+    argv[0] = const_cast<char *>(argv0.c_str());
+    argv[1] = const_cast<char *>(argv1.c_str());
+    argv[2] = const_cast<char *>(argv2.c_str());
+    argv[3] = const_cast<char *>(argv3.c_str());
 
     auto retVal = cluon::getCommandlineArguments(argc, argv);
     REQUIRE(4 == retVal.size());
