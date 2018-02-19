@@ -59,7 +59,7 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
             buffer.push_back(c);                       // LCOV_EXCL_LINE
         }
         if (retVal) { // LCOV_EXCL_LINE
-#else // LCOV_EXCL_LINE
+#else                 // LCOV_EXCL_LINE
         if (OD4_HEADER_SIZE == in.readsome(&buffer[0], OD4_HEADER_SIZE)) {
 #endif
             if ((0x0D == static_cast<uint8_t>(buffer[0])) && (0xA4 == static_cast<uint8_t>(buffer[1]))) {
