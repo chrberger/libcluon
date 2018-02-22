@@ -1,3 +1,9 @@
+libcluon (0.0.51) xenial; urgency=low
+
+  * Compile fix for single-file, header-only distribution due to missing inline
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 22 Feb 2018 21:30:00 +0100
+
 libcluon (0.0.50) xenial; urgency=low
 
   * Added TCPConnection handling class

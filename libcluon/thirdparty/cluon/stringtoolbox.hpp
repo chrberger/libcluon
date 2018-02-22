@@ -68,7 +68,7 @@ inline std::string replaceAll(const std::string &str,
 /**
  * @return std::vector<std:string> where the given string is split along delimiter.
  */
-std::vector<std::string> split(const std::string &str,
+inline std::vector<std::string> split(const std::string &str,
                                const char &delimiter) noexcept {
   std::vector<std::string> retVal{};
   std::string::size_type prev{0};
