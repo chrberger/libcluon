@@ -16,7 +16,6 @@
  */
 
 #include "cluon/TCPConnection.hpp"
-#include "cluon/cluonDataStructures.hpp"
 
 // clang-format off
 #ifdef WIN32
@@ -63,48 +62,48 @@ TCPConnection::TCPConnection(const std::string &address,
         // Check for valid IP address.
         struct sockaddr_in tmpSocketAddress {};
         const bool isValid = (0 < ::inet_pton(AF_INET, address.c_str(), &(tmpSocketAddress.sin_addr)));
-
-        std::memset(&m_address, 0, sizeof(m_address));
-        m_address.sin_addr.s_addr = ::inet_addr(address.c_str());
-        m_address.sin_family = AF_INET;
-        m_address.sin_port   = htons(port);
-
+        if (isValid) {
+            std::memset(&m_address, 0, sizeof(m_address));
+            m_address.sin_addr.s_addr = ::inet_addr(address.c_str());
+            m_address.sin_family = AF_INET;
+            m_address.sin_port   = htons(port);
 #ifdef WIN32
-        // Load Winsock 2.2 DLL.
-        WSADATA wsaData;
-        if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-            std::cerr << "[cluon::TCPConnection] Error while calling WSAStartUp: " << WSAGetLastError() << std::endl;
-        }
-#endif
-
-        m_socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
-#ifdef WIN32
-        if (m_socket < 0) {
-            std::cerr << "[cluon::TCPConnection] Error while creating socket: " << WSAGetLastError() << std::endl;
-            WSACleanup();
-        }
-#endif
-
-        if (!(m_socket < 0)) {
-            auto retVal = ::connect(m_socket , reinterpret_cast<struct sockaddr *>(&m_address), sizeof(m_address));
-            if (0 > retVal) {
-#ifdef WIN32
-                auto errorCode = WSAGetLastError();
-#else
-                auto errorCode = errno;
-#endif
-                closeSocket(errorCode);
+            // Load Winsock 2.2 DLL.
+            WSADATA wsaData;
+            if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+                std::cerr << "[cluon::TCPConnection] Error while calling WSAStartUp: " << WSAGetLastError() << std::endl;
             }
-            else {
-                // Constructing a thread could fail.
-                try {
-                    m_readFromSocketThread = std::thread(&TCPConnection::readFromSocket, this);
+#endif
 
-                    // Let the operating system spawn the thread.
-                    using namespace std::literals::chrono_literals;
-                    do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
-                } catch (...) { closeSocket(ECHILD); }
+            m_socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+#ifdef WIN32
+            if (m_socket < 0) {
+                std::cerr << "[cluon::TCPConnection] Error while creating socket: " << WSAGetLastError() << std::endl;
+                WSACleanup();
+            }
+#endif
+
+            if (!(m_socket < 0)) {
+                auto retVal = ::connect(m_socket , reinterpret_cast<struct sockaddr *>(&m_address), sizeof(m_address));
+                if (0 > retVal) {
+#ifdef WIN32
+                    auto errorCode = WSAGetLastError();
+#else
+                    auto errorCode = errno;
+#endif
+                    closeSocket(errorCode);
+                }
+                else {
+                    // Constructing a thread could fail.
+                    try {
+                        m_readFromSocketThread = std::thread(&TCPConnection::readFromSocket, this);
+
+                        // Let the operating system spawn the thread.
+                        using namespace std::literals::chrono_literals;
+                        do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
+                    } catch (...) { closeSocket(ECHILD); }
+                }
             }
         }
     }
@@ -169,7 +168,7 @@ std::pair<ssize_t, int32_t> TCPConnection::send(std::string &&data) const noexce
         return {-1, E2BIG};
     }
 
-//    std::lock_guard<std::mutex> lck(m_socketMutex);
+    std::lock_guard<std::mutex> lck(m_socketMutex);
     ssize_t bytesSent = ::send(m_socket, data.c_str(), data.length(), 0);
     return {bytesSent, (0 > bytesSent ? errno : 0)};
 }
@@ -186,12 +185,7 @@ void TCPConnection::readFromSocket() noexcept {
 
     // Define file descriptor set to watch for read operations.
     fd_set setOfFiledescriptorsToReadFrom{};
-
     ssize_t bytesRead{0};
-
-    // Sender address and port.
-    constexpr uint16_t MAX_ADDR_SIZE{1024};
-    std::array<char, MAX_ADDR_SIZE> remoteAddress{};
 
     // Indicate to main thread that we are ready.
     m_readFromSocketThreadRunning.store(true);
@@ -202,7 +196,8 @@ void TCPConnection::readFromSocket() noexcept {
         ::select(m_socket + 1, &setOfFiledescriptorsToReadFrom, nullptr, nullptr, &timeout);
         if (FD_ISSET(m_socket, &setOfFiledescriptorsToReadFrom)) {
             bytesRead = ::recv(m_socket, buffer.data(), buffer.max_size(), 0);
-            if (0 > bytesRead) {
+            if (0 >= bytesRead) {
+                // 0 == bytesRead: peer shut down the connection; 0 > bytesRead: other error.
                 m_readFromSocketThreadRunning.store(false);
                 if (nullptr != m_connectionLostDelegate) {
                     m_connectionLostDelegate();
@@ -218,11 +213,6 @@ void TCPConnection::readFromSocket() noexcept {
                     std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> transformedTimePoint(
                         std::chrono::microseconds(receivedTimeStamp.tv_sec * 1000000L + receivedTimeStamp.tv_usec));
                     timestamp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(transformedTimePoint);
-
-                    cluon::data::TimeStamp ts;
-                    ts.seconds(static_cast<int32_t>(receivedTimeStamp.tv_sec));
-                    ts.microseconds(static_cast<int32_t>(receivedTimeStamp.tv_usec));
-
                 } else {
                     // In case the ioctl failed, fall back to chrono.
                     timestamp = std::chrono::system_clock::now();
@@ -233,7 +223,8 @@ void TCPConnection::readFromSocket() noexcept {
                 // Call newDataDelegate.
                 m_newDataDelegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)), timestamp);
             }
-        } else {
+        }
+        else {
             // Let the operating system yield other threads.
             using namespace std::literals::chrono_literals;
             std::this_thread::sleep_for(1ms);

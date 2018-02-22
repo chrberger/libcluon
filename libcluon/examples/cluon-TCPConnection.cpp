@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018  Christian Berger
+ * Copyright (C) 2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
     const std::string PROGRAM(argv[0]); // NOLINT
     if (3 != argc) {
         std::cerr << PROGRAM
-                  << " demonstrates how to use libcluon to receive data via TCP (running for 60s)." << std::endl;
+                  << " demonstrates how to use libcluon to send & receive data using a TCP connection (running for 60s)." << std::endl;
         std::cerr << "Usage:   " << PROGRAM << " IPv4-address port" << std::endl;
         std::cerr << "Example: " << PROGRAM << " 127.0.0.1 1234" << std::endl;
     } else {
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
         if (connection.isRunning()) {
             using namespace std::literals::chrono_literals; // NOLINT
             std::this_thread::sleep_for(5s);
-            connection.send("Welcome back!");
+            connection.send("Sending demo data!");
 
             std::this_thread::sleep_for(60s);
             retVal = 0;

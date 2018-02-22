@@ -34,6 +34,7 @@
 #include <atomic>
 #include <chrono>
 #include <functional>
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -133,6 +134,7 @@ class LIBCLUON_API TCPConnection {
     void readFromSocket() noexcept;
 
    private:
+    mutable std::mutex m_socketMutex{};
     int32_t m_socket{-1};
     struct sockaddr_in m_address {};
     std::atomic<bool> m_readFromSocketThreadRunning{false};
