@@ -16,6 +16,7 @@
  */
 
 #include "cluon/MessageParser.hpp"
+#include "cluon/stringtoolbox.hpp"
 
 #include "cpp-peglib/peglib.h"
 
@@ -126,7 +127,7 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
             for (const auto &node : ast.nodes) {
                 if ("MESSAGE_IDENTIFIER" == node->name) {
                     prefix = node->token;
-                    messageNames.push_back(trim(prefix));
+                    messageNames.push_back(::stringtoolbox::trim(prefix));
                 } else if ("NATURAL_NUMBER" == node->name) {
                     numericalMessageIdentifiers.push_back(std::stoi(node->token));
                 } else if ("PRIMITIVE_FIELD" == node->name) {
@@ -148,7 +149,7 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                 retVal &= (-1 == duplicatedFieldIdentifier);
                 if (!retVal) {
                     std::cerr << "[cluon::MessageParser] Found duplicated numerical field identifier in message "
-                              << "'" << cluon::trim(prefix) << "': " << duplicatedFieldIdentifier << '\n';
+                              << "'" << ::stringtoolbox::trim(prefix) << "': " << duplicatedFieldIdentifier << '\n';
                 }
             }
             // Try finding duplicated field names.
@@ -164,7 +165,7 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                 }
                 retVal &= (duplicatedFieldName.empty());
                 if (!retVal) {
-                    std::cerr << "[cluon::MessageParser] Found duplicated field name in message '" << cluon::trim(prefix) << "': '" << duplicatedFieldName
+                    std::cerr << "[cluon::MessageParser] Found duplicated field name in message '" << ::stringtoolbox::trim(prefix) << "': '" << duplicatedFieldName
                               << "'" << '\n';
                 }
             }
@@ -204,12 +205,12 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
               // "Inner"-lambda to handle various types of message declarations.
               auto createMetaMessage = [](const peg::Ast &_node, std::string _packageName) -> MetaMessage {
                   MetaMessage mm;
-                  mm.packageName(trim(_packageName));
+                  mm.packageName(::stringtoolbox::trim(_packageName));
                   uint32_t fieldIdentifierCounter{0};
                   for (const auto &e : _node.nodes) {
                       if ("MESSAGE_IDENTIFIER" == e->name) {
                           std::string _messageName = e->token;
-                          mm.messageName(trim(_messageName));
+                          mm.messageName(::stringtoolbox::trim(_messageName));
                       } else if ("NATURAL_NUMBER" == e->name) {
                           mm.messageIdentifier(static_cast<uint32_t>(std::stoi(e->token)));
                       } else if ("PRIMITIVE_FIELD" == e->name) {
@@ -273,9 +274,9 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                           } else {
                               mf.fieldDataType(MetaMessage::MetaField::MESSAGE_T);
                           }
-                          mf.fieldDataTypeName(cluon::trim(_fieldDataType));
-                          mf.fieldName(trim(_fieldName));
-                          mf.fieldIdentifier((!_fieldIdentifier.empty() ? static_cast<uint32_t>(std::stoi(trim(_fieldIdentifier))) : fieldIdentifierCounter));
+                          mf.fieldDataTypeName(::stringtoolbox::trim(_fieldDataType));
+                          mf.fieldName(::stringtoolbox::trim(_fieldName));
+                          mf.fieldIdentifier((!_fieldIdentifier.empty() ? static_cast<uint32_t>(std::stoi(::stringtoolbox::trim(_fieldIdentifier))) : fieldIdentifierCounter));
                           mf.defaultInitializationValue(_fieldDefaultInitializerValue);
                           mm.add(std::move(mf));
                       }

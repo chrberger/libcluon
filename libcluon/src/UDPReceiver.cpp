@@ -17,7 +17,6 @@
 
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/UDPPacketSizeConstraints.hpp"
-#include "cluon/cluonDataStructures.hpp"
 
 // clang-format off
 #ifdef WIN32
@@ -260,11 +259,6 @@ void UDPReceiver::readFromSocket() noexcept {
                     std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> transformedTimePoint(
                         std::chrono::microseconds(receivedTimeStamp.tv_sec * 1000000L + receivedTimeStamp.tv_usec));
                     timestamp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(transformedTimePoint);
-
-                    cluon::data::TimeStamp ts;
-                    ts.seconds(static_cast<int32_t>(receivedTimeStamp.tv_sec));
-                    ts.microseconds(static_cast<int32_t>(receivedTimeStamp.tv_usec));
-
                 } else { // LCOV_EXCL_LINE
                     // In case the ioctl failed, fall back to chrono. // LCOV_EXCL_LINE
                     timestamp = std::chrono::system_clock::now(); // LCOV_EXCL_LINE

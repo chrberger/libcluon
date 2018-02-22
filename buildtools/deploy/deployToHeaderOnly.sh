@@ -63,6 +63,8 @@ cat <<EOF >> tmp.headeronly/cluon-complete.cpp
 #endif
 EOF
 
+cat libcluon/thirdparty/cluon/stringtoolbox.hpp >> tmp.headeronly/cluon-complete.hpp
+
 for i in \
     cluon/Time.hpp \
     cluon/PortableEndian.hpp \
@@ -72,6 +74,7 @@ for i in \
     cluon/UDPPacketSizeConstraints.hpp \
     cluon/UDPSender.hpp \
     cluon/UDPReceiver.hpp \
+    cluon/TCPConnection.hpp \
     cluon/ProtoConstants.hpp \
     cluon/ToProtoVisitor.hpp \
     cluon/FromProtoVisitor.hpp \
@@ -102,6 +105,7 @@ for i in \
     MessageParser.cpp \
     UDPSender.cpp \
     UDPReceiver.cpp \
+    TCPConnection.cpp \
     ToProtoVisitor.cpp \
     FromProtoVisitor.cpp \
     FromLCMVisitor.cpp \
