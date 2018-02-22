@@ -63,6 +63,8 @@ cat <<EOF >> tmp.headeronly/cluon-complete.cpp
 #endif
 EOF
 
+cat libcluon/thirdparty/cluon/stringtoolbox.hpp >> tmp.headeronly/cluon-complete.hpp
+
 for i in \
     cluon/Time.hpp \
     cluon/PortableEndian.hpp \

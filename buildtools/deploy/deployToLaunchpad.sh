@@ -104,6 +104,10 @@ Files: libcluon/thirdparty/Mustache/*
 Copyright: Copyright 2015-2018 Kevin Wojniak.
 License: Boost-1.0
 
+Files: libcluon/thirdparty/cluon/stringtoolbox.hpp
+Copyright: Copyright (c) 2018 Christian Berger. All rights reserved.
+License: MIT
+
 Files: libcluon/thirdparty/cluon/any/*
 Copyright: Copyright (c) 2016-18 Denilson das Mercês Amorim.
 License: Boost-1.0

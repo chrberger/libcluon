@@ -71,28 +71,6 @@ namespace cluon {
  */
 std::map<std::string, std::string> getCommandlineArguments(int32_t argc, char **argv) noexcept;
 
-/**
- * @return std::string without trailing whitespace characters.
- */
-inline std::string &rtrim(std::string &str) {
-    str.erase(str.find_last_not_of(" \t") + 1);
-    return str;
-}
-
-/**
- * @return std::tring without leading whitespace characters.
- */
-inline std::string &ltrim(std::string &str) {
-    str.erase(0, str.find_first_not_of(" \t"));
-    return str;
-}
-
-/**
- * @return std:string without leading and trailing whitespace characters.
- */
-inline std::string &trim(std::string &str) {
-    return ltrim(rtrim(str));
-}
 } // namespace cluon
 
 #endif

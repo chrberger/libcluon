@@ -50,6 +50,8 @@ No dependencies! All you need is a C++14-compliant compiler (we are testing with
 * [thelink2012/any](https://github.com/thelink2012/any) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/cluon/any)
 * [adishavit/argh v1.2.0](https://github.com/adishavit/argh/releases/tag/v1.2.0) - [![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/argh)
 * [yhirose/cpp-peglib](https://github.com/yhirose/cpp-peglib) - [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/cpp-peglib)
+* [chrberger/stringtoolbox](https://github.com/chrberger/stringtoolbox) - [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/cluon/stringtoolbox.hpp)
+
 
 ## Installation
 ### Installation as single-file, header-only library
