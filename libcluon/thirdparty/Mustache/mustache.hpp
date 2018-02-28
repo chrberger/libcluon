@@ -1,5 +1,7 @@
 /*
- * Copyright 2015-2017 Kevin Wojniak
+ * Boost Software License - Version 1.0
+ *
+ * Copyright 2015-2018 Kevin Wojniak
  *
  * Permission is hereby granted, free of charge, to any person or organization
  * obtaining a copy of the software and accompanying documentation covered by
@@ -325,6 +327,10 @@ public:
     // Object data
     void set(const string_type& name, const basic_data& var) {
         if (is_object()) {
+            auto it = obj_->find(name);
+            if (it != obj_->end()) {
+                obj_->erase(it);
+            }
             obj_->insert(std::pair<string_type,basic_data>{name, var});
         }
     }
@@ -1014,4 +1020,3 @@ using dataw = basic_data<mustachew::string_type>;
 } // namespace kainjow
 
 #endif // KAINJOW_MUSTACHE_HPP
-
