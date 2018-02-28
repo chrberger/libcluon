@@ -1,3 +1,9 @@
+libcluon (0.0.52) xenial; urgency=low
+
+  * Adjusted message identifier type to int32_t to match ODVD grammar
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 28 Feb 2018 11:08:45 +0100
+
 libcluon (0.0.51) xenial; urgency=low
 
   * Compile fix for single-file, header-only distribution due to missing inline
