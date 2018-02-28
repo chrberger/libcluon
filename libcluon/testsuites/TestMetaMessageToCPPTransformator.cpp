@@ -163,7 +163,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -213,7 +213,7 @@ struct isTripletForwardVisitable<MyMessage1> {
  */
 
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -371,7 +371,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -421,7 +421,7 @@ struct isTripletForwardVisitable<MyMessage1> {
  */
 
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -555,7 +555,7 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -605,7 +605,7 @@ struct isTripletForwardVisitable<MyMessage2> {
  */
 
 
-uint32_t MyMessage2::ID() {
+int32_t MyMessage2::ID() {
     return 2;
 }
 
@@ -774,7 +774,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -824,7 +824,7 @@ struct isTripletForwardVisitable<MyPackage::MyMessage1> {
  */
 namespace MyPackage {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -958,7 +958,7 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -1008,7 +1008,7 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
  */
 namespace MyPackage {
 
-uint32_t MyMessage2::ID() {
+int32_t MyMessage2::ID() {
     return 2;
 }
 
@@ -1178,7 +1178,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -1228,7 +1228,7 @@ struct isTripletForwardVisitable<MyPackage::MyMessage1> {
  */
 namespace MyPackage {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -1362,7 +1362,7 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -1412,7 +1412,7 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
  */
 namespace MyPackage {
 
-uint32_t MyMessage2::ID() {
+int32_t MyMessage2::ID() {
     return 2;
 }
 
@@ -1582,7 +1582,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -1632,7 +1632,7 @@ struct isTripletForwardVisitable<MyPackage::SubPackage::MyMessage1> {
  */
 namespace MyPackage { namespace SubPackage {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -1766,7 +1766,7 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -1816,7 +1816,7 @@ struct isTripletForwardVisitable<MyPackage::SubPackage::MyMessage2> {
  */
 namespace MyPackage { namespace SubPackage {
 
-uint32_t MyMessage2::ID() {
+int32_t MyMessage2::ID() {
     return 2;
 }
 
@@ -1982,7 +1982,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -2032,7 +2032,7 @@ struct isTripletForwardVisitable<MyPackage1::MyMessage1> {
  */
 namespace MyPackage1 {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -2187,7 +2187,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -2237,7 +2237,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MyMessage1> {
  */
 namespace MyPackage1 { namespace MySubPackage {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -2392,7 +2392,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -2442,7 +2442,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackageMessage::MyMessage1> {
  */
 namespace MyPackage1 { namespace MySubPackageMessage {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -2598,7 +2598,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -2648,7 +2648,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MySubPackageMessage::
  */
 namespace MyPackage1 { namespace MySubPackage { namespace MySubPackageMessage {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -2808,7 +2808,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -2912,7 +2912,7 @@ struct isTripletForwardVisitable<MyMessage1> {
  */
 
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -3127,7 +3127,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -3294,7 +3294,7 @@ struct isTripletForwardVisitable<MyMessage1> {
  */
 
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -3557,7 +3557,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -3607,7 +3607,7 @@ struct isTripletForwardVisitable<MyMessage1> {
  */
 
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -3741,7 +3741,7 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -3800,7 +3800,7 @@ struct isTripletForwardVisitable<MyMessage2> {
  */
 
 
-uint32_t MyMessage2::ID() {
+int32_t MyMessage2::ID() {
     return 2;
 }
 
@@ -3977,7 +3977,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -4027,7 +4027,7 @@ struct isTripletForwardVisitable<DEF::MyMessage1> {
  */
 namespace DEF {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -4161,7 +4161,7 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -4220,7 +4220,7 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
  */
 namespace DEF {
 
-uint32_t MyMessage2::ID() {
+int32_t MyMessage2::ID() {
     return 2;
 }
 
@@ -4398,7 +4398,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -4448,7 +4448,7 @@ struct isTripletForwardVisitable<DEF::MyMessage1> {
  */
 namespace DEF {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -4582,7 +4582,7 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -4641,7 +4641,7 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
  */
 namespace DEF {
 
-uint32_t MyMessage2::ID() {
+int32_t MyMessage2::ID() {
     return 2;
 }
 
@@ -4820,7 +4820,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -4870,7 +4870,7 @@ struct isTripletForwardVisitable<ABC::DEF::MyMessage1> {
  */
 namespace ABC { namespace DEF {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -5004,7 +5004,7 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -5063,7 +5063,7 @@ struct isTripletForwardVisitable<ABC::DEF::MyMessage2> {
  */
 namespace ABC { namespace DEF {
 
-uint32_t MyMessage2::ID() {
+int32_t MyMessage2::ID() {
     return 2;
 }
 
@@ -5242,7 +5242,7 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -5292,7 +5292,7 @@ struct isTripletForwardVisitable<ABC::GHI::DEF::MyMessage1> {
  */
 namespace ABC { namespace GHI { namespace DEF {
 
-uint32_t MyMessage1::ID() {
+int32_t MyMessage1::ID() {
     return 1;
 }
 
@@ -5426,7 +5426,7 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -5485,7 +5485,7 @@ struct isTripletForwardVisitable<ABC::GHI::DEF::MyMessage2> {
  */
 namespace ABC { namespace GHI { namespace DEF {
 
-uint32_t MyMessage2::ID() {
+int32_t MyMessage2::ID() {
     return 2;
 }
 

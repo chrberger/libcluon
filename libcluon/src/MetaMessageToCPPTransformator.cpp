@@ -141,7 +141,7 @@ class LIB_API {{%MESSAGE%}} {
         ~{{%MESSAGE%}}() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         {{#%FIELDS%}}
@@ -191,7 +191,7 @@ const char *sourceFileTemplate = R"(
  */
 {{%NAMESPACE_OPENING%}}
 
-uint32_t {{%MESSAGE%}}::ID() {
+int32_t {{%MESSAGE%}}::ID() {
     return {{%IDENTIFIER%}};
 }
 
