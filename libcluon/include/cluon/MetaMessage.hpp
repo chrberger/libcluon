@@ -193,19 +193,19 @@ class LIBCLUON_API MetaMessage {
     /**
      * @return Message identifier.
      */
-    uint32_t messageIdentifier() const noexcept;
+    int32_t messageIdentifier() const noexcept;
     /**
      * This method sets the message identifier.
      *
      * @param v Message identifier for this message.
      * @return Reference to this instance.
      */
-    MetaMessage &messageIdentifier(uint32_t v) noexcept;
+    MetaMessage &messageIdentifier(int32_t v) noexcept;
 
    private:
     std::string m_packageName{""};
     std::string m_messageName{""};
-    uint32_t m_messageIdentifier{0};
+    int32_t m_messageIdentifier{0};
     std::vector<MetaField> m_listOfMetaFields{};
 };
 } // namespace cluon

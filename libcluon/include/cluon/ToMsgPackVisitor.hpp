@@ -49,7 +49,7 @@ class LIBCLUON_API ToMsgPackVisitor {
     // The following methods are provided to allow an instance of this class to
     // be used as visitor for an instance with the method signature void accept<T>(T&);
 
-    void preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept;
+    void preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept;
     void postVisit() noexcept;
 
     void visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept;

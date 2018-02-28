@@ -169,7 +169,7 @@ FromProtoVisitor &FromProtoVisitor::operator=(const FromProtoVisitor &other) noe
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void FromProtoVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void FromProtoVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;

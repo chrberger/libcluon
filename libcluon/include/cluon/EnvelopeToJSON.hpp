@@ -72,7 +72,7 @@ class LIBCLUON_API EnvelopeToJSON {
 
    private:
     std::vector<cluon::MetaMessage> m_listOfMetaMessages{};
-    std::map<uint32_t, cluon::MetaMessage> m_scopeOfMetaMessages{};
+    std::map<int32_t, cluon::MetaMessage> m_scopeOfMetaMessages{};
 };
 } // namespace cluon
 #endif

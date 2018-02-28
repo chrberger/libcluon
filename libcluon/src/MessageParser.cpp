@@ -212,7 +212,7 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                           std::string _messageName = e->token;
                           mm.messageName(::stringtoolbox::trim(_messageName));
                       } else if ("NATURAL_NUMBER" == e->name) {
-                          mm.messageIdentifier(static_cast<uint32_t>(std::stoi(e->token)));
+                          mm.messageIdentifier(std::stoi(e->token));
                       } else if ("PRIMITIVE_FIELD" == e->name) {
                           std::string _fieldName;
                           auto fieldName = std::find_if(std::begin(e->nodes), std::end(e->nodes), [](auto a) { return (a->name == "IDENTIFIER"); });

@@ -132,7 +132,7 @@ void ToMsgPackVisitor::encodeInt(std::ostream &o, int64_t v) {
     }
 }
 
-void ToMsgPackVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void ToMsgPackVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;

@@ -83,11 +83,11 @@ MetaMessage &MetaMessage::messageName(const std::string &v) noexcept {
     return *this;
 }
 
-uint32_t MetaMessage::messageIdentifier() const noexcept {
+int32_t MetaMessage::messageIdentifier() const noexcept {
     return m_messageIdentifier;
 }
 
-MetaMessage &MetaMessage::messageIdentifier(uint32_t v) noexcept {
+MetaMessage &MetaMessage::messageIdentifier(int32_t v) noexcept {
     m_messageIdentifier = v;
     return *this;
 }

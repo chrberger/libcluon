@@ -30,7 +30,7 @@ std::string ToODVDVisitor::messageSpecification() const noexcept {
     return retVal;
 }
 
-void ToODVDVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void ToODVDVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)shortName;
     m_buffer << "message " << longName << " [ id = " << id << " ] {" << '\n';
 }

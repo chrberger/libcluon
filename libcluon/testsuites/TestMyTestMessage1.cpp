@@ -324,7 +324,7 @@ TEST_CASE("Testing MyTestMessage1 with visitor to summarize values.") {
 
     ExtendedSummarizer es;
     int64_t val = 0;
-    tmp.accept([&es](uint32_t, const std::string &, const std::string &_s) { es.pre(_s); },
+    tmp.accept([&es](int32_t, const std::string &, const std::string &_s) { es.pre(_s); },
                [&es, &val](const uint32_t &, std::string &&, std::string &&, auto a) { es.sum(&val, a); },
                [&es]() { es.post(); });
 
@@ -332,13 +332,13 @@ TEST_CASE("Testing MyTestMessage1 with visitor to summarize values.") {
 
     val = 0;
     tmp.accept(
-        [](uint32_t, const std::string &, const std::string &) {}, [&es, &val](uint32_t, std::string &&, std::string &&, auto a) { es.sum(&val, a); }, []() {});
+        [](int32_t, const std::string &, const std::string &) {}, [&es, &val](uint32_t, std::string &&, std::string &&, auto a) { es.sum(&val, a); }, []() {});
 
     REQUIRE(4 == val);
 
     // Simple toString().
     std::stringstream buffer;
-    tmp.accept([](uint32_t, const std::string &, const std::string &) {},
+    tmp.accept([](int32_t, const std::string &, const std::string &) {},
                [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << '\n'; },
                []() {});
     std::cout << buffer.str() << std::endl;

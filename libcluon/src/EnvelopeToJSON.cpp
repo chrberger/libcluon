@@ -81,7 +81,7 @@ std::string EnvelopeToJSON::getJSONFromProtoEncodedEnvelope(const std::string &p
 std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope) noexcept {
     std::string retVal{"{}"};
     if (!m_listOfMetaMessages.empty()) {
-        if (0 < m_scopeOfMetaMessages.count(static_cast<uint32_t>(envelope.dataType()))) {
+        if (0 < m_scopeOfMetaMessages.count(envelope.dataType())) {
             // First, create JSON from Envelope.
             constexpr bool OUTER_CURLY_BRACES{false};
             // Ignore field 2 (= serializedData) as it will be replaced below.
@@ -94,7 +94,7 @@ std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope)
             protoDecoder.decodeFrom(sstr);
 
             // Now, create JSON from payload.
-            cluon::MetaMessage payload{m_scopeOfMetaMessages[static_cast<uint32_t>(envelope.dataType())]};
+            cluon::MetaMessage payload{m_scopeOfMetaMessages[envelope.dataType()]};
             cluon::GenericMessage gm;
 
             // Create "empty" GenericMessage from this MetaMessage.

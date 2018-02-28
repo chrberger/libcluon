@@ -26,7 +26,7 @@ std::string ToProtoVisitor::encodedData() const noexcept {
     return s;
 }
 
-void ToProtoVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void ToProtoVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;

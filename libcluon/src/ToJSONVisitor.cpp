@@ -35,7 +35,7 @@ std::string ToJSONVisitor::json() const noexcept {
     return retVal;
 }
 
-void ToJSONVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void ToJSONVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)longName;
     (void)shortName;

@@ -33,7 +33,7 @@ class SetValues {
    public:
     uint32_t value{1000};
 
-    void preVisit(uint32_t, const std::string &, const std::string &) noexcept {}
+    void preVisit(int32_t, const std::string &, const std::string &) noexcept {}
     void postVisit() noexcept {}
 
     void visit(uint32_t, std::string &&, std::string &&, uint32_t &v) noexcept { v = value++; }
@@ -47,7 +47,7 @@ class ValueSummarizer {
    public:
     uint32_t value{0};
 
-    void preVisit(uint32_t, const std::string &, const std::string &) noexcept {}
+    void preVisit(int32_t, const std::string &, const std::string &) noexcept {}
     void postVisit() noexcept {}
 
     void visit(uint32_t, std::string &&, std::string &&, uint32_t &v) noexcept { value += v; }

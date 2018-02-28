@@ -50,7 +50,7 @@ void FromLCMVisitor::decodeFrom(std::istream &in) noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void FromLCMVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void FromLCMVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;

@@ -191,7 +191,7 @@ class LIBCLUON_API GenericMessage {
        public:
         // The following methods are provided to allow an instance of this class to
         // be used as visitor for an instance with the method signature void accept<T>(T&);
-        void preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept;
+        void preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept;
         void postVisit() noexcept;
 
         void visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept;
@@ -246,7 +246,7 @@ class LIBCLUON_API GenericMessage {
     GenericMessage &operator=(const GenericMessage &) = default;
 
    public:
-    uint32_t ID();
+    int32_t ID();
     const std::string ShortName();
     const std::string LongName();
 
@@ -278,7 +278,7 @@ class LIBCLUON_API GenericMessage {
    public:
     // The following methods are provided to allow an instance of this class to
     // be used as visitor for an instance with the method signature void accept<T>(T&);
-    void preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept;
+    void preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept;
     void postVisit() noexcept;
 
     void visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept;

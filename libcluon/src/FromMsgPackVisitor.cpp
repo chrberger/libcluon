@@ -270,7 +270,7 @@ void FromMsgPackVisitor::decodeFrom(std::istream &in) noexcept {
     m_keyValues = readKeyValues(in);
 }
 
-void FromMsgPackVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void FromMsgPackVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;

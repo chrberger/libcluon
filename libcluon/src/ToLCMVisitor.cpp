@@ -40,7 +40,7 @@ std::string ToLCMVisitor::encodedData(bool withHash) const noexcept {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ToLCMVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void ToLCMVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;

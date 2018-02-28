@@ -1787,7 +1787,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
 
     // Simple toString().
     std::stringstream buffer;
-    tmp7_2.accept([](uint32_t, const std::string &, const std::string &) {},
+    tmp7_2.accept([](int32_t, const std::string &, const std::string &) {},
                   [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << +v << '\n'; },
                   []() {});
     std::cout << buffer.str() << std::endl;

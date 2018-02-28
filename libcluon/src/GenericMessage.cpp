@@ -23,7 +23,7 @@
 
 namespace cluon {
 
-void GenericMessage::GenericMessageVisitor::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void GenericMessage::GenericMessageVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)longName;
     m_metaMessage.messageIdentifier(id).messageName(shortName);
     if (!longName.empty()) {
@@ -137,7 +137,7 @@ std::map<uint32_t, linb::any> GenericMessage::GenericMessageVisitor::intermediat
 
 ////////////////////////////////////////////////////////////////////////////////
 
-uint32_t GenericMessage::ID() {
+int32_t GenericMessage::ID() {
     return m_metaMessage.messageIdentifier();
 }
 
@@ -154,7 +154,7 @@ const std::string GenericMessage::LongName() {
     return m_metaMessage.packageName() + (!m_metaMessage.packageName().empty() ? "." : "") + m_metaMessage.messageName();
 }
 
-void GenericMessage::preVisit(uint32_t id, const std::string &shortName, const std::string &longName) noexcept {
+void GenericMessage::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
     (void)id;
     (void)shortName;
     (void)longName;
