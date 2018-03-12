@@ -1,3 +1,9 @@
+libcluon (0.0.53) xenial; urgency=low
+
+  * cluon-replay replays Envelopes now to stdout
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 12 Mar 2018 22:05:50 +0100
+
 libcluon (0.0.52) xenial; urgency=low
 
   * Adjusted message identifier type to int32_t to match ODVD grammar
