@@ -1,5 +1,5 @@
 // This is an auto-generated header-only single-file distribution of libcluon.
-// Date: Wed, 28 Feb 2018 11:09:31 +0100
+// Date: Mon, 12 Mar 2018 22:01:01 +0100
 // Version: 0.0.52
 //
 //
@@ -3750,7 +3750,7 @@ class LIB_API TimeStamp {
         ~TimeStamp() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -3914,7 +3914,7 @@ class LIB_API Envelope {
         ~Envelope() = default;
 
     public:
-        static uint32_t ID();
+        static int32_t ID();
         static const std::string ShortName();
         static const std::string LongName();
         
@@ -6273,17 +6273,51 @@ class LIBCLUON_API EnvelopeToJSON {
 #define ENVELOPE_HPP
 
 //#include "cluon/FromProtoVisitor.hpp"
+//#include "cluon/ToProtoVisitor.hpp"
 //#include "cluon/cluonDataStructures.hpp"
 
 #include <cstring>
+#include <array>
 #include <istream>
 #include <sstream>
+#include <string>
 #include <utility>
 #include <vector>
 
-#include <iostream>
-
 namespace cluon {
+
+/**
+ * This method transforms a given Envelope to a string representation to be
+ * sent to an OpenDaVINCI session.
+ *
+ * @param envelope Envelope with payload to be sent.
+ * @return String representation of the Envelope to be sent to OpenDaVINCI v4.
+ */
+inline std::string serializeEnvelope(cluon::data::Envelope &&envelope) noexcept {
+    std::string dataToSend;
+    {
+        cluon::ToProtoVisitor protoEncoder;
+        envelope.accept(protoEncoder);
+
+        const std::string tmp{protoEncoder.encodedData()};
+        uint32_t length{static_cast<uint32_t>(tmp.size())};
+        length = htole32(length);
+
+        // Add OpenDaVINCI header.
+        std::array<char, 5> header;
+        header[0] = static_cast<char>(0x0D);
+        header[1] = static_cast<char>(0xA4);
+        header[2] = *(reinterpret_cast<char *>(&length) + 0);
+        header[3] = *(reinterpret_cast<char *>(&length) + 1);
+        header[4] = *(reinterpret_cast<char *>(&length) + 2);
+
+        std::stringstream sstr;
+        sstr.write(header.data(), static_cast<std::streamsize>(header.size()));
+        sstr.write(tmp.data(), static_cast<std::streamsize>(tmp.size()));
+        dataToSend = sstr.str();
+    }
+    return dataToSend;
+}
 
 /**
  * This method extracts an Envelope from the given istream that holds bytes in
@@ -7060,15 +7094,6 @@ class LIBCLUON_API OD4Session {
    public:
     bool isRunning() noexcept;
 
-    /**
-     * This method transforms a given Envelope to a string representation to be
-     * sent to an OpenDaVINCI session.
-     *
-     * @param envelope Envelope with payload to be sent.
-     * @return String representation of the Envelope to be sent to OpenDaVINCI v4.
-     */
-    static std::string serializeAsOD4Container(cluon::data::Envelope &&envelope) noexcept;
-
    private:
     void callback(std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) noexcept;
     void sendInternal(std::string &&dataToSend) noexcept;
@@ -7088,7 +7113,7 @@ class LIBCLUON_API OD4Session {
  */
 namespace cluon { namespace data {
 
-inline uint32_t TimeStamp::ID() {
+inline int32_t TimeStamp::ID() {
     return 12;
 }
 
@@ -7123,7 +7148,7 @@ inline int32_t TimeStamp::microseconds() const noexcept {
  */
 namespace cluon { namespace data {
 
-inline uint32_t Envelope::ID() {
+inline int32_t Envelope::ID() {
     return 1;
 }
 
@@ -10970,10 +10995,10 @@ inline void ToMsgPackVisitor::visit(uint32_t id, std::string &&typeName, std::st
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//#include "cluon/Envelope.hpp"
 //#include "cluon/OD4Session.hpp"
 //#include "cluon/FromProtoVisitor.hpp"
 
-#include <array>
 #include <iostream>
 #include <sstream>
 
@@ -11036,33 +11061,7 @@ inline void OD4Session::callback(std::string &&data, std::string &&from, std::ch
 }
 
 inline void OD4Session::send(cluon::data::Envelope &&envelope) noexcept {
-    sendInternal(cluon::OD4Session::serializeAsOD4Container(std::move(envelope)));
-}
-
-inline std::string OD4Session::serializeAsOD4Container(cluon::data::Envelope &&envelope) noexcept {
-    std::string dataToSend;
-    {
-        cluon::ToProtoVisitor protoEncoder;
-        envelope.accept(protoEncoder);
-
-        const std::string tmp{protoEncoder.encodedData()};
-        uint32_t length{static_cast<uint32_t>(tmp.size())};
-        length = htole32(length);
-
-        // Add OpenDaVINCI header.
-        std::array<char, 5> header;
-        header[0] = static_cast<char>(0x0D);
-        header[1] = static_cast<char>(0xA4);
-        header[2] = *(reinterpret_cast<char *>(&length) + 0);
-        header[3] = *(reinterpret_cast<char *>(&length) + 1);
-        header[4] = *(reinterpret_cast<char *>(&length) + 2);
-
-        std::stringstream sstr;
-        sstr.write(header.data(), static_cast<std::streamsize>(header.size()));
-        sstr.write(tmp.data(), static_cast<std::streamsize>(tmp.size()));
-        dataToSend = sstr.str();
-    }
-    return dataToSend;
+    sendInternal(cluon::serializeEnvelope(std::move(envelope)));
 }
 
 inline void OD4Session::sendInternal(std::string &&dataToSend) noexcept {
@@ -11341,7 +11340,9 @@ inline std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &en
 #endif
 #ifdef HAVE_CLUON_MSC
 /*
- * Copyright 2015-2017 Kevin Wojniak
+ * Boost Software License - Version 1.0
+ *
+ * Copyright 2015-2018 Kevin Wojniak
  *
  * Permission is hereby granted, free of charge, to any person or organization
  * obtaining a copy of the software and accompanying documentation covered by
@@ -11667,6 +11668,10 @@ public:
     // Object data
     void set(const string_type& name, const basic_data& var) {
         if (is_object()) {
+            auto it = obj_->find(name);
+            if (it != obj_->end()) {
+                obj_->erase(it);
+            }
             obj_->insert(std::pair<string_type,basic_data>{name, var});
         }
     }
@@ -12356,7 +12361,6 @@ using dataw = basic_data<mustachew::string_type>;
 } // namespace kainjow
 
 #endif // KAINJOW_MUSTACHE_HPP
-
 /*
  * Copyright (C) 2017-2018  Christian Berger
  *
@@ -13087,6 +13091,7 @@ int main(int argc, char **argv) {
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <thread>
 
@@ -13094,44 +13099,55 @@ int main(int argc, char **argv) {
     int32_t retCode{0};
     const std::string PROGRAM{argv[0]}; // NOLINT
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
-    if (0 == commandlineArguments.count("cid")) {
-        std::cerr << PROGRAM << " replays a .rec file into an OpenDaVINCI session." << std::endl;
-        std::cerr << "Usage:   " << PROGRAM << " --cid=<OpenDaVINCI session> recording.rec" << std::endl;
+    if (1 == argc) {
+        std::cerr << PROGRAM << " replays a .rec file into an OpenDaVINCI session or to stdout." << std::endl;
+        std::cerr << "Usage:   " << PROGRAM << " [--cid=<OpenDaVINCI session>] recording.rec" << std::endl;
         std::cerr << "Example: " << PROGRAM << " --cid=111 file.rec" << std::endl;
         retCode = 1;
     }
     else {
-        // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
-        cluon::OD4Session od4(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])), [](auto){});
-        if (od4.isRunning()) {
-            std::string recFile;
-            for (auto e : commandlineArguments) {
-                if (recFile.empty() && e.second.empty() && e.first != PROGRAM) {
-                    recFile = e.first;
-                    break;
-                }
+        std::string recFile;
+        for (auto e : commandlineArguments) {
+            if (recFile.empty() && e.second.empty() && e.first != PROGRAM) {
+                recFile = e.first;
+                break;
+            }
+        }
+
+        std::fstream fin(recFile, std::ios::in|std::ios::binary);
+        if (fin.good()) {
+            std::unique_ptr<cluon::OD4Session> od4;
+            if (0 != commandlineArguments.count("cid")) {
+                // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
+                od4 = std::make_unique<cluon::OD4Session>(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])), [](auto){});
             }
 
-            std::fstream fin(recFile, std::ios::in|std::ios::binary);
-            if (fin.good()) {
-                int32_t oldTimeStampInMicroseconds{0};
-                while (fin.good()) {
-                    auto retVal{cluon::extractEnvelope(fin)};
-                    if (retVal.first) {
-                        if (retVal.second.dataType() > 0) {
-                            const auto SENT{retVal.second.sent()};
-                            const int32_t CURRENT_TIMESTAMP_IN_MICROSECONDS{(SENT.seconds()*1000*1000 + SENT.microseconds())};
-                            const int32_t DELAY = CURRENT_TIMESTAMP_IN_MICROSECONDS - oldTimeStampInMicroseconds;
-                            std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(DELAY > 0 ? DELAY : 0));
-                            od4.send(std::move(retVal.second));
-                            oldTimeStampInMicroseconds = CURRENT_TIMESTAMP_IN_MICROSECONDS;
+            int32_t oldTimeStampInMicroseconds{0};
+            while (fin.good()) {
+                auto retVal{cluon::extractEnvelope(fin)};
+                if (retVal.first) {
+                    if (retVal.second.dataType() > 0) {
+                        const auto SENT{retVal.second.sent()};
+                        const int32_t CURRENT_TIMESTAMP_IN_MICROSECONDS{(SENT.seconds()*1000*1000 + SENT.microseconds())};
+                        const int32_t DELAY = CURRENT_TIMESTAMP_IN_MICROSECONDS - oldTimeStampInMicroseconds;
+                        std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(DELAY > 0 ? DELAY : 0));
+
+                        if (od4) {
+                            if (od4->isRunning()) {
+                                od4->send(std::move(retVal.second));
+                            }
                         }
+                        else {
+                            std::cout << cluon::serializeEnvelope(std::move(retVal.second));
+                            std::cout.flush();
+                        }
+                        oldTimeStampInMicroseconds = CURRENT_TIMESTAMP_IN_MICROSECONDS;
                     }
                 }
             }
-            else {
-                std::cerr << "[" << PROGRAM << "] '" << recFile << "' could not be opened." << std::endl;
-            }
+        }
+        else {
+            std::cerr << "[" << PROGRAM << "] '" << recFile << "' could not be opened." << std::endl;
         }
     }
     return retCode;
