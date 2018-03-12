@@ -16,6 +16,7 @@
  */
 
 #include "cluon/cluon.hpp"
+#include "cluon/Envelope.hpp"
 #include "cluon/OD4Session.hpp"
 
 #include <iostream>
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
         // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
         cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])),
             [](cluon::data::Envelope &&envelope) noexcept {
-                std::cout << cluon::OD4Session::serializeAsOD4Container(std::move(envelope));
+                std::cout << cluon::serializeEnvelope(std::move(envelope));
                 std::cout.flush();
             });
 

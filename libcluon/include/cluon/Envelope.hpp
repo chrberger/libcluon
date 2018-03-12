@@ -19,17 +19,51 @@
 #define ENVELOPE_HPP
 
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
 #include <cstring>
+#include <array>
 #include <istream>
 #include <sstream>
+#include <string>
 #include <utility>
 #include <vector>
 
-#include <iostream>
-
 namespace cluon {
+
+/**
+ * This method transforms a given Envelope to a string representation to be
+ * sent to an OpenDaVINCI session.
+ *
+ * @param envelope Envelope with payload to be sent.
+ * @return String representation of the Envelope to be sent to OpenDaVINCI v4.
+ */
+inline std::string serializeEnvelope(cluon::data::Envelope &&envelope) noexcept {
+    std::string dataToSend;
+    {
+        cluon::ToProtoVisitor protoEncoder;
+        envelope.accept(protoEncoder);
+
+        const std::string tmp{protoEncoder.encodedData()};
+        uint32_t length{static_cast<uint32_t>(tmp.size())};
+        length = htole32(length);
+
+        // Add OpenDaVINCI header.
+        std::array<char, 5> header;
+        header[0] = static_cast<char>(0x0D);
+        header[1] = static_cast<char>(0xA4);
+        header[2] = *(reinterpret_cast<char *>(&length) + 0);
+        header[3] = *(reinterpret_cast<char *>(&length) + 1);
+        header[4] = *(reinterpret_cast<char *>(&length) + 2);
+
+        std::stringstream sstr;
+        sstr.write(header.data(), static_cast<std::streamsize>(header.size()));
+        sstr.write(tmp.data(), static_cast<std::streamsize>(tmp.size()));
+        dataToSend = sstr.str();
+    }
+    return dataToSend;
+}
 
 /**
  * This method extracts an Envelope from the given istream that holds bytes in

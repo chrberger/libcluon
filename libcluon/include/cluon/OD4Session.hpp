@@ -95,15 +95,6 @@ class LIBCLUON_API OD4Session {
    public:
     bool isRunning() noexcept;
 
-    /**
-     * This method transforms a given Envelope to a string representation to be
-     * sent to an OpenDaVINCI session.
-     *
-     * @param envelope Envelope with payload to be sent.
-     * @return String representation of the Envelope to be sent to OpenDaVINCI v4.
-     */
-    static std::string serializeAsOD4Container(cluon::data::Envelope &&envelope) noexcept;
-
    private:
     void callback(std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) noexcept;
     void sendInternal(std::string &&dataToSend) noexcept;
