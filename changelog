@@ -1,3 +1,9 @@
+libcluon (0.0.54) xenial; urgency=low
+
+  * Fixed lengthy waiting periods in cluon-replay
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 22 Mar 2018 20:25:53 +0100
+
 libcluon (0.0.53) xenial; urgency=low
 
   * cluon-replay replays Envelopes now to stdout
