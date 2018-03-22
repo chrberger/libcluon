@@ -94,7 +94,8 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
         }
         if (retVal) { // LCOV_EXCL_LINE
 #else                 // LCOV_EXCL_LINE
-        if (OD4_HEADER_SIZE == in.readsome(&buffer[0], OD4_HEADER_SIZE)) {
+        in.read(&buffer[0], OD4_HEADER_SIZE);
+        if (OD4_HEADER_SIZE == in.gcount()) {
 #endif
             if ((0x0D == static_cast<uint8_t>(buffer[0])) && (0xA4 == static_cast<uint8_t>(buffer[1]))) {
                 const uint32_t LENGTH{le32toh(*reinterpret_cast<uint32_t *>(&buffer[1])) >> 8};
@@ -108,7 +109,8 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
                     buffer.push_back(c);              // LCOV_EXCL_LINE
                 }
 #else // LCOV_EXCL_LINE
-                retVal = static_cast<int32_t>(LENGTH) == in.readsome(&buffer[0], static_cast<std::streamsize>(LENGTH));
+                in.read(&buffer[0], static_cast<std::streamsize>(LENGTH));
+                retVal = static_cast<int32_t>(LENGTH) == in.gcount();
 #endif
                 if (retVal) {
                     std::stringstream sstr(std::string(buffer.begin(), buffer.begin() + static_cast<std::streamsize>(LENGTH)));

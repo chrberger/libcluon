@@ -58,9 +58,9 @@ int main(int argc, char **argv) {
                 auto retVal{cluon::extractEnvelope(fin)};
                 if (retVal.first) {
                     if (retVal.second.dataType() > 0) {
-                        const auto RECEIVEDTIMESTAMP{retVal.second.received()};
+                        const auto SAMPLETIMESTAMP{retVal.second.sampleTimeStamp()};
                         constexpr int32_t TEN_SECONDS{10*1000*1000};
-                        const int32_t CURRENT_TIMESTAMP_IN_MICROSECONDS{(RECEIVEDTIMESTAMP.seconds()*1000*1000 + RECEIVEDTIMESTAMP.microseconds())};
+                        const int32_t CURRENT_TIMESTAMP_IN_MICROSECONDS{(SAMPLETIMESTAMP.seconds()*1000*1000 + SAMPLETIMESTAMP.microseconds())};
                         const int32_t DELAY = CURRENT_TIMESTAMP_IN_MICROSECONDS - oldTimeStampInMicroseconds;
                         if ( (oldTimeStampInMicroseconds > 0) && (DELAY < TEN_SECONDS) ) {
                             std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(DELAY > 0 ? DELAY : 0));

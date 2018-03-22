@@ -1,3 +1,9 @@
+libcluon (0.0.55) xenial; urgency=low
+
+  * Fix decoding Envelope from stream
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 22 Mar 2018 23:08:04 +0100
+
 libcluon (0.0.54) xenial; urgency=low
 
   * Fixed lengthy waiting periods in cluon-replay
