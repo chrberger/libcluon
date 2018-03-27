@@ -13,7 +13,7 @@
 
 libcluon is a small and efficient library written in modern C++ library to _glue_ distributed software components together - in a _clever_ way - simply: cluon. Its name is inspired by gluon, an [elementary particle acting as exchange particle](https://en.wikipedia.org/wiki/Gluon).
 
-libcluon is available as single-file, header-only library - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"`, and compile your project with a modern C++ compiler (C++14 or newer)
+libcluon is available as single-file, [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly) library - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"`, and compile your project with a modern C++ compiler (C++14 or newer)
 
 ## Table of Contents
 * [Features](#features)
@@ -29,7 +29,7 @@ libcluon is available as single-file, header-only library - just drop [cluon-com
 
 ## Features
 * Written in highly portable and high quality C++14
-* **Available as header-only, single-file distribution - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"`, and compile your project with a modern C++ compiler (C++14 or newer)**
+* **Available as [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly), single-file distribution - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"`, and compile your project with a modern C++ compiler (C++14 or newer)**
 * Message compiler produces fully self-contained messages that do only depend on C++14 - external libraries are not needed allowing easy embedding into existing projects
 * Native implementation of [Protobuf](https://developers.google.com/protocol-buffers/) for data serialization & deserialization: [Example](https://wandbox.org/permlink/rXayIZxXyVDt5Jgn)
 * Native implementation of [LCM](http://lcm-proj.github.io/type_specification.html)/[ZCM](http://zerocm.github.io/zcm/) for data serialization & deserialization: [Example](https://wandbox.org/permlink/ItJnZ3VVnZsqL28y)
@@ -55,7 +55,7 @@ No dependencies! All you need is a C++14-compliant compiler (we are testing with
 
 ## Installation
 ### Installation as single-file, header-only library
-libcluon is provided as header-only, single-file library as well - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"` where you want to use libcluon, and compile your project with a modern C++ compiler (C++14 or newer)
+libcluon is provided as [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly), single-file library as well - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"` where you want to use libcluon, and compile your project with a modern C++ compiler (C++14 or newer)
 
 ### Installation on Ubuntu 16.04 LTS
 We are providing pre-compiled binaries for Ubuntu 16.04 LTS (Xenial Xerus) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
