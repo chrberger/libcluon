@@ -116,3 +116,33 @@ TEST_CASE("Testing TimeStamp-3.") {
     REQUIRE(ts2.microseconds() == ts1.microseconds());
 }
 
+TEST_CASE("Testing MyTestMessage0.") {
+    testdata::MyTestMessage0 tmp;
+    REQUIRE(tmp.attribute1());
+    REQUIRE('c' == tmp.attribute2());
+
+    tmp.attribute2('d');
+
+    cluon::ToJSONVisitor jsonEncoder;
+    tmp.accept(jsonEncoder);
+
+    const char *JSON = R"({"attribute1":1,
+"attribute2":"d"})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    std::stringstream sstr{jsonEncoder.json()};
+
+    cluon::FromJSONVisitor jsonDecoder;
+    jsonDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage0 tmp2;
+    REQUIRE(tmp2.attribute1());
+    REQUIRE('c' == tmp2.attribute2());
+
+    tmp2.accept(jsonDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+    REQUIRE(tmp2.attribute2() == tmp.attribute2());
+}
+
