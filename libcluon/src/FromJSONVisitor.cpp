@@ -1,0 +1,339 @@
+/*
+ * Copyright (C) 2018  Christian Berger
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "cluon/FromJSONVisitor.hpp"
+#include "cluon/stringtoolbox.hpp"
+
+#include <cstring>
+#include <regex>
+#include <vector>
+
+#include <iostream>
+
+namespace cluon {
+
+FromJSONVisitor::FromJSONVisitor() noexcept
+    : m_keyValues{m_data} {}
+
+FromJSONVisitor::FromJSONVisitor(std::map<std::string, FromJSONVisitor::JSONKeyValue> &preset) noexcept
+    : m_keyValues{preset} {}
+
+
+// TODO: Any unallocated object must be stored finally in case of nested objects
+std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyValues(std::string &input, int indent) noexcept {
+    const std::string MATCH_JSON = R"((?:\"|\')?(?:[^"]*)(?:\"|\')(?=:)(?:\:\s*)(?:\"|\')?(?:true|false|[0-9a-zA-Z\+\-\,\.\$\ ]*))";
+
+    std::map<std::string, FromJSONVisitor::JSONKeyValue> result;
+
+    try {
+        std::smatch m;
+        std::string keyOfNestedObject;
+        do {
+            std::regex_search(input, m, std::regex(MATCH_JSON));
+            std::string p2{m.prefix()};
+            std::string p = stringtoolbox::trim(p2);
+
+std::cout << "P = '" << p << "'" << std::endl;
+            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
+                std::cout << "End nested object" << std::endl;
+                indent--;
+            }
+            else if (p.size() > 0 && p.at(0) == '}') {
+                std::cout << "End nested object" << std::endl;
+                indent--;
+            }
+
+            if (m.size() > 0) {
+                std::string match{m[0]};
+std::cout << "M = '" << match << "'" << std::endl;
+
+                std::vector<std::string> retVal = stringtoolbox::split(match, ':');
+                if (retVal.size() == 2) {
+                    if (stringtoolbox::trim(retVal[1]).size() == 0) {
+                        keyOfNestedObject = stringtoolbox::trim(retVal[0]);
+                        std::cout << "Nested object " << keyOfNestedObject << std::endl;
+
+                        std::string suf(m.suffix());
+                        suf = stringtoolbox::trim(suf);
+                        if (!suf.empty()) {
+//std::cout << "S_nested = '" << suf << "'" << std::endl;
+                        }
+                        input = suf;
+
+                        indent++;
+                        auto r = readKeyValues(input, indent);
+
+                        JSONKeyValue kv;
+                        kv.m_key = keyOfNestedObject;
+                        kv.m_type = JSONConstants::STRING;
+                        kv.m_value = r;
+
+                        result[kv.m_key] = kv;
+
+                        keyOfNestedObject = "";
+                    }
+                    else {
+                        auto e = std::make_pair(stringtoolbox::trim(retVal[0]), stringtoolbox::trim(retVal[1]));
+
+                        for(int i = 0; i < indent; i++) std::cout << " ";
+                        std::cout << e.first << "=" << e.second << std::endl;
+
+                        JSONKeyValue kv;
+                        kv.m_key = stringtoolbox::split(e.first, '"')[0];
+
+                        if ( (e.second.size() > 0) && (e.second.at(0) == '"') ) {
+std::cout << "Found string" << std::endl;
+                            kv.m_type = JSONConstants::STRING;
+                            kv.m_value = std::string(e.second).substr(1);
+                        }
+                        else if ( (e.second.size() > 0) && ( (e.second == "false") || (e.second == "true") ) ) {
+std::cout << "Found boolean" << std::endl;
+                            kv.m_value = e.second == "true";
+
+                            kv.m_type = (e.second == "true" ? JSONConstants::IS_TRUE : JSONConstants::IS_FALSE);
+                        }
+                        else {
+                            kv.m_type = JSONConstants::NUMBER;
+                            std::stringstream tmp(e.second);
+                            double d;
+                            tmp >> d;
+std::cout << "Found number: " << d << std::endl;
+                            kv.m_value = d;
+                        }
+std::cout << "key = " << "'" << kv.m_key << "'" << std::endl;
+
+                        result[kv.m_key] = kv;
+
+                        std::string suf(m.suffix());
+                        suf = stringtoolbox::trim(suf);
+                        if (!suf.empty()) {
+//std::cout << "S = '" << suf << "'" << std::endl;
+                        }
+                        input = suf;
+                    }
+                }
+            }
+        } while (!m.empty());
+    } catch (std::regex_error &) {
+        std::cout << "Error 1" << std::endl;
+    } catch (std::bad_cast &) {
+        std::cout << "Error 2" << std::endl;
+    }
+
+    return result;
+}
+
+void FromJSONVisitor::decodeFrom(std::istream &in) noexcept {
+    m_keyValues.clear();
+
+    std::stringstream sstr;
+    while (in.good()) {
+        uint8_t c = static_cast<uint8_t>(in.get());
+        sstr.write(reinterpret_cast<char*>(&c), sizeof(char));
+    }
+
+    std::string s{sstr.str()};
+
+    // Remove whitespace characters like newline, carriage return, or tab.
+    s.erase(std::remove_if( s.begin(), s.end(), [](char c){ return (c =='\r' || c =='\t' || c == '\n');}), s.end() );
+
+    // Process JSON object.
+    m_keyValues = readKeyValues(s, 0);
+}
+
+void FromJSONVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
+    (void)id;
+    (void)shortName;
+    (void)longName;
+}
+
+void FromJSONVisitor::postVisit() noexcept {}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::IS_FALSE == m_keyValues[name].m_type) {
+                v = false;
+            }
+            if (JSONConstants::IS_TRUE == m_keyValues[name].m_type) {
+                v = true;
+            }
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = (1 == static_cast<uint32_t>(linb::any_cast<double>(m_keyValues[name].m_value)));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::STRING == m_keyValues[name].m_type) {
+                v = linb::any_cast<std::string>(m_keyValues[name].m_value).at(0);
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = static_cast<int8_t>(linb::any_cast<double>(m_keyValues[name].m_value));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = static_cast<uint8_t>(linb::any_cast<double>(m_keyValues[name].m_value));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = static_cast<int16_t>(linb::any_cast<double>(m_keyValues[name].m_value));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = static_cast<uint16_t>(linb::any_cast<double>(m_keyValues[name].m_value));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = static_cast<int32_t>(linb::any_cast<double>(m_keyValues[name].m_value));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = static_cast<uint32_t>(linb::any_cast<double>(m_keyValues[name].m_value));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = static_cast<int64_t>(linb::any_cast<double>(m_keyValues[name].m_value));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = static_cast<uint64_t>(linb::any_cast<double>(m_keyValues[name].m_value));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = static_cast<float>(linb::any_cast<double>(m_keyValues[name].m_value));
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+                v = linb::any_cast<double>(m_keyValues[name].m_value);
+            }
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
+    (void)id;
+    (void)typeName;
+    if (0 < m_keyValues.count(name)) {
+        try {
+            v = linb::any_cast<std::string>(m_keyValues[name].m_value);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
+    }
+}
+
+} // namespace cluon
