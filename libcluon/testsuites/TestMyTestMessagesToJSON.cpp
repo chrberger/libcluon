@@ -42,6 +42,37 @@ TEST_CASE("Testing TimeStamp-1.") {
     REQUIRE(std::string(JSON) == jsonEncoder.json());
 
     std::stringstream sstr{jsonEncoder.json()};
+
+    cluon::FromJSONVisitor jsonDecoder;
+    jsonDecoder.decodeFrom(sstr);
+
+    cluon::data::TimeStamp ts2;
+    REQUIRE(ts2.seconds() == 0);
+    REQUIRE(ts2.microseconds() == 0);
+
+    ts2.accept(jsonDecoder);
+
+    REQUIRE(ts2.seconds() == ts1.seconds());
+    REQUIRE(ts2.microseconds() == ts1.microseconds());
+}
+
+TEST_CASE("Testing TimeStamp-2.") {
+    cluon::data::TimeStamp ts1;
+    REQUIRE(ts1.seconds() == 0);
+    REQUIRE(ts1.microseconds() == 0);
+
+    ts1.seconds(123).microseconds(121);
+
+    cluon::ToJSONVisitor jsonEncoder;
+    ts1.accept(jsonEncoder);
+
+    const char *JSON = R"({"seconds":123,
+"microseconds":121})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    std::stringstream sstr{jsonEncoder.json()};
+
     cluon::FromJSONVisitor jsonDecoder;
     jsonDecoder.decodeFrom(sstr);
 

@@ -61,7 +61,7 @@ class LIBCLUON_API FromJSONVisitor {
     /**
      * Internal constructor to pass reference to preset key/values.
      *
-     * @param preset Pre-filled key/value map to handled nested fields.
+     * @param preset Pre-filled key/value map to handle nested fields.
      */
     FromJSONVisitor(std::map<std::string, FromJSONVisitor::JSONKeyValue> &preset) noexcept;
 
@@ -71,7 +71,7 @@ class LIBCLUON_API FromJSONVisitor {
 
    public:
     /**
-     * This method decodes a given istream into Proto.
+     * This method decodes a given istream into an internal key/value representation.
      *
      * @param in istream to decode.
      */

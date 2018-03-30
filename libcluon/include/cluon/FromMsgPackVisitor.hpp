@@ -61,7 +61,7 @@ class LIBCLUON_API FromMsgPackVisitor {
     /**
      * Internal constructor to pass reference to preset key/values.
      *
-     * @param preset Pre-filled key/value map to handled nested fields.
+     * @param preset Pre-filled key/value map to handle nested fields.
      */
     FromMsgPackVisitor(std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> &preset) noexcept;
 
@@ -71,7 +71,7 @@ class LIBCLUON_API FromMsgPackVisitor {
 
    public:
     /**
-     * This method decodes a given istream into Proto.
+     * This method decodes a given istream into an internal key/value representation.
      *
      * @param in istream to decode.
      */
