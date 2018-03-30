@@ -262,3 +262,5 @@ TEST_CASE("Testing MyTestMessage4.") {
 
     REQUIRE("testing" == tmp2.attribute1());
 }
+
+
