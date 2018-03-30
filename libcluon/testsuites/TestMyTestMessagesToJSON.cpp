@@ -352,3 +352,31 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(tmp2.attribute11() == tmp.attribute11());
 }
 
+TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
+    testdata::MyTestMessage6 tmp6;
+
+    REQUIRE(123 == tmp6.attribute1().attribute1());
+
+    testdata::MyTestMessage2 tmp2;
+    tmp6.attribute1(tmp2.attribute1(150));
+
+    REQUIRE(150 == tmp6.attribute1().attribute1());
+
+    cluon::ToJSONVisitor jsonEncoder;
+    tmp6.accept(jsonEncoder);
+
+    const char *JSON = R"({"attribute1":{"attribute1":150}})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    std::stringstream sstr{jsonEncoder.json()};
+
+    cluon::FromJSONVisitor jsonDecoder;
+    jsonDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage6 tmp6_2;
+    REQUIRE(123 == tmp6_2.attribute1().attribute1());
+    tmp6_2.accept(jsonDecoder);
+    REQUIRE(150 == tmp6_2.attribute1().attribute1());
+}
+

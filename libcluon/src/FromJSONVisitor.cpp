@@ -45,87 +45,85 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
         do {
             std::regex_search(input, m, std::regex(MATCH_JSON));
             std::string p{m.prefix()};
-//            std::string p = stringtoolbox::trim(p2);
 
-//std::cout << "P = '" << p << "'" << std::endl;
+std::cout << "P = '" << p << "'" << std::endl;
             if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
-//                std::cout << "End nested object" << std::endl;
+                std::cout << "End nested object" << std::endl;
                 indent--;
             }
             else if (p.size() > 0 && p.at(0) == '}') {
-//                std::cout << "End nested object" << std::endl;
+                std::cout << "End nested object" << std::endl;
                 indent--;
             }
 
             if (m.size() > 0) {
                 std::string match{m[0]};
-//std::cout << "M = '" << match << "'" << std::endl;
+std::cout << "M = '" << match << "'" << std::endl;
 
                 std::vector<std::string> retVal = stringtoolbox::split(match, ':');
-                if (retVal.size() == 2) {
-                    if (stringtoolbox::trim(retVal[1]).size() == 0) {
-                        keyOfNestedObject = stringtoolbox::trim(retVal[0]);
-//std::cout << "Nested object " << keyOfNestedObject << std::endl;
+std::cout << "Si=" << retVal.size() << std::endl;
+                if ( (retVal.size() == 1) || ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() == 0) ) ) {
+                    keyOfNestedObject = stringtoolbox::trim(retVal[0]);
+std::cout << "Nested object " << keyOfNestedObject << std::endl;
 
-                        std::string suf(m.suffix());
-                        suf = stringtoolbox::trim(suf);
-                        if (!suf.empty()) {
-//std::cout << "S_nested = '" << suf << "'" << std::endl;
-                        }
-                        input = suf;
+                    std::string suf(m.suffix());
+                    suf = stringtoolbox::trim(suf);
+                    if (!suf.empty()) {
+std::cout << "S_nested = '" << suf << "'" << std::endl;
+                    }
+                    input = suf;
 
-                        indent++;
-                        auto r = readKeyValues(input, indent);
+                    indent++;
+                    auto r = readKeyValues(input, indent);
 
-                        JSONKeyValue kv;
-                        kv.m_key = keyOfNestedObject;
+                    JSONKeyValue kv;
+                    kv.m_key = stringtoolbox::split(keyOfNestedObject, '"')[0];
+                    kv.m_type = JSONConstants::OBJECT;
+                    kv.m_value = r;
+
+                    result[kv.m_key] = kv;
+
+                    keyOfNestedObject = "";
+                }
+                if ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() > 0) ) {
+                    auto e = std::make_pair(stringtoolbox::trim(retVal[0]), stringtoolbox::trim(retVal[1]));
+
+                    for(int i = 0; i < indent; i++) std::cout << " ";
+                    std::cout << e.first << "=" << e.second << std::endl;
+
+                    JSONKeyValue kv;
+                    kv.m_key = stringtoolbox::split(e.first, '"')[0];
+
+                    if ( (e.second.size() > 0) && (e.second.at(0) == '"') ) {
+std::cout << "Found string" << std::endl;
                         kv.m_type = JSONConstants::STRING;
-                        kv.m_value = r;
+                        kv.m_value = std::string(e.second).substr(1);
+                    }
+                    else if ( (e.second.size() > 0) && ( (e.second == "false") || (e.second == "true") ) ) {
+std::cout << "Found boolean" << std::endl;
+                        kv.m_value = e.second == "true";
 
-                        result[kv.m_key] = kv;
-
-                        keyOfNestedObject = "";
+                        kv.m_type = (e.second == "true" ? JSONConstants::IS_TRUE : JSONConstants::IS_FALSE);
                     }
                     else {
-                        auto e = std::make_pair(stringtoolbox::trim(retVal[0]), stringtoolbox::trim(retVal[1]));
-
-                        for(int i = 0; i < indent; i++) std::cout << " ";
-                        std::cout << e.first << "=" << e.second << std::endl;
-
-                        JSONKeyValue kv;
-                        kv.m_key = stringtoolbox::split(e.first, '"')[0];
-
-                        if ( (e.second.size() > 0) && (e.second.at(0) == '"') ) {
-std::cout << "Found string" << std::endl;
-                            kv.m_type = JSONConstants::STRING;
-                            kv.m_value = std::string(e.second).substr(1);
-                        }
-                        else if ( (e.second.size() > 0) && ( (e.second == "false") || (e.second == "true") ) ) {
-std::cout << "Found boolean" << std::endl;
-                            kv.m_value = e.second == "true";
-
-                            kv.m_type = (e.second == "true" ? JSONConstants::IS_TRUE : JSONConstants::IS_FALSE);
-                        }
-                        else {
-                            kv.m_type = JSONConstants::NUMBER;
-                            std::stringstream tmp(e.second);
-                            double d;
-                            tmp >> d;
+                        kv.m_type = JSONConstants::NUMBER;
+                        std::stringstream tmp(e.second);
+                        double d;
+                        tmp >> d;
 std::cout << "Found number: " << d << std::endl;
-                            kv.m_value = d;
-                        }
+                        kv.m_value = d;
+                    }
 std::cout << "key = " << "'" << kv.m_key << "'" << std::endl;
 
-                        result[kv.m_key] = kv;
+                    result[kv.m_key] = kv;
 
-                        std::string suf(m.suffix());
-                        suf = stringtoolbox::trim(suf);
-                        if (!suf.empty()) {
-//std::cout << "S = '" << suf << "'" << std::endl;
-                        }
-                        oldInput = input;
-                        input = suf;
+                    std::string suf(m.suffix());
+                    suf = stringtoolbox::trim(suf);
+                    if (!suf.empty()) {
+std::cout << "S = '" << suf << "'" << std::endl;
                     }
+                    oldInput = input;
+                    input = suf;
                 }
             }
         } while (!m.empty() && (oldInput != input));
