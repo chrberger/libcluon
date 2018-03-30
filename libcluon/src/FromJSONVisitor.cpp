@@ -34,7 +34,9 @@ FromJSONVisitor::FromJSONVisitor(std::map<std::string, FromJSONVisitor::JSONKeyV
     : m_keyValues{preset} {}
 
 std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyValues(std::string &input, int indent) noexcept {
-    const std::string MATCH_JSON = R"((?:\"|\')?(?:[^"]*)(?:\"|\')(?=:)(?:\:\s*)(?:\"|\')?(?:true|false|[0-9a-zA-Z\+\-\,\.\$\ ]*))";
+//    const std::string MATCH_JSON = R"((?:\"|\')?(?:[^"]*)(?:\"|\')(?=:)(?:\:\s*)(?:\"|\')?(?:true|false|[0-9a-zA-Z\+\-\,\.\$\ ]*))";
+
+    const std::string MATCH_JSON = R"((?:\"|\')(?:[^"]*)(?:\"|\')(?=:)(?:\:\s*)(?:\"|\')?(?:true|false|[\-]{0,1}[0-9]+[\.][0-9]+|[\-]{0,1}[0-9]+|[0-9a-zA-Z\+\-\,\.\$\ \=]*)(?:\"|\')?)";
 
     std::map<std::string, FromJSONVisitor::JSONKeyValue> result;
     try {
@@ -45,7 +47,7 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
             std::string p{m.prefix()};
 //            std::string p = stringtoolbox::trim(p2);
 
-//std::cout << "P = '" << p << "'" << std::endl;
+std::cout << "P = '" << p << "'" << std::endl;
             if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
 //                std::cout << "End nested object" << std::endl;
                 indent--;
@@ -57,7 +59,7 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
 
             if (m.size() > 0) {
                 std::string match{m[0]};
-//std::cout << "M = '" << match << "'" << std::endl;
+std::cout << "M = '" << match << "'" << std::endl;
 
                 std::vector<std::string> retVal = stringtoolbox::split(match, ':');
                 if (retVal.size() == 2) {
@@ -119,7 +121,7 @@ std::cout << "key = " << "'" << kv.m_key << "'" << std::endl;
                         std::string suf(m.suffix());
                         suf = stringtoolbox::trim(suf);
                         if (!suf.empty()) {
-//std::cout << "S = '" << suf << "'" << std::endl;
+std::cout << "S = '" << suf << "'" << std::endl;
                         }
                         input = suf;
                     }
@@ -129,6 +131,7 @@ std::cout << "key = " << "'" << kv.m_key << "'" << std::endl;
     } catch (std::regex_error &) {
     } catch (std::bad_cast &) {
     }
+std::cout << std::endl;
     return result;
 }
 
