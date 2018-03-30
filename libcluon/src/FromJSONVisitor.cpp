@@ -37,6 +37,7 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
     const std::string MATCH_JSON = R"((?:\"|\')(?:[^"]*)(?:\"|\')(?=:)(?:\:\s*)(?:\"|\')?(?:true|false|[\-]{0,1}[0-9]+[\.][0-9]+|[\-]{0,1}[0-9]+|[0-9a-zA-Z\+\-\,\.\$\ \=]*)(?:\"|\')?)";
 
     std::map<std::string, FromJSONVisitor::JSONKeyValue> result;
+    std::string oldInput;
     try {
         std::smatch m;
         std::string keyOfNestedObject;
@@ -121,11 +122,12 @@ std::cout << "key = " << "'" << kv.m_key << "'" << std::endl;
                         if (!suf.empty()) {
 //std::cout << "S = '" << suf << "'" << std::endl;
                         }
+                        oldInput = input;
                         input = suf;
                     }
                 }
             }
-        } while (!m.empty());
+        } while (!m.empty() && (oldInput != input));
     } catch (std::regex_error &) {
     } catch (std::bad_cast &) {
     }
