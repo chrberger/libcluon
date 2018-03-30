@@ -20,6 +20,7 @@
 
 #include <cstring>
 #include <regex>
+#include <sstream>
 #include <vector>
 
 #include <iostream>
@@ -32,40 +33,37 @@ FromJSONVisitor::FromJSONVisitor() noexcept
 FromJSONVisitor::FromJSONVisitor(std::map<std::string, FromJSONVisitor::JSONKeyValue> &preset) noexcept
     : m_keyValues{preset} {}
 
-
-// TODO: Any unallocated object must be stored finally in case of nested objects
 std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyValues(std::string &input, int indent) noexcept {
     const std::string MATCH_JSON = R"((?:\"|\')?(?:[^"]*)(?:\"|\')(?=:)(?:\:\s*)(?:\"|\')?(?:true|false|[0-9a-zA-Z\+\-\,\.\$\ ]*))";
 
     std::map<std::string, FromJSONVisitor::JSONKeyValue> result;
-
     try {
         std::smatch m;
         std::string keyOfNestedObject;
         do {
             std::regex_search(input, m, std::regex(MATCH_JSON));
-            std::string p2{m.prefix()};
-            std::string p = stringtoolbox::trim(p2);
+            std::string p{m.prefix()};
+//            std::string p = stringtoolbox::trim(p2);
 
-std::cout << "P = '" << p << "'" << std::endl;
+//std::cout << "P = '" << p << "'" << std::endl;
             if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
-                std::cout << "End nested object" << std::endl;
+//                std::cout << "End nested object" << std::endl;
                 indent--;
             }
             else if (p.size() > 0 && p.at(0) == '}') {
-                std::cout << "End nested object" << std::endl;
+//                std::cout << "End nested object" << std::endl;
                 indent--;
             }
 
             if (m.size() > 0) {
                 std::string match{m[0]};
-std::cout << "M = '" << match << "'" << std::endl;
+//std::cout << "M = '" << match << "'" << std::endl;
 
                 std::vector<std::string> retVal = stringtoolbox::split(match, ':');
                 if (retVal.size() == 2) {
                     if (stringtoolbox::trim(retVal[1]).size() == 0) {
                         keyOfNestedObject = stringtoolbox::trim(retVal[0]);
-                        std::cout << "Nested object " << keyOfNestedObject << std::endl;
+std::cout << "Nested object " << keyOfNestedObject << std::endl;
 
                         std::string suf(m.suffix());
                         suf = stringtoolbox::trim(suf);
@@ -129,11 +127,8 @@ std::cout << "key = " << "'" << kv.m_key << "'" << std::endl;
             }
         } while (!m.empty());
     } catch (std::regex_error &) {
-        std::cout << "Error 1" << std::endl;
     } catch (std::bad_cast &) {
-        std::cout << "Error 2" << std::endl;
     }
-
     return result;
 }
 
@@ -145,13 +140,12 @@ void FromJSONVisitor::decodeFrom(std::istream &in) noexcept {
         uint8_t c = static_cast<uint8_t>(in.get());
         sstr.write(reinterpret_cast<char*>(&c), sizeof(char));
     }
-
     std::string s{sstr.str()};
 
     // Remove whitespace characters like newline, carriage return, or tab.
     s.erase(std::remove_if( s.begin(), s.end(), [](char c){ return (c =='\r' || c =='\t' || c == '\n');}), s.end() );
 
-    // Process JSON object.
+    // Parse JSON from in.
     m_keyValues = readKeyValues(s, 0);
 }
 
@@ -171,10 +165,10 @@ void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&n
             if (JSONConstants::IS_FALSE == m_keyValues[name].m_type) {
                 v = false;
             }
-            if (JSONConstants::IS_TRUE == m_keyValues[name].m_type) {
+            else if (JSONConstants::IS_TRUE == m_keyValues[name].m_type) {
                 v = true;
             }
-            if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
+            else if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
                 v = (1 == static_cast<uint32_t>(linb::any_cast<double>(m_keyValues[name].m_value)));
             }
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE

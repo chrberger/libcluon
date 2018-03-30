@@ -23,8 +23,6 @@
 #include "cluon/cluonDataStructures.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
-#include <iostream>
-#include <limits>
 #include <sstream>
 #include <string>
 
