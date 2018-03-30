@@ -19,6 +19,7 @@
 #include "cluon/stringtoolbox.hpp"
 
 #include <cstring>
+#include <array>
 #include <regex>
 #include <sstream>
 #include <vector>
@@ -150,6 +151,37 @@ void FromJSONVisitor::decodeFrom(std::istream &in) noexcept {
 
     // Parse JSON from in.
     m_keyValues = readKeyValues(s, 0);
+}
+
+std::string FromJSONVisitor::decodeBase64(const std::string &input) const noexcept {
+    const std::string ALPHABET{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
+
+    uint32_t index{0};
+    char *decoded = new char[input.size() * 3 / 4];
+    char counter{0};
+    std::array<char, 4> buffer;
+
+    for (uint32_t i{0}; i < input.size(); i++) {
+        char c;
+        for (c = 0 ; c < 64 && (ALPHABET.at(c) != input.at(i)); c++);
+
+        buffer[counter++] = c;
+        if (4 == counter) {
+            decoded[index++] = (buffer[0] << 2) + (buffer[1] >> 4);
+            if (64 != buffer[2]) {
+                decoded[index++] = (buffer[1] << 4) + (buffer[2] >> 2);
+            }
+            if (64 != buffer[3]) {
+                decoded[index++] = (buffer[2] << 6) + buffer[3];
+            }
+            counter = 0;
+        }
+    }
+
+    decoded[index] = 0;
+    std::string retVal(decoded, index);
+    delete [] decoded;
+    return retVal;
 }
 
 void FromJSONVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
@@ -327,7 +359,8 @@ void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&n
     (void)typeName;
     if (0 < m_keyValues.count(name)) {
         try {
-            v = linb::any_cast<std::string>(m_keyValues[name].m_value);
+            std::string tmp{linb::any_cast<std::string>(m_keyValues[name].m_value)};
+            v = decodeBase64(tmp);
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
         }
     }

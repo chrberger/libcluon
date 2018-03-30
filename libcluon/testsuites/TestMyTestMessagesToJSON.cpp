@@ -235,3 +235,30 @@ TEST_CASE("Testing MyTestMessage3.") {
     REQUIRE(tmp2.attribute1() == tmp.attribute1());
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
+
+TEST_CASE("Testing MyTestMessage4.") {
+    testdata::MyTestMessage4 tmp;
+    REQUIRE(tmp.attribute1().empty());
+
+    tmp.attribute1("testing");
+    REQUIRE("testing" == tmp.attribute1());
+
+    cluon::ToJSONVisitor jsonEncoder;
+    tmp.accept(jsonEncoder);
+
+    const char *JSON = R"({"attribute1":"dGVzdGluZw=="})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    std::stringstream sstr{jsonEncoder.json()};
+
+    cluon::FromJSONVisitor jsonDecoder;
+    jsonDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage4 tmp2;
+    REQUIRE(tmp2.attribute1().empty());
+
+    tmp2.accept(jsonDecoder);
+
+    REQUIRE("testing" == tmp2.attribute1());
+}
