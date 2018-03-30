@@ -43,16 +43,20 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
         std::smatch m;
         do {
             std::regex_search(input, m, std::regex(MATCH_JSON));
-//            std::string p{m.prefix()};
+            std::string p{m.prefix()};
+//            std::string p = stringtoolbox::trim(p2);
+
+//std::cout << "P = '" << p << "'" << std::endl;
 
             if (m.size() > 0) {
                 std::string match{m[0]};
-//std::cout << "M = '" << match << "'" << std::endl;
+std::cout << "M = '" << match << "'" << std::endl;
 
                 std::vector<std::string> retVal = stringtoolbox::split(match, ':');
                 if ( (retVal.size() == 1) || ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() == 0) ) ) {
                     std::string keyOfNestedObject{stringtoolbox::trim(retVal[0])};
-
+                    keyOfNestedObject = stringtoolbox::split(keyOfNestedObject, '"')[0];
+std::cout << "N" << keyOfNestedObject << std::endl;
                     {
                         std::string suffix(m.suffix());
                         suffix = stringtoolbox::trim(suffix);
@@ -63,11 +67,11 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                     auto mapOfNestedValues = readKeyValues(input);
 
                     JSONKeyValue kv;
-                    kv.m_key = stringtoolbox::split(keyOfNestedObject, '"')[0];
+                    kv.m_key = keyOfNestedObject;
                     kv.m_type = JSONConstants::OBJECT;
                     kv.m_value = mapOfNestedValues;
 
-                    result[kv.m_key] = kv;
+                    result[keyOfNestedObject] = kv;
                 }
                 if ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() > 0) ) {
                     auto e = std::make_pair(stringtoolbox::trim(retVal[0]), stringtoolbox::trim(retVal[1]));
@@ -88,6 +92,8 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                         std::stringstream tmp(e.second);
                         double v; tmp >> v;
                         kv.m_value = v;
+
+std::cout << "NUMBER=" << v << std::endl;
                     }
 
                     result[kv.m_key] = kv;
@@ -100,10 +106,26 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                     }
                 }
             }
+
+            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
+                std::cout << "End nested object1" << std::endl;
+                return result;
+            }
+            else if (p.size() > 0 && p.at(0) == '}') {
+                std::cout << "End nested object2" << std::endl;
+                return result;
+            }
+
         } while (!m.empty() && (oldInput != input));
     } catch (std::regex_error &) {
     } catch (std::bad_cast &) {
     }
+
+for (auto e : result) {
+    std::cout << e.first << std::endl;
+}
+
+std::cout << std::endl;
     return result;
 }
 
@@ -211,10 +233,13 @@ void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&n
 void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)id;
     (void)typeName;
+std::cout << "V:" << name << std::endl;
     if (0 < m_keyValues.count(name)) {
         try {
+std::cout << "VL:" << __LINE__ << std::endl;
             if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
                 v = static_cast<uint8_t>(linb::any_cast<double>(m_keyValues[name].m_value));
+std::cout << "V:" << +v << std::endl;
             }
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
         }

@@ -380,3 +380,47 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
     REQUIRE(150 == tmp6_2.attribute1().attribute1());
 }
 
+TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for serialization and deserialization.") {
+    testdata::MyTestMessage7 tmp7;
+
+    REQUIRE(123 == tmp7.attribute1().attribute1());
+    REQUIRE(12345 == tmp7.attribute2());
+    REQUIRE(123 == tmp7.attribute3().attribute1());
+
+    testdata::MyTestMessage2 tmp2_1;
+    tmp7.attribute1(tmp2_1.attribute1(9));
+
+    tmp7.attribute2(12);
+
+    testdata::MyTestMessage2 tmp2_3;
+    tmp7.attribute3(tmp2_3.attribute1(13));
+
+    REQUIRE(9 == tmp7.attribute1().attribute1());
+    REQUIRE(12 == tmp7.attribute2());
+    REQUIRE(13 == tmp7.attribute3().attribute1());
+
+    cluon::ToJSONVisitor jsonEncoder;
+    tmp7.accept(jsonEncoder);
+
+    const char *JSON = R"({"attribute1":{"attribute1":9},
+"attribute2":12,
+"attribute3":{"attribute1":13}})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    std::stringstream sstr{jsonEncoder.json()};
+
+    cluon::FromJSONVisitor jsonDecoder;
+    jsonDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage7 tmp7_2;
+    REQUIRE(123 == tmp7_2.attribute1().attribute1());
+    REQUIRE(12345 == tmp7_2.attribute2());
+    REQUIRE(123 == tmp7_2.attribute3().attribute1());
+
+    tmp7_2.accept(jsonDecoder);
+    REQUIRE(9 == tmp7_2.attribute1().attribute1());
+//    REQUIRE(12 == tmp7_2.attribute2());
+    REQUIRE(13 == tmp7_2.attribute3().attribute1());
+}
+

@@ -27,6 +27,8 @@
 #include <map>
 #include <string>
 
+#include <iostream>
+
 namespace cluon {
 /**
 This class decodes a given message from JSON format.
@@ -103,8 +105,10 @@ class LIBCLUON_API FromJSONVisitor {
         (void)id;
         (void)typeName;
 
+std::cout << "N_ " << name << std::endl;
         if (0 < m_keyValues.count(name)) {
             try {
+std::cout << "N_ " << __LINE__ << std::endl;
                 std::map<std::string, FromJSONVisitor::JSONKeyValue> v
                     = linb::any_cast<std::map<std::string, FromJSONVisitor::JSONKeyValue>>(m_keyValues[name].m_value);
                 cluon::FromJSONVisitor nestedJSONDecoder(v);
