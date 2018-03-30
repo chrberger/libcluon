@@ -116,7 +116,7 @@ class LIBCLUON_API FromJSONVisitor {
 
    private:
     std::string decodeBase64(const std::string &input) const noexcept;
-    std::map<std::string, FromJSONVisitor::JSONKeyValue> readKeyValues(std::string &input, int indent) noexcept;
+    std::map<std::string, FromJSONVisitor::JSONKeyValue> readKeyValues(std::string &input) noexcept;
 
    private:
     std::map<std::string, FromJSONVisitor::JSONKeyValue> m_data{};

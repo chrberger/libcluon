@@ -34,8 +34,7 @@ FromJSONVisitor::FromJSONVisitor() noexcept
 FromJSONVisitor::FromJSONVisitor(std::map<std::string, FromJSONVisitor::JSONKeyValue> &preset) noexcept
     : m_keyValues{preset} {}
 
-std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyValues(std::string &input, int indent) noexcept {
-    (void)indent;
+std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyValues(std::string &input) noexcept {
     const std::string MATCH_JSON = R"((?:\"|\')(?:[^"]*)(?:\"|\')(?=:)(?:\:\s*)(?:\"|\')?(?:true|false|[\-]{0,1}[0-9]+[\.][0-9]+|[\-]{0,1}[0-9]+|[0-9a-zA-Z\+\-\,\.\$\ \=]*)(?:\"|\')?)";
 
     std::map<std::string, FromJSONVisitor::JSONKeyValue> result;
@@ -47,15 +46,15 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
             std::regex_search(input, m, std::regex(MATCH_JSON));
             std::string p{m.prefix()};
 
-//std::cout << "P = '" << p << "'" << std::endl;
-            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
-//                std::cout << "End nested object" << std::endl;
-                indent--;
-            }
-            else if (p.size() > 0 && p.at(0) == '}') {
-//                std::cout << "End nested object" << std::endl;
-                indent--;
-            }
+////std::cout << "P = '" << p << "'" << std::endl;
+//            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
+////                std::cout << "End nested object" << std::endl;
+//                indent--;
+//            }
+//            else if (p.size() > 0 && p.at(0) == '}') {
+////                std::cout << "End nested object" << std::endl;
+//                indent--;
+//            }
 
             if (m.size() > 0) {
                 std::string match{m[0]};
@@ -69,13 +68,13 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
 
                     std::string suf(m.suffix());
                     suf = stringtoolbox::trim(suf);
-                    if (!suf.empty()) {
-//std::cout << "S_nested = '" << suf << "'" << std::endl;
-                    }
+//                    if (!suf.empty()) {
+////std::cout << "S_nested = '" << suf << "'" << std::endl;
+//                    }
                     input = suf;
 
-                    indent++;
-                    auto r = readKeyValues(input, indent);
+//                    indent++;
+                    auto r = readKeyValues(input);
 
                     JSONKeyValue kv;
                     kv.m_key = stringtoolbox::split(keyOfNestedObject, '"')[0];
@@ -120,9 +119,9 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
 
                     std::string suf(m.suffix());
                     suf = stringtoolbox::trim(suf);
-                    if (!suf.empty()) {
-//std::cout << "S = '" << suf << "'" << std::endl;
-                    }
+//                    if (!suf.empty()) {
+////std::cout << "S = '" << suf << "'" << std::endl;
+//                    }
                     oldInput = input;
                     input = suf;
                 }
@@ -149,7 +148,7 @@ void FromJSONVisitor::decodeFrom(std::istream &in) noexcept {
     s.erase(std::remove_if( s.begin(), s.end(), [](char c){ return (c =='\r' || c =='\t' || c == '\n');}), s.end() );
 
     // Parse JSON from in.
-    m_keyValues = readKeyValues(s, 0);
+    m_keyValues = readKeyValues(s);
 }
 
 std::string FromJSONVisitor::decodeBase64(const std::string &input) const noexcept {
