@@ -41,20 +41,9 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
     std::string oldInput;
     try {
         std::smatch m;
-        std::string keyOfNestedObject;
         do {
             std::regex_search(input, m, std::regex(MATCH_JSON));
             std::string p{m.prefix()};
-
-////std::cout << "P = '" << p << "'" << std::endl;
-//            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
-////                std::cout << "End nested object" << std::endl;
-//                indent--;
-//            }
-//            else if (p.size() > 0 && p.at(0) == '}') {
-////                std::cout << "End nested object" << std::endl;
-//                indent--;
-//            }
 
             if (m.size() > 0) {
                 std::string match{m[0]};
@@ -63,17 +52,13 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                 std::vector<std::string> retVal = stringtoolbox::split(match, ':');
 //std::cout << "Si=" << retVal.size() << std::endl;
                 if ( (retVal.size() == 1) || ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() == 0) ) ) {
-                    keyOfNestedObject = stringtoolbox::trim(retVal[0]);
+                    std::string keyOfNestedObject{stringtoolbox::trim(retVal[0])};
 //std::cout << "Nested object " << keyOfNestedObject << std::endl;
 
                     std::string suf(m.suffix());
                     suf = stringtoolbox::trim(suf);
-//                    if (!suf.empty()) {
-////std::cout << "S_nested = '" << suf << "'" << std::endl;
-//                    }
                     input = suf;
 
-//                    indent++;
                     auto r = readKeyValues(input);
 
                     JSONKeyValue kv;
@@ -82,14 +67,9 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                     kv.m_value = r;
 
                     result[kv.m_key] = kv;
-
-                    keyOfNestedObject = "";
                 }
                 if ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() > 0) ) {
                     auto e = std::make_pair(stringtoolbox::trim(retVal[0]), stringtoolbox::trim(retVal[1]));
-
-//for(int i = 0; i < indent; i++) std::cout << " ";
-//std::cout << e.first << "=" << e.second << std::endl;
 
                     JSONKeyValue kv;
                     kv.m_key = stringtoolbox::split(e.first, '"')[0];
@@ -119,9 +99,6 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
 
                     std::string suf(m.suffix());
                     suf = stringtoolbox::trim(suf);
-//                    if (!suf.empty()) {
-////std::cout << "S = '" << suf << "'" << std::endl;
-//                    }
                     oldInput = input;
                     input = suf;
                 }
@@ -156,21 +133,21 @@ std::string FromJSONVisitor::decodeBase64(const std::string &input) const noexce
 
     uint32_t index{0};
     char *decoded = new char[input.size() * 3 / 4];
-    char counter{0};
+    uint8_t counter{0};
     std::array<char, 4> buffer;
 
     for (uint32_t i{0}; i < input.size(); i++) {
         char c;
-        for (c = 0 ; c < 64 && (ALPHABET.at(c) != input.at(i)); c++);
+        for (c = 0 ; c < 64 && (ALPHABET.at(static_cast<uint8_t>(c)) != input.at(i)); c++);
 
         buffer[counter++] = c;
         if (4 == counter) {
-            decoded[index++] = (buffer[0] << 2) + (buffer[1] >> 4);
+            decoded[index++] = static_cast<char>((buffer[0] << 2) + (buffer[1] >> 4));
             if (64 != buffer[2]) {
-                decoded[index++] = (buffer[1] << 4) + (buffer[2] >> 2);
+                decoded[index++] = static_cast<char>((buffer[1] << 4) + (buffer[2] >> 2));
             }
             if (64 != buffer[3]) {
-                decoded[index++] = (buffer[2] << 6) + buffer[3];
+                decoded[index++] = static_cast<char>((buffer[2] << 6) + buffer[3]);
             }
             counter = 0;
         }
