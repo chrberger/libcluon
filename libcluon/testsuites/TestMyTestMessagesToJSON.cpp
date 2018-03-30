@@ -176,3 +176,31 @@ TEST_CASE("Testing MyTestMessage0 with false value.") {
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
 
+
+TEST_CASE("Testing MyTestMessage9.") {
+    testdata::MyTestMessage9 tmp;
+
+    tmp.attribute1(1.1f);
+    tmp.attribute2(1.23456789);
+    REQUIRE(1.1f == Approx(tmp.attribute1()));
+    REQUIRE(1.23456789 == Approx(tmp.attribute2()));
+
+    cluon::ToJSONVisitor jsonEncoder;
+    tmp.accept(jsonEncoder);
+
+    const char *JSON = R"({"attribute1":1.1,
+"attribute2":1.23456789})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    std::stringstream sstr{jsonEncoder.json()};
+
+    cluon::FromJSONVisitor jsonDecoder;
+    jsonDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage9 tmp2;
+    tmp2.accept(jsonDecoder);
+
+    REQUIRE(1.1f == Approx(tmp2.attribute1()));
+    REQUIRE(1.23456789 == Approx(tmp2.attribute2()));
+}
