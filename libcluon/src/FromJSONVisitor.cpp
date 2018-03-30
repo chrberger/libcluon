@@ -43,7 +43,7 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
         std::smatch m;
         do {
             std::regex_search(input, m, std::regex(MATCH_JSON));
-            std::string p{m.prefix()};
+//            std::string p{m.prefix()};
 
             if (m.size() > 0) {
                 std::string match{m[0]};
@@ -53,16 +53,19 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                 if ( (retVal.size() == 1) || ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() == 0) ) ) {
                     std::string keyOfNestedObject{stringtoolbox::trim(retVal[0])};
 
-                    std::string suf(m.suffix());
-                    suf = stringtoolbox::trim(suf);
-                    input = suf;
+                    {
+                        std::string suffix(m.suffix());
+                        suffix = stringtoolbox::trim(suffix);
+                        oldInput = input;
+                        input = suffix;
+                    }
 
-                    auto r = readKeyValues(input);
+                    auto mapOfNestedValues = readKeyValues(input);
 
                     JSONKeyValue kv;
                     kv.m_key = stringtoolbox::split(keyOfNestedObject, '"')[0];
                     kv.m_type = JSONConstants::OBJECT;
-                    kv.m_value = r;
+                    kv.m_value = mapOfNestedValues;
 
                     result[kv.m_key] = kv;
                 }
@@ -89,10 +92,12 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
 
                     result[kv.m_key] = kv;
 
-                    std::string suf(m.suffix());
-                    suf = stringtoolbox::trim(suf);
-                    oldInput = input;
-                    input = suf;
+                    {
+                        std::string suffix(m.suffix());
+                        suffix = stringtoolbox::trim(suffix);
+                        oldInput = input;
+                        input = suffix;
+                    }
                 }
             }
         } while (!m.empty() && (oldInput != input));
