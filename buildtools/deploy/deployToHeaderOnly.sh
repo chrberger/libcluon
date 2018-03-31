@@ -159,6 +159,14 @@ cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 #endif
 EOF
 
+cat <<EOF >> tmp.headeronly/cluon-complete.hpp
+#ifdef HAVE_CLUON_LIVEFEED
+EOF
+cat libcluon/tools/cluon-livefeed.cpp >> tmp.headeronly/cluon-complete.hpp
+cat <<EOF >> tmp.headeronly/cluon-complete.hpp
+#endif
+EOF
+
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"cluon\//\/\/#include\ \"cluon\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"cpp-peglib\//\/\/#include\ \"cpp-peglib\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
 cat tmp.headeronly/cluon-complete.hpp | sed -e 's/^#include\ \"argh\//\/\/#include\ \"argh\//g' > tmp.headeronly/cluon-complete.hpp.tmp && mv tmp.headeronly/cluon-complete.hpp.tmp tmp.headeronly/cluon-complete.hpp
