@@ -77,16 +77,16 @@ int main(int argc, char **argv) {
 
             const auto LAST_TIME_POINT{envelope.received().seconds() * 1000 * 1000 + envelope.received().microseconds()};
 
-            uint16_t y = 1;
-            const uint16_t x = 1;
+            uint8_t y = 1;
+            const uint8_t x = 1;
             for (auto e : mapOfLastEnvelopes) {
                 for (auto ee : e.second) {
-                    auto entry = ee.second;
+                    auto env = ee.second;
                     std::stringstream sstr;
 
-                    sstr << "Envelope: " << std::setfill(' ') << std::setw(5) << entry.dataType() << std::setw(0) << "/" << entry.senderStamp() << "; " << "sent: " << formatTimeStamp(entry.sent()) << "; sample: " << formatTimeStamp(entry.sampleTimeStamp()) << std::endl;
+                    sstr << "Envelope: " << std::setfill(' ') << std::setw(5) << env.dataType() << std::setw(0) << "/" << env.senderStamp() << "; " << "sent: " << formatTimeStamp(env.sent()) << "; sample: " << formatTimeStamp(env.sampleTimeStamp()) << std::endl;
 
-                    const auto AGE{LAST_TIME_POINT - (entry.received().seconds() * 1000 * 1000 + entry.received().microseconds())};
+                    const auto AGE{LAST_TIME_POINT - (env.received().seconds() * 1000 * 1000 + env.received().microseconds())};
 
                     Color c = Color::DEFAULT;
                     if (AGE <= 2 * 1000 * 1000) { c = Color::GREEN; }
