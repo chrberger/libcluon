@@ -420,7 +420,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
 
     tmp7_2.accept(jsonDecoder);
     REQUIRE(9 == tmp7_2.attribute1().attribute1());
-//    REQUIRE(12 == tmp7_2.attribute2());
+    REQUIRE(12 == tmp7_2.attribute2());
     REQUIRE(13 == tmp7_2.attribute3().attribute1());
 }
 

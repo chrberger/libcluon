@@ -46,7 +46,15 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
             std::string p{m.prefix()};
 //            std::string p = stringtoolbox::trim(p2);
 
-//std::cout << "P = '" << p << "'" << std::endl;
+std::cout << "P = '" << p << "'" << std::endl;
+            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
+                std::cout << "End nested object1" << std::endl;
+                break;
+            }
+            else if (p.size() > 0 && p.at(0) == '}') {
+                std::cout << "End nested object2:" << m.suffix() << std::endl;
+                break;
+            }
 
             if (m.size() > 0) {
                 std::string match{m[0]};
@@ -60,6 +68,7 @@ std::cout << "N" << keyOfNestedObject << std::endl;
                     {
                         std::string suffix(m.suffix());
                         suffix = stringtoolbox::trim(suffix);
+std::cout << "S = " << suffix << std::endl;
                         oldInput = input;
                         input = suffix;
                     }
@@ -106,16 +115,6 @@ std::cout << "NUMBER=" << v << std::endl;
                     }
                 }
             }
-
-            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
-                std::cout << "End nested object1" << std::endl;
-                return result;
-            }
-            else if (p.size() > 0 && p.at(0) == '}') {
-                std::cout << "End nested object2" << std::endl;
-                return result;
-            }
-
         } while (!m.empty() && (oldInput != input));
     } catch (std::regex_error &) {
     } catch (std::bad_cast &) {
