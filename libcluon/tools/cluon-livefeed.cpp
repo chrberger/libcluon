@@ -16,9 +16,12 @@
  */
 
 #include "cluon/cluon.hpp"
+#include "cluon/MetaMessage.hpp"
+#include "cluon/MessageParser.hpp"
 #include "cluon/OD4Session.hpp"
 
 #include <chrono>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -61,10 +64,31 @@ int main(int argc, char **argv) {
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
     if (0 == commandlineArguments.count("cid")) {
         std::cerr << PROGRAM
-                  << " displays any Envelopes received from an OpenDaVINCI v4 session to stdout." << std::endl;
-        std::cerr << "Usage:    " << PROGRAM << " --cid=<OpenDaVINCI session>" << std::endl;
+                  << " displays any Envelopes received from an OpenDaVINCI v4 session to stdout with optional data type resolving using a .odvd message specification." << std::endl;
+        std::cerr << "Usage:    " << PROGRAM << " [--odvd=<ODVD message specification file>] --cid=<OpenDaVINCI session>" << std::endl;
         std::cerr << "Examples: " << PROGRAM << " --cid=111" << std::endl;
+        std::cerr << "          " << PROGRAM << " --odvd=MyMessages.odvd --cid=111" << std::endl;
     } else {
+        std::map<int32_t, cluon::MetaMessage> scopeOfMetaMessages{};
+
+        // Try parsing a supplied .odvd file to resolve numerical data types to human readable message names.
+        {
+            std::string odvdFile{commandlineArguments["odvd"]};
+            if (!odvdFile.empty()) {
+                std::fstream fin{odvdFile, std::ios::in};
+                if (fin.good()) {
+                    const std::string s{static_cast<std::stringstream const&>(std::stringstream() << fin.rdbuf()).str()}; // NOLINT
+
+                    cluon::MessageParser mp;
+                    auto parsingResult = mp.parse(s);
+                    if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == parsingResult.second) {
+                        for (const auto &mm : parsingResult.first) { scopeOfMetaMessages[mm.messageIdentifier()] = mm; }
+                        std::clog << "Parsed " << parsingResult.first.size() << " message(s)." << std::endl;
+                    }
+                }
+            }
+        }
+
         std::mutex mapOfLastEnvelopesMutex;
         std::map<int32_t, std::map<uint32_t, cluon::data::Envelope> > mapOfLastEnvelopes;
 
@@ -88,7 +112,14 @@ int main(int argc, char **argv) {
                     auto env = ee.second;
                     std::stringstream sstr;
 
-                    sstr << "Envelope: " << std::setfill(' ') << std::setw(5) << env.dataType() << std::setw(0) << "/" << env.senderStamp() << "; " << "sent: " << formatTimeStamp(env.sent()) << "; sample: " << formatTimeStamp(env.sampleTimeStamp()) << std::endl;
+                    sstr << "Envelope: " << std::setfill(' ') << std::setw(5) << env.dataType() << std::setw(0) << "/" << env.senderStamp() << "; " << "sent: " << formatTimeStamp(env.sent()) << "; sample: " << formatTimeStamp(env.sampleTimeStamp());
+                    if (scopeOfMetaMessages.count(env.dataType()) > 0) {
+                        sstr << "; " << scopeOfMetaMessages[env.dataType()].messageName();
+                    }
+                    else {
+                        sstr << "; unknown data type";
+                    }
+                    sstr << std::endl;
 
                     const auto AGE{LAST_TIME_POINT - (env.received().seconds() * 1000 * 1000 + env.received().microseconds())};
 
