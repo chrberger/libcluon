@@ -1,3 +1,9 @@
+libcluon (0.0.59) xenial; urgency=low
+
+  * cluon-livefeed with compile fix for Windows
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 01 Apr 2018 15:57:22 +0200
+
 libcluon (0.0.58) xenial; urgency=low
 
   * Added message resolving to cluon-livefeed
