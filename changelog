@@ -1,3 +1,9 @@
+libcluon (0.0.58) xenial; urgency=low
+
+  * Added message resolving to cluon-livefeed
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 01 Apr 2018 15:21:36 +0200
+
 libcluon (0.0.57) xenial; urgency=low
 
   * Added message resolving to cluon-livefeed
