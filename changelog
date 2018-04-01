@@ -1,3 +1,27 @@
+libcluon (0.0.59) xenial; urgency=low
+
+  * cluon-livefeed with compile fix for Windows
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 01 Apr 2018 15:57:22 +0200
+
+libcluon (0.0.58) xenial; urgency=low
+
+  * Added message resolving to cluon-livefeed
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 01 Apr 2018 15:21:36 +0200
+
+libcluon (0.0.57) xenial; urgency=low
+
+  * Added message resolving to cluon-livefeed
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 01 Apr 2018 15:19:20 +0200
+
+libcluon (0.0.56) xenial; urgency=low
+
+  * Adding cluon-livefeed to display Envelopes currently being exchanged in an OD4Session
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 31 Mar 2018 22:45:11 +0200
+
 libcluon (0.0.55) xenial; urgency=low
 
   * Fix decoding Envelope from stream

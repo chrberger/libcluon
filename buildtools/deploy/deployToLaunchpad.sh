@@ -80,18 +80,17 @@ Upstream-Name: libcluon
 Source: https://github.com/chrberger/libcluon
 
 Files: *
-Copyright: 2017-18 Christian Berger <christian.berger@gu.se>
+Copyright: Copyright (c) 2017-18 Christian Berger. All rights reserved.
 License: GPL-3.0+
 
 Files: debian/*
-Copyright: 2017-18 Christian Berger <christian.berger@gu.se>
+Copyright: Copyright (c) 2017-18 Christian Berger. All rights reserved.
 License: GPL-3.0+
 
 Files: buildtools/xUnit/*
 Copyright: 2017-18 Two Blue Cubes Ltd. All rights reserved.
 License: Boost-1.0
 
-Files:
 Files: libcluon/thirdparty/argh/*
 Copyright: Copyright (c) 2016-18 Adi Shavit. All rights reserved.
 License: BSD-3-Clause
@@ -104,13 +103,13 @@ Files: libcluon/thirdparty/Mustache/*
 Copyright: Copyright 2015-2018 Kevin Wojniak.
 License: Boost-1.0
 
-Files: libcluon/thirdparty/cluon/stringtoolbox.hpp
-Copyright: Copyright (c) 2018 Christian Berger. All rights reserved.
-License: MIT
-
 Files: libcluon/thirdparty/cluon/any/*
 Copyright: Copyright (c) 2016-18 Denilson das Mercês Amorim.
 License: Boost-1.0
+
+Files: libcluon/thirdparty/cluon/stringtoolbox.hpp
+Copyright: Copyright (c) 2018 Christian Berger. All rights reserved.
+License: MIT
 
 
 License: GPL-3.0+
