@@ -1,3 +1,9 @@
+libcluon (0.0.57) xenial; urgency=low
+
+  * Added message resolving to cluon-livefeed
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 01 Apr 2018 15:19:20 +0200
+
 libcluon (0.0.56) xenial; urgency=low
 
   * Adding cluon-livefeed to display Envelopes currently being exchanged in an OD4Session
