@@ -83,7 +83,7 @@ void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::s
                               << receivedAt.microseconds() << "." << std::endl;
                 }
             }
-            catch(...) {}
+            catch(...) {} // LCOV_EXCL_LINE
         }
     }
 }

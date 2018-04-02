@@ -181,6 +181,9 @@ TEST_CASE("Create OD4 session with dataTrigger and transmit data with sample tim
     tsResponse = cluon::extractMessage<cluon::data::TimeStamp>(std::move(reply));
     REQUIRE(3 == tsResponse.seconds());
     REQUIRE(4 == tsResponse.microseconds());
+
+    retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), nullptr);
+    REQUIRE(retVal);
 }
 
 TEST_CASE("Create OD4 session with catch-all delegate disables with dataTrigger delegate.") {
