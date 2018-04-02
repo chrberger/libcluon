@@ -114,9 +114,9 @@ TEST_CASE("Create OD4 session with unrelated dataTrigger and transmit data with 
 
     cluon::OD4Session od4(81);
 
-    auto dataTrigger = [&replyNotReceived](cluon::data::Envelope &&) {
-        replyNotReceived = false;
-    };
+    auto dataTrigger = [&replyNotReceived](cluon::data::Envelope &&) { // LCOV_EXCL_LINE
+        replyNotReceived = false; // LCOV_EXCL_LINE
+    }; // LCOV_EXCL_LINE
 
     bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID()+2, dataTrigger);
     REQUIRE(retVal);
