@@ -18,6 +18,7 @@
 #include "cluon/Envelope.hpp"
 #include "cluon/OD4Session.hpp"
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/Time.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -31,52 +32,53 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
                      this->callback(std::move(data), std::move(from), std::move(timepoint));
                  }}
     , m_sender{"225.0.0." + std::to_string(CID), 12175}
-    , m_delegate(delegate) {}
+    , m_delegate(delegate)
+    , m_mapOfDataTriggeredDelegatesMutex{}
+    , m_mapOfDataTriggeredDelegates{} {}
 
-void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) noexcept {
-    cluon::data::TimeStamp receivedAt;
-    {
-        // Transform chrono time representation to same behavior as gettimeofday.
-        typedef std::chrono::duration<int32_t> seconds_type;
-        typedef std::chrono::duration<int64_t, std::micro> microseconds_type;
-
-        auto duration                = timepoint.time_since_epoch();
-        seconds_type s               = std::chrono::duration_cast<seconds_type>(duration);
-        microseconds_type us         = std::chrono::duration_cast<microseconds_type>(duration);
-        microseconds_type partial_us = us - std::chrono::duration_cast<microseconds_type>(s);
-
-        receivedAt.seconds(static_cast<int32_t>(s.count())).microseconds(static_cast<int32_t>(partial_us.count()));
-    }
-
-    if (nullptr != m_delegate) {
-        constexpr uint8_t OD4_HEADER_SIZE{5};
-        const std::string protoEncodedEnvelope{data};
-        if (OD4_HEADER_SIZE <= protoEncodedEnvelope.size()) {
-            char byte0{protoEncodedEnvelope.at(0)};
-            char byte1{protoEncodedEnvelope.at(1)};
-            uint32_t length{0};
-            {
-                std::stringstream sstr{std::string(&protoEncodedEnvelope[1], 4)};
-                sstr.read(reinterpret_cast<char *>(&length), sizeof(uint32_t)); /* Flawfinder: ignore */ // NOLINT
-                length = le32toh(length);
-                length >>= 8;
-            }
-            std::string input;
-            if ((0x0D == static_cast<uint8_t>(byte0)) && (0xA4 == static_cast<uint8_t>(byte1)) && (length == protoEncodedEnvelope.size() - OD4_HEADER_SIZE)) {
-                cluon::data::Envelope env;
-                {
-                    std::stringstream sstr{protoEncodedEnvelope.substr(OD4_HEADER_SIZE)};
-                    cluon::FromProtoVisitor protoDecoder;
-                    protoDecoder.decodeFrom(sstr);
-                    env.accept(protoDecoder);
-                }
-                env.received(receivedAt);
-                m_delegate(std::move(env));
+bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon::data::Envelope &&envelope)> delegate) noexcept {
+    bool retVal{false};
+    if (nullptr == m_delegate) {
+        std::lock_guard<std::mutex> lck(m_mapOfDataTriggeredDelegatesMutex);
+        if ( (nullptr == delegate) && (m_mapOfDataTriggeredDelegates.count(messageIdentifier) > 0) ) {
+            auto element = m_mapOfDataTriggeredDelegates.find(messageIdentifier);
+            if (element != m_mapOfDataTriggeredDelegates.end()) {
+                m_mapOfDataTriggeredDelegates.erase(element);
             }
         }
-    } else {
-        std::cout << "[cluon::OD4Session] Received " << data.size() << " bytes from " << from << " at " << receivedAt.seconds() << "."
-                  << receivedAt.microseconds() << "." << std::endl;
+        else {
+            m_mapOfDataTriggeredDelegates[messageIdentifier] = delegate;
+        }
+        retVal = true;
+    }
+    return retVal;
+}
+
+void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) noexcept {
+    std::stringstream sstr(data);
+    auto retVal = extractEnvelope(sstr);
+
+    if (retVal.first) {
+        cluon::data::TimeStamp receivedAt{cluon::time::convert(timepoint)};
+        cluon::data::Envelope env{retVal.second};
+        env.received(receivedAt);
+
+        // "Catch all"-delegate.
+        if (nullptr != m_delegate) {
+            cluon::data::Envelope env1{retVal.second};
+            m_delegate(std::move(env));
+        }
+        else {
+            // Data triggered-delegates.
+            std::lock_guard<std::mutex> lck(m_mapOfDataTriggeredDelegatesMutex);
+            if (m_mapOfDataTriggeredDelegates.count(env.dataType()) > 0) {
+                m_mapOfDataTriggeredDelegates[env.dataType()](std::move(env));
+            }
+            else {
+                std::cout << "[cluon::OD4Session] Received " << data.size() << " bytes from " << from << " at " << receivedAt.seconds() << "."
+                          << receivedAt.microseconds() << "." << std::endl;
+            }
+        }
     }
 }
 

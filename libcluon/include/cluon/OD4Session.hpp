@@ -28,6 +28,8 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <map>
+#include <mutex>
 #include <string>
 #include <utility>
 
@@ -57,7 +59,10 @@ class LIBCLUON_API OD4Session {
      * Constructor.
      *
      * @param CID OpenDaVINCI v4 session identifier [1 .. 254]
-     * @param delegate Function to call on newly arriving Envelopes.
+     * @param delegate Function to call on newly arriving Envelopes ("catch-all");
+     *        if a nullptr is passed, the method dataTrigger can be used to set
+     *        message specific delegates. Please note that it is NOT possible
+     *        to have both: a delegate for "catch-all" and the data-triggered ones.
      */
     OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&envelope)> delegate = nullptr) noexcept;
 
@@ -67,6 +72,16 @@ class LIBCLUON_API OD4Session {
      * @param envelope to be sent.
      */
     void send(cluon::data::Envelope &&envelope) noexcept;
+
+    /**
+     * This method sets a delegate to be called data-triggered on arrival
+     * of a new Envelope for a given message identifier.
+     *
+     * @param messageIdentifier Message identifier to assign a delegate.
+     * @param delegate Function to call on newly arriving Envelopes; setting it to nullptr will erase it.
+     * @return true if the given delegate could be successfully set or unset.
+     */
+    bool dataTrigger(int32_t messageIdentifier, std::function<void(cluon::data::Envelope &&envelope)> delegate) noexcept;
 
     /**
      * This method will send a given message to this OpenDaVINCI v4 session.
@@ -104,6 +119,9 @@ class LIBCLUON_API OD4Session {
     cluon::UDPSender m_sender;
 
     std::function<void(cluon::data::Envelope &&envelope)> m_delegate{nullptr};
+
+    std::mutex m_mapOfDataTriggeredDelegatesMutex{};
+    std::map<int32_t, std::function<void(cluon::data::Envelope &&envelope)> > m_mapOfDataTriggeredDelegates{};
 };
 
 } // namespace cluon
