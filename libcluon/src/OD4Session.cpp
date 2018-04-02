@@ -39,17 +39,20 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
 bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon::data::Envelope &&envelope)> delegate) noexcept {
     bool retVal{false};
     if (nullptr == m_delegate) {
-        std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
-        if ( (nullptr == delegate) && (m_mapOfDataTriggeredDelegates.count(messageIdentifier) > 0) ) {
-            auto element = m_mapOfDataTriggeredDelegates.find(messageIdentifier);
-            if (element != m_mapOfDataTriggeredDelegates.end()) {
-                m_mapOfDataTriggeredDelegates.erase(element);
+        try {
+            std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
+            if ( (nullptr == delegate) && (m_mapOfDataTriggeredDelegates.count(messageIdentifier) > 0) ) {
+                auto element = m_mapOfDataTriggeredDelegates.find(messageIdentifier);
+                if (element != m_mapOfDataTriggeredDelegates.end()) {
+                    m_mapOfDataTriggeredDelegates.erase(element);
+                }
             }
+            else {
+                m_mapOfDataTriggeredDelegates[messageIdentifier] = delegate;
+            }
+            retVal = true;
         }
-        else {
-            m_mapOfDataTriggeredDelegates[messageIdentifier] = delegate;
-        }
-        retVal = true;
+        catch(...) {}
     }
     return retVal;
 }
@@ -69,15 +72,18 @@ void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::s
             m_delegate(std::move(env));
         }
         else {
-            // Data triggered-delegates.
-            std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
-            if (m_mapOfDataTriggeredDelegates.count(env.dataType()) > 0) {
-                m_mapOfDataTriggeredDelegates[env.dataType()](std::move(env));
+            try {
+                // Data triggered-delegates.
+                std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
+                if (m_mapOfDataTriggeredDelegates.count(env.dataType()) > 0) {
+                    m_mapOfDataTriggeredDelegates[env.dataType()](std::move(env));
+                }
+                else {
+                    std::cout << "[cluon::OD4Session] Received " << data.size() << " bytes from " << from << " at " << receivedAt.seconds() << "."
+                              << receivedAt.microseconds() << "." << std::endl;
+                }
             }
-            else {
-                std::cout << "[cluon::OD4Session] Received " << data.size() << " bytes from " << from << " at " << receivedAt.seconds() << "."
-                          << receivedAt.microseconds() << "." << std::endl;
-            }
+            catch(...) {}
         }
     }
 }
