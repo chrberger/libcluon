@@ -52,7 +52,7 @@ bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon
             }
             retVal = true;
         }
-        catch(...) {}
+        catch(...) {} // LCOV_EXCL_LINE
     }
     return retVal;
 }
