@@ -1,3 +1,9 @@
+libcluon (0.0.60) xenial; urgency=low
+
+  * Added OD4Session::dataTrigger(<Message Identifier>, <Lambda>) to specify message-dependent, data-triggered lambdas
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 02 Apr 2018 20:37:47 +0200
+
 libcluon (0.0.59) xenial; urgency=low
 
   * cluon-livefeed with compile fix for Windows
