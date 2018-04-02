@@ -193,14 +193,14 @@ TEST_CASE("Create OD4 session with catch-all delegate disables with dataTrigger 
     cluon::data::Envelope reply;
     REQUIRE(0 == reply.dataType());
 
-    cluon::OD4Session od4(83, [&reply, &replyReceived](cluon::data::Envelope &&envelope) {
+    cluon::OD4Session od4(83, [&reply, &replyReceived](cluon::data::Envelope &&envelope) { 
         reply         = envelope;
         replyReceived = true;
     });
 
-    auto dataTrigger = [&replyNotReceivedDataTrigger](cluon::data::Envelope &&) {
-        replyNotReceivedDataTrigger = false;
-    };
+    auto dataTrigger = [&replyNotReceivedDataTrigger](cluon::data::Envelope &&) { // LCOV_EXCL_LINE
+        replyNotReceivedDataTrigger = false; // LCOV_EXCL_LINE
+    }; // LCOV_EXCL_LINE
 
     bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), dataTrigger);
     REQUIRE(!retVal);
