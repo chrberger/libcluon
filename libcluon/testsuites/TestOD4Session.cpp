@@ -76,7 +76,7 @@ TEST_CASE("Create OD4 session and transmit data with sample time stamp.") {
     cluon::data::Envelope reply;
     REQUIRE(0 == reply.dataType());
 
-    cluon::OD4Session od4(79, [&reply, &replyReceived](cluon::data::Envelope &&envelope) {
+    cluon::OD4Session od4(80, [&reply, &replyReceived](cluon::data::Envelope &&envelope) {
         reply         = envelope;
         replyReceived = true;
     });
@@ -107,4 +107,130 @@ TEST_CASE("Create OD4 session and transmit data with sample time stamp.") {
     tsResponse = cluon::extractMessage<cluon::data::TimeStamp>(std::move(reply));
     REQUIRE(1 == tsResponse.seconds());
     REQUIRE(2 == tsResponse.microseconds());
+}
+
+TEST_CASE("Create OD4 session with unrelated dataTrigger and transmit data with sample time stamp.") {
+    std::atomic<bool> replyNotReceived{true};
+
+    cluon::OD4Session od4(81);
+
+    auto dataTrigger = [&replyNotReceived](cluon::data::Envelope &&) { // LCOV_EXCL_LINE
+        replyNotReceived = false; // LCOV_EXCL_LINE
+    }; // LCOV_EXCL_LINE
+
+    bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID()+2, dataTrigger);
+    REQUIRE(retVal);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    cluon::data::TimeStamp tsSampleTime;
+    tsSampleTime.seconds(100).microseconds(200);
+
+    cluon::data::TimeStamp tsRequest;
+    tsRequest.seconds(3).microseconds(4);
+    od4.send(tsRequest, tsSampleTime);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    std::this_thread::sleep_for(1000ms);
+
+    REQUIRE(replyNotReceived);
+}
+
+TEST_CASE("Create OD4 session with dataTrigger and transmit data with sample time stamp.") {
+    std::atomic<bool> replyReceived{false};
+    cluon::data::Envelope reply;
+    REQUIRE(0 == reply.dataType());
+
+    cluon::OD4Session od4(82);
+
+    auto dataTrigger = [&reply, &replyReceived](cluon::data::Envelope &&envelope) {
+        reply         = envelope;
+        replyReceived = true;
+    };
+
+    bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), dataTrigger);
+    REQUIRE(retVal);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    cluon::data::TimeStamp tsSampleTime;
+    tsSampleTime.seconds(100).microseconds(200);
+
+    cluon::data::TimeStamp tsRequest;
+    tsRequest.seconds(3).microseconds(4);
+    od4.send(tsRequest, tsSampleTime);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!replyReceived);
+
+    REQUIRE(reply.dataType() == cluon::data::TimeStamp::ID());
+
+    cluon::data::TimeStamp tsResponse;
+    REQUIRE(0 == tsResponse.seconds());
+    REQUIRE(0 == tsResponse.microseconds());
+
+    REQUIRE(100 == reply.sampleTimeStamp().seconds());
+    REQUIRE(200 == reply.sampleTimeStamp().microseconds());
+
+    tsResponse = cluon::extractMessage<cluon::data::TimeStamp>(std::move(reply));
+    REQUIRE(3 == tsResponse.seconds());
+    REQUIRE(4 == tsResponse.microseconds());
+
+    retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), nullptr);
+    REQUIRE(retVal);
+}
+
+TEST_CASE("Create OD4 session with catch-all delegate disables with dataTrigger delegate.") {
+    std::atomic<bool> replyNotReceivedDataTrigger{true};
+
+    std::atomic<bool> replyReceived{false};
+    cluon::data::Envelope reply;
+    REQUIRE(0 == reply.dataType());
+
+    cluon::OD4Session od4(83, [&reply, &replyReceived](cluon::data::Envelope &&envelope) { 
+        reply         = envelope;
+        replyReceived = true;
+    });
+
+    auto dataTrigger = [&replyNotReceivedDataTrigger](cluon::data::Envelope &&) { // LCOV_EXCL_LINE
+        replyNotReceivedDataTrigger = false; // LCOV_EXCL_LINE
+    }; // LCOV_EXCL_LINE
+
+    bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), dataTrigger);
+    REQUIRE(!retVal);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    cluon::data::TimeStamp tsSampleTime;
+    tsSampleTime.seconds(101).microseconds(201);
+
+    cluon::data::TimeStamp tsRequest;
+    tsRequest.seconds(5).microseconds(6);
+    od4.send(tsRequest, tsSampleTime);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!replyReceived);
+
+    REQUIRE(replyNotReceivedDataTrigger);
+    REQUIRE(reply.dataType() == cluon::data::TimeStamp::ID());
+
+    cluon::data::TimeStamp tsResponse;
+    REQUIRE(0 == tsResponse.seconds());
+    REQUIRE(0 == tsResponse.microseconds());
+
+    REQUIRE(101 == reply.sampleTimeStamp().seconds());
+    REQUIRE(201 == reply.sampleTimeStamp().microseconds());
+
+    tsResponse = cluon::extractMessage<cluon::data::TimeStamp>(std::move(reply));
+    REQUIRE(5 == tsResponse.seconds());
+    REQUIRE(6 == tsResponse.microseconds());
 }
