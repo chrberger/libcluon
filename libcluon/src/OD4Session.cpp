@@ -39,7 +39,7 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
 bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon::data::Envelope &&envelope)> delegate) noexcept {
     bool retVal{false};
     if (nullptr == m_delegate) {
-        std::lock_guard<std::mutex> lck(m_mapOfDataTriggeredDelegatesMutex);
+        std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
         if ( (nullptr == delegate) && (m_mapOfDataTriggeredDelegates.count(messageIdentifier) > 0) ) {
             auto element = m_mapOfDataTriggeredDelegates.find(messageIdentifier);
             if (element != m_mapOfDataTriggeredDelegates.end()) {
@@ -70,7 +70,7 @@ void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::s
         }
         else {
             // Data triggered-delegates.
-            std::lock_guard<std::mutex> lck(m_mapOfDataTriggeredDelegatesMutex);
+            std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
             if (m_mapOfDataTriggeredDelegates.count(env.dataType()) > 0) {
                 m_mapOfDataTriggeredDelegates[env.dataType()](std::move(env));
             }
