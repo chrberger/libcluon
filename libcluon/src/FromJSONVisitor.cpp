@@ -19,7 +19,9 @@
 #include "cluon/stringtoolbox.hpp"
 
 #include <cstring>
+#include <algorithm>
 #include <array>
+#include <iterator>
 #include <regex>
 #include <sstream>
 #include <vector>
@@ -109,12 +111,9 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
 void FromJSONVisitor::decodeFrom(std::istream &in) noexcept {
     m_keyValues.clear();
 
-    std::stringstream sstr;
-    while (in.good()) {
-        uint8_t c = static_cast<uint8_t>(in.get());
-        sstr.write(reinterpret_cast<char*>(&c), sizeof(char));
-    }
-    std::string s{sstr.str()};
+    std::string s;
+    std::istream_iterator<char> it(in), it_end;
+    std::copy(it, it_end, std::insert_iterator<std::string>(s, s.begin()));
 
     // Remove whitespace characters like newline, carriage return, or tab.
     s.erase(std::remove_if( s.begin(), s.end(), [](char c){ return (c =='\r' || c =='\t' || c == '\n');}), s.end() );
