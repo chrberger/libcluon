@@ -1,3 +1,9 @@
+libcluon (0.0.61) xenial; urgency=low
+
+  * Added timeTrigger to OD4Session
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 03 Apr 2018 18:39:08 +0200
+
 libcluon (0.0.60) xenial; urgency=low
 
   * Added OD4Session::dataTrigger(<Message Identifier>, <Lambda>) to specify message-dependent, data-triggered lambdas
