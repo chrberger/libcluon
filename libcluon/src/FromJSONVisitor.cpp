@@ -24,8 +24,6 @@
 #include <sstream>
 #include <vector>
 
-#include <iostream>
-
 namespace cluon {
 
 FromJSONVisitor::FromJSONVisitor() noexcept
@@ -43,32 +41,16 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
         std::smatch m;
         do {
             std::regex_search(input, m, std::regex(MATCH_JSON));
-//            std::string p{m.prefix()};
-//            std::string p = stringtoolbox::trim(p2);
-
-//std::cout << "P = '" << p << "'" << std::endl;
-//            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
-//                std::cout << "End nested object1" << std::endl;
-////                break;
-//            }
-//            else if (p.size() > 0 && p.at(0) == '}') {
-//                std::cout << "End nested object2:" << m.suffix() << std::endl;
-////                break;
-//            }
 
             if (m.size() > 0) {
                 std::string match{m[0]};
-//std::cout << "M = '" << match << "'" << std::endl;
-
                 std::vector<std::string> retVal = stringtoolbox::split(match, ':');
                 if ( (retVal.size() == 1) || ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() == 0) ) ) {
                     std::string keyOfNestedObject{stringtoolbox::trim(retVal[0])};
                     keyOfNestedObject = stringtoolbox::split(keyOfNestedObject, '"')[0];
-//std::cout << "N" << keyOfNestedObject << std::endl;
                     {
                         std::string suffix(m.suffix());
                         suffix = stringtoolbox::trim(suffix);
-//std::cout << "SN = " << suffix << std::endl;
                         oldInput = input;
                         input = suffix;
                     }
@@ -101,8 +83,6 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                         std::stringstream tmp(e.second);
                         double v; tmp >> v;
                         kv.m_value = v;
-
-//std::cout << "NUMBER=" << v << std::endl;
                     }
 
                     result[kv.m_key] = kv;
@@ -110,13 +90,10 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                     {
                         std::string suffix(m.suffix());
                         suffix = stringtoolbox::trim(suffix);
-//std::cout << "S = " << suffix << std::endl;
                         oldInput = input;
                         input = suffix;
                         if (suffix.size() > 0 && suffix.at(0) == '}') {
-                            break;
-//std::cout << "End nested object3:" << suffix << std::endl;
-//                            return result;
+                            break; // Nested payload complete; return.
                         }
                     }
                 }
@@ -126,11 +103,6 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
     } catch (std::bad_cast &) {
     }
 
-//for (auto e : result) {
-//    std::cout << e.first << std::endl;
-//}
-
-//std::cout << std::endl;
     return result;
 }
 

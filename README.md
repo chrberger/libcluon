@@ -33,7 +33,7 @@ libcluon is available as single-file, [header-only](https://github.com/chrberger
 * Message compiler produces fully self-contained messages that do only depend on C++14 - external libraries are not needed allowing easy embedding into existing projects
 * Native implementation of [Protobuf](https://developers.google.com/protocol-buffers/) for data serialization & deserialization: [Example](https://wandbox.org/permlink/rXayIZxXyVDt5Jgn)
 * Native implementation of [LCM](http://lcm-proj.github.io/type_specification.html)/[ZCM](http://zerocm.github.io/zcm/) for data serialization & deserialization: [Example](https://wandbox.org/permlink/ItJnZ3VVnZsqL28y)
-* Native implementation of [JSON](https://www.json.org/) export for messages: [Example](https://wandbox.org/permlink/qyvkWIzGZFiBnTvm)
+* Native implementation of [JSON](https://www.json.org/) for data serialization & deserialization: [Example](https://wandbox.org/permlink/qyvkWIzGZFiBnTvm)
 * Native implementation of [MsgPack](https://msgpack.org/) for data serialization & deserialization: [Example](https://wandbox.org/permlink/qFNxlA8zwZj2if0P)
 * libcluon natively available for JavaScript via [Emscripten](https://github.com/kripken/emscripten): [libcluon.js](https://bintray.com/chrberger/libcluon/javascript#files)
 * Portable implementation of publish/subscribe communication (Linux, MacOSX, Windows): [Example](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestUDPReceiver.cpp#L111)
