@@ -20,6 +20,7 @@
 #include "cluon/Envelope.hpp"
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/OD4Session.hpp"
+#include "cluon/Time.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
 #include <atomic>
@@ -230,4 +231,79 @@ TEST_CASE("Create OD4 session with catch-all delegate disables with dataTrigger 
     tsResponse = cluon::extractMessage<cluon::data::TimeStamp>(std::move(reply));
     REQUIRE(5 == tsResponse.seconds());
     REQUIRE(6 == tsResponse.microseconds());
+}
+
+TEST_CASE("Create OD4 session timeTrigger delegate.") {
+    cluon::OD4Session od4(84);
+
+    int32_t counter{0};
+    auto timeTrigger = [&counter]() {
+        if (counter++ < 1) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+
+    od4.timeTrigger(20.0, timeTrigger);
+    REQUIRE(2 == counter);
+}
+
+TEST_CASE("Create OD4 session timeTrigger delegate with invalid freq.") {
+    cluon::OD4Session od4(85);
+
+    int32_t counter{0};
+    auto timeTrigger = [&counter]() {
+        if (counter++ < 1) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+
+    cluon::data::TimeStamp before{cluon::time::now()};
+    od4.timeTrigger(0, timeTrigger);
+    cluon::data::TimeStamp after{cluon::time::now()};
+    REQUIRE(2 == counter);
+    REQUIRE(2 * 1000 * 1000 <=((after.seconds()*1000*1000 + after.microseconds()) - (before.seconds()*1000*1000 + before.microseconds())));
+}
+
+TEST_CASE("Create OD4 session timeTrigger delegate throwing exception cancels timeTrigger.") {
+    cluon::OD4Session od4(86);
+
+    int32_t counter{0};
+    auto timeTrigger = [&counter]() {
+        if (counter++ < 2) {
+            return true;
+        }
+        else {
+            throw std::string("Exception");
+        }
+    };
+
+    od4.timeTrigger(10, timeTrigger);
+    REQUIRE(3 == counter);
+}
+
+TEST_CASE("Create OD4 session timeTrigger delegate running too slowly results in no waiting.") {
+    cluon::OD4Session od4(87);
+
+    int32_t counter{0};
+    auto timeTrigger = [&counter]() {
+        if (counter++ < 1) {
+            std::this_thread::sleep_for(std::chrono::duration<int64_t, std::milli>(200));
+            return true;
+        }
+        else {
+            throw false;
+        }
+    };
+
+    cluon::data::TimeStamp before{cluon::time::now()};
+    od4.timeTrigger(10, timeTrigger);
+    cluon::data::TimeStamp after{cluon::time::now()};
+    REQUIRE(2 == counter);
+    REQUIRE(200 * 1000 <=((after.seconds()*1000*1000 + after.microseconds()) - (before.seconds()*1000*1000 + before.microseconds())));
 }

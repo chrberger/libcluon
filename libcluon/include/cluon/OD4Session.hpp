@@ -52,19 +52,32 @@ MyMessage msg;
 od4.send(msg);
 \endcode
 
-Variant B allows a more fine-grained setup where you specify the Envelopes of
-interest:
+Variant B allows a more fine-grained setup where you specify the Envelopes of interest:
 
 \code{.cpp}
 cluon::OD4Session od4{111};
 
-od4.dataTrigger(cluon::data::TimeStamp::ID(), [](cluon::data::Envelope &&envelope){ std::cout << "Received cluon::data::TimeStamp" << std::endl;}
-od4.dataTrigger(MyMessage::ID(), [](cluon::data::Envelope &&envelope){ std::cout << "Received MyMessage" << std::endl;}
+od4.dataTrigger(cluon::data::TimeStamp::ID(), [](cluon::data::Envelope &&envelope){ std::cout << "Received cluon::data::TimeStamp" << std::endl;});
+od4.dataTrigger(MyMessage::ID(), [](cluon::data::Envelope &&envelope){ std::cout << "Received MyMessage" << std::endl;});
 
 // Do something in parallel.
 
 MyMessage msg;
 od4.send(msg);
+\endcode
+
+Next to receive Envelopes, OD4Session can call a user-supplied lambda in a time-triggered
+way. The lambda is executed as long as it does not return false or throws an exception
+that is then caught in the method timeTrigger and the method is exited:
+
+\code{.cpp}
+cluon::OD4Session od4{111};
+
+const float FREQ{10}; // 10 Hz.
+od4.timeTrigger(FREQ, [](){
+  // Do something time-triggered.
+  return false;
+}); // This call blocks until the lambda returns false.
 \endcode
 */
 class LIBCLUON_API OD4Session {
@@ -102,6 +115,18 @@ class LIBCLUON_API OD4Session {
      * @return true if the given delegate could be successfully set or unset.
      */
     bool dataTrigger(int32_t messageIdentifier, std::function<void(cluon::data::Envelope &&envelope)> delegate) noexcept;
+
+    /**
+     * This method sets a delegate to be called time-triggered using the
+     * specified frequency until the delegate returns false. This method
+     * blocks until the delegate has returned false or threw an exception.
+     * Thus, this method is typically called as last statement in a main
+     * function of a program.
+     *
+     * @param freq Frequency in Hertz to run the given delegate.
+     * @param delegate Function to call according to the given frequency.
+     */
+    void timeTrigger(float freq, std::function<bool()> delegate) noexcept;
 
     /**
      * This method will send a given message to this OpenDaVINCI v4 session.
