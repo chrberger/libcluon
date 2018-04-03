@@ -35,11 +35,31 @@
 
 namespace cluon {
 /**
-This class provides an interface to an OpenDaVINCI v4 session:
+This class provides an interface to an OpenDaVINCI v4 session. An OpenDaVINCI
+v4 session allows the automatic exchange of time-stamped Envelopes carrying
+user-defined messages usually using UDP multicast.
+
+There are two ways to participate in an OpenDaVINCI session. Variant A is simply
+calling a user-supplied lambda whenever a new Envelope is received:
 
 \code{.cpp}
 cluon::OD4Session od4{111, [](cluon::data::Envelope &&envelope){ std::cout << "Received cluon::Envelope" << std::endl;}
 };
+
+// Do something in parallel.
+
+MyMessage msg;
+od4.send(msg);
+\endcode
+
+Variant B allows a more fine-grained setup where you specify the Envelopes of
+interest:
+
+\code{.cpp}
+cluon::OD4Session od4{111};
+
+od4.dataTrigger(cluon::data::TimeStamp::ID(), [](cluon::data::Envelope &&envelope){ std::cout << "Received cluon::data::TimeStamp" << std::endl;}
+od4.dataTrigger(MyMessage::ID(), [](cluon::data::Envelope &&envelope){ std::cout << "Received MyMessage" << std::endl;}
 
 // Do something in parallel.
 
