@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 namespace cluon {
 
@@ -35,6 +36,37 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
     , m_delegate(delegate)
     , m_mapOfDataTriggeredDelegatesMutex{}
     , m_mapOfDataTriggeredDelegates{} {}
+
+void OD4Session::timeTrigger(float freq, std::function<bool()> delegate) noexcept {
+    if (nullptr != delegate) {
+        bool delegateIsRunning{true};
+        const int64_t TIME_SLICE_IN_MILLISECONDS{static_cast<uint32_t>(1000 / ((freq > 0) ? freq : 1.0f) )};
+        do {
+            cluon::data::TimeStamp before{cluon::time::now()};
+            try {
+                delegateIsRunning = delegate();
+            }
+            catch(...) {
+                delegateIsRunning = false; // delegate threw exception.
+            }
+            cluon::data::TimeStamp after{cluon::time::now()};
+
+            const int64_t beforeInMicroseconds{before.seconds() * 1000 * 1000 + before.microseconds()};
+            const int64_t afterInMicroseconds{after.seconds() * 1000 * 1000 + after.microseconds()};
+
+            const int64_t timeSpent{(afterInMicroseconds > beforeInMicroseconds) ? (afterInMicroseconds - beforeInMicroseconds)/1000 : 0};
+            const int64_t timeToSleepInMilliseconds{TIME_SLICE_IN_MILLISECONDS - timeSpent};
+
+            // Sleep the remaining time.
+            if ( (timeToSleepInMilliseconds > 0) && (timeToSleepInMilliseconds <= TIME_SLICE_IN_MILLISECONDS) ) {
+                std::this_thread::sleep_for(std::chrono::duration<int64_t, std::milli>(timeToSleepInMilliseconds));
+            }
+            else {
+                std::cerr << "[cluon::OD4Session]: time-triggered delegate violated allocated time slice." << std::endl;
+            }
+        } while (delegateIsRunning);
+    }
+}
 
 bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon::data::Envelope &&envelope)> delegate) noexcept {
     bool retVal{false};
