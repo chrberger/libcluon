@@ -114,8 +114,9 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                         oldInput = input;
                         input = suffix;
                         if (suffix.size() > 0 && suffix.at(0) == '}') {
+                            break;
 //std::cout << "End nested object3:" << suffix << std::endl;
-                            return result;
+//                            return result;
                         }
                     }
                 }
