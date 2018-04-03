@@ -43,32 +43,32 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
         std::smatch m;
         do {
             std::regex_search(input, m, std::regex(MATCH_JSON));
-            std::string p{m.prefix()};
+//            std::string p{m.prefix()};
 //            std::string p = stringtoolbox::trim(p2);
 
-std::cout << "P = '" << p << "'" << std::endl;
-            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
-                std::cout << "End nested object1" << std::endl;
-//                break;
-            }
-            else if (p.size() > 0 && p.at(0) == '}') {
-                std::cout << "End nested object2:" << m.suffix() << std::endl;
-//                break;
-            }
+//std::cout << "P = '" << p << "'" << std::endl;
+//            if (p.size() > 1 && p.at(0) == '"' && p.at(1) == '}') {
+//                std::cout << "End nested object1" << std::endl;
+////                break;
+//            }
+//            else if (p.size() > 0 && p.at(0) == '}') {
+//                std::cout << "End nested object2:" << m.suffix() << std::endl;
+////                break;
+//            }
 
             if (m.size() > 0) {
                 std::string match{m[0]};
-std::cout << "M = '" << match << "'" << std::endl;
+//std::cout << "M = '" << match << "'" << std::endl;
 
                 std::vector<std::string> retVal = stringtoolbox::split(match, ':');
                 if ( (retVal.size() == 1) || ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() == 0) ) ) {
                     std::string keyOfNestedObject{stringtoolbox::trim(retVal[0])};
                     keyOfNestedObject = stringtoolbox::split(keyOfNestedObject, '"')[0];
-std::cout << "N" << keyOfNestedObject << std::endl;
+//std::cout << "N" << keyOfNestedObject << std::endl;
                     {
                         std::string suffix(m.suffix());
                         suffix = stringtoolbox::trim(suffix);
-std::cout << "SN = " << suffix << std::endl;
+//std::cout << "SN = " << suffix << std::endl;
                         oldInput = input;
                         input = suffix;
                     }
@@ -102,7 +102,7 @@ std::cout << "SN = " << suffix << std::endl;
                         double v; tmp >> v;
                         kv.m_value = v;
 
-std::cout << "NUMBER=" << v << std::endl;
+//std::cout << "NUMBER=" << v << std::endl;
                     }
 
                     result[kv.m_key] = kv;
@@ -110,11 +110,11 @@ std::cout << "NUMBER=" << v << std::endl;
                     {
                         std::string suffix(m.suffix());
                         suffix = stringtoolbox::trim(suffix);
-std::cout << "S = " << suffix << std::endl;
+//std::cout << "S = " << suffix << std::endl;
                         oldInput = input;
                         input = suffix;
                         if (suffix.size() > 0 && suffix.at(0) == '}') {
-                            std::cout << "End nested object3:" << suffix << std::endl;
+//std::cout << "End nested object3:" << suffix << std::endl;
                             return result;
                         }
                     }
@@ -125,11 +125,11 @@ std::cout << "S = " << suffix << std::endl;
     } catch (std::bad_cast &) {
     }
 
-for (auto e : result) {
-    std::cout << e.first << std::endl;
-}
+//for (auto e : result) {
+//    std::cout << e.first << std::endl;
+//}
 
-std::cout << std::endl;
+//std::cout << std::endl;
     return result;
 }
 
@@ -237,13 +237,10 @@ void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&n
 void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)id;
     (void)typeName;
-std::cout << "V:" << name << std::endl;
     if (0 < m_keyValues.count(name)) {
         try {
-std::cout << "VL:" << __LINE__ << std::endl;
             if (JSONConstants::NUMBER == m_keyValues[name].m_type) {
                 v = static_cast<uint8_t>(linb::any_cast<double>(m_keyValues[name].m_value));
-std::cout << "V:" << +v << std::endl;
             }
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
         }
