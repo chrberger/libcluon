@@ -26,12 +26,16 @@
         #define ssize_t long
     #endif
 
+    // Disable warning "'<': signed/unsigned mismatch".
+    #pragma warning(disable : 4018)
     // Disable warning "Unary minus operator applied to unsigned type, result still unsigned".
     #pragma warning(disable : 4146)
     // Disable warning "Possible loss of precision".
     #pragma warning(disable : 4244)
     // Disable warning "Conversion from 'size_t' to 'type', possible loss of data".
     #pragma warning(disable : 4267)
+    // Disable warning "'static_cast': truncation of constant value".
+    #pragma warning(disable : 4309)
     // Disable warning "'operator ""s': literal suffix identifiers that do not start with an underscore are reserved".
     #pragma warning(disable : 4455)
     // Disable deprecated API warnings.
