@@ -19,6 +19,7 @@
 
 #include "cluon/FromJSONVisitor.hpp"
 #include "cluon/ToJSONVisitor.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
@@ -424,3 +425,98 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     REQUIRE(13 == tmp7_2.attribute3().attribute1());
 }
 
+TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
+    cluon::data::Envelope env;
+    REQUIRE(env.serializedData().empty());
+    REQUIRE(0 == env.senderStamp());
+    REQUIRE(0 == env.dataType());
+    REQUIRE(0 == env.sent().seconds());
+    REQUIRE(0 == env.sent().microseconds());
+    REQUIRE(0 == env.received().seconds());
+    REQUIRE(0 == env.received().microseconds());
+    REQUIRE(0 == env.sampleTimeStamp().seconds());
+    REQUIRE(0 == env.sampleTimeStamp().microseconds());
+
+    cluon::data::TimeStamp ts1;
+    ts1.seconds(1).microseconds(2);
+    cluon::data::TimeStamp ts2;
+    ts2.seconds(10).microseconds(20);
+    cluon::data::TimeStamp ts3;
+    ts3.seconds(100).microseconds(200);
+
+    env.senderStamp(2).sent(ts1).received(ts2).sampleTimeStamp(ts3).dataType(12);
+    {
+        cluon::data::TimeStamp payload;
+        payload.seconds(3).microseconds(4);
+
+        cluon::ToProtoVisitor proto;
+        payload.accept(proto);
+        env.serializedData(proto.encodedData());
+    }
+
+    REQUIRE(2 == env.senderStamp());
+    REQUIRE(12 == env.dataType());
+    REQUIRE(1 == env.sent().seconds());
+    REQUIRE(2 == env.sent().microseconds());
+    REQUIRE(10 == env.received().seconds());
+    REQUIRE(20 == env.received().microseconds());
+    REQUIRE(100 == env.sampleTimeStamp().seconds());
+    REQUIRE(200 == env.sampleTimeStamp().microseconds());
+
+    REQUIRE(4 == env.serializedData().size());
+    REQUIRE(0x8 == env.serializedData().at(0));
+    REQUIRE(0x6 == env.serializedData().at(1));
+    REQUIRE(0x10 == env.serializedData().at(2));
+    REQUIRE(0x8 == env.serializedData().at(3));
+
+    // Next, turn Envelope into JSON-encoded byte stream.
+    cluon::ToJSONVisitor jsonEncoder;
+    env.accept(jsonEncoder);
+
+    const char *JSON = R"({"dataType":12,
+"serializedData":"CAYQCA==",
+"sent":{"seconds":1,
+"microseconds":2},
+"received":{"seconds":10,
+"microseconds":20},
+"sampleTimeStamp":{"seconds":100,
+"microseconds":200},
+"senderStamp":2})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    {
+        cluon::data::Envelope env2;
+        REQUIRE(env2.serializedData().empty());
+        REQUIRE(0 == env2.senderStamp());
+        REQUIRE(0 == env2.dataType());
+        REQUIRE(0 == env2.sent().seconds());
+        REQUIRE(0 == env2.sent().microseconds());
+        REQUIRE(0 == env2.received().seconds());
+        REQUIRE(0 == env2.received().microseconds());
+        REQUIRE(0 == env2.sampleTimeStamp().seconds());
+        REQUIRE(0 == env2.sampleTimeStamp().microseconds());
+
+        std::stringstream sstr{jsonEncoder.json()};
+
+        cluon::FromJSONVisitor jsonDecoder;
+        jsonDecoder.decodeFrom(sstr);
+
+        env2.accept(jsonDecoder);
+        REQUIRE(!env2.serializedData().empty());
+        REQUIRE(2 == env2.senderStamp());
+        REQUIRE(12 == env2.dataType());
+        REQUIRE(1 == env2.sent().seconds());
+        REQUIRE(2 == env2.sent().microseconds());
+        REQUIRE(10 == env2.received().seconds());
+        REQUIRE(20 == env2.received().microseconds());
+        REQUIRE(100 == env2.sampleTimeStamp().seconds());
+        REQUIRE(200 == env2.sampleTimeStamp().microseconds());
+
+        REQUIRE(4 == env2.serializedData().size());
+        REQUIRE(0x8 == env2.serializedData().at(0));
+        REQUIRE(0x6 == env2.serializedData().at(1));
+        REQUIRE(0x10 == env2.serializedData().at(2));
+        REQUIRE(0x8 == env2.serializedData().at(3));
+    }
+}
