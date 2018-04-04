@@ -126,9 +126,10 @@ std::string FromJSONVisitor::decodeBase64(const std::string &input) const noexce
     const std::string ALPHABET{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
 
     uint32_t index{0};
+
     char *decoded = new char[input.size() * 3 / 4];
     uint8_t counter{0};
-    std::array<char, 4> buffer;
+    char buffer[4];
 
     for (uint32_t i{0}; i < input.size(); i++) {
         char c;
@@ -329,8 +330,7 @@ void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&n
     if (0 < m_keyValues.count(name)) {
         try {
             std::string tmp{linb::any_cast<std::string>(m_keyValues[name].m_value)};
-//            v = decodeBase64(tmp);
-            v = tmp;
+            v = decodeBase64(tmp);
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
         }
     }
