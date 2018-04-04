@@ -353,6 +353,7 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(tmp2.attribute11() == tmp.attribute11());
 }
 
+#ifndef WIN32
 TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
     testdata::MyTestMessage6 tmp6;
 
@@ -520,3 +521,4 @@ TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
         REQUIRE(0x8 == env2.serializedData().at(3));
     }
 }
+#endif
