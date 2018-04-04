@@ -987,7 +987,7 @@ message MyTestMessage5 [id = 30005] {
     REQUIRE(tmp2.attribute6() == 0);
     REQUIRE(tmp2.attribute7() == 0);
     REQUIRE(tmp2.attribute8() == 0);
-    REQUIRE(tmp2.attribute9() == 0);
-    REQUIRE(tmp2.attribute10() == 0);
+    REQUIRE(0 == Approx(tmp2.attribute9()));
+    REQUIRE(0 == Approx(tmp2.attribute10()));
     REQUIRE(tmp2.attribute11().empty());
 }

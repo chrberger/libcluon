@@ -33,14 +33,15 @@ static std::mutex envConverterMutex;
 static cluon::EnvelopeConverter envConverter;
 
 int setMessageSpecification(const std::string &s);
-std::string decodeEnvelopeConverter(const std::string &s);
+std::string decodeEnvelopeToJSON(const std::string &s);
+std::string encodeEnvelopeFromJSONWithoutTimeStamps(const std::string &s, int32_t messageIdentifier);
 
 int setMessageSpecification(const std::string &s) {
     std::lock_guard<std::mutex> lck(envConverterMutex);
     return envConverter.setMessageSpecification(s);
 }
 
-std::string decodeEnvelopeConverter(const std::string &s) {
+std::string decodeEnvelopeToJSON(const std::string &s) {
     std::lock_guard<std::mutex> lck(envConverterMutex);
     return envConverter.getJSONFromProtoEncodedEnvelope(s);
 }
