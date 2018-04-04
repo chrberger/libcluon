@@ -264,7 +264,6 @@ TEST_CASE("Testing MyTestMessage4.") {
     REQUIRE("testing" == tmp2.attribute1());
 }
 
-#ifndef WIN32
 TEST_CASE("Testing MyTestMessage5.") {
     testdata::MyTestMessage5 tmp;
 
@@ -354,6 +353,7 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(tmp2.attribute11() == tmp.attribute11());
 }
 
+#ifndef WIN32
 TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
     testdata::MyTestMessage6 tmp6;
 
