@@ -116,10 +116,10 @@ TEST_CASE("Create OD4 session with unrelated dataTrigger and transmit data with 
     cluon::OD4Session od4(81);
 
     auto dataTrigger = [&replyNotReceived](cluon::data::Envelope &&) { // LCOV_EXCL_LINE
-        replyNotReceived = false; // LCOV_EXCL_LINE
-    }; // LCOV_EXCL_LINE
+        replyNotReceived= false;                                          // LCOV_EXCL_LINE
+    };                                                                 // LCOV_EXCL_LINE
 
-    bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID()+2, dataTrigger);
+    bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID() + 2, dataTrigger);
     REQUIRE(retVal);
 
     using namespace std::literals::chrono_literals; // NOLINT
@@ -194,14 +194,14 @@ TEST_CASE("Create OD4 session with catch-all delegate disables with dataTrigger 
     cluon::data::Envelope reply;
     REQUIRE(0 == reply.dataType());
 
-    cluon::OD4Session od4(83, [&reply, &replyReceived](cluon::data::Envelope &&envelope) { 
+    cluon::OD4Session od4(83, [&reply, &replyReceived](cluon::data::Envelope &&envelope) {
         reply         = envelope;
         replyReceived = true;
     });
 
     auto dataTrigger = [&replyNotReceivedDataTrigger](cluon::data::Envelope &&) { // LCOV_EXCL_LINE
-        replyNotReceivedDataTrigger = false; // LCOV_EXCL_LINE
-    }; // LCOV_EXCL_LINE
+        replyNotReceivedDataTrigger= false;                                                     // LCOV_EXCL_LINE
+    };                                                                            // LCOV_EXCL_LINE
 
     bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), dataTrigger);
     REQUIRE(!retVal);
@@ -243,8 +243,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate.") {
     auto timeTrigger = [&counter]() {
         if (counter++ < 1) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     };
@@ -260,8 +259,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate with invalid freq.") {
     auto timeTrigger = [&counter]() {
         if (counter++ < 1) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     };
@@ -270,7 +268,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate with invalid freq.") {
     od4.timeTrigger(0, timeTrigger);
     cluon::data::TimeStamp after{cluon::time::now()};
     REQUIRE(2 == counter);
-    REQUIRE(2 * 1000 * 1000 <=((after.seconds()*1000*1000 + after.microseconds()) - (before.seconds()*1000*1000 + before.microseconds())));
+    REQUIRE(2 * 1000 * 1000 <= ((after.seconds() * 1000 * 1000 + after.microseconds()) - (before.seconds() * 1000 * 1000 + before.microseconds())));
 }
 
 TEST_CASE("Create OD4 session timeTrigger delegate throwing exception cancels timeTrigger.") {
@@ -280,8 +278,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate throwing exception cancels ti
     auto timeTrigger = [&counter]() {
         if (counter++ < 2) {
             return true;
-        }
-        else {
+        } else {
             throw std::string("Exception");
         }
     };
@@ -298,8 +295,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate running too slowly results in
         if (counter++ < 1) {
             std::this_thread::sleep_for(std::chrono::duration<int64_t, std::milli>(200));
             return true;
-        }
-        else {
+        } else {
             throw false;
         }
     };
@@ -308,5 +304,5 @@ TEST_CASE("Create OD4 session timeTrigger delegate running too slowly results in
     od4.timeTrigger(10, timeTrigger);
     cluon::data::TimeStamp after{cluon::time::now()};
     REQUIRE(2 == counter);
-    REQUIRE(200 * 1000 <=((after.seconds()*1000*1000 + after.microseconds()) - (before.seconds()*1000*1000 + before.microseconds())));
+    REQUIRE(200 * 1000 <= ((after.seconds() * 1000 * 1000 + after.microseconds()) - (before.seconds() * 1000 * 1000 + before.microseconds())));
 }

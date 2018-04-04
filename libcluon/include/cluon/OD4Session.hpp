@@ -166,7 +166,7 @@ class LIBCLUON_API OD4Session {
     std::function<void(cluon::data::Envelope &&envelope)> m_delegate{nullptr};
 
     std::mutex m_mapOfDataTriggeredDelegatesMutex{};
-    std::map<int32_t, std::function<void(cluon::data::Envelope &&envelope)> > m_mapOfDataTriggeredDelegates{};
+    std::map<int32_t, std::function<void(cluon::data::Envelope &&envelope)>> m_mapOfDataTriggeredDelegates{};
 };
 
 } // namespace cluon

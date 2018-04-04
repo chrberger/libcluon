@@ -42,9 +42,9 @@
 namespace cluon {
 
 TCPConnection::TCPConnection(const std::string &address,
-                            uint16_t port,
-                            std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate,
-                            std::function<void()> connectionLostDelegate) noexcept
+                             uint16_t port,
+                             std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate,
+                             std::function<void()> connectionLostDelegate) noexcept
     : m_address()
     , m_readFromSocketThread()
     , m_newDataDelegate(std::move(newDataDelegate))
@@ -56,17 +56,15 @@ TCPConnection::TCPConnection(const std::string &address,
     std::vector<int> addressTokens{std::istream_iterator<int>(sstr), std::istream_iterator<int>()};
 
     if ((!addressTokens.empty()) && (4 == addressTokens.size())
-        && !(std::end(addressTokens)
-             != std::find_if(addressTokens.begin(), addressTokens.end(), [](int a) { return (a < 0) || (a > 255); }))
-        && (0 < port)) {
+        && !(std::end(addressTokens) != std::find_if(addressTokens.begin(), addressTokens.end(), [](int a) { return (a < 0) || (a > 255); })) && (0 < port)) {
         // Check for valid IP address.
         struct sockaddr_in tmpSocketAddress {};
         const bool isValid = (0 < ::inet_pton(AF_INET, address.c_str(), &(tmpSocketAddress.sin_addr)));
         if (isValid) {
             std::memset(&m_address, 0, sizeof(m_address));
             m_address.sin_addr.s_addr = ::inet_addr(address.c_str());
-            m_address.sin_family = AF_INET;
-            m_address.sin_port   = htons(port);
+            m_address.sin_family      = AF_INET;
+            m_address.sin_port        = htons(port);
 #ifdef WIN32
             // Load Winsock 2.2 DLL.
             WSADATA wsaData;
@@ -85,7 +83,7 @@ TCPConnection::TCPConnection(const std::string &address,
 #endif
 
             if (!(m_socket < 0)) {
-                auto retVal = ::connect(m_socket , reinterpret_cast<struct sockaddr *>(&m_address), sizeof(m_address));
+                auto retVal = ::connect(m_socket, reinterpret_cast<struct sockaddr *>(&m_address), sizeof(m_address));
                 if (0 > retVal) {
 #ifdef WIN32
                     auto errorCode = WSAGetLastError();
@@ -93,8 +91,7 @@ TCPConnection::TCPConnection(const std::string &address,
                     auto errorCode = errno;
 #endif
                     closeSocket(errorCode);
-                }
-                else {
+                } else {
                     // Constructing a thread could fail.
                     try {
                         m_readFromSocketThread = std::thread(&TCPConnection::readFromSocket, this);
@@ -223,8 +220,7 @@ void TCPConnection::readFromSocket() noexcept {
                 // Call newDataDelegate.
                 m_newDataDelegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)), timestamp);
             }
-        }
-        else {
+        } else {
             // Let the operating system yield other threads.
             using namespace std::literals::chrono_literals;
             std::this_thread::sleep_for(1ms);

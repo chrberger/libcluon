@@ -22,8 +22,8 @@
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
-#include <cstring>
 #include <array>
+#include <cstring>
 #include <istream>
 #include <sstream>
 #include <string>

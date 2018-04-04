@@ -78,124 +78,125 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                                                                                       std::vector<std::string> &fieldNames,
                                                                                       std::vector<int32_t> &numericalMessageIdentifiers,
                                                                                       std::vector<int32_t> &numericalFieldIdentifiers) {
-        bool retVal = true;
-        // First, we need to visit the children of AST node MESSAGES_SPECIFICATION.
-        if ("MESSAGES_SPECIFICATION" == ast.name) {
-            for (const auto &node : ast.nodes) {
-                retVal &= checkForUniqueFieldNames(*node, prefix, messageNames, fieldNames, numericalMessageIdentifiers, numericalFieldIdentifiers);
-            }
-            // Try finding duplicated message identifiers.
-            if (retVal) {
-                std::sort(std::begin(numericalMessageIdentifiers), std::end(numericalMessageIdentifiers));
-                int32_t duplicatedMessageIdentifier{-1};
-                for (auto it{std::begin(numericalMessageIdentifiers)}; it != std::end(numericalMessageIdentifiers); it++) {
-                    if (it + 1 != std::end(numericalMessageIdentifiers)) {
-                        if (std::find(it + 1, std::end(numericalMessageIdentifiers), *it) != std::end(numericalMessageIdentifiers)) {
-                            duplicatedMessageIdentifier = *it;
+            bool retVal = true;
+            // First, we need to visit the children of AST node MESSAGES_SPECIFICATION.
+            if ("MESSAGES_SPECIFICATION" == ast.name) {
+                for (const auto &node : ast.nodes) {
+                    retVal &= checkForUniqueFieldNames(*node, prefix, messageNames, fieldNames, numericalMessageIdentifiers, numericalFieldIdentifiers);
+                }
+                // Try finding duplicated message identifiers.
+                if (retVal) {
+                    std::sort(std::begin(numericalMessageIdentifiers), std::end(numericalMessageIdentifiers));
+                    int32_t duplicatedMessageIdentifier{-1};
+                    for (auto it{std::begin(numericalMessageIdentifiers)}; it != std::end(numericalMessageIdentifiers); it++) {
+                        if (it + 1 != std::end(numericalMessageIdentifiers)) {
+                            if (std::find(it + 1, std::end(numericalMessageIdentifiers), *it) != std::end(numericalMessageIdentifiers)) {
+                                duplicatedMessageIdentifier = *it;
+                            }
                         }
                     }
-                }
-                retVal &= (-1 == duplicatedMessageIdentifier);
-                if (!retVal) {
-                    std::cerr << "[cluon::MessageParser] Found duplicated numerical message identifier: " << duplicatedMessageIdentifier << '\n';
-                }
-            }
-            // Try finding duplicated message names.
-            if (retVal) {
-                std::sort(std::begin(messageNames), std::end(messageNames));
-                std::string duplicatedMessageName;
-                for (auto it{std::begin(messageNames)}; it != std::end(messageNames); it++) {
-                    if (it + 1 != std::end(messageNames)) {
-                        if (std::find(it + 1, std::end(messageNames), *it) != std::end(messageNames)) {
-                            duplicatedMessageName = *it;
-                        }
+                    retVal &= (-1 == duplicatedMessageIdentifier);
+                    if (!retVal) {
+                        std::cerr << "[cluon::MessageParser] Found duplicated numerical message identifier: " << duplicatedMessageIdentifier << '\n';
                     }
                 }
-                retVal &= (duplicatedMessageName.empty());
-                if (!retVal) {
-                    std::cerr << "[cluon::MessageParser] Found duplicated message name '" << duplicatedMessageName << "'" << '\n';
+                // Try finding duplicated message names.
+                if (retVal) {
+                    std::sort(std::begin(messageNames), std::end(messageNames));
+                    std::string duplicatedMessageName;
+                    for (auto it{std::begin(messageNames)}; it != std::end(messageNames); it++) {
+                        if (it + 1 != std::end(messageNames)) {
+                            if (std::find(it + 1, std::end(messageNames), *it) != std::end(messageNames)) {
+                                duplicatedMessageName = *it;
+                            }
+                        }
+                    }
+                    retVal &= (duplicatedMessageName.empty());
+                    if (!retVal) {
+                        std::cerr << "[cluon::MessageParser] Found duplicated message name '" << duplicatedMessageName << "'" << '\n';
+                    }
                 }
             }
-        }
-        // Second, we need to visit the children of AST node MESSAGE_DECLARATION.
-        if ("MESSAGE_DECLARATION" == ast.name) {
-            fieldNames.clear();
-            numericalFieldIdentifiers.clear();
-            prefix = "";
-            retVal = true;
+            // Second, we need to visit the children of AST node MESSAGE_DECLARATION.
+            if ("MESSAGE_DECLARATION" == ast.name) {
+                fieldNames.clear();
+                numericalFieldIdentifiers.clear();
+                prefix = "";
+                retVal = true;
 
-            for (const auto &node : ast.nodes) {
-                if ("MESSAGE_IDENTIFIER" == node->name) {
-                    prefix = node->token;
-                    messageNames.push_back(::stringtoolbox::trim(prefix));
-                } else if ("NATURAL_NUMBER" == node->name) {
-                    numericalMessageIdentifiers.push_back(std::stoi(node->token));
-                } else if ("PRIMITIVE_FIELD" == node->name) {
+                for (const auto &node : ast.nodes) {
+                    if ("MESSAGE_IDENTIFIER" == node->name) {
+                        prefix = node->token;
+                        messageNames.push_back(::stringtoolbox::trim(prefix));
+                    } else if ("NATURAL_NUMBER" == node->name) {
+                        numericalMessageIdentifiers.push_back(std::stoi(node->token));
+                    } else if ("PRIMITIVE_FIELD" == node->name) {
+                        retVal &= checkForUniqueFieldNames(*node, prefix, messageNames, fieldNames, numericalMessageIdentifiers, numericalFieldIdentifiers);
+                    }
+                }
+
+                // Try finding duplicated numerical field identifiers.
+                if (retVal) {
+                    std::sort(std::begin(numericalFieldIdentifiers), std::end(numericalFieldIdentifiers));
+                    int32_t duplicatedFieldIdentifier{-1};
+                    for (auto it{std::begin(numericalFieldIdentifiers)}; it != std::end(numericalFieldIdentifiers); it++) {
+                        if (it + 1 != std::end(numericalFieldIdentifiers)) {
+                            if (std::find(it + 1, std::end(numericalFieldIdentifiers), *it) != std::end(numericalFieldIdentifiers)) {
+                                duplicatedFieldIdentifier = *it;
+                            }
+                        }
+                    }
+                    retVal &= (-1 == duplicatedFieldIdentifier);
+                    if (!retVal) {
+                        std::cerr << "[cluon::MessageParser] Found duplicated numerical field identifier in message "
+                                  << "'" << ::stringtoolbox::trim(prefix) << "': " << duplicatedFieldIdentifier << '\n';
+                    }
+                }
+                // Try finding duplicated field names.
+                if (retVal) {
+                    std::sort(std::begin(fieldNames), std::end(fieldNames));
+                    std::string duplicatedFieldName;
+                    for (auto it{std::begin(fieldNames)}; it != std::end(fieldNames); it++) {
+                        if (it + 1 != std::end(fieldNames)) {
+                            if (std::find(it + 1, std::end(fieldNames), *it) != std::end(fieldNames)) {
+                                duplicatedFieldName = *it;
+                            }
+                        }
+                    }
+                    retVal &= (duplicatedFieldName.empty());
+                    if (!retVal) {
+                        std::cerr << "[cluon::MessageParser] Found duplicated field name in message '" << ::stringtoolbox::trim(prefix) << "': '"
+                                  << duplicatedFieldName << "'" << '\n';
+                    }
+                }
+            }
+            // Within AST node MESSAGE_DECLARATION, we have PRIMITIVE_FIELD from
+            // which we need to extract the field "token".
+            if (ast.name == "PRIMITIVE_FIELD") {
+                // Extract the value of entry "IDENTIFIER".
+                auto nodeIdentifier = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->name == "IDENTIFIER"); });
+                if (nodeIdentifier != std::end(ast.nodes)) {
+                    fieldNames.push_back((*nodeIdentifier)->token);
+                }
+
+                // Visit this node's children to check for duplicated numerical identifiers.
+                for (const auto &node : ast.nodes) {
                     retVal &= checkForUniqueFieldNames(*node, prefix, messageNames, fieldNames, numericalMessageIdentifiers, numericalFieldIdentifiers);
                 }
             }
-
-            // Try finding duplicated numerical field identifiers.
-            if (retVal) {
-                std::sort(std::begin(numericalFieldIdentifiers), std::end(numericalFieldIdentifiers));
-                int32_t duplicatedFieldIdentifier{-1};
-                for (auto it{std::begin(numericalFieldIdentifiers)}; it != std::end(numericalFieldIdentifiers); it++) {
-                    if (it + 1 != std::end(numericalFieldIdentifiers)) {
-                        if (std::find(it + 1, std::end(numericalFieldIdentifiers), *it) != std::end(numericalFieldIdentifiers)) {
-                            duplicatedFieldIdentifier = *it;
-                        }
-                    }
+            // Within AST node PRIMITIVE_FIELD, we have PRIMITIVE_FIELD_OPTIONS from
+            // which we need to extract the field "token".
+            if (ast.name == "PRIMITIVE_FIELD_OPTIONS") {
+                // Extract the value of entry "IDENTIFIER".
+                auto nodeNumericalFieldIdentifier
+                    = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->name == "NATURAL_NUMBER"); });
+                if (nodeNumericalFieldIdentifier != std::end(ast.nodes)) {
+                    numericalFieldIdentifiers.push_back(std::stoi((*nodeNumericalFieldIdentifier)->token));
                 }
-                retVal &= (-1 == duplicatedFieldIdentifier);
-                if (!retVal) {
-                    std::cerr << "[cluon::MessageParser] Found duplicated numerical field identifier in message "
-                              << "'" << ::stringtoolbox::trim(prefix) << "': " << duplicatedFieldIdentifier << '\n';
-                }
-            }
-            // Try finding duplicated field names.
-            if (retVal) {
-                std::sort(std::begin(fieldNames), std::end(fieldNames));
-                std::string duplicatedFieldName;
-                for (auto it{std::begin(fieldNames)}; it != std::end(fieldNames); it++) {
-                    if (it + 1 != std::end(fieldNames)) {
-                        if (std::find(it + 1, std::end(fieldNames), *it) != std::end(fieldNames)) {
-                            duplicatedFieldName = *it;
-                        }
-                    }
-                }
-                retVal &= (duplicatedFieldName.empty());
-                if (!retVal) {
-                    std::cerr << "[cluon::MessageParser] Found duplicated field name in message '" << ::stringtoolbox::trim(prefix) << "': '" << duplicatedFieldName
-                              << "'" << '\n';
-                }
-            }
-        }
-        // Within AST node MESSAGE_DECLARATION, we have PRIMITIVE_FIELD from
-        // which we need to extract the field "token".
-        if (ast.name == "PRIMITIVE_FIELD") {
-            // Extract the value of entry "IDENTIFIER".
-            auto nodeIdentifier = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->name == "IDENTIFIER"); });
-            if (nodeIdentifier != std::end(ast.nodes)) {
-                fieldNames.push_back((*nodeIdentifier)->token);
             }
 
-            // Visit this node's children to check for duplicated numerical identifiers.
-            for (const auto &node : ast.nodes) {
-                retVal &= checkForUniqueFieldNames(*node, prefix, messageNames, fieldNames, numericalMessageIdentifiers, numericalFieldIdentifiers);
-            }
-        }
-        // Within AST node PRIMITIVE_FIELD, we have PRIMITIVE_FIELD_OPTIONS from
-        // which we need to extract the field "token".
-        if (ast.name == "PRIMITIVE_FIELD_OPTIONS") {
-            // Extract the value of entry "IDENTIFIER".
-            auto nodeNumericalFieldIdentifier = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->name == "NATURAL_NUMBER"); });
-            if (nodeNumericalFieldIdentifier != std::end(ast.nodes)) {
-                numericalFieldIdentifiers.push_back(std::stoi((*nodeNumericalFieldIdentifier)->token));
-            }
-        }
-
-        return retVal;
-    };
+            return retVal;
+        };
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -276,7 +277,8 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                           }
                           mf.fieldDataTypeName(::stringtoolbox::trim(_fieldDataType));
                           mf.fieldName(::stringtoolbox::trim(_fieldName));
-                          mf.fieldIdentifier((!_fieldIdentifier.empty() ? static_cast<uint32_t>(std::stoi(::stringtoolbox::trim(_fieldIdentifier))) : fieldIdentifierCounter));
+                          mf.fieldIdentifier(
+                              (!_fieldIdentifier.empty() ? static_cast<uint32_t>(std::stoi(::stringtoolbox::trim(_fieldIdentifier))) : fieldIdentifierCounter));
                           mf.defaultInitializationValue(_fieldDefaultInitializerValue);
                           mm.add(std::move(mf));
                       }

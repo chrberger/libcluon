@@ -81,6 +81,8 @@ for i in \
     cluon/FromLCMVisitor.hpp \
     cluon/MsgPackConstants.hpp \
     cluon/FromMsgPackVisitor.hpp \
+    cluon/JSONConstants.hpp \
+    cluon/FromJSONVisitor.hpp \
     cluon/ToJSONVisitor.hpp \
     cluon/ToCSVVisitor.hpp \
     cluon/ToLCMVisitor.hpp \
@@ -110,6 +112,7 @@ for i in \
     FromProtoVisitor.cpp \
     FromLCMVisitor.cpp \
     FromMsgPackVisitor.cpp \
+    FromJSONVisitor.cpp \
     GenericMessage.cpp \
     ToJSONVisitor.cpp \
     ToCSVVisitor.cpp \

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018  Christian Berger
+ * Copyright (C) 2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FROMMSGPACKVISITOR_HPP
-#define FROMMSGPACKVISITOR_HPP
+#ifndef FROMJSONVISITOR_HPP
+#define FROMJSONVISITOR_HPP
 
-#include "cluon/MsgPackConstants.hpp"
+#include "cluon/JSONConstants.hpp"
 #include "cluon/any/any.hpp"
 #include "cluon/cluon.hpp"
 
@@ -29,45 +29,45 @@
 
 namespace cluon {
 /**
-This class decodes a given message from MsgPack format.
+This class decodes a given message from JSON format.
 */
-class LIBCLUON_API FromMsgPackVisitor {
+class LIBCLUON_API FromJSONVisitor {
     /**
-     * This class represents a key/value in a MsgPack payload stream of key/values.
+     * This class represents a key/value in a JSON list of key/values.
      */
-    class MsgPackKeyValue {
+    class JSONKeyValue {
        private:
-        MsgPackKeyValue &operator=(MsgPackKeyValue &&) = delete;
+        JSONKeyValue &operator=(JSONKeyValue &&) = delete;
 
        public:
-        MsgPackKeyValue()                        = default;
-        MsgPackKeyValue(const MsgPackKeyValue &) = default;
-        MsgPackKeyValue(MsgPackKeyValue &&)      = default;
-        MsgPackKeyValue &operator=(const MsgPackKeyValue &) = default;
-        ~MsgPackKeyValue()                                  = default;
+        JSONKeyValue()                        = default;
+        JSONKeyValue(const JSONKeyValue &) = default;
+        JSONKeyValue(JSONKeyValue &&)      = default;
+        JSONKeyValue &operator=(const JSONKeyValue &) = default;
+        ~JSONKeyValue()                                  = default;
 
        public:
         std::string m_key{""};
-        MsgPackConstants m_formatFamily{MsgPackConstants::BOOL_FORMAT};
+        JSONConstants m_type{JSONConstants::UNDEFINED};
         linb::any m_value;
     };
 
    private:
-    FromMsgPackVisitor(const FromMsgPackVisitor &) = delete;
-    FromMsgPackVisitor(FromMsgPackVisitor &&)      = delete;
-    FromMsgPackVisitor &operator=(FromMsgPackVisitor &&) = delete;
-    FromMsgPackVisitor &operator=(const FromMsgPackVisitor &other) = delete;
+    FromJSONVisitor(const FromJSONVisitor &) = delete;
+    FromJSONVisitor(FromJSONVisitor &&)      = delete;
+    FromJSONVisitor &operator=(FromJSONVisitor &&) = delete;
+    FromJSONVisitor &operator=(const FromJSONVisitor &other) = delete;
 
     /**
      * Internal constructor to pass reference to preset key/values.
      *
      * @param preset Pre-filled key/value map to handle nested fields.
      */
-    FromMsgPackVisitor(std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> &preset) noexcept;
+    FromJSONVisitor(std::map<std::string, FromJSONVisitor::JSONKeyValue> &preset) noexcept;
 
    public:
-    FromMsgPackVisitor() noexcept;
-    ~FromMsgPackVisitor() = default;
+    FromJSONVisitor() noexcept;
+    ~FromJSONVisitor() = default;
 
    public:
     /**
@@ -105,25 +105,22 @@ class LIBCLUON_API FromMsgPackVisitor {
 
         if (0 < m_keyValues.count(name)) {
             try {
-                std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> v
-                    = linb::any_cast<std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue>>(m_keyValues[name].m_value);
-                cluon::FromMsgPackVisitor nestedMsgPackDecoder(v);
-                value.accept(nestedMsgPackDecoder);
+                std::map<std::string, FromJSONVisitor::JSONKeyValue> v
+                    = linb::any_cast<std::map<std::string, FromJSONVisitor::JSONKeyValue>>(m_keyValues[name].m_value);
+                cluon::FromJSONVisitor nestedJSONDecoder(v);
+                value.accept(nestedJSONDecoder);
             } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
             }
         }
     }
 
    private:
-    MsgPackConstants getFormatFamily(uint8_t T) noexcept;
-    std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> readKeyValues(std::istream &in) noexcept;
-    uint64_t readUint(std::istream &in) noexcept;
-    int64_t readInt(std::istream &in) noexcept;
-    std::string readString(std::istream &in) noexcept;
+    std::string decodeBase64(const std::string &input) const noexcept;
+    std::map<std::string, FromJSONVisitor::JSONKeyValue> readKeyValues(std::string &input) noexcept;
 
    private:
-    std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> m_data{};
-    std::map<std::string, FromMsgPackVisitor::MsgPackKeyValue> &m_keyValues;
+    std::map<std::string, FromJSONVisitor::JSONKeyValue> m_data{};
+    std::map<std::string, FromJSONVisitor::JSONKeyValue> &m_keyValues;
 };
 } // namespace cluon
 

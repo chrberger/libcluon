@@ -106,9 +106,9 @@ class LIBCLUON_API TCPConnection {
      * @param connectionLostDelegate Functional (noexcept) to handle a lost connection.
      */
     TCPConnection(const std::string &address,
-                uint16_t port,
-                std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate,
-                std::function<void()> connectionLostDelegate) noexcept;
+                  uint16_t port,
+                  std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate,
+                  std::function<void()> connectionLostDelegate) noexcept;
     ~TCPConnection() noexcept;
 
     /**
