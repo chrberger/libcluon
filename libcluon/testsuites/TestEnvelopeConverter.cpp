@@ -21,9 +21,12 @@
 #include <sstream>
 #include <string>
 
+#include "cluon/Envelope.hpp"
 #include "cluon/EnvelopeConverter.hpp"
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/ToProtoVisitor.hpp"
+#include "cluon/FromJSONVisitor.hpp"
+#include "cluon/ToJSONVisitor.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
@@ -586,4 +589,402 @@ message GHI.MessageB [id = 30006] {
     // Test with OD4-header:
     const std::string JSON_C = envConverter.getJSONFromProtoEncodedEnvelope(output);
     REQUIRE(std::string(JSON) == JSON_C);
+}
+
+TEST_CASE("Convert JSON representation of MyTestMessage5 into Proto-encoded data and decode Message again.") {
+    // First, prepare message to encode as JSON.
+    testdata::MyTestMessage5 tmp;
+
+    REQUIRE(1 == tmp.attribute1());
+    REQUIRE(-1 == tmp.attribute2());
+    REQUIRE(100 == tmp.attribute3());
+    REQUIRE(-100 == tmp.attribute4());
+    REQUIRE(10000 == tmp.attribute5());
+    REQUIRE(-10000 == tmp.attribute6());
+    REQUIRE(12345 == tmp.attribute7());
+    REQUIRE(-12345 == tmp.attribute8());
+    REQUIRE(-1.2345f == Approx(tmp.attribute9()));
+    REQUIRE(-10.2345 == Approx(tmp.attribute10()));
+    REQUIRE("Hello World!" == tmp.attribute11());
+
+    // Second, set values.
+    tmp.attribute1(3)
+        .attribute2(-3)
+        .attribute3(103)
+        .attribute4(-103)
+        .attribute5(10003)
+        .attribute6(-10003)
+        .attribute7(54321)
+        .attribute8(-74321)
+        .attribute9(-5.4321f)
+        .attribute10(-50.4321)
+        .attribute11("Hello cluon World!");
+
+    REQUIRE(3 == tmp.attribute1());
+    REQUIRE(-3 == tmp.attribute2());
+    REQUIRE(103 == tmp.attribute3());
+    REQUIRE(-103 == tmp.attribute4());
+    REQUIRE(10003 == tmp.attribute5());
+    REQUIRE(-10003 == tmp.attribute6());
+    REQUIRE(54321 == tmp.attribute7());
+    REQUIRE(-74321 == tmp.attribute8());
+    REQUIRE(-5.4321f == Approx(tmp.attribute9()));
+    REQUIRE(-50.4321 == Approx(tmp.attribute10()));
+    REQUIRE("Hello cluon World!" == tmp.attribute11());
+
+    // Third, create JSON representation.
+    cluon::ToJSONVisitor jsonEncoder;
+    tmp.accept(jsonEncoder);
+
+    const char *JSON = R"({"attribute1":3,
+"attribute2":-3,
+"attribute3":103,
+"attribute4":-103,
+"attribute5":10003,
+"attribute6":-10003,
+"attribute7":54321,
+"attribute8":-74321,
+"attribute9":-5.4321,
+"attribute10":-50.4321,
+"attribute11":"SGVsbG8gY2x1b24gV29ybGQh"})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    // Fourth, dynamically provide a message specification to create Envelope from JSON.
+    const char *messageSpecification = R"(
+message MyTestMessage5 [id = 30005] {
+    uint8 attribute1 [ default = 1, id = 1 ];
+    int8 attribute2 [ default = -1, id = 2 ];
+    uint16 attribute3 [ default = 100, id = 3 ];
+    int16 attribute4 [ default = -100, id = 4 ];
+    uint32 attribute5 [ default = 10000, id = 5 ];
+    int32 attribute6 [ default = -10000, id = 6 ];
+    uint64 attribute7 [ default = 12345, id = 7 ];
+    int64 attribute8 [ default = -12345, id = 8 ];
+    float attribute9 [ default = -1.2345, id = 9 ];
+    double attribute10 [ default = -10.2345, id = 10 ];
+    string attribute11 [ default = "Hello World!", id = 11 ];
+}
+)";
+
+    // Fifth, parse message specification.
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(1 == envConverter.setMessageSpecification(std::string(messageSpecification)));
+
+    // Sixth, turn JSON into proper Envelope.
+    constexpr int32_t MESSAGE_IDENTIFIER{30005};
+    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER)};
+    REQUIRE(!protoEncodedData.empty());
+
+    // Seventh, read back Envelope from serialization.
+    std::stringstream sstr(protoEncodedData);
+    auto retVal = cluon::extractEnvelope(sstr);
+
+    REQUIRE(retVal.first);
+    cluon::data::Envelope env;
+    REQUIRE(0 == env.dataType());
+
+    // Verify values in transformed Envelope.
+    env = retVal.second;
+    REQUIRE(MESSAGE_IDENTIFIER == env.dataType());
+    REQUIRE(0 == (env.sent().seconds()+env.sent().microseconds()));
+    REQUIRE(0 == (env.received().seconds()+env.received().microseconds()));
+    REQUIRE(0 == (env.sampleTimeStamp().seconds()+env.sampleTimeStamp().microseconds()));
+
+    // Eighth, read back message.
+    testdata::MyTestMessage5 tmp2;
+    REQUIRE(1 == tmp2.attribute1());
+    REQUIRE(-1 == tmp2.attribute2());
+    REQUIRE(100 == tmp2.attribute3());
+    REQUIRE(-100 == tmp2.attribute4());
+    REQUIRE(10000 == tmp2.attribute5());
+    REQUIRE(-10000 == tmp2.attribute6());
+    REQUIRE(12345 == tmp2.attribute7());
+    REQUIRE(-12345 == tmp2.attribute8());
+    REQUIRE(-1.2345f == Approx(tmp2.attribute9()));
+    REQUIRE(-10.2345 == Approx(tmp2.attribute10()));
+    REQUIRE("Hello World!" == tmp2.attribute11());
+
+    tmp2 = cluon::extractMessage<testdata::MyTestMessage5>(std::move(env));
+
+    // Simple toString().
+    std::stringstream buffer;
+    tmp2.accept([](int32_t, const std::string &, const std::string &) {},
+                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << '\n'; },
+                  []() {});
+    std::cout << buffer.str() << std::endl;
+
+    // Finally, compare decoded values.
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+    REQUIRE(tmp2.attribute2() == tmp.attribute2());
+    REQUIRE(tmp2.attribute3() == tmp.attribute3());
+    REQUIRE(tmp2.attribute4() == tmp.attribute4());
+    REQUIRE(tmp2.attribute5() == tmp.attribute5());
+    REQUIRE(tmp2.attribute6() == tmp.attribute6());
+    REQUIRE(tmp2.attribute7() == tmp.attribute7());
+    REQUIRE(tmp2.attribute8() == tmp.attribute8());
+    REQUIRE(tmp2.attribute9() == Approx(tmp.attribute9()));
+    REQUIRE(tmp2.attribute10() == Approx(tmp.attribute10()));
+    REQUIRE(tmp2.attribute11() == tmp.attribute11());
+}
+
+TEST_CASE("Convert JSON representation of MyTestMessage5 into Proto-encoded data with no message specification.") {
+    // First, prepare message to encode as JSON.
+    testdata::MyTestMessage5 tmp;
+
+    REQUIRE(1 == tmp.attribute1());
+    REQUIRE(-1 == tmp.attribute2());
+    REQUIRE(100 == tmp.attribute3());
+    REQUIRE(-100 == tmp.attribute4());
+    REQUIRE(10000 == tmp.attribute5());
+    REQUIRE(-10000 == tmp.attribute6());
+    REQUIRE(12345 == tmp.attribute7());
+    REQUIRE(-12345 == tmp.attribute8());
+    REQUIRE(-1.2345f == Approx(tmp.attribute9()));
+    REQUIRE(-10.2345 == Approx(tmp.attribute10()));
+    REQUIRE("Hello World!" == tmp.attribute11());
+
+    // Second, set values.
+    tmp.attribute1(3)
+        .attribute2(-3)
+        .attribute3(103)
+        .attribute4(-103)
+        .attribute5(10003)
+        .attribute6(-10003)
+        .attribute7(54321)
+        .attribute8(-74321)
+        .attribute9(-5.4321f)
+        .attribute10(-50.4321)
+        .attribute11("Hello cluon World!");
+
+    REQUIRE(3 == tmp.attribute1());
+    REQUIRE(-3 == tmp.attribute2());
+    REQUIRE(103 == tmp.attribute3());
+    REQUIRE(-103 == tmp.attribute4());
+    REQUIRE(10003 == tmp.attribute5());
+    REQUIRE(-10003 == tmp.attribute6());
+    REQUIRE(54321 == tmp.attribute7());
+    REQUIRE(-74321 == tmp.attribute8());
+    REQUIRE(-5.4321f == Approx(tmp.attribute9()));
+    REQUIRE(-50.4321 == Approx(tmp.attribute10()));
+    REQUIRE("Hello cluon World!" == tmp.attribute11());
+
+    // Third, create JSON representation.
+    cluon::ToJSONVisitor jsonEncoder;
+    tmp.accept(jsonEncoder);
+
+    const char *JSON = R"({"attribute1":3,
+"attribute2":-3,
+"attribute3":103,
+"attribute4":-103,
+"attribute5":10003,
+"attribute6":-10003,
+"attribute7":54321,
+"attribute8":-74321,
+"attribute9":-5.4321,
+"attribute10":-50.4321,
+"attribute11":"SGVsbG8gY2x1b24gV29ybGQh"})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    // Fifth, parse message specification.
+    cluon::EnvelopeConverter envConverter;
+
+    // Sixth, turn JSON into proper Envelope.
+    constexpr int32_t MESSAGE_IDENTIFIER{30005};
+    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER)};
+    REQUIRE(protoEncodedData.empty());
+
+    // Seventh, read back Envelope from serialization.
+    std::stringstream sstr(protoEncodedData);
+    auto retVal = cluon::extractEnvelope(sstr);
+
+    REQUIRE(!retVal.first);
+    cluon::data::Envelope env;
+    REQUIRE(0 == env.dataType());
+
+    // Verify values in transformed Envelope.
+    env = retVal.second;
+    REQUIRE(MESSAGE_IDENTIFIER != env.dataType());
+}
+
+TEST_CASE("Convert JSON representation of MyTestMessage5 into Proto-encoded data with wrong message identifier.") {
+    // First, prepare message to encode as JSON.
+    testdata::MyTestMessage5 tmp;
+
+    REQUIRE(1 == tmp.attribute1());
+    REQUIRE(-1 == tmp.attribute2());
+    REQUIRE(100 == tmp.attribute3());
+    REQUIRE(-100 == tmp.attribute4());
+    REQUIRE(10000 == tmp.attribute5());
+    REQUIRE(-10000 == tmp.attribute6());
+    REQUIRE(12345 == tmp.attribute7());
+    REQUIRE(-12345 == tmp.attribute8());
+    REQUIRE(-1.2345f == Approx(tmp.attribute9()));
+    REQUIRE(-10.2345 == Approx(tmp.attribute10()));
+    REQUIRE("Hello World!" == tmp.attribute11());
+
+    // Second, set values.
+    tmp.attribute1(3)
+        .attribute2(-3)
+        .attribute3(103)
+        .attribute4(-103)
+        .attribute5(10003)
+        .attribute6(-10003)
+        .attribute7(54321)
+        .attribute8(-74321)
+        .attribute9(-5.4321f)
+        .attribute10(-50.4321)
+        .attribute11("Hello cluon World!");
+
+    REQUIRE(3 == tmp.attribute1());
+    REQUIRE(-3 == tmp.attribute2());
+    REQUIRE(103 == tmp.attribute3());
+    REQUIRE(-103 == tmp.attribute4());
+    REQUIRE(10003 == tmp.attribute5());
+    REQUIRE(-10003 == tmp.attribute6());
+    REQUIRE(54321 == tmp.attribute7());
+    REQUIRE(-74321 == tmp.attribute8());
+    REQUIRE(-5.4321f == Approx(tmp.attribute9()));
+    REQUIRE(-50.4321 == Approx(tmp.attribute10()));
+    REQUIRE("Hello cluon World!" == tmp.attribute11());
+
+    // Third, create JSON representation.
+    cluon::ToJSONVisitor jsonEncoder;
+    tmp.accept(jsonEncoder);
+
+    const char *JSON = R"({"attribute1":3,
+"attribute2":-3,
+"attribute3":103,
+"attribute4":-103,
+"attribute5":10003,
+"attribute6":-10003,
+"attribute7":54321,
+"attribute8":-74321,
+"attribute9":-5.4321,
+"attribute10":-50.4321,
+"attribute11":"SGVsbG8gY2x1b24gV29ybGQh"})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    // Fourth, dynamically provide a message specification to create Envelope from JSON.
+    const char *messageSpecification = R"(
+message MyTestMessage5 [id = 30005] {
+    uint8 attribute1 [ default = 1, id = 1 ];
+    int8 attribute2 [ default = -1, id = 2 ];
+    uint16 attribute3 [ default = 100, id = 3 ];
+    int16 attribute4 [ default = -100, id = 4 ];
+    uint32 attribute5 [ default = 10000, id = 5 ];
+    int32 attribute6 [ default = -10000, id = 6 ];
+    uint64 attribute7 [ default = 12345, id = 7 ];
+    int64 attribute8 [ default = -12345, id = 8 ];
+    float attribute9 [ default = -1.2345, id = 9 ];
+    double attribute10 [ default = -10.2345, id = 10 ];
+    string attribute11 [ default = "Hello World!", id = 11 ];
+}
+)";
+
+    // Fifth, parse message specification.
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(1 == envConverter.setMessageSpecification(std::string(messageSpecification)));
+
+    // Sixth, turn JSON into proper Envelope.
+    constexpr int32_t MESSAGE_IDENTIFIER{30005+1};
+    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER)};
+    REQUIRE(protoEncodedData.empty());
+
+    // Seventh, read back Envelope from serialization.
+    std::stringstream sstr(protoEncodedData);
+    auto retVal = cluon::extractEnvelope(sstr);
+
+    REQUIRE(!retVal.first);
+    cluon::data::Envelope env;
+    REQUIRE(0 == env.dataType());
+
+    // Verify values in transformed Envelope.
+    env = retVal.second;
+    REQUIRE(MESSAGE_IDENTIFIER != env.dataType());
+    REQUIRE(0 == (env.sent().seconds()+env.sent().microseconds()));
+    REQUIRE(0 == (env.received().seconds()+env.received().microseconds()));
+    REQUIRE(0 == (env.sampleTimeStamp().seconds()+env.sampleTimeStamp().microseconds()));
+}
+
+TEST_CASE("Convert JSON representation of MyTestMessage5 into Proto-encoded data with junk data.") {
+    // Fourth, dynamically provide a message specification to create Envelope from JSON.
+    const char *messageSpecification = R"(
+message MyTestMessage5 [id = 30005] {
+    uint8 attribute1 [ default = 1, id = 1 ];
+    int8 attribute2 [ default = -1, id = 2 ];
+    uint16 attribute3 [ default = 100, id = 3 ];
+    int16 attribute4 [ default = -100, id = 4 ];
+    uint32 attribute5 [ default = 10000, id = 5 ];
+    int32 attribute6 [ default = -10000, id = 6 ];
+    uint64 attribute7 [ default = 12345, id = 7 ];
+    int64 attribute8 [ default = -12345, id = 8 ];
+    float attribute9 [ default = -1.2345, id = 9 ];
+    double attribute10 [ default = -10.2345, id = 10 ];
+    string attribute11 [ default = "Hello World!", id = 11 ];
+}
+)";
+
+    // Fifth, parse message specification.
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(1 == envConverter.setMessageSpecification(std::string(messageSpecification)));
+
+    std::string JUNK = "Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli appellantur. Hi omnes lingua, institutis, legibus inter se differunt. Gallos ab Aquitanis Garumna flumen, a Belgis Matrona et Sequana dividit."; // Written by Caesar :-D
+
+    // Sixth, turn JSON into proper Envelope.
+    constexpr int32_t MESSAGE_IDENTIFIER{30005};
+    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(JUNK, MESSAGE_IDENTIFIER)};
+    REQUIRE(!protoEncodedData.empty());
+
+    // Seventh, read back Envelope from serialization.
+    std::stringstream sstr(protoEncodedData);
+    auto retVal = cluon::extractEnvelope(sstr);
+
+    REQUIRE(retVal.first);
+    cluon::data::Envelope env;
+    REQUIRE(0 == env.dataType());
+
+    // Verify values in transformed Envelope.
+    env = retVal.second;
+    REQUIRE(MESSAGE_IDENTIFIER == env.dataType());
+    REQUIRE(0 == (env.sent().seconds()+env.sent().microseconds()));
+    REQUIRE(0 == (env.received().seconds()+env.received().microseconds()));
+    REQUIRE(0 == (env.sampleTimeStamp().seconds()+env.sampleTimeStamp().microseconds()));
+
+    testdata::MyTestMessage5 tmp2;
+    REQUIRE(1 == tmp2.attribute1());
+    REQUIRE(-1 == tmp2.attribute2());
+    REQUIRE(100 == tmp2.attribute3());
+    REQUIRE(-100 == tmp2.attribute4());
+    REQUIRE(10000 == tmp2.attribute5());
+    REQUIRE(-10000 == tmp2.attribute6());
+    REQUIRE(12345 == tmp2.attribute7());
+    REQUIRE(-12345 == tmp2.attribute8());
+    REQUIRE(-1.2345f == Approx(tmp2.attribute9()));
+    REQUIRE(-10.2345 == Approx(tmp2.attribute10()));
+    REQUIRE("Hello World!" == tmp2.attribute11());
+
+    tmp2 = cluon::extractMessage<testdata::MyTestMessage5>(std::move(env));
+
+    // Simple toString().
+    std::stringstream buffer;
+    tmp2.accept([](int32_t, const std::string &, const std::string &) {},
+                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << '\n'; },
+                  []() {});
+    std::cout << buffer.str() << std::endl;
+
+    // Junk data results in default values.
+    REQUIRE(tmp2.attribute1() == 0);
+    REQUIRE(tmp2.attribute2() == 0);
+    REQUIRE(tmp2.attribute3() == 0);
+    REQUIRE(tmp2.attribute4() == 0);
+    REQUIRE(tmp2.attribute5() == 0);
+    REQUIRE(tmp2.attribute6() == 0);
+    REQUIRE(tmp2.attribute7() == 0);
+    REQUIRE(tmp2.attribute8() == 0);
+    REQUIRE(tmp2.attribute9() == 0);
+    REQUIRE(tmp2.attribute10() == 0);
+    REQUIRE(tmp2.attribute11().empty());
 }

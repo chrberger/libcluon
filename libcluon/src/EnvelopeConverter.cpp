@@ -15,15 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/EnvelopeConverter.hpp"
 #include "cluon/Envelope.hpp"
+#include "cluon/EnvelopeConverter.hpp"
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/ToJSONVisitor.hpp"
+#include "cluon/FromJSONVisitor.hpp"
 
 #include <algorithm>
 #include <sstream>
+#include <utility>
 
 namespace cluon {
 
@@ -111,6 +114,36 @@ std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelo
 
             retVal = '{' + envelopeToJSON.json() + ',' + '\n' + '"' + tmp + '"' + ':' + '{' + payloadToJSON.json() + '}' + '}';
         }
+    }
+    return retVal;
+}
+
+std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(const std::string &json, int32_t messageIdentifier) noexcept {
+    std::string retVal;
+    if (0 < m_scopeOfMetaMessages.count(messageIdentifier)) {
+        // Get specification for message to be created.
+        cluon::MetaMessage message{m_scopeOfMetaMessages[messageIdentifier]};
+
+        // Create "empty" instance for the required message as GenericMessage.
+        cluon::GenericMessage gm;
+        gm.createFrom(message, m_listOfMetaMessages);
+
+        // Parse data from given JSON.
+        std::stringstream sstr{json};
+        cluon::FromJSONVisitor jsonDecoder;
+        jsonDecoder.decodeFrom(sstr);
+
+        // Set values in the newly created GenericMessage from JSONDecoder.
+        gm.accept(jsonDecoder);
+
+        // Finally, transform GenericMessage into Envelope.
+        ToProtoVisitor protoEncoder;
+        gm.accept(protoEncoder);
+
+        cluon::data::Envelope env;
+        env.dataType(messageIdentifier).serializedData(protoEncoder.encodedData());
+
+        retVal = cluon::serializeEnvelope(std::move(env));
     }
     return retVal;
 }

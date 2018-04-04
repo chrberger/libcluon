@@ -45,10 +45,9 @@ std::string decodeEnvelopeConverter(const std::string &s) {
     return envConverter.getJSONFromProtoEncodedEnvelope(s);
 }
 
-std::string encodeEnvelopeFromJSONWithoutTimeStamps(const std::string &s) {
+std::string encodeEnvelopeFromJSONWithoutTimeStamps(const std::string &s, int32_t messageIdentifier) {
     std::lock_guard<std::mutex> lck(envConverterMutex);
-return s;
-//    return envConverter.getProtoEncodedEnvelopeFromJSON(s);
+    return envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(s, messageIdentifier);
 }
 
 int main(int argc, char **argv) {
