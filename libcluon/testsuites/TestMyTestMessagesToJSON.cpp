@@ -57,7 +57,6 @@ TEST_CASE("Testing TimeStamp-1.") {
     REQUIRE(ts2.microseconds() == ts1.microseconds());
 }
 
-#ifndef WIN32
 TEST_CASE("Testing TimeStamp-2.") {
     cluon::data::TimeStamp ts1;
     REQUIRE(ts1.seconds() == 0);
@@ -88,6 +87,7 @@ TEST_CASE("Testing TimeStamp-2.") {
     REQUIRE(ts2.microseconds() == ts1.microseconds());
 }
 
+#ifndef WIN32
 TEST_CASE("Testing TimeStamp-3.") {
     cluon::data::TimeStamp ts1;
     REQUIRE(ts1.seconds() == 0);
