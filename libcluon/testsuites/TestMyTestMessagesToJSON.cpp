@@ -57,6 +57,7 @@ TEST_CASE("Testing TimeStamp-1.") {
     REQUIRE(ts2.microseconds() == ts1.microseconds());
 }
 
+#ifndef WIN32
 TEST_CASE("Testing TimeStamp-2.") {
     cluon::data::TimeStamp ts1;
     REQUIRE(ts1.seconds() == 0);
@@ -353,7 +354,6 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(tmp2.attribute11() == tmp.attribute11());
 }
 
-#ifndef WIN32
 TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
     testdata::MyTestMessage6 tmp6;
 
