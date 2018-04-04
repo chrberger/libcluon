@@ -88,8 +88,8 @@ for i in \
     cluon/ToLCMVisitor.hpp \
     cluon/ToODVDVisitor.hpp \
     cluon/ToMsgPackVisitor.hpp \
-    cluon/EnvelopeConverter.hpp \
     cluon/Envelope.hpp \
+    cluon/EnvelopeConverter.hpp \
     cluon/GenericMessage.hpp \
     cluon/LCMToGenericMessage.hpp \
     cluon/OD4Session.hpp; do

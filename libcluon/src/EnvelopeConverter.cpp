@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/Envelope.hpp"
 #include "cluon/EnvelopeConverter.hpp"
+#include "cluon/Envelope.hpp"
+#include "cluon/FromJSONVisitor.hpp"
 #include "cluon/FromProtoVisitor.hpp"
-#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/ToJSONVisitor.hpp"
-#include "cluon/FromJSONVisitor.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 
 #include <algorithm>
 #include <sstream>

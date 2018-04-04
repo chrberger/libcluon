@@ -520,4 +520,3 @@ TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
         REQUIRE(0x8 == env2.serializedData().at(3));
     }
 }
-

@@ -23,10 +23,10 @@
 
 #include "cluon/Envelope.hpp"
 #include "cluon/EnvelopeConverter.hpp"
-#include "cluon/FromProtoVisitor.hpp"
-#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/FromJSONVisitor.hpp"
+#include "cluon/FromProtoVisitor.hpp"
 #include "cluon/ToJSONVisitor.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
@@ -687,9 +687,9 @@ message MyTestMessage5 [id = 30005] {
     // Verify values in transformed Envelope.
     env = retVal.second;
     REQUIRE(MESSAGE_IDENTIFIER == env.dataType());
-    REQUIRE(0 == (env.sent().seconds()+env.sent().microseconds()));
-    REQUIRE(0 == (env.received().seconds()+env.received().microseconds()));
-    REQUIRE(0 == (env.sampleTimeStamp().seconds()+env.sampleTimeStamp().microseconds()));
+    REQUIRE(0 == (env.sent().seconds() + env.sent().microseconds()));
+    REQUIRE(0 == (env.received().seconds() + env.received().microseconds()));
+    REQUIRE(0 == (env.sampleTimeStamp().seconds() + env.sampleTimeStamp().microseconds()));
 
     // Eighth, read back message.
     testdata::MyTestMessage5 tmp2;
@@ -710,8 +710,8 @@ message MyTestMessage5 [id = 30005] {
     // Simple toString().
     std::stringstream buffer;
     tmp2.accept([](int32_t, const std::string &, const std::string &) {},
-                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << '\n'; },
-                  []() {});
+                [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << '\n'; },
+                []() {});
     std::cout << buffer.str() << std::endl;
 
     // Finally, compare decoded values.
@@ -889,7 +889,7 @@ message MyTestMessage5 [id = 30005] {
     REQUIRE(1 == envConverter.setMessageSpecification(std::string(messageSpecification)));
 
     // Sixth, turn JSON into proper Envelope.
-    constexpr int32_t MESSAGE_IDENTIFIER{30005+1};
+    constexpr int32_t MESSAGE_IDENTIFIER{30005 + 1};
     std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER)};
     REQUIRE(protoEncodedData.empty());
 
@@ -904,9 +904,9 @@ message MyTestMessage5 [id = 30005] {
     // Verify values in transformed Envelope.
     env = retVal.second;
     REQUIRE(MESSAGE_IDENTIFIER != env.dataType());
-    REQUIRE(0 == (env.sent().seconds()+env.sent().microseconds()));
-    REQUIRE(0 == (env.received().seconds()+env.received().microseconds()));
-    REQUIRE(0 == (env.sampleTimeStamp().seconds()+env.sampleTimeStamp().microseconds()));
+    REQUIRE(0 == (env.sent().seconds() + env.sent().microseconds()));
+    REQUIRE(0 == (env.received().seconds() + env.received().microseconds()));
+    REQUIRE(0 == (env.sampleTimeStamp().seconds() + env.sampleTimeStamp().microseconds()));
 }
 
 TEST_CASE("Convert JSON representation of MyTestMessage5 into Proto-encoded data with junk data.") {
@@ -931,7 +931,10 @@ message MyTestMessage5 [id = 30005] {
     cluon::EnvelopeConverter envConverter;
     REQUIRE(1 == envConverter.setMessageSpecification(std::string(messageSpecification)));
 
-    std::string JUNK = "Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli appellantur. Hi omnes lingua, institutis, legibus inter se differunt. Gallos ab Aquitanis Garumna flumen, a Belgis Matrona et Sequana dividit."; // Written by Caesar :-D
+    std::string JUNK
+        = "Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli appellantur. "
+          "Hi omnes lingua, institutis, legibus inter se differunt. Gallos ab Aquitanis Garumna flumen, a Belgis Matrona et Sequana dividit."; // Written by
+                                                                                                                                               // Caesar :-D
 
     // Sixth, turn JSON into proper Envelope.
     constexpr int32_t MESSAGE_IDENTIFIER{30005};
@@ -949,9 +952,9 @@ message MyTestMessage5 [id = 30005] {
     // Verify values in transformed Envelope.
     env = retVal.second;
     REQUIRE(MESSAGE_IDENTIFIER == env.dataType());
-    REQUIRE(0 == (env.sent().seconds()+env.sent().microseconds()));
-    REQUIRE(0 == (env.received().seconds()+env.received().microseconds()));
-    REQUIRE(0 == (env.sampleTimeStamp().seconds()+env.sampleTimeStamp().microseconds()));
+    REQUIRE(0 == (env.sent().seconds() + env.sent().microseconds()));
+    REQUIRE(0 == (env.received().seconds() + env.received().microseconds()));
+    REQUIRE(0 == (env.sampleTimeStamp().seconds() + env.sampleTimeStamp().microseconds()));
 
     testdata::MyTestMessage5 tmp2;
     REQUIRE(1 == tmp2.attribute1());
@@ -971,8 +974,8 @@ message MyTestMessage5 [id = 30005] {
     // Simple toString().
     std::stringstream buffer;
     tmp2.accept([](int32_t, const std::string &, const std::string &) {},
-                  [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << '\n'; },
-                  []() {});
+                [&buffer](uint32_t, std::string &&, std::string &&n, auto v) { buffer << n << " = " << v << '\n'; },
+                []() {});
     std::cout << buffer.str() << std::endl;
 
     // Junk data results in default values.

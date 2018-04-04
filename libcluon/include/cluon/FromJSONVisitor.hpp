@@ -40,11 +40,11 @@ class LIBCLUON_API FromJSONVisitor {
         JSONKeyValue &operator=(JSONKeyValue &&) = delete;
 
        public:
-        JSONKeyValue()                        = default;
+        JSONKeyValue()                     = default;
         JSONKeyValue(const JSONKeyValue &) = default;
         JSONKeyValue(JSONKeyValue &&)      = default;
         JSONKeyValue &operator=(const JSONKeyValue &) = default;
-        ~JSONKeyValue()                                  = default;
+        ~JSONKeyValue()                               = default;
 
        public:
         std::string m_key{""};
