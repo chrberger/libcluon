@@ -237,7 +237,6 @@ TEST_CASE("Testing MyTestMessage3.") {
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
 
-#ifndef WIN32
 TEST_CASE("Testing MyTestMessage4.") {
     testdata::MyTestMessage4 tmp;
     REQUIRE(tmp.attribute1().empty());
@@ -265,6 +264,7 @@ TEST_CASE("Testing MyTestMessage4.") {
     REQUIRE("testing" == tmp2.attribute1());
 }
 
+#ifndef WIN32
 TEST_CASE("Testing MyTestMessage5.") {
     testdata::MyTestMessage5 tmp;
 
