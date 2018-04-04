@@ -240,7 +240,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate.") {
     cluon::OD4Session od4(84);
 
     int32_t counter{0};
-    auto timeTrigger = [&counter](cluon::OD4Session&) {
+    auto timeTrigger = [&counter]() {
         if (counter++ < 1) {
             return true;
         } else {
@@ -256,7 +256,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate with invalid freq.") {
     cluon::OD4Session od4(85);
 
     int32_t counter{0};
-    auto timeTrigger = [&counter](cluon::OD4Session&) {
+    auto timeTrigger = [&counter]() {
         if (counter++ < 1) {
             return true;
         } else {
@@ -275,7 +275,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate throwing exception cancels ti
     cluon::OD4Session od4(86);
 
     int32_t counter{0};
-    auto timeTrigger = [&counter](cluon::OD4Session&) {
+    auto timeTrigger = [&counter]() {
         if (counter++ < 2) {
             return true;
         } else {
@@ -291,7 +291,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate running too slowly results in
     cluon::OD4Session od4(87);
 
     int32_t counter{0};
-    auto timeTrigger = [&counter](cluon::OD4Session&) {
+    auto timeTrigger = [&counter]() {
         if (counter++ < 1) {
             std::this_thread::sleep_for(std::chrono::duration<int64_t, std::milli>(200));
             return true;

@@ -74,9 +74,8 @@ that is then caught in the method timeTrigger and the method is exited:
 cluon::OD4Session od4{111};
 
 const float FREQ{10}; // 10 Hz.
-od4.timeTrigger(FREQ, [](cluon::OD4Session &session){
+od4.timeTrigger(FREQ, [](){
   // Do something time-triggered.
-  // session.send(...);
   return false;
 }); // This call blocks until the lambda returns false.
 \endcode
@@ -125,11 +124,9 @@ class LIBCLUON_API OD4Session {
      * function of a program.
      *
      * @param freq Frequency in Hertz to run the given delegate.
-     * @param delegate Function to call according to the given frequency; the
-     *        delegate function will receive a reference to the OD4Session where
-     *        is was registered so that the time-triggered delegate can send messages.
+     * @param delegate Function to call according to the given frequency.
      */
-    void timeTrigger(float freq, std::function<bool(cluon::OD4Session &session)> delegate) noexcept;
+    void timeTrigger(float freq, std::function<bool()> delegate) noexcept;
 
     /**
      * This method will send a given message to this OpenDaVINCI v4 session.

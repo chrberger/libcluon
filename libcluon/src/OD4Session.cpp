@@ -37,14 +37,14 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
     , m_mapOfDataTriggeredDelegatesMutex{}
     , m_mapOfDataTriggeredDelegates{} {}
 
-void OD4Session::timeTrigger(float freq, std::function<bool(cluon::OD4Session& session)> delegate) noexcept {
+void OD4Session::timeTrigger(float freq, std::function<bool()> delegate) noexcept {
     if (nullptr != delegate) {
         bool delegateIsRunning{true};
         const int64_t TIME_SLICE_IN_MILLISECONDS{static_cast<uint32_t>(1000 / ((freq > 0) ? freq : 1.0f))};
         do {
             cluon::data::TimeStamp before{cluon::time::now()};
             try {
-                delegateIsRunning = delegate(*this);
+                delegateIsRunning = delegate();
             } catch (...) {
                 delegateIsRunning = false; // delegate threw exception.
             }
