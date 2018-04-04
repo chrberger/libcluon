@@ -1,3 +1,9 @@
+libcluon (0.0.62) xenial; urgency=low
+
+  * FromJSONVisitor added
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 04 Apr 2018 12:20:03 +0200
+
 libcluon (0.0.61) xenial; urgency=low
 
   * Added timeTrigger to OD4Session
