@@ -381,7 +381,6 @@ TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for seria
     REQUIRE(150 == tmp6_2.attribute1().attribute1());
 }
 
-#ifndef WIN32
 TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for serialization and deserialization.") {
     testdata::MyTestMessage7 tmp7;
 
@@ -426,6 +425,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     REQUIRE(13 == tmp7_2.attribute3().attribute1());
 }
 
+#ifndef WIN32
 TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
     cluon::data::Envelope env;
     REQUIRE(env.serializedData().empty());
