@@ -117,7 +117,6 @@ TEST_CASE("Testing TimeStamp-3.") {
     REQUIRE(ts2.microseconds() == ts1.microseconds());
 }
 
-#ifndef WIN32
 TEST_CASE("Testing MyTestMessage0.") {
     testdata::MyTestMessage0 tmp;
     REQUIRE(tmp.attribute1());
@@ -148,6 +147,7 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
 
+#ifndef WIN32
 TEST_CASE("Testing MyTestMessage0 with false value.") {
     testdata::MyTestMessage0 tmp;
     REQUIRE(tmp.attribute1());
