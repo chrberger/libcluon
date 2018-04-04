@@ -74,8 +74,9 @@ that is then caught in the method timeTrigger and the method is exited:
 cluon::OD4Session od4{111};
 
 const float FREQ{10}; // 10 Hz.
-od4.timeTrigger(FREQ, [](){
+od4.timeTrigger(FREQ, [](cluon::OD4Session &session){
   // Do something time-triggered.
+  // session.send(...);
   return false;
 }); // This call blocks until the lambda returns false.
 \endcode
@@ -124,9 +125,11 @@ class LIBCLUON_API OD4Session {
      * function of a program.
      *
      * @param freq Frequency in Hertz to run the given delegate.
-     * @param delegate Function to call according to the given frequency.
+     * @param delegate Function to call according to the given frequency; the
+     *        delegate function will receive a reference to the OD4Session where
+     *        is was registered so that the time-triggered delegate can send messages.
      */
-    void timeTrigger(float freq, std::function<bool()> delegate) noexcept;
+    void timeTrigger(float freq, std::function<bool(cluon::OD4Session &session)> delegate) noexcept;
 
     /**
      * This method will send a given message to this OpenDaVINCI v4 session.
@@ -137,19 +140,23 @@ class LIBCLUON_API OD4Session {
      */
     template <typename T>
     void send(T &message, const cluon::data::TimeStamp &sampleTimeStamp = cluon::data::TimeStamp(), uint32_t senderStamp = 0) noexcept {
-        cluon::ToProtoVisitor protoEncoder;
+        try {
+            std::lock_guard<std::mutex> lck(m_senderMutex);
+            cluon::ToProtoVisitor protoEncoder;
 
-        cluon::data::Envelope envelope;
-        {
-            envelope.dataType(static_cast<int32_t>(message.ID()));
-            message.accept(protoEncoder);
-            envelope.serializedData(protoEncoder.encodedData());
-            envelope.sent(cluon::time::now());
-            envelope.sampleTimeStamp((0 == (sampleTimeStamp.seconds() + sampleTimeStamp.microseconds())) ? envelope.sent() : sampleTimeStamp);
-            envelope.senderStamp(senderStamp);
+            cluon::data::Envelope envelope;
+            {
+                envelope.dataType(static_cast<int32_t>(message.ID()));
+                message.accept(protoEncoder);
+                envelope.serializedData(protoEncoder.encodedData());
+                envelope.sent(cluon::time::now());
+                envelope.sampleTimeStamp((0 == (sampleTimeStamp.seconds() + sampleTimeStamp.microseconds())) ? envelope.sent() : sampleTimeStamp);
+                envelope.senderStamp(senderStamp);
+            }
+
+            send(std::move(envelope));
         }
-
-        send(std::move(envelope));
+        catch(...) {}
     }
 
    public:
@@ -162,6 +169,8 @@ class LIBCLUON_API OD4Session {
    private:
     cluon::UDPReceiver m_receiver;
     cluon::UDPSender m_sender;
+
+    std::mutex m_senderMutex{};
 
     std::function<void(cluon::data::Envelope &&envelope)> m_delegate{nullptr};
 

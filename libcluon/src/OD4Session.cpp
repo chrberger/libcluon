@@ -37,14 +37,14 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
     , m_mapOfDataTriggeredDelegatesMutex{}
     , m_mapOfDataTriggeredDelegates{} {}
 
-void OD4Session::timeTrigger(float freq, std::function<bool()> delegate) noexcept {
+void OD4Session::timeTrigger(float freq, std::function<bool(cluon::OD4Session& session)> delegate) noexcept {
     if (nullptr != delegate) {
         bool delegateIsRunning{true};
         const int64_t TIME_SLICE_IN_MILLISECONDS{static_cast<uint32_t>(1000 / ((freq > 0) ? freq : 1.0f))};
         do {
             cluon::data::TimeStamp before{cluon::time::now()};
             try {
-                delegateIsRunning = delegate();
+                delegateIsRunning = delegate(*this);
             } catch (...) {
                 delegateIsRunning = false; // delegate threw exception.
             }
@@ -86,13 +86,13 @@ bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon
 }
 
 void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) noexcept {
+    (void)from;
     std::stringstream sstr(data);
     auto retVal = extractEnvelope(sstr);
 
     if (retVal.first) {
-        cluon::data::TimeStamp receivedAt{cluon::time::convert(timepoint)};
         cluon::data::Envelope env{retVal.second};
-        env.received(receivedAt);
+        env.received(cluon::time::convert(timepoint));
 
         // "Catch all"-delegate.
         if (nullptr != m_delegate) {
@@ -104,9 +104,6 @@ void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::s
                 std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
                 if (m_mapOfDataTriggeredDelegates.count(env.dataType()) > 0) {
                     m_mapOfDataTriggeredDelegates[env.dataType()](std::move(env));
-                } else {
-                    std::cout << "[cluon::OD4Session] Received " << data.size() << " bytes from " << from << " at " << receivedAt.seconds() << "."
-                              << receivedAt.microseconds() << "." << std::endl;
                 }
             } catch (...) {} // LCOV_EXCL_LINE
         }
