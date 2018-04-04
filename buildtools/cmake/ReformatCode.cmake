@@ -20,11 +20,11 @@ file(GLOB_RECURSE ALL_SOURCES include/*.[ch]pp include/*.cc include/*.[ch]
                               testsuites/*.[ch]pp testsuites/*.cc testsuites/*.[ch])
 
 # Adding clang-format target if executable is found
-find_program(CLANG_FORMAT "clang-format")
+find_program(CLANG_FORMAT NAMES clang-format clang-format-6.0)
 if(CLANG_FORMAT)
   add_custom_target(
     reformat-code
-    COMMAND /usr/bin/clang-format
+    COMMAND ${CLANG_FORMAT}
     -i
     ${ALL_SOURCES}
     )
