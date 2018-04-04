@@ -353,7 +353,7 @@ TEST_CASE("Testing MyTestMessage5.") {
     REQUIRE(tmp2.attribute10() == Approx(tmp.attribute10()));
     REQUIRE(tmp2.attribute11() == tmp.attribute11());
 }
-#endif
+
 TEST_CASE("Testing MyTestMessage6 with visitor to visit nested message for serialization and deserialization.") {
     testdata::MyTestMessage6 tmp6;
 
@@ -425,7 +425,7 @@ TEST_CASE("Testing MyTestMessage7 with visitor to visit nested messages for seri
     REQUIRE(12 == tmp7_2.attribute2());
     REQUIRE(13 == tmp7_2.attribute3().attribute1());
 }
-#ifdef WIN32
+
 TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
     cluon::data::Envelope env;
     REQUIRE(env.serializedData().empty());
