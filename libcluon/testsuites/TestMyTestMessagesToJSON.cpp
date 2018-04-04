@@ -205,7 +205,6 @@ TEST_CASE("Testing MyTestMessage9.") {
     REQUIRE(1.23456789 == Approx(tmp2.attribute2()));
 }
 
-#ifndef WIN32
 TEST_CASE("Testing MyTestMessage3.") {
     testdata::MyTestMessage3 tmp;
     REQUIRE(124 == tmp.attribute1());
@@ -238,6 +237,7 @@ TEST_CASE("Testing MyTestMessage3.") {
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
 
+#ifndef WIN32
 TEST_CASE("Testing MyTestMessage4.") {
     testdata::MyTestMessage4 tmp;
     REQUIRE(tmp.attribute1().empty());
