@@ -329,7 +329,8 @@ void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&n
     if (0 < m_keyValues.count(name)) {
         try {
             std::string tmp{linb::any_cast<std::string>(m_keyValues[name].m_value)};
-            v = decodeBase64(tmp);
+//            v = decodeBase64(tmp);
+            v = tmp;
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
         }
     }
