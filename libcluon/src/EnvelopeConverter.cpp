@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/EnvelopeToJSON.hpp"
+#include "cluon/EnvelopeConverter.hpp"
 #include "cluon/Envelope.hpp"
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
@@ -27,7 +27,7 @@
 
 namespace cluon {
 
-int32_t EnvelopeToJSON::setMessageSpecification(const std::string &ms) noexcept {
+int32_t EnvelopeConverter::setMessageSpecification(const std::string &ms) noexcept {
     int32_t retVal{-1};
 
     m_listOfMetaMessages.clear();
@@ -43,7 +43,7 @@ int32_t EnvelopeToJSON::setMessageSpecification(const std::string &ms) noexcept 
     return retVal;
 }
 
-std::string EnvelopeToJSON::getJSONFromProtoEncodedEnvelope(const std::string &protoEncodedEnvelope) noexcept {
+std::string EnvelopeConverter::getJSONFromProtoEncodedEnvelope(const std::string &protoEncodedEnvelope) noexcept {
     std::string retVal{"{}"};
     if (!m_listOfMetaMessages.empty()) {
         cluon::data::Envelope envelope;
@@ -78,7 +78,7 @@ std::string EnvelopeToJSON::getJSONFromProtoEncodedEnvelope(const std::string &p
     return retVal;
 }
 
-std::string EnvelopeToJSON::getJSONFromEnvelope(cluon::data::Envelope &envelope) noexcept {
+std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelope) noexcept {
     std::string retVal{"{}"};
     if (!m_listOfMetaMessages.empty()) {
         if (0 < m_scopeOfMetaMessages.count(envelope.dataType())) {

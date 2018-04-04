@@ -21,7 +21,7 @@
 #include <sstream>
 #include <string>
 
-#include "cluon/EnvelopeToJSON.hpp"
+#include "cluon/EnvelopeConverter.hpp"
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluon.hpp"
@@ -29,8 +29,8 @@
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Transform Envelope into JSON represention without message specification.") {
-    cluon::EnvelopeToJSON env2JSON;
-    REQUIRE("{}" == env2JSON.getJSONFromProtoEncodedEnvelope("Hello World"));
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE("{}" == envConverter.getJSONFromProtoEncodedEnvelope("Hello World"));
 }
 
 TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
@@ -230,19 +230,19 @@ message example.Envelope [id = 1] {
 "example_TimeStamp":{"seconds":3,
 "microseconds":4}})";
 
-    cluon::EnvelopeToJSON env2JSON;
-    REQUIRE(2 == env2JSON.setMessageSpecification(std::string(messageSpecification)));
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(2 == envConverter.setMessageSpecification(std::string(messageSpecification)));
 
     // Test with Envelope:
-    const std::string JSON_A = env2JSON.getJSONFromEnvelope(env);
+    const std::string JSON_A = envConverter.getJSONFromEnvelope(env);
     REQUIRE(std::string(JSON) == JSON_A);
 
     // Test without OD4 header:
-    const std::string JSON_B = env2JSON.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
+    const std::string JSON_B = envConverter.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
     REQUIRE(std::string(JSON) == JSON_B);
 
     // Test with OD4-header:
-    const std::string JSON_C = env2JSON.getJSONFromProtoEncodedEnvelope(output);
+    const std::string JSON_C = envConverter.getJSONFromProtoEncodedEnvelope(output);
     REQUIRE(std::string(JSON) == JSON_C);
 }
 
@@ -364,19 +364,19 @@ message TestMessageA [id = 30001] {
 "attribute13":"SGVsbG8gV29ybGQ=",
 "attribute14":"SGVsbG8gR2FsYXh5"}})";
 
-    cluon::EnvelopeToJSON env2JSON;
-    REQUIRE(1 == env2JSON.setMessageSpecification(std::string(messageSpecification)));
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(1 == envConverter.setMessageSpecification(std::string(messageSpecification)));
 
     // Test with Envelope:
-    const std::string JSON_A = env2JSON.getJSONFromEnvelope(env);
+    const std::string JSON_A = envConverter.getJSONFromEnvelope(env);
     REQUIRE(std::string(JSON) == JSON_A);
 
     // Test without OD4 header:
-    const std::string JSON_B = env2JSON.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
+    const std::string JSON_B = envConverter.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
     REQUIRE(std::string(JSON) == JSON_B);
 
     // Test with OD4-header:
-    const std::string JSON_C = env2JSON.getJSONFromProtoEncodedEnvelope(output);
+    const std::string JSON_C = envConverter.getJSONFromProtoEncodedEnvelope(output);
     REQUIRE(std::string(JSON) == JSON_C);
 }
 
@@ -467,19 +467,19 @@ message MessageB [id = 30006] {
 "senderStamp":2,
 "MessageB":{"attribute1":{"attribute1":99}}})";
 
-    cluon::EnvelopeToJSON env2JSON;
-    REQUIRE(2 == env2JSON.setMessageSpecification(std::string(messageSpecification)));
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(2 == envConverter.setMessageSpecification(std::string(messageSpecification)));
 
     // Test with Envelope:
-    const std::string JSON_A = env2JSON.getJSONFromEnvelope(env);
+    const std::string JSON_A = envConverter.getJSONFromEnvelope(env);
     REQUIRE(std::string(JSON) == JSON_A);
 
     // Test without OD4 header:
-    const std::string JSON_B = env2JSON.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
+    const std::string JSON_B = envConverter.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
     REQUIRE(std::string(JSON) == JSON_B);
 
     // Test with OD4-header:
-    const std::string JSON_C = env2JSON.getJSONFromProtoEncodedEnvelope(output);
+    const std::string JSON_C = envConverter.getJSONFromProtoEncodedEnvelope(output);
     REQUIRE(std::string(JSON) == JSON_C);
 }
 
@@ -572,18 +572,18 @@ message GHI.MessageB [id = 30006] {
 "senderStamp":2,
 "GHI_MessageB":{"attribute1":{"attribute1":99}}})";
 
-    cluon::EnvelopeToJSON env2JSON;
-    REQUIRE(2 == env2JSON.setMessageSpecification(std::string(messageSpecification)));
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(2 == envConverter.setMessageSpecification(std::string(messageSpecification)));
 
     // Test with Envelope:
-    const std::string JSON_A = env2JSON.getJSONFromEnvelope(env);
+    const std::string JSON_A = envConverter.getJSONFromEnvelope(env);
     REQUIRE(std::string(JSON) == JSON_A);
 
     // Test without OD4 header:
-    const std::string JSON_B = env2JSON.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
+    const std::string JSON_B = envConverter.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
     REQUIRE(std::string(JSON) == JSON_B);
 
     // Test with OD4-header:
-    const std::string JSON_C = env2JSON.getJSONFromProtoEncodedEnvelope(output);
+    const std::string JSON_C = envConverter.getJSONFromProtoEncodedEnvelope(output);
     REQUIRE(std::string(JSON) == JSON_C);
 }

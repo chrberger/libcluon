@@ -23,26 +23,32 @@
 #endif
 // clang-format off
 
-#include "cluon/EnvelopeToJSON.hpp"
+#include "cluon/EnvelopeConverter.hpp"
 
 #include <mutex>
 #include <sstream>
 #include <string>
 
-static std::mutex env2JSONMutex;
-static cluon::EnvelopeToJSON env2JSON;
+static std::mutex envConverterMutex;
+static cluon::EnvelopeConverter envConverter;
 
 int setMessageSpecification(const std::string &s);
-std::string decodeEnvelopeToJSON(const std::string &s);
+std::string decodeEnvelopeConverter(const std::string &s);
 
 int setMessageSpecification(const std::string &s) {
-    std::lock_guard<std::mutex> lck(env2JSONMutex);
-    return env2JSON.setMessageSpecification(s);
+    std::lock_guard<std::mutex> lck(envConverterMutex);
+    return envConverter.setMessageSpecification(s);
 }
 
-std::string decodeEnvelopeToJSON(const std::string &s) {
-    std::lock_guard<std::mutex> lck(env2JSONMutex);
-    return env2JSON.getJSONFromProtoEncodedEnvelope(s);
+std::string decodeEnvelopeConverter(const std::string &s) {
+    std::lock_guard<std::mutex> lck(envConverterMutex);
+    return envConverter.getJSONFromProtoEncodedEnvelope(s);
+}
+
+std::string encodeEnvelopeFromJSONWithoutTimeStamps(const std::string &s) {
+    std::lock_guard<std::mutex> lck(envConverterMutex);
+return s;
+//    return envConverter.getProtoEncodedEnvelopeFromJSON(s);
 }
 
 int main(int argc, char **argv) {
@@ -55,5 +61,6 @@ int main(int argc, char **argv) {
 EMSCRIPTEN_BINDINGS(libcluon) {
     function("setMessageSpecification", &setMessageSpecification);
     function("decodeEnvelopeToJSON", &decodeEnvelopeToJSON);
+    function("encodeEnvelopeFromJSONWithoutTimeStamps", &encodeEnvelopeFromJSONWithoutTimeStamps);
 }
 #endif

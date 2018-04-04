@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ENVELOPETOJSON_HPP
-#define ENVELOPETOJSON_HPP
+#ifndef ENVELOPECONVERTER_HPP
+#define ENVELOPECONVERTER_HPP
 
 #include "cluon/MetaMessage.hpp"
 #include "cluon/cluon.hpp"
@@ -29,18 +29,17 @@
 
 namespace cluon {
 /**
-This class transforms a given Envelope into a JSON representation for its
-contained payload.
+This class provides various conversion functions to and from Envelope data structures.
 */
-class LIBCLUON_API EnvelopeToJSON {
+class LIBCLUON_API EnvelopeConverter {
    private:
-    EnvelopeToJSON(const EnvelopeToJSON &) = delete;
-    EnvelopeToJSON(EnvelopeToJSON &&)      = delete;
-    EnvelopeToJSON &operator=(const EnvelopeToJSON &) = delete;
-    EnvelopeToJSON &operator=(EnvelopeToJSON &&) = delete;
+    EnvelopeConverter(const EnvelopeConverter &) = delete;
+    EnvelopeConverter(EnvelopeConverter &&)      = delete;
+    EnvelopeConverter &operator=(const EnvelopeConverter &) = delete;
+    EnvelopeConverter &operator=(EnvelopeConverter &&) = delete;
 
    public:
-    EnvelopeToJSON() = default;
+    EnvelopeConverter() = default;
 
     /**
      * This method sets the message specification to be used for

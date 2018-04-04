@@ -17,7 +17,7 @@
 
 #include "cluon/cluon.hpp"
 #include "cluon/OD4Session.hpp"
-#include "cluon/EnvelopeToJSON.hpp"
+#include "cluon/EnvelopeConverter.hpp"
 #include "cluon/Time.hpp"
 
 #include <fstream>
@@ -38,17 +38,17 @@ int main(int argc, char **argv) {
         std::cerr << "          " << PROGRAM << " --odvd=MyMessages.odvd --cid=111" << std::endl;
     } else {
         std::string odvdFile{commandlineArguments["odvd"]};
-        cluon::EnvelopeToJSON envelopeToJSON;
+        cluon::EnvelopeConverter envConverter;
         if (!odvdFile.empty()) {
             std::fstream fin{odvdFile, std::ios::in};
             if (fin.good()) {
                 const std::string s{static_cast<std::stringstream const&>(std::stringstream() << fin.rdbuf()).str()}; // NOLINT
-                std::clog << "Parsed " << envelopeToJSON.setMessageSpecification(s) << " message(s)." << std::endl;
+                std::clog << "Parsed " << envConverter.setMessageSpecification(s) << " message(s)." << std::endl;
             }
         }
 
         cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])),
-            [&e2J = envelopeToJSON](cluon::data::Envelope &&envelope) noexcept {
+            [&e2J = envConverter](cluon::data::Envelope &&envelope) noexcept {
                 envelope.received(cluon::time::now());
                 std::cout << e2J.getJSONFromEnvelope(envelope) << std::endl;
                 std::cout.flush();
