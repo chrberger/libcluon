@@ -26,6 +26,7 @@
 #include <sstream>
 #include <vector>
 
+#include <iostream>
 namespace cluon {
 
 FromJSONVisitor::FromJSONVisitor() noexcept
@@ -123,6 +124,7 @@ void FromJSONVisitor::decodeFrom(std::istream &in) noexcept {
 }
 
 std::string FromJSONVisitor::decodeBase64(const std::string &input) const noexcept {
+/*
     const std::string ALPHABET{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
 
     uint32_t index{0};
@@ -152,6 +154,34 @@ std::string FromJSONVisitor::decodeBase64(const std::string &input) const noexce
     std::string retVal(decoded, index);
     delete [] decoded;
     return retVal;
+*/
+    const std::string ALPHABET{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
+
+    std::string decoded;
+
+    uint8_t counter{0};
+    char buffer[4];
+    for (uint32_t i{0}; i < input.size(); i++) {
+        char c;
+        for (c = 0 ; c < 64 && (ALPHABET.at(static_cast<uint8_t>(c)) != input.at(i)); c++);
+
+        buffer[counter++] = c;
+        if (4 == counter) {
+            decoded.push_back(static_cast<char>((buffer[0] << 2) + (buffer[1] >> 4)));
+            if (64 != buffer[2]) {
+                decoded.push_back(static_cast<char>((buffer[1] << 4) + (buffer[2] >> 2)));
+            }
+            if (64 != buffer[3]) {
+                decoded.push_back(static_cast<char>((buffer[2] << 6) + buffer[3]));
+            }
+            counter = 0;
+        }
+    }
+
+//    decoded[index] = 0;
+//    std::string retVal(decoded, index);
+//    delete [] decoded;
+    return decoded;
 }
 
 void FromJSONVisitor::preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
