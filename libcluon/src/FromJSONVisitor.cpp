@@ -102,8 +102,8 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
                 }
             }
         } while (!m.empty() && (oldInput != input));
-    } catch (std::regex_error &) {
-    } catch (std::bad_cast &) {}
+    } catch (std::regex_error &) {  // LCOV_EXCL_LINE
+    } catch (std::bad_cast &) {}  // LCOV_EXCL_LINE
 
     return result;
 }

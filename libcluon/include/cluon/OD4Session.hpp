@@ -152,7 +152,7 @@ class LIBCLUON_API OD4Session {
             }
 
             send(std::move(envelope));
-        } catch (...) {}
+        } catch (...) {} // LCOV_EXCL_LINE
     }
 
    public:
