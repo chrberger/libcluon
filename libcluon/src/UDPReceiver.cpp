@@ -238,6 +238,13 @@ void UDPReceiver::readFromSocket() noexcept {
     // Indicate to main thread that we are ready.
     m_readFromSocketThreadRunning.store(true);
 
+    // Let the operating system yield other threads as this thread is
+    // being spawned in the constructor.
+    {
+        using namespace std::literals::chrono_literals; // NOLINT
+        std::this_thread::sleep_for(5ms);
+    }
+
     while (m_readFromSocketThreadRunning.load()) {
         FD_ZERO(&setOfFiledescriptorsToReadFrom);          // NOLINT
         FD_SET(m_socket, &setOfFiledescriptorsToReadFrom); // NOLINT
