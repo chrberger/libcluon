@@ -29,7 +29,7 @@ namespace cluon {
 OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&envelope)> delegate) noexcept
     : m_receiver{nullptr}
     , m_sender{"225.0.0." + std::to_string(CID), 12175}
-    , m_delegate(delegate)
+    , m_delegate(std::move(delegate))
     , m_mapOfDataTriggeredDelegatesMutex{}
     , m_mapOfDataTriggeredDelegates{} {
     m_receiver = std::make_unique<cluon::UDPReceiver>("225.0.0." + std::to_string(CID), 12175,
