@@ -1,3 +1,15 @@
+libcluon (0.0.64) xenial; urgency=low
+
+  * Fix for OD4Session to avoid receiving data while still in constructor
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 07 Apr 2018 20:17:51 +0200
+
+libcluon (0.0.63) xenial; urgency=low
+
+  * Refactored EnvelopeToJSON to EnvelopeConverter to handle conversion to/from JSON
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 04 Apr 2018 22:15:19 +0200
+
 libcluon (0.0.62) xenial; urgency=low
 
   * FromJSONVisitor added

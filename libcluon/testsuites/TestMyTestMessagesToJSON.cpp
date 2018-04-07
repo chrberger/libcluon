@@ -147,6 +147,56 @@ TEST_CASE("Testing MyTestMessage0.") {
     REQUIRE(tmp2.attribute2() == tmp.attribute2());
 }
 
+TEST_CASE("Testing MyTestMessage0: true-literal") {
+    testdata::MyTestMessage0 tmp;
+    REQUIRE(tmp.attribute1());
+    REQUIRE('c' == tmp.attribute2());
+
+    tmp.attribute2('d');
+
+    const char *JSON = R"({"attribute1":true,
+"attribute2":"d"})";
+
+    std::stringstream sstr{std::string(JSON)};
+
+    cluon::FromJSONVisitor jsonDecoder;
+    jsonDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage0 tmp2;
+    REQUIRE(tmp2.attribute1());
+    REQUIRE('c' == tmp2.attribute2());
+
+    tmp2.accept(jsonDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+    REQUIRE(tmp2.attribute2() == tmp.attribute2());
+}
+
+TEST_CASE("Testing MyTestMessage0: false-literal") {
+    testdata::MyTestMessage0 tmp;
+    REQUIRE(tmp.attribute1());
+    REQUIRE('c' == tmp.attribute2());
+
+    tmp.attribute1(false).attribute2('d');
+
+    const char *JSON = R"({"attribute1":false,
+"attribute2":"d"})";
+
+    std::stringstream sstr{std::string(JSON)};
+
+    cluon::FromJSONVisitor jsonDecoder;
+    jsonDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage0 tmp2;
+    REQUIRE(tmp2.attribute1());
+    REQUIRE('c' == tmp2.attribute2());
+
+    tmp2.accept(jsonDecoder);
+
+    REQUIRE(tmp2.attribute1() == tmp.attribute1());
+    REQUIRE(tmp2.attribute2() == tmp.attribute2());
+}
+
 TEST_CASE("Testing MyTestMessage0 with false value.") {
     testdata::MyTestMessage0 tmp;
     REQUIRE(tmp.attribute1());
