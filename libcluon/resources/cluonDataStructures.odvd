@@ -28,3 +28,8 @@ message cluon.data.Envelope [id = 1] {
     cluon.data.TimeStamp sampleTimeStamp    [id = 5];
     uint32 senderStamp                      [id = 6];
 }
+
+message cluon.data.PlayerCommand [id = 9] {
+    uint8 command [id = 1]; // 0 = nothing, 1 = play, 2 = pause
+}
+

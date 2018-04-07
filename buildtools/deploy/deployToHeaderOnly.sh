@@ -92,7 +92,8 @@ for i in \
     cluon/EnvelopeConverter.hpp \
     cluon/GenericMessage.hpp \
     cluon/LCMToGenericMessage.hpp \
-    cluon/OD4Session.hpp; do
+    cluon/OD4Session.hpp \
+    cluon/Player.hpp; do
 cat libcluon/include/$i >> tmp.headeronly/cluon-complete.hpp
 done
 
@@ -121,7 +122,8 @@ for i in \
     ToMsgPackVisitor.cpp \
     OD4Session.cpp \
     ToODVDVisitor.cpp \
-    EnvelopeConverter.cpp; do
+    EnvelopeConverter.cpp \
+    Player.cpp; do
 cat libcluon/src/$i >> tmp.headeronly/cluon-complete.cpp
 done
 cat <<EOF >> tmp.headeronly/cluon-complete.cpp

@@ -18,6 +18,8 @@
 #include "cluon/cluon.hpp"
 #include "cluon/Envelope.hpp"
 #include "cluon/OD4Session.hpp"
+#include "cluon/Player.hpp"
+#include "cluon/cluonDataStructures.hpp"
 
 #include <cstdint>
 #include <fstream>
@@ -45,43 +47,50 @@ int main(int argc, char **argv) {
             }
         }
 
-        std::fstream fin(recFile, std::ios::in|std::ios::binary);
-        if (fin.good()) {
-            std::unique_ptr<cluon::OD4Session> od4;
-            if (0 != commandlineArguments.count("cid")) {
-                // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
-                od4 = std::make_unique<cluon::OD4Session>(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])), [](auto){});
-            }
-
-            int32_t oldTimeStampInMicroseconds{0};
-            while (fin.good()) {
-                auto retVal{cluon::extractEnvelope(fin)};
-                if (retVal.first) {
-                    if (retVal.second.dataType() > 0) {
-                        const auto SAMPLETIMESTAMP{retVal.second.sampleTimeStamp()};
-                        constexpr int32_t TEN_SECONDS{10*1000*1000};
-                        const int32_t CURRENT_TIMESTAMP_IN_MICROSECONDS{(SAMPLETIMESTAMP.seconds()*1000*1000 + SAMPLETIMESTAMP.microseconds())};
-                        const int32_t DELAY = CURRENT_TIMESTAMP_IN_MICROSECONDS - oldTimeStampInMicroseconds;
-                        if ( (oldTimeStampInMicroseconds > 0) && (DELAY < TEN_SECONDS) ) {
-                            std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(DELAY > 0 ? DELAY : 0));
-                        }
-
-                        if (od4) {
-                            if (od4->isRunning()) {
-                                od4->send(std::move(retVal.second));
-                            }
-                        }
-                        else {
-                            std::cout << cluon::serializeEnvelope(std::move(retVal.second));
-                            std::cout.flush();
-                        }
-                        oldTimeStampInMicroseconds = CURRENT_TIMESTAMP_IN_MICROSECONDS;
+        // Listen for data from stdin.
+        std::atomic<bool> play{true};
+        std::thread t([&play](){
+            while (std::cin.good()) {
+                auto tmp{cluon::extractEnvelope(std::cin)};
+                if (tmp.first) {
+                    if (tmp.second.dataType() == cluon::data::PlayerCommand::ID()) {
+                        cluon::data::PlayerCommand pc = cluon::extractMessage<cluon::data::PlayerCommand>(std::move(tmp.second));
+                        play = (pc.command() == 1);
                     }
                 }
             }
+        });
+
+        // OD4Session.
+        std::unique_ptr<cluon::OD4Session> od4;
+        if (0 != commandlineArguments.count("cid")) {
+            // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
+            od4 = std::make_unique<cluon::OD4Session>(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])), [](auto){});
         }
-        else {
-            std::cerr << "[" << PROGRAM << "] '" << recFile << "' could not be opened." << std::endl;
+
+        constexpr bool AUTOREWIND{false};
+        constexpr bool THREADING{true};
+        cluon::Player player(recFile, AUTOREWIND, THREADING);
+
+        while (player.hasMoreData()) {
+            if (play) {
+                auto next = player.getNextEnvelopeToBeReplayed();
+                if (next.first) {
+                    if (od4) {
+                        if (od4->isRunning()) {
+                            od4->send(std::move(next.second));
+                        }
+                    }
+                    else {
+                        std::cout << cluon::serializeEnvelope(std::move(next.second));
+                        std::cout.flush();
+                    }
+                    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(player.getDelay()));
+                }
+            }
+            else {
+                std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100));
+            }
         }
     }
     return retCode;
