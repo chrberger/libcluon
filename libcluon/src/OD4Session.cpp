@@ -27,15 +27,16 @@
 namespace cluon {
 
 OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&envelope)> delegate) noexcept
-    : m_receiver{"225.0.0." + std::to_string(CID),
-                 12175,
-                 [this](std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) {
-                     this->callback(std::move(data), std::move(from), std::move(timepoint));
-                 }}
+    : m_receiver{nullptr}
     , m_sender{"225.0.0." + std::to_string(CID), 12175}
     , m_delegate(delegate)
     , m_mapOfDataTriggeredDelegatesMutex{}
-    , m_mapOfDataTriggeredDelegates{} {}
+    , m_mapOfDataTriggeredDelegates{} {
+    m_receiver = std::make_unique<cluon::UDPReceiver>("225.0.0." + std::to_string(CID), 12175,
+                 [this](std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) {
+                     this->callback(std::move(data), std::move(from), std::move(timepoint));
+                 });
+}
 
 void OD4Session::timeTrigger(float freq, std::function<bool()> delegate) noexcept {
     if (nullptr != delegate) {
@@ -85,8 +86,7 @@ bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon
     return retVal;
 }
 
-void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) noexcept {
-    (void)from;
+void OD4Session::callback(std::string &&data, std::string &&/*from*/, std::chrono::system_clock::time_point &&timepoint) noexcept {
     std::stringstream sstr(data);
     auto retVal = extractEnvelope(sstr);
 
@@ -96,7 +96,6 @@ void OD4Session::callback(std::string &&data, std::string &&from, std::chrono::s
 
         // "Catch all"-delegate.
         if (nullptr != m_delegate) {
-            cluon::data::Envelope env1{retVal.second};
             m_delegate(std::move(env));
         } else {
             try {
@@ -119,7 +118,7 @@ void OD4Session::sendInternal(std::string &&dataToSend) noexcept {
 }
 
 bool OD4Session::isRunning() noexcept {
-    return m_receiver.isRunning();
+    return m_receiver->isRunning();
 }
 
 } // namespace cluon

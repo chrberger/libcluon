@@ -29,6 +29,7 @@
 #include <cstdint>
 #include <functional>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <utility>
@@ -163,7 +164,7 @@ class LIBCLUON_API OD4Session {
     void sendInternal(std::string &&dataToSend) noexcept;
 
    private:
-    cluon::UDPReceiver m_receiver;
+    std::unique_ptr<cluon::UDPReceiver> m_receiver;
     cluon::UDPSender m_sender;
 
     std::mutex m_senderMutex{};
