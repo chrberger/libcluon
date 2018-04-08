@@ -34,7 +34,7 @@ static cluon::EnvelopeConverter envConverter;
 
 int setMessageSpecification(const std::string &s);
 std::string decodeEnvelopeToJSON(const std::string &s);
-std::string encodeEnvelopeFromJSONWithoutTimeStamps(const std::string &s, int32_t messageIdentifier);
+std::string encodeEnvelopeFromJSONWithoutTimeStamps(const std::string &s, int32_t messageIdentifier, uint32_t senderStamp);
 
 int setMessageSpecification(const std::string &s) {
     std::lock_guard<std::mutex> lck(envConverterMutex);
@@ -46,9 +46,9 @@ std::string decodeEnvelopeToJSON(const std::string &s) {
     return envConverter.getJSONFromProtoEncodedEnvelope(s);
 }
 
-std::string encodeEnvelopeFromJSONWithoutTimeStamps(const std::string &s, int32_t messageIdentifier) {
+std::string encodeEnvelopeFromJSONWithoutTimeStamps(const std::string &s, int32_t messageIdentifier, uint32_t senderStamp) {
     std::lock_guard<std::mutex> lck(envConverterMutex);
-    return envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(s, messageIdentifier);
+    return envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(s, messageIdentifier, senderStamp);
 }
 
 int main(int argc, char **argv) {
