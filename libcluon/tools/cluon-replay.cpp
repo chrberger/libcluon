@@ -18,6 +18,7 @@
 #include "cluon/cluon.hpp"
 #include "cluon/Envelope.hpp"
 #include "cluon/OD4Session.hpp"
+#include "cluon/ToProtoVisitor.hpp"
 #include "cluon/Player.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
@@ -25,6 +26,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -48,18 +50,36 @@ int main(int argc, char **argv) {
         }
 
         // Listen for data from stdin.
-        std::atomic<bool> play{true};
-        std::thread t([&play](){
+        std::atomic<bool> playCommandUpdate{false};
+        std::mutex playerCommandMutex;
+        cluon::data::PlayerCommand playerCommand;
+        std::thread t([&playCommandUpdate, &playerCommandMutex, &playerCommand](){
             while (std::cin.good()) {
                 auto tmp{cluon::extractEnvelope(std::cin)};
                 if (tmp.first) {
                     if (tmp.second.dataType() == cluon::data::PlayerCommand::ID()) {
                         cluon::data::PlayerCommand pc = cluon::extractMessage<cluon::data::PlayerCommand>(std::move(tmp.second));
-                        play = (pc.command() == 1);
+                        {
+                            std::lock_guard<std::mutex> lck(playerCommandMutex);
+                            playerCommand = pc;
+                        }
+                        playCommandUpdate = true;
                     }
                 }
             }
         });
+
+        // Listen for PlayerStatus updates.
+        std::atomic<bool> playerStatusUpdate{false};
+        std::mutex playerStatusMutex;
+        cluon::data::PlayerStatus playerStatus;
+        auto playerListener = [&playerStatusUpdate, &playerStatusMutex, &playerStatus](cluon::data::PlayerStatus &&ps){
+            {
+                std::lock_guard<std::mutex> lck(playerStatusMutex);
+                playerStatus = ps;
+            }
+            playerStatusUpdate = true;
+        };
 
         // OD4Session.
         std::unique_ptr<cluon::OD4Session> od4;
@@ -71,15 +91,52 @@ int main(int argc, char **argv) {
         constexpr bool AUTOREWIND{false};
         constexpr bool THREADING{true};
         cluon::Player player(recFile, AUTOREWIND, THREADING);
+        player.setPlayerListener(playerListener);
 
+        bool play = true;
         while (player.hasMoreData()) {
+            if (playerStatusUpdate) {
+                std::string s;
+                {
+                    std::lock_guard<std::mutex> lck(playerStatusMutex);
+
+                    cluon::ToProtoVisitor protoEncoder;
+                    playerStatus.accept(protoEncoder);
+                    s = protoEncoder.encodedData();
+                }
+                cluon::data::Envelope env;
+                env.dataType(playerStatus.ID())
+                   .sent(cluon::time::now())
+                   .sampleTimeStamp(cluon::time::now())
+                   .serializedData(s);
+
+                if (od4 && od4->isRunning()) {
+                    od4->send(std::move(env));
+                }
+                else {
+                    std::cout << cluon::serializeEnvelope(std::move(env));
+                    std::cout.flush();
+                }
+                playerStatusUpdate = false;
+            }
+            if (playCommandUpdate) {
+                std::lock_guard<std::mutex> lck(playerCommandMutex);
+                play = (1 == playerCommand.command());
+
+                std::clog << "Got update: " << +playerCommand.command() << ", play = " << play << std::endl;
+
+                if (3 == playerCommand.command()) {
+                    std::clog << "Got update: " << +playerCommand.command() << ", seekTo: " << playerCommand.seekTo() << std::endl;
+                    player.seekTo(playerCommand.seekTo());
+                }
+                playCommandUpdate = false;
+                continue;
+            }
             if (play) {
                 auto next = player.getNextEnvelopeToBeReplayed();
                 if (next.first) {
-                    if (od4) {
-                        if (od4->isRunning()) {
-                            od4->send(std::move(next.second));
-                        }
+                    if (od4 && od4->isRunning()) {
+                        od4->send(std::move(next.second));
                     }
                     else {
                         std::cout << cluon::serializeEnvelope(std::move(next.second));

@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <deque>
 #include <fstream>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -48,7 +49,7 @@ class LIBCLUON_API Player {
         enum {
             ONE_MILLISECOND_IN_MICROSECONDS = 1000,
             ONE_SECOND_IN_MICROSECONDS = 1000 * ONE_MILLISECOND_IN_MICROSECONDS,
-            MAX_DELAY_IN_MICROSECONDS = 5 * ONE_SECOND_IN_MICROSECONDS,
+            MAX_DELAY_IN_MICROSECONDS = 1 * ONE_SECOND_IN_MICROSECONDS,
             LOOK_AHEAD_IN_S = 30,
             MIN_ENTRIES_FOR_LOOK_AHEAD = 5000,
         };
@@ -95,6 +96,8 @@ class LIBCLUON_API Player {
          * This method rewinds the iterators.
          */
         void rewind() noexcept;
+
+        void seekTo(float ratio) noexcept;
 
         /**
          * @return total amount of cluon::data::Envelopes in the .rec file.
@@ -208,6 +211,13 @@ class LIBCLUON_API Player {
 
         // Mapping of pos_type (within .rec file) --> cluon::data::Envelope (read from .rec file).
         std::map<uint64_t, cluon::data::Envelope> m_envelopeCache;
+
+    public:
+        void setPlayerListener(std::function<void(cluon::data::PlayerStatus playerStatus)> playerListener) noexcept;
+
+    private:
+        std::mutex m_playerListenerMutex;
+        std::function<void(cluon::data::PlayerStatus playerStatus)> m_playerListener{nullptr};
 };
 
 }

@@ -62,7 +62,9 @@ Player::Player(const std::string &file, const bool &autoRewind, const bool &thre
     m_envelopeCacheFillingThreadIsRunningMutex(),
     m_envelopeCacheFillingThreadIsRunning(false),
     m_envelopeCacheFillingThread(),
-    m_envelopeCache() {
+    m_envelopeCache(),
+    m_playerListenerMutex(),
+    m_playerListener(nullptr) {
     initializeIndex();
     computeInitialCacheLevelAndFillCache();
 
@@ -81,6 +83,13 @@ Player::~Player() {
     }
 
     m_recFile.close();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void Player::setPlayerListener(std::function<void(cluon::data::PlayerStatus playerStatus)> playerListener) noexcept {
+    std::lock_guard<std::mutex> lck(m_playerListenerMutex);
+    m_playerListener = playerListener;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -134,7 +143,7 @@ void Player::initializeIndex() noexcept {
 void Player::resetCaches() noexcept {
     try {
         std::lock_guard<std::mutex> lck(m_indexMutex);
-        m_delay = m_correctedDelay = 0;
+        m_delay = m_correctedDelay = m_numberOfReturnedEnvelopesInTotal = 0;
         m_envelopeCache.clear();
     }
     catch(...) {}
@@ -209,7 +218,7 @@ std::pair<bool, cluon::data::Envelope> Player::getNextEnvelopeToBeReplayed() noe
     bool hasEnvelopeToReturn{false};
     cluon::data::Envelope envelopeToReturn;
 
-    static int64_t lastEnvelopesSampleTimeStamp = 0;
+//    static int64_t lastEnvelopesSampleTimeStamp = 0;
 
     // If at "EOF", either throw exception or autorewind.
     if (m_currentEnvelopeToReplay == m_index.end()) {
@@ -221,40 +230,43 @@ std::pair<bool, cluon::data::Envelope> Player::getNextEnvelopeToBeReplayed() noe
         }
     }
 
-    checkAvailabilityOfNextEnvelopeToBeReplayed();
+//    checkAvailabilityOfNextEnvelopeToBeReplayed();
 
     try {
-        std::lock_guard<std::mutex> lck(m_indexMutex);
+        {
+            std::lock_guard<std::mutex> lck(m_indexMutex);
 
-        cluon::data::Envelope &nextEnvelope = m_envelopeCache[m_currentEnvelopeToReplay->second.m_filePosition];
+            cluon::data::Envelope &nextEnvelope = m_envelopeCache[m_currentEnvelopeToReplay->second.m_filePosition];
+            envelopeToReturn = nextEnvelope;
 
-        m_correctedDelay = m_delay = static_cast<uint32_t>(m_currentEnvelopeToReplay->first - m_previousEnvelopeAlreadyReplayed->first);
+            m_correctedDelay = m_delay = static_cast<uint32_t>(m_currentEnvelopeToReplay->first - m_previousEnvelopeAlreadyReplayed->first);
 
-        // TODO: Delegate deleting into own thread.
-        if (m_previousPreviousEnvelopeAlreadyReplayed != m_index.end()) {
-            auto it = m_envelopeCache.find(m_previousEnvelopeAlreadyReplayed->second.m_filePosition);
-            if (it != m_envelopeCache.end()) {
-                m_envelopeCache.erase(it);
+            // TODO: Delegate deleting into own thread.
+            if (m_previousPreviousEnvelopeAlreadyReplayed != m_index.end()) {
+                auto it = m_envelopeCache.find(m_previousEnvelopeAlreadyReplayed->second.m_filePosition);
+                if (it != m_envelopeCache.end()) {
+                    m_envelopeCache.erase(it);
+                }
             }
+
+            m_previousPreviousEnvelopeAlreadyReplayed = m_previousEnvelopeAlreadyReplayed;
+            m_previousEnvelopeAlreadyReplayed = m_currentEnvelopeToReplay++;
+
+            m_numberOfReturnedEnvelopesInTotal++;
         }
-
-        m_previousPreviousEnvelopeAlreadyReplayed = m_previousEnvelopeAlreadyReplayed;
-        m_previousEnvelopeAlreadyReplayed = m_currentEnvelopeToReplay++;
-
-        m_numberOfReturnedEnvelopesInTotal++;
 
         // TODO compensate for internal data processing.
 
         // If Player is non-threaded, manage cache regularly.
         if (!m_threading) {
-            float refillMultiplicator = 1.1f;
-            checkRefillingCache(static_cast<uint32_t>(m_index.size()), refillMultiplicator);
+//            float refillMultiplicator = 1.1f;
+//            checkRefillingCache(static_cast<uint32_t>(m_index.size()), refillMultiplicator);
+            fillEnvelopeCache(1);
         }
 
         // Store sample time stamp as int64 to avoid unnecessary copying of Envelopes.
         hasEnvelopeToReturn = true;
-        envelopeToReturn = nextEnvelope;
-        lastEnvelopesSampleTimeStamp = envelopeToReturn.sampleTimeStamp().seconds() * 1000 * 1000 + envelopeToReturn.sampleTimeStamp().microseconds();
+//        lastEnvelopesSampleTimeStamp = envelopeToReturn.sampleTimeStamp().seconds() * 1000 * 1000 + envelopeToReturn.sampleTimeStamp().microseconds();
     }
     catch(...) {}
     return std::make_pair(hasEnvelopeToReturn, envelopeToReturn);
@@ -313,6 +325,43 @@ void Player::rewind() noexcept {
     }
 }
 
+void Player::seekTo(float ratio) noexcept {
+    if (!(ratio < 0) && !(ratio > 1)) {
+        bool enableThreading = m_threading;
+        if (m_threading) {
+            // Stop concurrent thread.
+            setEnvelopeCacheFillingRunning(false);
+            m_envelopeCacheFillingThread.join();
+        }
+
+        // Read data sequentially.
+        m_threading = false;
+        computeInitialCacheLevelAndFillCache();
+
+        uint32_t numberOfEntriesInIndex = 0;
+
+        try {
+            std::lock_guard<std::mutex> lck(m_indexMutex);
+            numberOfEntriesInIndex = static_cast<uint32_t>(m_index.size());
+        }
+        catch(...) {}
+
+        // Fast forward.
+        std::clog << "Seeking to " << numberOfEntriesInIndex*ratio << "/" << numberOfEntriesInIndex << std::endl;
+        for(uint32_t i = 0; i < static_cast<uint32_t>(numberOfEntriesInIndex*ratio); i++) {
+            getNextEnvelopeToBeReplayed();
+        }
+        std::clog << "Seeking done." << std::endl;
+
+        if (enableThreading) {
+            m_threading = enableThreading;
+            // Re-start concurrent thread.
+            setEnvelopeCacheFillingRunning(true);
+            m_envelopeCacheFillingThread = std::thread(&Player::manageCache, this);
+        }
+    }
+}
+
 bool Player::hasMoreData() const noexcept {
     std::lock_guard<std::mutex> lck(m_indexMutex);
     return hasMoreDataFromRecFile();
@@ -366,12 +415,27 @@ void Player::manageCache() noexcept {
         // Publish some statistics at 1 Hz.
         if ( 0 == ((++statisticsCounter) % 10) ) {
             uint64_t numberOfReturnedEnvelopesInTotal = 0;
+            uint32_t totalNumberOfEnvelopes = 0;
             try {
                 // m_numberOfReturnedEnvelopesInTotal is modified in a different thread.
                 std::lock_guard<std::mutex> lck(m_indexMutex);
                 numberOfReturnedEnvelopesInTotal = m_numberOfReturnedEnvelopesInTotal;
+                totalNumberOfEnvelopes = static_cast<uint32_t>(m_index.size());
             }
             catch(...) {}
+
+            try {
+                std::lock_guard<std::mutex> lck(m_playerListenerMutex);
+                if (nullptr != m_playerListener) {
+                    cluon::data::PlayerStatus ps;
+                    ps.state(2); // State: "playback"
+                    ps.numberOfEntries(totalNumberOfEnvelopes);
+                    ps.currentEntryForPlayback(static_cast<uint32_t>(numberOfReturnedEnvelopesInTotal));
+                    m_playerListener(ps);
+                }
+            }
+            catch(...) {}
+
             statisticsCounter = 0;
         }
     }
