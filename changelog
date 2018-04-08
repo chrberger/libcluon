@@ -1,3 +1,9 @@
+libcluon (0.0.65) xenial; urgency=low
+
+  * Adding parameter senderStamp to getProtoEncodedEnvelopeFromJSONWithoutTimeStamps
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 08 Apr 2018 11:44:30 +0200
+
 libcluon (0.0.64) xenial; urgency=low
 
   * Fix for OD4Session to avoid receiving data while still in constructor
