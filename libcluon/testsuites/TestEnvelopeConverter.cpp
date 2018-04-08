@@ -673,7 +673,8 @@ message MyTestMessage5 [id = 30005] {
 
     // Sixth, turn JSON into proper Envelope.
     constexpr int32_t MESSAGE_IDENTIFIER{30005};
-    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER)};
+    constexpr uint32_t SENDER_STAMP{13};
+    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER, SENDER_STAMP)};
     REQUIRE(!protoEncodedData.empty());
 
     // Seventh, read back Envelope from serialization.
@@ -687,6 +688,7 @@ message MyTestMessage5 [id = 30005] {
     // Verify values in transformed Envelope.
     env = retVal.second;
     REQUIRE(MESSAGE_IDENTIFIER == env.dataType());
+    REQUIRE(SENDER_STAMP == env.senderStamp());
     REQUIRE(0 == (env.sent().seconds() + env.sent().microseconds()));
     REQUIRE(0 == (env.received().seconds() + env.received().microseconds()));
     REQUIRE(0 == (env.sampleTimeStamp().seconds() + env.sampleTimeStamp().microseconds()));
@@ -792,7 +794,8 @@ TEST_CASE("Convert JSON representation of MyTestMessage5 into Proto-encoded data
 
     // Sixth, turn JSON into proper Envelope.
     constexpr int32_t MESSAGE_IDENTIFIER{30005};
-    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER)};
+    constexpr uint32_t SENDER_STAMP{10};
+    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER, SENDER_STAMP)};
     REQUIRE(protoEncodedData.empty());
 
     // Seventh, read back Envelope from serialization.
@@ -890,7 +893,8 @@ message MyTestMessage5 [id = 30005] {
 
     // Sixth, turn JSON into proper Envelope.
     constexpr int32_t MESSAGE_IDENTIFIER{30005 + 1};
-    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER)};
+    constexpr uint32_t SENDER_STAMP{1};
+    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER, SENDER_STAMP)};
     REQUIRE(protoEncodedData.empty());
 
     // Seventh, read back Envelope from serialization.
@@ -938,7 +942,8 @@ message MyTestMessage5 [id = 30005] {
 
     // Sixth, turn JSON into proper Envelope.
     constexpr int32_t MESSAGE_IDENTIFIER{30005};
-    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(JUNK, MESSAGE_IDENTIFIER)};
+    constexpr uint32_t SENDER_STAMP{0};
+    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(JUNK, MESSAGE_IDENTIFIER, SENDER_STAMP)};
     REQUIRE(!protoEncodedData.empty());
 
     // Seventh, read back Envelope from serialization.

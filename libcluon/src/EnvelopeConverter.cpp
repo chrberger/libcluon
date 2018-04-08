@@ -118,7 +118,7 @@ std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelo
     return retVal;
 }
 
-std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(const std::string &json, int32_t messageIdentifier) noexcept {
+std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp) noexcept {
     std::string retVal;
     if (0 < m_scopeOfMetaMessages.count(messageIdentifier)) {
         // Get specification for message to be created.
@@ -141,7 +141,9 @@ std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(
         gm.accept(protoEncoder);
 
         cluon::data::Envelope env;
-        env.dataType(messageIdentifier).serializedData(protoEncoder.encodedData());
+        env.dataType(messageIdentifier)
+           .serializedData(protoEncoder.encodedData())
+           .senderStamp(senderStamp);
 
         retVal = cluon::serializeEnvelope(std::move(env));
     }
