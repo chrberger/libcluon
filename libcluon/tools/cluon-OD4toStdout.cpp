@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
     if (0 == commandlineArguments.count("cid")) {
         std::cerr << PROGRAM
-                  << " dumps Containers received from an OpenDaVINCI v4 session to stdout." << std::endl;
+                  << " dumps Envelopes received from an OD4Session to stdout; any data read from stdin is tried to be relayed as Envelope into the OD4Session." << std::endl;
         std::cerr << "Usage:   " << PROGRAM << " --cid=<OpenDaVINCI session>" << std::endl;
         std::cerr << "Example: " << PROGRAM << " --cid=111" << std::endl;
     }
@@ -41,11 +41,15 @@ int main(int argc, char **argv) {
                 std::cout.flush();
             });
 
-        using namespace std::literals::chrono_literals; // NOLINT
-        while (od4Session.isRunning()) {
-            std::this_thread::sleep_for(1s);
+        while (std::cin.good() && od4Session.isRunning()) {
+            auto tmp{cluon::extractEnvelope(std::cin)};
+            if (tmp.first) {
+                od4Session.send(std::move(tmp.second));
+            }
         }
+
         retVal = 0;
     }
     return retVal;
 }
+
