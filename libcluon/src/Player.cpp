@@ -336,8 +336,10 @@ void Player::seekTo(float ratio) noexcept {
 
         // Read data sequentially.
         m_threading = false;
-        computeInitialCacheLevelAndFillCache();
+//        computeInitialCacheLevelAndFillCache();
 
+        resetCaches();
+        resetIterators();
         uint32_t numberOfEntriesInIndex = 0;
 
         try {
@@ -347,10 +349,23 @@ void Player::seekTo(float ratio) noexcept {
         catch(...) {}
 
         // Fast forward.
+        m_numberOfReturnedEnvelopesInTotal = 0;
         std::clog << "Seeking to " << numberOfEntriesInIndex*ratio << "/" << numberOfEntriesInIndex << std::endl;
-        for(uint32_t i = 0; i < static_cast<uint32_t>(numberOfEntriesInIndex*ratio); i++) {
-            getNextEnvelopeToBeReplayed();
+        for(m_numberOfReturnedEnvelopesInTotal = 0; m_numberOfReturnedEnvelopesInTotal < static_cast<uint32_t>(numberOfEntriesInIndex*ratio)-1; m_numberOfReturnedEnvelopesInTotal++) {
+//            getNextEnvelopeToBeReplayed();
+            m_currentEnvelopeToReplay++;
         }
+        m_nextEntryToReadFromRecFile
+            = m_previousEnvelopeAlreadyReplayed
+            = m_currentEnvelopeToReplay;
+
+        // Refill cache.
+        m_envelopeCache.clear();
+        fillEnvelopeCache(m_desiredInitialLevel);
+
+        // Correct iterators.
+//        getNextEnvelopeToBeReplayed();
+        getNextEnvelopeToBeReplayed();
         std::clog << "Seeking done." << std::endl;
 
         if (enableThreading) {
