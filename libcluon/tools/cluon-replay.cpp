@@ -88,10 +88,60 @@ int main(int argc, char **argv) {
             od4 = std::make_unique<cluon::OD4Session>(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])), [](auto){});
         }
 
+        {
+            std::string s;
+            playerStatus.state(1); // loading file
+            {
+                std::lock_guard<std::mutex> lck(playerStatusMutex);
+
+                cluon::ToProtoVisitor protoEncoder;
+                playerStatus.accept(protoEncoder);
+                s = protoEncoder.encodedData();
+            }
+            cluon::data::Envelope env;
+            env.dataType(playerStatus.ID())
+               .sent(cluon::time::now())
+               .sampleTimeStamp(cluon::time::now())
+               .serializedData(s);
+
+            if (od4 && od4->isRunning()) {
+                od4->send(std::move(env));
+            }
+            else {
+                std::cout << cluon::serializeEnvelope(std::move(env));
+                std::cout.flush();
+            }
+        }
         constexpr bool AUTOREWIND{false};
         constexpr bool THREADING{true};
         cluon::Player player(recFile, AUTOREWIND, THREADING);
         player.setPlayerListener(playerListener);
+
+        {
+            std::string s;
+            playerStatus.numberOfEntries(player.getTotalNumberOfEnvelopesInRecFile());
+            playerStatus.state(2); // playback file
+            {
+                std::lock_guard<std::mutex> lck(playerStatusMutex);
+
+                cluon::ToProtoVisitor protoEncoder;
+                playerStatus.accept(protoEncoder);
+                s = protoEncoder.encodedData();
+            }
+            cluon::data::Envelope env;
+            env.dataType(playerStatus.ID())
+               .sent(cluon::time::now())
+               .sampleTimeStamp(cluon::time::now())
+               .serializedData(s);
+
+            if (od4 && od4->isRunning()) {
+                od4->send(std::move(env));
+            }
+            else {
+                std::cout << cluon::serializeEnvelope(std::move(env));
+                std::cout.flush();
+            }
+        }
 
         bool play = true;
         while (player.hasMoreData()) {
@@ -121,7 +171,7 @@ int main(int argc, char **argv) {
             }
             if (playCommandUpdate) {
                 std::lock_guard<std::mutex> lck(playerCommandMutex);
-                play = (1 == playerCommand.command());
+                play = !(2 == playerCommand.command());
 
                 std::clog << "Got update: " << +playerCommand.command() << ", play = " << play << std::endl;
 
