@@ -173,7 +173,9 @@ int main(int argc, char **argv) {
                 }
                 if (playCommandUpdate) {
                     std::lock_guard<std::mutex> lck(playerCommandMutex);
-                    play = !(2 == playerCommand.command());
+                    if ( (playerCommand.command() == 1) || (playerCommand.command() == 2) ) {
+                        play = !(2 == playerCommand.command());
+                    }
 
                     std::clog << PROGRAM << ": Change state: " << +playerCommand.command() << ", play = " << play << std::endl;
 
@@ -182,7 +184,6 @@ int main(int argc, char **argv) {
                         player.seekTo(playerCommand.seekTo());
                     }
                     playCommandUpdate = false;
-                    continue;
                 }
                 if (play) {
                     auto next = player.getNextEnvelopeToBeReplayed();

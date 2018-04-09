@@ -43,6 +43,14 @@ TEST_CASE("Test delta.") {
     REQUIRE(200 == cluon::time::deltaInMicroseconds(after, before));
 }
 
+TEST_CASE("Test from microseconds.") {
+    int64_t timePoint{static_cast<int64_t>(2*1000*1000)+13};
+    cluon::data::TimeStamp result = cluon::time::fromMicroseconds(timePoint);
+
+    REQUIRE(2 == result.seconds());
+    REQUIRE(13 == result.microseconds());
+}
+
 TEST_CASE("Test convert Time.") {
     cluon::data::TimeStamp before{cluon::time::now()};
 
