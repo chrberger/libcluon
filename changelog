@@ -1,3 +1,9 @@
+libcluon (0.0.66) xenial; urgency=low
+
+  * Improved performance for cluon-replay
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 09 Apr 2018 12:01:13 +0200
+
 libcluon (0.0.65) xenial; urgency=low
 
   * Adding parameter senderStamp to getProtoEncodedEnvelopeFromJSONWithoutTimeStamps
