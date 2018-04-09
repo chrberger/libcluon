@@ -1,3 +1,9 @@
+libcluon (0.0.67) xenial; urgency=low
+
+  * cluon-OD4toStdout reads from stdin to relay Envelopes; more TimeStamp functions in cluon/Time.hpp
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 09 Apr 2018 16:50:21 +0200
+
 libcluon (0.0.66) xenial; urgency=low
 
   * Improved performance for cluon-replay
