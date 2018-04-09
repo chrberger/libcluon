@@ -25,6 +25,20 @@ namespace cluon {
 namespace time {
 
 /**
+ * @return TimeStamp converted to microseconds.
+ */
+inline int64_t toMicroseconds(const cluon::data::TimeStamp &tp) noexcept {
+    return static_cast<int64_t>(tp.seconds())*1000*1000 + static_cast<int64_t>(tp.microseconds());
+}
+
+/**
+ * @return Delta (BEFORE - AFTER) between two TimeStamps in microseconds.
+ */
+inline int64_t deltaInMicroseconds(const cluon::data::TimeStamp &AFTER, const cluon::data::TimeStamp &BEFORE) noexcept {
+    return toMicroseconds(AFTER) - toMicroseconds(BEFORE);
+}
+
+/**
  * @return TimeStamp of converted chrono::time_point.
  */
 inline cluon::data::TimeStamp convert(const std::chrono::system_clock::time_point &tp) noexcept {

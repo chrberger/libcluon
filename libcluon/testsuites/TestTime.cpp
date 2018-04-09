@@ -30,7 +30,17 @@ TEST_CASE("Test Time.") {
 
     cluon::data::TimeStamp after{cluon::time::now()};
 
-    REQUIRE((after.seconds() * 1000 * 1000 + after.microseconds()) > (before.seconds() * 1000 * 1000 + before.microseconds()));
+    REQUIRE(cluon::time::toMicroseconds(after) > cluon::time::toMicroseconds(before));
+}
+
+TEST_CASE("Test delta.") {
+    cluon::data::TimeStamp before;
+    before.seconds(0).microseconds(100);
+
+    cluon::data::TimeStamp after;
+    after.seconds(0).microseconds(300);
+
+    REQUIRE(200 == cluon::time::deltaInMicroseconds(after, before));
 }
 
 TEST_CASE("Test convert Time.") {
@@ -43,5 +53,5 @@ TEST_CASE("Test convert Time.") {
 
     cluon::data::TimeStamp after2 = cluon::time::convert(after);
 
-    REQUIRE((after2.seconds() * 1000 * 1000 + after2.microseconds()) > (before.seconds() * 1000 * 1000 + before.microseconds()));
+    REQUIRE(cluon::time::toMicroseconds(after2) > cluon::time::toMicroseconds(before));
 }
