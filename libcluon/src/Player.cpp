@@ -405,13 +405,6 @@ void Player::manageCache() noexcept {
     uint8_t statisticsCounter = 0;
     float refillMultiplicator = 1.1f;
     uint32_t numberOfEntries = 0;
-    uint32_t numberOfEntriesInIndex = 0;
-
-    try {
-        std::lock_guard<std::mutex> lck(m_indexMutex);
-        numberOfEntriesInIndex = static_cast<uint32_t>(m_index.size());
-    }
-    catch(...) {}
 
     while (isEnvelopeCacheFillingRunning()) {
         try {
@@ -422,6 +415,7 @@ void Player::manageCache() noexcept {
 
         // Check if refilling of the cache is needed.
         refillMultiplicator = checkRefillingCache(numberOfEntries, refillMultiplicator);
+        (void)refillMultiplicator;
 
         // Manage cache at 10 Hz.
         using namespace std::chrono_literals;
@@ -462,7 +456,7 @@ float Player::checkRefillingCache(const uint32_t &numberOfEntries, float refillM
         const uint32_t entriesReadFromFile = fillEnvelopeCache(static_cast<uint32_t>(refillMultiplicator * m_desiredInitialLevel));
         if (entriesReadFromFile > 0) {
             std::clog << "[cluon::Player]: Number of entries in cache: "  << numberOfEntries << ". " << entriesReadFromFile << " added to cache. " << m_envelopeCache.size() << " entries available." << std::endl;
-            refillMultiplicator *= 1.25;
+            refillMultiplicator *= 1.25f;
         }
     }
     return refillMultiplicator;
