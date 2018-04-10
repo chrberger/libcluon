@@ -1,3 +1,9 @@
+libcluon (0.0.70) xenial; urgency=low
+
+  * Added mask functionality to ToCSVVisitor
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 10 Apr 2018 21:41:35 +0200
+
 libcluon (0.0.69) xenial; urgency=low
 
   * cluon-replay can simultaneously replay to an OD4Session and to stdout
