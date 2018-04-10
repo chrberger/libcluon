@@ -22,8 +22,12 @@
 
 namespace cluon {
 
-ToCSVVisitor::ToCSVVisitor(char delimiter, bool withHeader) noexcept
-    : ToCSVVisitor::ToCSVVisitor("", delimiter, withHeader, false) {}
+ToCSVVisitor::ToCSVVisitor(char delimiter, bool withHeader, const std::map<uint32_t, bool> &mask) noexcept
+    : m_mask(mask)
+    , m_prefix("")
+    , m_delimiter(delimiter)
+    , m_withHeader(withHeader)
+    , m_isNested(false) {}
 
 ToCSVVisitor::ToCSVVisitor(const std::string &prefix, char delimiter, bool withHeader, bool isNested) noexcept
     : m_prefix(prefix)
@@ -62,120 +66,133 @@ void ToCSVVisitor::postVisit() noexcept {
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << v << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << v << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << +v << m_delimiter;
     }
-    m_bufferValues << +v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << +v << m_delimiter;
     }
-    m_bufferValues << +v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << v << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << v << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << v << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << v << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << v << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << v << m_delimiter;
     }
-    m_bufferValues << v << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << std::setprecision(7) << v << std::setprecision(6) << m_delimiter;
     }
-    m_bufferValues << std::setprecision(7) << v << std::setprecision(6) << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << std::setprecision(11) << v << std::setprecision(6) << m_delimiter;
     }
-    m_bufferValues << std::setprecision(11) << v << std::setprecision(6) << m_delimiter;
 }
 
 void ToCSVVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
-    (void)id;
     (void)typeName;
-    if (m_fillHeader) {
-        m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+    if ((0 == m_mask.count(id)) || m_mask[id]) {
+        if (m_fillHeader) {
+            m_bufferHeader << m_prefix << (!m_prefix.empty() ? "." : "") << name << m_delimiter;
+        }
+        m_bufferValues << '\"' << v << '\"' << m_delimiter;
     }
-    m_bufferValues << '\"' << v << '\"' << m_delimiter;
 }
 
 } // namespace cluon
