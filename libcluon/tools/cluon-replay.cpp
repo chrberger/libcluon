@@ -35,12 +35,16 @@ int main(int argc, char **argv) {
     const std::string PROGRAM{argv[0]}; // NOLINT
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
     if (1 == argc) {
-        std::cerr << PROGRAM << " replays a .rec file into an OpenDaVINCI session or to stdout." << std::endl;
-        std::cerr << "Usage:   " << PROGRAM << " [--cid=<OpenDaVINCI session>] recording.rec" << std::endl;
+        std::cerr << PROGRAM << " replays a .rec file into an OpenDaVINCI session or to stdout; if playing back to an OD4Session using parameter --cid, you can specify the optional parameter --stdout to also playback to stdout." << std::endl;
+        std::cerr << "Usage:   " << PROGRAM << " [--cid=<OpenDaVINCI session> [--stdout]] recording.rec" << std::endl;
         std::cerr << "Example: " << PROGRAM << " --cid=111 file.rec" << std::endl;
+        std::cerr << "         " << PROGRAM << " --cid=111 --stdout file.rec" << std::endl;
+        std::cerr << "         " << PROGRAM << " file.rec" << std::endl;
         retCode = 1;
     }
     else {
+        const bool playBackToStdout = ( (0 != commandlineArguments.count("stdout")) || (0 == commandlineArguments.count("cid")) );
+
         std::string recFile;
         for (auto e : commandlineArguments) {
             if (recFile.empty() && e.second.empty() && e.first != PROGRAM) {
@@ -191,7 +195,7 @@ int main(int argc, char **argv) {
                         if (od4 && od4->isRunning()) {
                             od4->send(std::move(next.second));
                         }
-                        else {
+                        if (playBackToStdout) {
                             std::cout << cluon::serializeEnvelope(std::move(next.second));
                             std::cout.flush();
                         }
