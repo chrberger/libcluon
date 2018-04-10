@@ -21,6 +21,7 @@
 #include "cluon/cluon.hpp"
 
 #include <cstdint>
+#include <map>
 #include <sstream>
 #include <string>
 
@@ -57,8 +58,11 @@ class LIBCLUON_API ToCSVVisitor {
      * @param delimiter Delimiter character.
      * @param withHeader If true, the first line in the output contains the
      *        column headers.
+     * @param mask Map describing which fields to render. If empty, all
+     *             fields will be emitted; individual field identifiers
+     *             can be masked setting them to false.
      */
-    ToCSVVisitor(char delimiter = ';', bool withHeader = true) noexcept;
+    ToCSVVisitor(char delimiter = ';', bool withHeader = true, const std::map<uint32_t, bool> &mask = {}) noexcept;
 
    protected:
     /**
@@ -119,6 +123,7 @@ class LIBCLUON_API ToCSVVisitor {
     }
 
    private:
+    std::map<uint32_t, bool> m_mask{};
     std::string m_prefix{};
     char m_delimiter{';'};
     bool m_withHeader{true};
