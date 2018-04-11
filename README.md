@@ -9,7 +9,8 @@
 )](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Ubuntu (armhf)](https://img.shields.io/badge/deb-armhf-blue.svg
 )](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Alpine (x86_64)](https://img.shields.io/badge/Alpine-x86__64-blue.svg
 )](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/x86_64/Dockerfile#L19) [![Alpine (armhf)](https://img.shields.io/badge/Alpine-armhf-blue.svg
-)](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/armhf/Dockerfile#L25)
+)](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/armhf/Dockerfile#L25) [![Alpine (aarch64)](https://img.shields.io/badge/Alpine-aarch64-blue.svg
+)](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/aarch64/Dockerfile#L25)
 
 libcluon is a small and efficient library written in modern C++ library to _glue_ distributed software components together - in a _clever_ way - simply: cluon. Its name is inspired by gluon, an [elementary particle acting as exchange particle](https://en.wikipedia.org/wiki/Gluon).
 
@@ -75,7 +76,7 @@ sudo apt-get install libcluon
 ```
 
 ### Installation on Alpine 3.7
-We are providing pre-compiled binaries for Alpine 3.7 for `x86_64` and `armfh`; simply install the pre-compile `.apk` package as follows:
+We are providing pre-compiled binaries for Alpine 3.7 for `x86_64`, `armfh`, and `aarch64`; simply install the pre-compile `.apk` package as follows:
 
 ```
 apk add libcluon --no-cache --repository https://chrberger.github.io/libcluon/alpine/v3.7 --allow-untrusted
