@@ -107,7 +107,11 @@ std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelo
             gm.accept(protoDecoder);
 
             ToJSONVisitor payloadToJSON{OUTER_CURLY_BRACES};
-            gm.accept(payloadToJSON);
+            try {
+                // Catch possible linb::any exception.
+                gm.accept(payloadToJSON);
+            }
+            catch (...) {}
 
             std::string tmp{payload.messageName()};
             std::replace(tmp.begin(), tmp.end(), '.', '_');
