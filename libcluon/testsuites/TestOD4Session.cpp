@@ -279,7 +279,11 @@ TEST_CASE("Create OD4 session timeTrigger delegate throwing exception cancels ti
         if (counter++ < 2) {
             return true;
         } else {
+#ifdef WIN32
+			return false;
+#else
             throw std::string("Exception");
+#endif
         }
     };
 
@@ -296,7 +300,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate running too slowly results in
             std::this_thread::sleep_for(std::chrono::duration<int64_t, std::milli>(200));
             return true;
         } else {
-            throw false;
+            return false;
         }
     };
 
