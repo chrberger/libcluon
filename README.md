@@ -9,7 +9,8 @@
 )](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Ubuntu (armhf)](https://img.shields.io/badge/deb-armhf-blue.svg
 )](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Alpine (x86_64)](https://img.shields.io/badge/Alpine-x86__64-blue.svg
 )](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/x86_64/Dockerfile#L19) [![Alpine (armhf)](https://img.shields.io/badge/Alpine-armhf-blue.svg
-)](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/armhf/Dockerfile#L25)
+)](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/armhf/Dockerfile#L25) [![Alpine (aarch64)](https://img.shields.io/badge/Alpine-aarch64-blue.svg
+)](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/aarch64/Dockerfile#L25)
 
 libcluon is a small and efficient library written in modern C++ library to _glue_ distributed software components together - in a _clever_ way - simply: cluon. Its name is inspired by gluon, an [elementary particle acting as exchange particle](https://en.wikipedia.org/wiki/Gluon).
 
@@ -48,7 +49,7 @@ _Say you want to quickly realize a distributed software system where individual 
 ## Dependencies
 No dependencies! All you need is a C++14-compliant compiler (we are testing with Clang 5.0, GCC 5.4, GCC 6.0, GCC 7.2, Xcode 9.1, and Visual Studio 14 (MSVC 19.0)) as the project ships the following dependencies as part of the source distribution:
 
-* [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.2.1) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/buildtools/xUnit)
+* [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.2.2) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/buildtools/xUnit)
 * [adishavit/argh v1.2.0](https://github.com/adishavit/argh/releases/tag/v1.2.1) - [![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/argh)
 * [chrberger/stringtoolbox](https://github.com/chrberger/stringtoolbox) - [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/cluon/stringtoolbox.hpp)
 * [kainjow/Mustache v3.2](https://github.com/kainjow/Mustache/releases/tag/v3.2) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/Mustache)
@@ -75,7 +76,7 @@ sudo apt-get install libcluon
 ```
 
 ### Installation on Alpine 3.7
-We are providing pre-compiled binaries for Alpine 3.7 for `x86_64` and `armfh`; simply install the pre-compile `.apk` package as follows:
+We are providing pre-compiled binaries for Alpine 3.7 for `x86_64`, `armfh`, and `aarch64`; simply install the pre-compile `.apk` package as follows:
 
 ```
 apk add libcluon --no-cache --repository https://chrberger.github.io/libcluon/alpine/v3.7 --allow-untrusted

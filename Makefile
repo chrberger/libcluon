@@ -71,7 +71,7 @@ define runOnCode
 			/opt/build.sh $1 ./$(SOURCE_FOLDER)/
 endef
 
-.PHONY: all clean createDockerBuildImage build compile test install memory-leaks code-coverage show-coverage reformat-code static-code-analysis performance deploy deployToAlpine deployToAlpine-armhf deployToJavaScript deployToLaunchpad deployToHeaderOnly docs
+.PHONY: all clean createDockerBuildImage build compile test install memory-leaks code-coverage show-coverage reformat-code static-code-analysis performance deploy deployToAlpine deployToAlpine-armhf deployToAlpine-aarch64 deployToJavaScript deployToLaunchpad deployToHeaderOnly docs
 
 ################################################################################
 all: build
@@ -117,6 +117,9 @@ deployToAlpine:
 deployToAlpine-armhf:
 	./buildtools/deploy/deployToAlpine-armhf.sh
 
+deployToAlpine-aarch64:
+	./buildtools/deploy/deployToAlpine-aarch64.sh
+
 deployToJavaScript:
 	./buildtools/deploy/deployToJavaScript.sh
 
@@ -126,7 +129,7 @@ deployToLaunchpad:
 deployToHeaderOnly:
 	./buildtools/deploy/deployToHeaderOnly.sh
 
-deploy: deployToLaunchpad docs deployToHeaderOnly deployToAlpine deployToJavaScript deployToAlpine-armhf
+deploy: deployToLaunchpad docs deployToHeaderOnly deployToAlpine deployToJavaScript deployToAlpine-armhf deployToAlpine-aarch64
 
 docs:
 	./buildtools/deploy/generateDocumentation.sh
