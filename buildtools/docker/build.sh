@@ -189,12 +189,13 @@ if [ "\$COMMAND" == "static-code-analysis" ]; then
     #L005: too many consecutive empty lines
     #T009: comma should not be preceded by whitespace
     #T012: negation operator used in its short form
+    #T016: min/max potential macro substitution problem
     echo "Running vera++."
     echo "=================================================================" 1>> \$STATIC_CODE_ANALYSIS_PWD/report && \
     echo "Report: vera++" 1>> \$STATIC_CODE_ANALYSIS_PWD/report && \
     echo "-----------------------------------------------------------------" 1>> \$STATIC_CODE_ANALYSIS_PWD/report && \
     for i in \$(find /opt/sources/\$SOURCE_FOLDER -type f -name "*.cpp"); do
-        vera++ -s \$i 2>&1 | grep "^/opt" | grep -v "/thirdparty/" | grep -v "T009:" | grep -v "T011:" | grep -v "T012:" | grep -v "L001:" | grep -v "L004:" | grep -v "L005:" 1>> \$STATIC_CODE_ANALYSIS_PWD/report
+        vera++ -s \$i 2>&1 | grep "^/opt" | grep -v "/thirdparty/" | grep -v "T009:" | grep -v "T011:" | grep -v "T012:" | grep -v "T016:" | grep -v "L001:" | grep -v "L004:" | grep -v "L005:" 1>> \$STATIC_CODE_ANALYSIS_PWD/report
     done
 
     echo "Running cppcheck."

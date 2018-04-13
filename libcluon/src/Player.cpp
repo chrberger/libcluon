@@ -162,7 +162,7 @@ void Player::resetIterators() noexcept {
         // Invalidate iterator for erasing entries point.
         m_previousPreviousEnvelopeAlreadyReplayed = m_index.end();
     }
-    catch( ...) {}
+    catch (...) {}
 }
 
 void Player::computeInitialCacheLevelAndFillCache() noexcept {
@@ -205,7 +205,7 @@ uint32_t Player::fillEnvelopeCache(const uint32_t &maxNumberOfEntriesToReadFromF
                     std::lock_guard<std::mutex> lck(m_indexMutex);
                     m_nextEntryToReadFromRecFile->second.m_available = m_envelopeCache.emplace(std::make_pair(m_nextEntryToReadFromRecFile->second.m_filePosition, retVal.second)).second;
                 }
-                catch(...) {}
+                catch (...) {}
 
                 m_nextEntryToReadFromRecFile++;
                 entriesReadFromFile++;
@@ -265,7 +265,7 @@ std::pair<bool, cluon::data::Envelope> Player::getNextEnvelopeToBeReplayed() noe
         // Store sample time stamp as int64 to avoid unnecessary copying of Envelopes.
         hasEnvelopeToReturn = true;
     }
-    catch(...) {}
+    catch (...) {}
     return std::make_pair(hasEnvelopeToReturn, envelopeToReturn);
 }
 
@@ -277,7 +277,7 @@ void Player::checkAvailabilityOfNextEnvelopeToBeReplayed() noexcept {
                 std::lock_guard<std::mutex> lck(m_indexMutex);
                 numberOfEntries = m_envelopeCache.size();
             }
-            catch(...) {}
+            catch (...) {}
         }
         if (0 == numberOfEntries) {
             using namespace std::chrono_literals;
@@ -342,7 +342,7 @@ void Player::seekTo(float ratio) noexcept {
             std::lock_guard<std::mutex> lck(m_indexMutex);
             numberOfEntriesInIndex = static_cast<uint32_t>(m_index.size());
         }
-        catch(...) {}
+        catch (...) {}
 
         // Fast forward.
         m_numberOfReturnedEnvelopesInTotal = 0;
@@ -405,7 +405,7 @@ void Player::manageCache() noexcept {
             std::lock_guard<std::mutex> lck(m_indexMutex);
             numberOfEntries = static_cast<uint32_t>(m_envelopeCache.size());
         }
-        catch(...) {}
+        catch (...) {}
 
         // Check if refilling of the cache is needed.
         refillMultiplicator = checkRefillingCache(numberOfEntries, refillMultiplicator);
@@ -425,7 +425,7 @@ void Player::manageCache() noexcept {
                 numberOfReturnedEnvelopesInTotal = m_numberOfReturnedEnvelopesInTotal;
                 totalNumberOfEnvelopes = static_cast<uint32_t>(m_index.size());
             }
-            catch(...) {}
+            catch (...) {}
 
             try {
                 std::lock_guard<std::mutex> lck(m_playerListenerMutex);
@@ -437,7 +437,7 @@ void Player::manageCache() noexcept {
                     m_playerListener(ps);
                 }
             }
-            catch(...) {}
+            catch (...) {}
 
             statisticsCounter = 0;
         }
