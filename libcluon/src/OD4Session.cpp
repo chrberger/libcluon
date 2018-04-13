@@ -51,8 +51,8 @@ void OD4Session::timeTrigger(float freq, std::function<bool()> delegate) noexcep
             }
             cluon::data::TimeStamp after{cluon::time::now()};
 
-            const int64_t beforeInMicroseconds{before.seconds() * 1000 * 1000 + before.microseconds()};
-            const int64_t afterInMicroseconds{after.seconds() * 1000 * 1000 + after.microseconds()};
+            const int64_t beforeInMicroseconds{cluon::time::toMicroseconds(before)};
+            const int64_t afterInMicroseconds{cluon::time::toMicroseconds(after)};
 
             const int64_t timeSpent{(afterInMicroseconds > beforeInMicroseconds) ? (afterInMicroseconds - beforeInMicroseconds) / 1000 : 0};
             const int64_t timeToSleepInMilliseconds{TIME_SLICE_IN_MILLISECONDS - timeSpent};
