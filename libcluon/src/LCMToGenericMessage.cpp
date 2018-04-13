@@ -32,7 +32,7 @@
     #include <cstring>
     uint32_t __ntohl(const uint32_t v) {
         uint8_t d[4] = {};
-        std::memcpy(&d, &v, sizeof(d));
+        std::memmove(&d, &v, sizeof(d));
 
         return ((uint32_t) d[3] << 0)
              | ((uint32_t) d[2] << 8)

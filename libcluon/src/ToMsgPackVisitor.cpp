@@ -56,18 +56,18 @@ void ToMsgPackVisitor::encode(std::ostream &o, const std::string &s) {
     } else if (LENGTH <= 0xFF) {
         const uint8_t v = static_cast<uint8_t>(MsgPackConstants::STR8);
         o.write(reinterpret_cast<const char *>(&v), sizeof(uint8_t));
-        uint8_t l = static_cast<uint8_t>(LENGTH);
-        o.write(reinterpret_cast<const char *>(&l), sizeof(uint8_t));
+        uint8_t len = static_cast<uint8_t>(LENGTH);
+        o.write(reinterpret_cast<const char *>(&len), sizeof(uint8_t));
     } else if (LENGTH <= 0xFFFF) {
         const uint8_t v = static_cast<uint8_t>(MsgPackConstants::STR16);
         o.write(reinterpret_cast<const char *>(&v), sizeof(uint8_t));
-        uint16_t l = htobe16(static_cast<uint16_t>(LENGTH));
-        o.write(reinterpret_cast<const char *>(&l), sizeof(uint16_t));
+        uint16_t len = htobe16(static_cast<uint16_t>(LENGTH));
+        o.write(reinterpret_cast<const char *>(&len), sizeof(uint16_t));
     } else {
         const uint8_t v = static_cast<uint8_t>(MsgPackConstants::STR32);
         o.write(reinterpret_cast<const char *>(&v), sizeof(uint8_t));
-        uint32_t l = htobe32(LENGTH);
-        o.write(reinterpret_cast<const char *>(&l), sizeof(uint32_t));
+        uint32_t len = htobe32(LENGTH);
+        o.write(reinterpret_cast<const char *>(&len), sizeof(uint32_t));
     }
     o.write(s.c_str(), static_cast<std::streamsize>(LENGTH)); // LENGTH won't be negative.
 }

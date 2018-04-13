@@ -98,45 +98,47 @@ void Player::initializeIndex() noexcept {
     m_recFile.open(m_file.c_str(), std::ios_base::in|std::ios_base::binary);
     m_recFileValid = m_recFile.good();
 
-    // Determine file size to display progress.
-    m_recFile.seekg(0, m_recFile.end);
-        int64_t fileLength = m_recFile.tellg();
-    m_recFile.seekg(0, m_recFile.beg);
+    if (m_recFileValid) {
+        // Determine file size to display progress.
+        m_recFile.seekg(0, m_recFile.end);
+            int64_t fileLength = m_recFile.tellg();
+        m_recFile.seekg(0, m_recFile.beg);
 
-    // Read complete file and store file positions to envelopes to create
-    // index of available data. The actual reading of Envelopes is deferred.
-    uint64_t totalBytesRead = 0;
-    const cluon::data::TimeStamp BEFORE{cluon::time::now()};
-    {
-        int32_t oldPercentage = -1;
-        while (m_recFile.good()) {
-            const uint64_t POS_BEFORE = static_cast<uint64_t>(m_recFile.tellg());
-                auto retVal = extractEnvelope(m_recFile);
-            const uint64_t POS_AFTER = static_cast<uint64_t>(m_recFile.tellg());
+        // Read complete file and store file positions to envelopes to create
+        // index of available data. The actual reading of Envelopes is deferred.
+        uint64_t totalBytesRead = 0;
+        const cluon::data::TimeStamp BEFORE{cluon::time::now()};
+        {
+            int32_t oldPercentage = -1;
+            while (m_recFile.good()) {
+                const uint64_t POS_BEFORE = static_cast<uint64_t>(m_recFile.tellg());
+                    auto retVal = extractEnvelope(m_recFile);
+                const uint64_t POS_AFTER = static_cast<uint64_t>(m_recFile.tellg());
 
-            if (!m_recFile.eof() && retVal.first) {
-                totalBytesRead += (POS_AFTER - POS_BEFORE);
+                if (!m_recFile.eof() && retVal.first) {
+                    totalBytesRead += (POS_AFTER - POS_BEFORE);
 
-                // Store mapping .rec file position --> index entry.
-                const int64_t microseconds = cluon::time::toMicroseconds(retVal.second.sampleTimeStamp());
-                m_index.emplace(std::make_pair(microseconds, IndexEntry(microseconds, POS_BEFORE)));
+                    // Store mapping .rec file position --> index entry.
+                    const int64_t microseconds = cluon::time::toMicroseconds(retVal.second.sampleTimeStamp());
+                    m_index.emplace(std::make_pair(microseconds, IndexEntry(microseconds, POS_BEFORE)));
 
-                const int32_t percentage = static_cast<int32_t>(static_cast<float>(m_recFile.tellg()*100.0)/static_cast<float>(fileLength));
-                if ( (percentage % 5 == 0) && (percentage != oldPercentage) ) {
-                    std::clog << "[cluon::Player]: Indexed " << percentage << "% from " << m_file << "." << std::endl;
-                    oldPercentage = percentage;
+                    const int32_t percentage = static_cast<int32_t>(static_cast<float>(m_recFile.tellg()*100.0)/static_cast<float>(fileLength));
+                    if ( (percentage % 5 == 0) && (percentage != oldPercentage) ) {
+                        std::clog << "[cluon::Player]: Indexed " << percentage << "% from " << m_file << "." << std::endl;
+                        oldPercentage = percentage;
+                    }
                 }
             }
         }
-    }
-    const cluon::data::TimeStamp AFTER{cluon::time::now()};
+        const cluon::data::TimeStamp AFTER{cluon::time::now()};
 
-    // Reset pointer to beginning of the .rec file.
-    if (m_recFileValid) {
         std::clog << "[cluon::Player]: " << m_file
                                          << " contains " << m_index.size() << " entries; "
                                          << "read " << totalBytesRead << " bytes "
                                          << "in " << cluon::time::deltaInMicroseconds(AFTER, BEFORE)/static_cast<int64_t>(1000*1000) << "s." << std::endl;
+    }
+    else {
+        std::clog << "[cluon::Player]: " << m_file << " could not be opened." << std::endl;
     }
 }
 
@@ -146,7 +148,7 @@ void Player::resetCaches() noexcept {
         m_delay = m_correctedDelay = m_numberOfReturnedEnvelopesInTotal = 0;
         m_envelopeCache.clear();
     }
-    catch(...) {}
+    catch (...) {}
 }
 
 void Player::resetIterators() noexcept {
@@ -160,7 +162,7 @@ void Player::resetIterators() noexcept {
         // Invalidate iterator for erasing entries point.
         m_previousPreviousEnvelopeAlreadyReplayed = m_index.end();
     }
-    catch(...) {}
+    catch( ...) {}
 }
 
 void Player::computeInitialCacheLevelAndFillCache() noexcept {
@@ -203,7 +205,7 @@ uint32_t Player::fillEnvelopeCache(const uint32_t &maxNumberOfEntriesToReadFromF
                     std::lock_guard<std::mutex> lck(m_indexMutex);
                     m_nextEntryToReadFromRecFile->second.m_available = m_envelopeCache.emplace(std::make_pair(m_nextEntryToReadFromRecFile->second.m_filePosition, retVal.second)).second;
                 }
-                catch(...){}
+                catch(...) {}
 
                 m_nextEntryToReadFromRecFile++;
                 entriesReadFromFile++;
@@ -345,7 +347,7 @@ void Player::seekTo(float ratio) noexcept {
         // Fast forward.
         m_numberOfReturnedEnvelopesInTotal = 0;
         std::clog << "[cluon::Player]: Seeking to " << numberOfEntriesInIndex*ratio << "/" << numberOfEntriesInIndex << std::endl;
-        for(m_numberOfReturnedEnvelopesInTotal = 0; m_numberOfReturnedEnvelopesInTotal < static_cast<uint32_t>(numberOfEntriesInIndex*ratio)-1; m_numberOfReturnedEnvelopesInTotal++) {
+        for (m_numberOfReturnedEnvelopesInTotal = 0; m_numberOfReturnedEnvelopesInTotal < static_cast<uint32_t>(numberOfEntriesInIndex*ratio)-1; m_numberOfReturnedEnvelopesInTotal++) {
             m_currentEnvelopeToReplay++;
         }
         m_nextEntryToReadFromRecFile

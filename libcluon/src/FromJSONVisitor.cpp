@@ -125,12 +125,11 @@ void FromJSONVisitor::decodeFrom(std::istream &in) noexcept {
 std::string FromJSONVisitor::decodeBase64(const std::string &input) const noexcept {
     const std::string ALPHABET{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
     uint8_t counter{0};
-    char buffer[4];
+    std::array<char, 4> buffer;
     std::string decoded;
     for (uint32_t i{0}; i < input.size(); i++) {
         char c;
-        for (c = 0; c < 64 && (ALPHABET.at(static_cast<uint8_t>(c)) != input.at(i)); c++)
-            ;
+        for (c = 0; c < 64 && (ALPHABET.at(static_cast<uint8_t>(c)) != input.at(i)); c++) {}
 
         buffer[counter++] = c;
         if (4 == counter) {
