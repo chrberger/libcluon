@@ -16,7 +16,6 @@ environment:
 
 
 build_script:
-  - del "C:\Program Files (x86)\MSBuild\15.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
   - cmake -E make_directory Win64
   - cd Win64
   - cmake "-G%CMAKE_GENERATOR%" -D CMAKE_BUILD_TYPE=%CMAKE_CONFIG% -D CMAKE_INSTALL_PREFIX=./install ../libcluon
