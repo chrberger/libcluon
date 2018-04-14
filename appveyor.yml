@@ -28,7 +28,7 @@ build_script:
 test_script:
   - ps:
   - cd Win64
-  - ctest --output-on-failure -C "%CMAKE_CONFIG%"
+  - ctest -VV --output-on-failure -C "%CMAKE_CONFIG%"
 
 # scripts to run after tests
 after_test:
