@@ -30,6 +30,7 @@
 
 TEST_CASE("Create OD4 session without lambda.") {
     cluon::OD4Session od4(78);
+
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
 
@@ -38,6 +39,9 @@ TEST_CASE("Create OD4 session without lambda.") {
     cluon::data::TimeStamp tsRequest;
     tsRequest.seconds(1).microseconds(2);
     od4.send(tsRequest);
+
+    // Allow for delivery of data.
+    std::this_thread::sleep_for(1s);
 }
 
 TEST_CASE("Create OD4 session and transmit data no sample time stamp.") {

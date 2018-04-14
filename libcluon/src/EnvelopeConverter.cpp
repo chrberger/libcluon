@@ -111,7 +111,7 @@ std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelo
                 // Catch possible linb::any exception.
                 gm.accept(payloadToJSON);
             }
-            catch (...) {}
+            catch (...) {} // LCOV_EXCL_LINE
 
             std::string tmp{payload.messageName()};
             std::replace(tmp.begin(), tmp.end(), '.', '_');
