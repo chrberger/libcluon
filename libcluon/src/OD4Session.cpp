@@ -87,8 +87,7 @@ bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon
 }
 
 void OD4Session::callback(std::string &&data, std::string &&/*from*/, std::chrono::system_clock::time_point &&timepoint) noexcept {
-    const std::string newData{std::move(data)};
-    std::stringstream sstr(newData);
+    std::stringstream sstr(data);
     auto retVal = extractEnvelope(sstr);
 
     if (retVal.first) {
