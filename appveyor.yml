@@ -11,12 +11,13 @@ branches:
 
 environment:
   matrix:
-    - CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
+    - CMAKE_GENERATOR: "VVisual Studio 15 2017 Win64"
       CMAKE_CONFIG: Debug
 
 
 build_script:
   - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+  - del "C:\Program Files (x86)\MSBuild\15.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
   - cmake -E make_directory Win64
   - cd Win64
   - cmake "-G%CMAKE_GENERATOR%" -D CMAKE_BUILD_TYPE=%CMAKE_CONFIG% -D CMAKE_INSTALL_PREFIX=./install ../libcluon
