@@ -31,6 +31,8 @@ TEST_CASE("Test empty commandline parsing.") {
     auto retVal = cluon::getCommandlineArguments(argc, argv);
     REQUIRE(1 == retVal.size());
     REQUIRE(retVal["myBinary"] == "");
+
+    delete [] argv;
 }
 
 TEST_CASE("Test non-empty commandline parsing.") {
@@ -53,4 +55,6 @@ TEST_CASE("Test non-empty commandline parsing.") {
     REQUIRE(retVal["cid"] == "100");
     REQUIRE(retVal["freq"] == "10");
     REQUIRE(retVal["verbose"] == "1");
+
+    delete [] argv;
 }
