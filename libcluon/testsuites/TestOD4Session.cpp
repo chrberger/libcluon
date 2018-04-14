@@ -40,6 +40,7 @@ TEST_CASE("Create OD4 session without lambda.") {
     tsRequest.seconds(1).microseconds(2);
     od4.send(tsRequest);
 
+    // Allow for delivery of data.
     std::this_thread::sleep_for(1s);
 }
 
