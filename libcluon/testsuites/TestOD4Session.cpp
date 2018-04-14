@@ -29,11 +29,8 @@
 #include <thread>
 
 TEST_CASE("Create OD4 session without lambda.") {
-#ifdef WIN32
-    cluon::OD4Session od4(78, [](auto){});
-#else
     cluon::OD4Session od4(78);
-#endif
+
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
 
@@ -42,6 +39,8 @@ TEST_CASE("Create OD4 session without lambda.") {
     cluon::data::TimeStamp tsRequest;
     tsRequest.seconds(1).microseconds(2);
     od4.send(tsRequest);
+
+    std::this_thread::sleep_for(1s);
 }
 
 TEST_CASE("Create OD4 session and transmit data no sample time stamp.") {
