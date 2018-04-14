@@ -11,7 +11,7 @@ branches:
 
 environment:
   matrix:
-    - CMAKE_GENERATOR: "VVisual Studio 15 2017 Win64"
+    - CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
       CMAKE_CONFIG: Debug
 
 
