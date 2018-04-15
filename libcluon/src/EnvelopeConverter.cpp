@@ -110,8 +110,7 @@ std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelo
             try {
                 // Catch possible linb::any exception.
                 gm.accept(payloadToJSON);
-            }
-            catch (...) {} // LCOV_EXCL_LINE
+            } catch (...) {} // LCOV_EXCL_LINE
 
             std::string tmp{payload.messageName()};
             std::replace(tmp.begin(), tmp.end(), '.', '_');
@@ -122,7 +121,8 @@ std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelo
     return retVal;
 }
 
-std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp) noexcept {
+std::string
+EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp) noexcept {
     std::string retVal;
     if (0 < m_scopeOfMetaMessages.count(messageIdentifier)) {
         // Get specification for message to be created.
@@ -145,9 +145,7 @@ std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(
         gm.accept(protoEncoder);
 
         cluon::data::Envelope env;
-        env.dataType(messageIdentifier)
-           .serializedData(protoEncoder.encodedData())
-           .senderStamp(senderStamp);
+        env.dataType(messageIdentifier).serializedData(protoEncoder.encodedData()).senderStamp(senderStamp);
 
         retVal = cluon::serializeEnvelope(std::move(env));
     }

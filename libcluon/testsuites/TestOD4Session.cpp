@@ -284,7 +284,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate throwing exception cancels ti
             return true;
         } else {
 #ifdef WIN32
-			return false;
+            return false;
 #else
             throw std::string("Exception");
 #endif

@@ -266,7 +266,7 @@ std::pair<bool, cluon::data::Envelope> Player::getNextEnvelopeToBeReplayed() noe
             // Store sample time stamp as int64 to avoid unnecessary copying of Envelopes.
             hasEnvelopeToReturn = true;
         }
-        catch(...) {}
+        catch (...) {}
     }
     return std::make_pair(hasEnvelopeToReturn, envelopeToReturn);
 }

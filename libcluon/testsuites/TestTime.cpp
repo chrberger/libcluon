@@ -44,7 +44,7 @@ TEST_CASE("Test delta.") {
 }
 
 TEST_CASE("Test from microseconds.") {
-    int64_t timePoint{static_cast<int64_t>(2*1000*1000)+13};
+    int64_t timePoint{static_cast<int64_t>(2 * 1000 * 1000) + 13};
     cluon::data::TimeStamp result = cluon::time::fromMicroseconds(timePoint);
 
     REQUIRE(2 == result.seconds());

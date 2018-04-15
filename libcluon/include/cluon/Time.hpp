@@ -30,8 +30,7 @@ namespace time {
  */
 inline cluon::data::TimeStamp fromMicroseconds(int64_t tp) noexcept {
     cluon::data::TimeStamp ts;
-    ts.seconds(static_cast<int32_t>(tp/static_cast<int64_t>(1000*1000)))
-      .microseconds(static_cast<int32_t>(tp%static_cast<int64_t>(1000*1000)));
+    ts.seconds(static_cast<int32_t>(tp / static_cast<int64_t>(1000 * 1000))).microseconds(static_cast<int32_t>(tp % static_cast<int64_t>(1000 * 1000)));
     return ts;
 }
 
@@ -40,7 +39,7 @@ inline cluon::data::TimeStamp fromMicroseconds(int64_t tp) noexcept {
  * @return TimeStamp converted to microseconds.
  */
 inline int64_t toMicroseconds(const cluon::data::TimeStamp &tp) noexcept {
-    return static_cast<int64_t>(tp.seconds())*static_cast<int64_t>(1000*1000) + static_cast<int64_t>(tp.microseconds());
+    return static_cast<int64_t>(tp.seconds()) * static_cast<int64_t>(1000 * 1000) + static_cast<int64_t>(tp.microseconds());
 }
 
 /**
