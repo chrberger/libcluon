@@ -20,8 +20,17 @@
 namespace cluon {
 
 SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept {
-    (void)name;
     (void)size;
+    if (!name.empty()) {
+        const std::string n{name.substr(0, (name.size() > 255 ? 255 : name.size()))};
+        if ('/' != n[0]) {
+            m_name = "/";
+        }
+        m_name += n;
+        if (m_name.size() > 255) {
+            m_name = m_name.substr(0, 255);
+        }
+    }
 }
 
 SharedMemory::~SharedMemory() noexcept {}

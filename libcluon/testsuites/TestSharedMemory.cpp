@@ -24,3 +24,24 @@ TEST_CASE("Trying to create SharedMemory with empty name.") {
     REQUIRE(!sm1.valid());
     REQUIRE(sm1.name().empty());
 }
+
+TEST_CASE("Trying to create SharedMemory with name without leading /.") {
+    cluon::SharedMemory sm1{"ABC"};
+    REQUIRE(!sm1.valid());
+    REQUIRE("/ABC" == sm1.name());
+}
+
+TEST_CASE("Trying to create SharedMemory with name without leading / and too long name > 255.") {
+    const std::string NAME{"Vlrel3r6cZeWaRsWgvCWfAHtpPKX56fSgNYNM5bMjEcBnuiMOG3g4YJ4Y9KbPcNyes45xPI9jD5FjxEB1GR9WqaWmyqdH6po1O6is2aDecMe8GGlwqkVJtWH5YwlCYgoJ1EiQhqIUVfzp56IY00J6lXJS0uVJrpcMIZuiCsTGTQDG0vPC2EkdbMxe9BPV6a8BnMMumnGKYcqFxiCGrv1SVtLw40zLXTuelQQHiPCFANYlISyhRPt456PMNm7AQJUMHA5"};
+    const std::string NAME_255 = "/" + NAME.substr(0, 254);
+    cluon::SharedMemory sm1{NAME};
+    REQUIRE(!sm1.valid());
+    REQUIRE(NAME_255 == sm1.name());
+}
+
+TEST_CASE("Trying to create SharedMemory with correct name.") {
+    cluon::SharedMemory sm1{"/ABC"};
+    REQUIRE(!sm1.valid());
+    REQUIRE("/ABC" == sm1.name());
+}
+
