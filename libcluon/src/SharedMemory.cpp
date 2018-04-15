@@ -17,6 +17,14 @@
 
 #include "cluon/SharedMemory.hpp"
 
+// clang-format off
+#ifndef WIN32
+    #include <sys/mman.h>
+    #include <sys/stat.h>
+    #include <fcntl.h>
+#endif
+// clang-format on
+
 namespace cluon {
 
 SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept {
@@ -30,10 +38,21 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept {
         if (m_name.size() > 255) {
             m_name = m_name.substr(0, 255);
         }
+
+#ifndef WIN32
+    m_fd = ::shm_open(m_name.c_str(), O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
+//    ftruncate(fd_sync, sizeof(shared_memory_sync));
+//    void* addr_sync = mmap(0, sizeof(shared_memory_sync), PROT_READ|PROT_WRITE, MAP_SHARED, fd_sync, 0);
+//    shared_memory_sync* p_sync = static_cast<shared_memory_sync*> (addr_sync);
+#endif
     }
 }
 
-SharedMemory::~SharedMemory() noexcept {}
+SharedMemory::~SharedMemory() noexcept {
+#ifndef WIN32
+    ::shm_unlink(m_name.c_str());
+#endif
+}
 
 void SharedMemory::lock() noexcept {}
 
@@ -48,7 +67,7 @@ const std::string SharedMemory::name() const noexcept {
 }
 
 bool SharedMemory::valid() noexcept {
-    bool valid{false};
+    bool valid{-1 != m_fd};
     {
         lock();
         valid = (nullptr != m_sharedMemory);

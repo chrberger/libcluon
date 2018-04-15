@@ -34,6 +34,13 @@ include(ReformatCode)
 # Find threads library.
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+set(LIBRARIES ${LIBRARIES} Threads::Threads)
+
+if(UNIX)
+    find_package(LibRT REQUIRED)
+    set(LIBRARIES ${LIBRARIES} ${LIBRT_LIBRARIES})
+    include_directories(SYSTEM ${LIBRT_INCLUDE_DIR})
+endif()
 
 ################################################################################
 # Check wether code for JavaScript is generated.
@@ -84,7 +91,7 @@ add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:${PROJECT_NAME}-objec
 add_library(${PROJECT_NAME}-test-objects-static STATIC $<TARGET_OBJECTS:${PROJECT_NAME}-test-objects>)
 
 # Define resulting libraries to link.
-set(LIBRARIES ${LIBRARIES} ${PROJECT_NAME}-static Threads::Threads)
+set(LIBRARIES ${PROJECT_NAME}-static ${LIBRARIES})
 set(ADDITIONAL_LIBRARIES_FOR_TESTING ${ADDITIONAL_LIBRARIES_FOR_TESTING} ${PROJECT_NAME}-test-objects-static)
 
 set(CLUON-OD4TOSTDOUT cluon-OD4toStdout)

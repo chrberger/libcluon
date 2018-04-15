@@ -20,6 +20,9 @@
 
 #include "cluon/cluon.hpp"
 
+#ifndef WIN32
+#endif
+
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -73,6 +76,14 @@ class LIBCLUON_API SharedMemory {
     std::string m_name{""};
     uint32_t m_size{0};
     char *m_sharedMemory{nullptr};
+
+#ifndef WIN32
+    struct SharedMemoryHeader {
+        uint32_t __size;
+        pthread_mutex_t __mutex;
+        pthread_cond_t __condition;
+    };
+#endif
 };
 } // namespace cluon
 
