@@ -23,6 +23,7 @@ _Say you want to quickly realize a distributed software system where individual 
 * [Features](#features)
 * [Dependencies](#dependencies)
 * [Installation on Ubuntu 16.04 LTS](#installation-on-ubuntu-1604-lts)
+* [Installation on Ubuntu 14.04 LTS](#installation-on-ubuntu-1404-lts)
 * [Installation on Alpine 3.7](#installation-on-alpine-37)
 * [Installation on Windows](#installation-on-windows)
 * [Build from sources on the example of Ubuntu 16.04 LTS](#build-from-sources-on-the-example-of-ubuntu-1604-lts)
@@ -74,6 +75,24 @@ Afterwards, update your package database and install `libcluon`:
 sudo apt-get update
 sudo apt-get install libcluon
 ```
+
+### Installation on Ubuntu 14.04 LTS
+To use `libcluon` on Ubuntu 14.04 LTS, you need to compile it from sources after upgrading your C++ compiler to get C++14 support:
+
+```
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get install gcc-6 g++-6
+```
+
+Afterwards, update the symlinks to your C++-compiler:
+
+```
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6
+```
+
+Now, you can continue with [building `libcluon` from sources](#build-from-sources-on-the-example-of-ubuntu-1604-lts).
+
 
 ### Installation on Alpine 3.7
 We are providing pre-compiled binaries for Alpine 3.7 for `x86_64`, `armfh`, and `aarch64`; simply install the pre-compile `.apk` package as follows:
