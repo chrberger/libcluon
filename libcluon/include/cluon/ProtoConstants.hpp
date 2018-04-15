@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROTOCONSTANTS_HPP
-#define PROTOCONSTANTS_HPP
+#ifndef CLUON_PROTOCONSTANTS_HPP
+#define CLUON_PROTOCONSTANTS_HPP
 
 #include <cstdint>
 

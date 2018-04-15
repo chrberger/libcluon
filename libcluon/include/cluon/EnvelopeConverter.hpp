@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ENVELOPECONVERTER_HPP
-#define ENVELOPECONVERTER_HPP
+#ifndef CLUON_ENVELOPECONVERTER_HPP
+#define CLUON_ENVELOPECONVERTER_HPP
 
 #include "cluon/MetaMessage.hpp"
 #include "cluon/cluon.hpp"

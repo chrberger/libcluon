@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef OD4SESSION_HPP
-#define OD4SESSION_HPP
+#ifndef CLUON_OD4SESSION_HPP
+#define CLUON_OD4SESSION_HPP
 
 #include "cluon/Time.hpp"
 #include "cluon/ToProtoVisitor.hpp"

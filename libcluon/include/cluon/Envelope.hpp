@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ENVELOPE_HPP
-#define ENVELOPE_HPP
+#ifndef CLUON_ENVELOPE_HPP
+#define CLUON_ENVELOPE_HPP
 
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/ToProtoVisitor.hpp"

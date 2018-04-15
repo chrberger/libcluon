@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TOJSONVISITOR_HPP
-#define TOJSONVISITOR_HPP
+#ifndef CLUON_TOJSONVISITOR_HPP
+#define CLUON_TOJSONVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 

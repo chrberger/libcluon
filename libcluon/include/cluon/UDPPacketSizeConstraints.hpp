@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UDPPACKETSIZECONSTRAINTS_H
-#define UDPPACKETSIZECONSTRAINTS_H
+#ifndef CLUON_UDPPACKETSIZECONSTRAINTS_H
+#define CLUON_UDPPACKETSIZECONSTRAINTS_H
 
 #include <cstdint>
 

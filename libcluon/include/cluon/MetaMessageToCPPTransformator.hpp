@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef METAMESSAGETOCPPTRANSFORMATOR_HPP
-#define METAMESSAGETOCPPTRANSFORMATOR_HPP
+#ifndef CLUON_METAMESSAGETOCPPTRANSFORMATOR_HPP
+#define CLUON_METAMESSAGETOCPPTRANSFORMATOR_HPP
 
 #include "Mustache/mustache.hpp"
 #include "cluon/MetaMessage.hpp"

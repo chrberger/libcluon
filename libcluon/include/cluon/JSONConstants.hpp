@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef JSONCONSTANTS_HPP
-#define JSONCONSTANTS_HPP
+#ifndef CLUON_JSONCONSTANTS_HPP
+#define CLUON_JSONCONSTANTS_HPP
 
 #include <cstdint>
 

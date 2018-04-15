@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GENERICMESSAGE_HPP
-#define GENERICMESSAGE_HPP
+#ifndef CLUON_GENERICMESSAGE_HPP
+#define CLUON_GENERICMESSAGE_HPP
 
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/MetaMessage.hpp"

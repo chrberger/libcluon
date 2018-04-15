@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CLUON_HPP
-#define CLUON_HPP
+#ifndef CLUON_CLUON_HPP
+#define CLUON_CLUON_HPP
 
 // clang-format off
 #ifdef WIN32
@@ -65,6 +65,7 @@
 // clang-format on
 
 #include "cluon/PortableEndian.hpp"
+
 #include <map>
 #include <string>
 

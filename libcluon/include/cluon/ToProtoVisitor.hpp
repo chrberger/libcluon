@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TOPROTOVISITOR_HPP
-#define TOPROTOVISITOR_HPP
+#ifndef CLUON_TOPROTOVISITOR_HPP
+#define CLUON_TOPROTOVISITOR_HPP
 
 #include "cluon/ProtoConstants.hpp"
 #include "cluon/cluon.hpp"

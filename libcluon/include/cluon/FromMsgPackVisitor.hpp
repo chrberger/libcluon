@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FROMMSGPACKVISITOR_HPP
-#define FROMMSGPACKVISITOR_HPP
+#ifndef CLUON_FROMMSGPACKVISITOR_HPP
+#define CLUON_FROMMSGPACKVISITOR_HPP
 
 #include "cluon/MsgPackConstants.hpp"
 #include "cluon/any/any.hpp"

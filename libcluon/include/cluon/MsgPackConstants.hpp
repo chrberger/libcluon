@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MSGPACKCONSTANTS_HPP
-#define MSGPACKCONSTANTS_HPP
+#ifndef CLUON_MSGPACKCONSTANTS_HPP
+#define CLUON_MSGPACKCONSTANTS_HPP
 
 #include <cstdint>
 

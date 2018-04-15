@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLAYER_HPP
-#define PLAYER_HPP
+#ifndef CLUON_PLAYER_HPP
+#define CLUON_PLAYER_HPP
 
 #include "cluon/cluonDataStructures.hpp"
 
@@ -33,7 +33,7 @@
 
 namespace cluon {
 
-class IndexEntry {
+class LIBCLUON_API IndexEntry {
     public:
         IndexEntry() noexcept;
         IndexEntry(const int64_t &sampleTimeStamp, const uint64_t &filePosition) noexcept;

@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FROMJSONVISITOR_HPP
-#define FROMJSONVISITOR_HPP
+#ifndef CLUON_FROMJSONVISITOR_HPP
+#define CLUON_FROMJSONVISITOR_HPP
 
 #include "cluon/JSONConstants.hpp"
 #include "cluon/any/any.hpp"

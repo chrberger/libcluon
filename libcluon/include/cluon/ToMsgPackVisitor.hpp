@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TOMSGPACKVISITOR_HPP
-#define TOMSGPACKVISITOR_HPP
+#ifndef CLUON_TOMSGPACKVISITOR_HPP
+#define CLUON_TOMSGPACKVISITOR_HPP
 
 #include "cluon/MsgPackConstants.hpp"
 #include "cluon/cluon.hpp"

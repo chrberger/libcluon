@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UDPSENDER_HPP
-#define UDPSENDER_HPP
+#ifndef CLUON_UDPSENDER_HPP
+#define CLUON_UDPSENDER_HPP
 
 #include "cluon/cluon.hpp"
 

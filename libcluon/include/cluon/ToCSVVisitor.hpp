@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TOCSVVISITOR_HPP
-#define TOCSVVISITOR_HPP
+#ifndef CLUON_TOCSVVISITOR_HPP
+#define CLUON_TOCSVVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 

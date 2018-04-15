@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TCPCONNECTION_HPP
-#define TCPCONNECTION_HPP
+#ifndef CLUON_TCPCONNECTION_HPP
+#define CLUON_TCPCONNECTION_HPP
 
 #include "cluon/cluon.hpp"
 

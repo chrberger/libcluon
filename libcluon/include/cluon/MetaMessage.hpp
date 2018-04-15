@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef METAMESSAGE_HPP
-#define METAMESSAGE_HPP
+#ifndef CLUON_METAMESSAGE_HPP
+#define CLUON_METAMESSAGE_HPP
 
 #include "cluon/cluon.hpp"
 

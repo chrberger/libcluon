@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TIME_HPP
-#define TIME_HPP
+#ifndef CLUON_TIME_HPP
+#define CLUON_TIME_HPP
 
 #include "cluon/cluonDataStructures.hpp"
+
 #include <chrono>
 
 namespace cluon {

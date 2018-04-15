@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FROMPROTOVISITOR_HPP
-#define FROMPROTOVISITOR_HPP
+#ifndef CLUON_FROMPROTOVISITOR_HPP
+#define CLUON_FROMPROTOVISITOR_HPP
 
 #include "cluon/ProtoConstants.hpp"
 #include "cluon/cluon.hpp"

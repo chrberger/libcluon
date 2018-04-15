@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TOODVDVISITOR_HPP
-#define TOODVDVISITOR_HPP
+#ifndef CLUON_TOODVDVISITOR_HPP
+#define CLUON_TOODVDVISITOR_HPP
 
 #include "cluon/cluon.hpp"
 
