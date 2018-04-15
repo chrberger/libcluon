@@ -228,42 +228,44 @@ std::pair<bool, cluon::data::Envelope> Player::getNextEnvelopeToBeReplayed() noe
         }
     }
 
-    checkAvailabilityOfNextEnvelopeToBeReplayed();
+    if (m_currentEnvelopeToReplay != m_index.end()) {
+        checkAvailabilityOfNextEnvelopeToBeReplayed();
 
-    try {
-        {
-            std::lock_guard<std::mutex> lck(m_indexMutex);
+        try {
+            {
+                std::lock_guard<std::mutex> lck(m_indexMutex);
 
-            cluon::data::Envelope &nextEnvelope = m_envelopeCache[m_currentEnvelopeToReplay->second.m_filePosition];
-            envelopeToReturn = nextEnvelope;
+                cluon::data::Envelope &nextEnvelope = m_envelopeCache[m_currentEnvelopeToReplay->second.m_filePosition];
+                envelopeToReturn = nextEnvelope;
 
-            m_correctedDelay = m_delay = static_cast<uint32_t>(m_currentEnvelopeToReplay->first - m_previousEnvelopeAlreadyReplayed->first);
+                m_correctedDelay = m_delay = static_cast<uint32_t>(m_currentEnvelopeToReplay->first - m_previousEnvelopeAlreadyReplayed->first);
 
-            // TODO: Delegate deleting into own thread.
-            if (m_previousPreviousEnvelopeAlreadyReplayed != m_index.end()) {
-                auto it = m_envelopeCache.find(m_previousEnvelopeAlreadyReplayed->second.m_filePosition);
-                if (it != m_envelopeCache.end()) {
-                    m_envelopeCache.erase(it);
+                // TODO: Delegate deleting into own thread.
+                if (m_previousPreviousEnvelopeAlreadyReplayed != m_index.end()) {
+                    auto it = m_envelopeCache.find(m_previousEnvelopeAlreadyReplayed->second.m_filePosition);
+                    if (it != m_envelopeCache.end()) {
+                        m_envelopeCache.erase(it);
+                    }
                 }
+
+                m_previousPreviousEnvelopeAlreadyReplayed = m_previousEnvelopeAlreadyReplayed;
+                m_previousEnvelopeAlreadyReplayed = m_currentEnvelopeToReplay++;
+
+                m_numberOfReturnedEnvelopesInTotal++;
             }
 
-            m_previousPreviousEnvelopeAlreadyReplayed = m_previousEnvelopeAlreadyReplayed;
-            m_previousEnvelopeAlreadyReplayed = m_currentEnvelopeToReplay++;
+            // TODO compensate for internal data processing.
 
-            m_numberOfReturnedEnvelopesInTotal++;
+            // If Player is non-threaded, read next entry sequentially.
+            if (!m_threading) {
+                fillEnvelopeCache(1);
+            }
+
+            // Store sample time stamp as int64 to avoid unnecessary copying of Envelopes.
+            hasEnvelopeToReturn = true;
         }
-
-        // TODO compensate for internal data processing.
-
-        // If Player is non-threaded, read next entry sequentially.
-        if (!m_threading) {
-            fillEnvelopeCache(1);
-        }
-
-        // Store sample time stamp as int64 to avoid unnecessary copying of Envelopes.
-        hasEnvelopeToReturn = true;
+        catch(...) {}
     }
-    catch(...) {}
     return std::make_pair(hasEnvelopeToReturn, envelopeToReturn);
 }
 
