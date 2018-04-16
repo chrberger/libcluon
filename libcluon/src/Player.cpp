@@ -122,7 +122,7 @@ void Player::initializeIndex() noexcept {
                     const int64_t microseconds = cluon::time::toMicroseconds(retVal.second.sampleTimeStamp());
                     m_index.emplace(std::make_pair(microseconds, IndexEntry(microseconds, POS_BEFORE)));
 
-                    const int32_t percentage = static_cast<int32_t>(static_cast<float>(m_recFile.tellg()*100.0)/static_cast<float>(fileLength));
+                    const int32_t percentage = static_cast<int32_t>((static_cast<float>(m_recFile.tellg())*100.0f)/static_cast<float>(fileLength));
                     if ( (percentage % 5 == 0) && (percentage != oldPercentage) ) {
                         std::clog << "[cluon::Player]: Indexed " << percentage << "% from " << m_file << "." << std::endl;
                         oldPercentage = percentage;
@@ -145,7 +145,9 @@ void Player::initializeIndex() noexcept {
 void Player::resetCaches() noexcept {
     try {
         std::lock_guard<std::mutex> lck(m_indexMutex);
-        m_delay = m_correctedDelay = m_numberOfReturnedEnvelopesInTotal = 0;
+        m_delay = 0;
+        m_correctedDelay = 0;
+        m_numberOfReturnedEnvelopesInTotal = 0;
         m_envelopeCache.clear();
     }
     catch (...) {}
@@ -174,7 +176,7 @@ void Player::computeInitialCacheLevelAndFillCache() noexcept {
             largestSampleTimePoint = std::max(largestSampleTimePoint, it->first);
         }
 
-        const uint32_t ENTRIES_TO_READ_PER_SECOND_FOR_REALTIME_REPLAY = static_cast<uint32_t>(std::ceil(m_index.size()*(static_cast<float>(Player::ONE_SECOND_IN_MICROSECONDS))/(largestSampleTimePoint - smallestSampleTimePoint)));
+        const uint32_t ENTRIES_TO_READ_PER_SECOND_FOR_REALTIME_REPLAY = static_cast<uint32_t>(std::ceil(static_cast<float>(m_index.size())*(static_cast<float>(Player::ONE_SECOND_IN_MICROSECONDS))/static_cast<float>(largestSampleTimePoint - smallestSampleTimePoint)));
         m_desiredInitialLevel = std::max<uint32_t>(ENTRIES_TO_READ_PER_SECOND_FOR_REALTIME_REPLAY * Player::LOOK_AHEAD_IN_S,
                                                    MIN_ENTRIES_FOR_LOOK_AHEAD);
 
@@ -348,8 +350,8 @@ void Player::seekTo(float ratio) noexcept {
 
         // Fast forward.
         m_numberOfReturnedEnvelopesInTotal = 0;
-        std::clog << "[cluon::Player]: Seeking to " << numberOfEntriesInIndex*ratio << "/" << numberOfEntriesInIndex << std::endl;
-        for (m_numberOfReturnedEnvelopesInTotal = 0; m_numberOfReturnedEnvelopesInTotal < static_cast<uint32_t>(numberOfEntriesInIndex*ratio)-1; m_numberOfReturnedEnvelopesInTotal++) {
+        std::clog << "[cluon::Player]: Seeking to " << static_cast<float>(numberOfEntriesInIndex)*ratio << "/" << numberOfEntriesInIndex << std::endl;
+        for (m_numberOfReturnedEnvelopesInTotal = 0; m_numberOfReturnedEnvelopesInTotal < static_cast<uint32_t>(static_cast<float>(numberOfEntriesInIndex)*ratio)-1; m_numberOfReturnedEnvelopesInTotal++) {
             m_currentEnvelopeToReplay++;
         }
         m_nextEntryToReadFromRecFile
@@ -358,7 +360,7 @@ void Player::seekTo(float ratio) noexcept {
 
         // Refill cache.
         m_envelopeCache.clear();
-        fillEnvelopeCache(static_cast<uint32_t>(m_desiredInitialLevel*.3f));
+        fillEnvelopeCache(static_cast<uint32_t>(static_cast<float>(m_desiredInitialLevel)*.3f));
 
         // Correct iterators.
         getNextEnvelopeToBeReplayed();
@@ -449,7 +451,7 @@ void Player::manageCache() noexcept {
 float Player::checkRefillingCache(const uint32_t &numberOfEntries, float refillMultiplicator) noexcept {
     // If filling level is around 35%, pour in more from the recording.
     if (numberOfEntries < 0.35*m_desiredInitialLevel) {
-        const uint32_t entriesReadFromFile = fillEnvelopeCache(static_cast<uint32_t>(refillMultiplicator * m_desiredInitialLevel));
+        const uint32_t entriesReadFromFile = fillEnvelopeCache(static_cast<uint32_t>(refillMultiplicator * static_cast<float>(m_desiredInitialLevel)));
         if (entriesReadFromFile > 0) {
             std::clog << "[cluon::Player]: Number of entries in cache: "  << numberOfEntries << ". " << entriesReadFromFile << " added to cache. " << m_envelopeCache.size() << " entries available." << std::endl;
             refillMultiplicator *= 1.25f;
