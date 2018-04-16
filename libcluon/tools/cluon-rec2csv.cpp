@@ -92,9 +92,9 @@ int32_t main(int32_t argc, char **argv) {
 
                         std::stringstream sstrFilename;
                         sstrFilename << m.messageName() << "-" << env.senderStamp();
-                        const std::string _FILENAME = sstrFilename.str();
+                        const std::string __FILENAME = sstrFilename.str();
+                        mapOfFilenames[KEY] = __FILENAME;
 
-                        mapOfFilenames[KEY] = _FILENAME;
                         if (mapOfEntries.count(KEY) > 0) {
                             // Extract timestamps.
                             std::string timeStamps;
