@@ -116,7 +116,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
         }
 
         if (!(m_socket < 0)) {
-            // Trying to enable non_block mode.
+            // Trying to enable non_blocking mode.
 #ifdef WIN32 // LCOV_EXCL_LINE
             u_long nonBlocking = 1;
             m_isBlockingSocket = !(NO_ERROR == ::ioctlsocket(m_socket, FIONBIO, &nonBlocking));
@@ -124,6 +124,23 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             const int FLAGS = ::fcntl(m_socket, F_GETFL, 0);
             m_isBlockingSocket = !(0 == ::fcntl(m_socket, F_SETFL, FLAGS | O_NONBLOCK));
 #endif
+        }
+
+        if (!(m_socket < 0)) {
+            // Trying to enable non_blocking mode.
+#ifdef WIN32 // LCOV_EXCL_LINE
+            u_long nonBlocking = 1;
+            m_isBlockingSocket = !(NO_ERROR == ::ioctlsocket(m_socket, FIONBIO, &nonBlocking));
+#else
+            const int FLAGS = ::fcntl(m_socket, F_GETFL, 0);
+            m_isBlockingSocket = !(0 == ::fcntl(m_socket, F_SETFL, FLAGS | O_NONBLOCK));
+#endif
+        }
+
+        if (!(m_socket < 0)) {
+            // Try setting receiving buffer.
+            int recvBuffer{1024 * 1024};
+            ::setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, &recvBuffer, sizeof(recvBuffer));
         }
 
         if (!(m_socket < 0)) {
