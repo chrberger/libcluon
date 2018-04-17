@@ -27,6 +27,7 @@
     #include <sys/ioctl.h>
     #include <sys/socket.h>
     #include <sys/types.h>
+    #include <fcntl.h>
     #include <unistd.h>
 #endif
 // clang-format on
@@ -114,6 +115,12 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             }
         }
 
+fcntl(m_socket, F_SETFL, O_NONBLOCK);
+int n = 1024 * 1024;
+if (setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n)) == -1) {
+    std::cerr << "Could not set SO_RCVBUF" << std::endl;
+}
+
         if (!(m_socket < 0)) {
             // Bind to receive address/port.
             // clang-format off
@@ -150,7 +157,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
         }
 
         if (!(m_socket < 0)) {
-            // Constructing a thread could fail.
+            // Constructing the receiving thread could fail.
             try {
                 m_readFromSocketThread = std::thread(&UDPReceiver::readFromSocket, this);
 
@@ -158,19 +165,42 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                 using namespace std::literals::chrono_literals; // NOLINT
                 do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
             } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
+
+            try {
+                m_pipelineThread = std::thread(&UDPReceiver::processPipeline, this);
+
+                // Let the operating system spawn the thread.
+                using namespace std::literals::chrono_literals; // NOLINT
+                do { std::this_thread::sleep_for(1ms); } while (!m_pipelineThreadRunning.load());
+            } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
         }
     }
 }
 
 UDPReceiver::~UDPReceiver() noexcept {
-    m_readFromSocketThreadRunning.store(false);
+    {
+        m_readFromSocketThreadRunning.store(false);
 
-    // Joining the thread could fail.
-    try {
-        if (m_readFromSocketThread.joinable()) {
-            m_readFromSocketThread.join();
-        }
-    } catch (...) {} // LCOV_EXCL_LINE
+        // Joining the thread could fail.
+        try {
+            if (m_readFromSocketThread.joinable()) {
+                m_readFromSocketThread.join();
+            }
+        } catch (...) {} // LCOV_EXCL_LINE
+    }
+
+    {
+        m_pipelineThreadRunning.store(false);
+        // Wake any waiting threads.
+        m_pipelineCondition.notify_all();
+
+        // Joining the thread could fail.
+        try {
+            if (m_pipelineThread.joinable()) {
+                m_pipelineThread.join();
+            }
+        } catch (...) {} // LCOV_EXCL_LINE
+    }
 
     closeSocket(0);
 }
@@ -211,6 +241,28 @@ bool UDPReceiver::isRunning() const noexcept {
     return m_readFromSocketThreadRunning.load();
 }
 
+void UDPReceiver::processPipeline() noexcept {
+    // Indicate to main thread that we are ready.
+    m_pipelineThreadRunning.store(true);
+
+    while (m_pipelineThreadRunning.load()) {
+        std::unique_lock<std::mutex> lck(m_pipelineMutex);
+        // Wait until the thread should stop or data is available.
+        m_pipelineCondition.wait(lck, [this]{return (!this->m_pipelineThreadRunning.load() || !this->m_pipeline.empty());});
+
+// TODO: Make processing more fine granular.
+        if (nullptr != m_delegate) {
+            for(auto e : m_pipeline) {
+                // Call delegate.
+                m_delegate(std::move(e.m_data), std::move(e.m_from), std::move(e.m_sampleTime));
+            }
+        }
+
+        // All entries have been processed.
+        m_pipeline.clear();
+    }
+}
+
 void UDPReceiver::readFromSocket() noexcept {
     // Create buffer to store data from socket.
     constexpr uint16_t MAX_LENGTH = static_cast<uint16_t>(UDPPacketSizeConstraints::MAX_SIZE_UDP_PACKET)
@@ -220,8 +272,10 @@ void UDPReceiver::readFromSocket() noexcept {
 
     // Define timeout for select system call.
     struct timeval timeout {};
-    timeout.tv_sec  = 0;
-    timeout.tv_usec = 20 * 1000; // Check for new data with 50Hz.
+//    timeout.tv_sec  = 0;
+//    timeout.tv_usec = 20 * 1000; // Check for new data with 50Hz.
+    timeout.tv_sec  = 1;
+    timeout.tv_usec = 0;
 
     // Define file descriptor set to watch for read operations.
     fd_set setOfFiledescriptorsToReadFrom{};
@@ -243,14 +297,17 @@ void UDPReceiver::readFromSocket() noexcept {
         FD_SET(m_socket, &setOfFiledescriptorsToReadFrom); // NOLINT
         ::select(m_socket + 1, &setOfFiledescriptorsToReadFrom, nullptr, nullptr, &timeout);
         if (FD_ISSET(m_socket, &setOfFiledescriptorsToReadFrom)) { // NOLINT
-            bytesRead = ::recvfrom(m_socket,
+            ssize_t currentBytesRead{0};
+            do {
+
+            currentBytesRead = ::recvfrom(m_socket,
                                    buffer.data(),
                                    buffer.max_size(),
                                    0,
                                    reinterpret_cast<struct sockaddr *>(&remote), // NOLINT
                                    reinterpret_cast<socklen_t *>(&addrLength));  // NOLINT
 
-            if ((0 < bytesRead) && (nullptr != m_delegate)) {
+            if ((0 < currentBytesRead) && (nullptr != m_delegate)) {
 #ifdef __linux__
                 std::chrono::system_clock::time_point timestamp;
                 struct timeval receivedTimeStamp {};
@@ -274,15 +331,31 @@ void UDPReceiver::readFromSocket() noexcept {
                             remoteAddress.max_size());
                 const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
 
-                // Call delegate.
-                m_delegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)),
-                           std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT),
-                           timestamp);
+                PipelineEntry pe;
+                pe.m_data = std::move(std::string(buffer.data(), static_cast<size_t>(currentBytesRead)));
+                pe.m_from = std::move(std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT));
+                pe.m_sampleTime = timestamp;
+
+                {
+                    std::unique_lock<std::mutex> lck(m_pipelineMutex);
+                    m_pipeline.emplace_back(pe);
+                }
+                m_pipelineCondition.notify_all();
+
+//                // Call delegate.
+//                m_delegate(std::string(buffer.data(), static_cast<size_t>(currentBytesRead)),
+//                           std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT),
+//                           timestamp);
+
+bytesRead += currentBytesRead;
             }
+
+
+            } while(currentBytesRead > 0);
         } else {
-            // Let the operating system yield other threads.
-            using namespace std::literals::chrono_literals; // NOLINT
-            std::this_thread::sleep_for(1ms);
+//            // Let the operating system yield other threads.
+//            using namespace std::literals::chrono_literals; // NOLINT
+//            std::this_thread::sleep_for(1ms);
         }
     }
 }

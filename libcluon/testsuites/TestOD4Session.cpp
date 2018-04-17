@@ -23,10 +23,14 @@
 #include "cluon/Time.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
+#include <iostream>
+
 #include <atomic>
 #include <chrono>
+#include <mutex>
 #include <sstream>
 #include <thread>
+#include <vector>
 
 TEST_CASE("Create OD4 session without lambda.") {
     cluon::OD4Session od4(78);
@@ -315,4 +319,36 @@ TEST_CASE("Create OD4 session timeTrigger delegate running too slowly results in
     REQUIRE(200 * 1000 <= cluon::time::deltaInMicroseconds(after, before));
 }
 
+TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
+    std::mutex receivingMutex;
+    std::vector<cluon::data::Envelope> receiving;
+
+    cluon::OD4Session od4(88);
+
+    auto dataTrigger = [&receivingMutex, &receiving](cluon::data::Envelope &&envelope) {
+        std::lock_guard<std::mutex> lck(receivingMutex);
+        receiving.push_back(envelope);
+    };
+
+    bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), dataTrigger);
+    REQUIRE(retVal);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    for(uint32_t i{0}; i < 10000; i++) {
+        cluon::data::TimeStamp tsSampleTime;
+        tsSampleTime.seconds(0).microseconds(i);
+
+        od4.send(tsSampleTime);
+    }
+
+    // Wait for one second to process sent data.
+    using namespace std::literals::chrono_literals; // NOLINT
+    std::this_thread::sleep_for(1s);
+
+    std::cout << "Received: " << receiving.size() << std::endl;
+}
 

@@ -32,8 +32,11 @@
 
 #include <cstdint>
 #include <atomic>
+#include <condition_variable>
+#include <deque>
 #include <chrono>
 #include <functional>
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -107,7 +110,10 @@ class LIBCLUON_API UDPReceiver {
      * @param errorCode Error code that caused this closing.
      */
     void closeSocket(int errorCode) noexcept;
+
     void readFromSocket() noexcept;
+
+    void processPipeline() noexcept;
 
    private:
     int32_t m_socket{-1};
@@ -116,6 +122,19 @@ class LIBCLUON_API UDPReceiver {
     bool m_isMulticast{false};
     std::atomic<bool> m_readFromSocketThreadRunning{false};
     std::thread m_readFromSocketThread{};
+
+    std::atomic<bool> m_pipelineThreadRunning{false};
+    std::thread m_pipelineThread{};
+    std::mutex m_pipelineMutex{};
+    std::condition_variable m_pipelineCondition{};
+    class PipelineEntry {
+       public:
+        std::string m_data;
+        std::string m_from;
+        std::chrono::system_clock::time_point m_sampleTime;
+    };
+    std::deque<PipelineEntry> m_pipeline{};
+
     std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point)> m_delegate{};
 };
 } // namespace cluon
