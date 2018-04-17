@@ -272,7 +272,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate with invalid freq.") {
     od4.timeTrigger(0, timeTrigger);
     cluon::data::TimeStamp after{cluon::time::now()};
     REQUIRE(2 == counter);
-    REQUIRE(2 * 1000 * 1000 <= ((after.seconds() * 1000 * 1000 + after.microseconds()) - (before.seconds() * 1000 * 1000 + before.microseconds())));
+    REQUIRE(2 * 1000 * 1000 <= cluon::time::deltaInMicroseconds(after, before));
 }
 
 TEST_CASE("Create OD4 session timeTrigger delegate throwing exception cancels timeTrigger.") {
@@ -312,5 +312,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate running too slowly results in
     od4.timeTrigger(10, timeTrigger);
     cluon::data::TimeStamp after{cluon::time::now()};
     REQUIRE(2 == counter);
-    REQUIRE(200 * 1000 <= ((after.seconds() * 1000 * 1000 + after.microseconds()) - (before.seconds() * 1000 * 1000 + before.microseconds())));
+    REQUIRE(200 * 1000 <= cluon::time::deltaInMicroseconds(after, before));
 }
+
+
