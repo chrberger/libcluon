@@ -355,6 +355,9 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
 
 #ifndef WIN32
     REQUIRE(receiving.size() > .9f*MAX_ENVELOPES); // At least 90% of the packets must be processed.
+#else
+    // Allow for delivery of data.
+    std::this_thread::sleep_for(10s);
 #endif
 }
 
@@ -421,6 +424,9 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
 
 #ifndef WIN32
     REQUIRE(receiving.size() > .9f*3*MAX_ENVELOPES); // At least 90% of the packets must be processed.
+#else
+    // Allow for delivery of data.
+    std::this_thread::sleep_for(10s);
 #endif
 }
 
