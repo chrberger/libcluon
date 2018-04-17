@@ -250,16 +250,22 @@ void UDPReceiver::processPipeline() noexcept {
         // Wait until the thread should stop or data is available.
         m_pipelineCondition.wait(lck, [this]{return (!this->m_pipelineThreadRunning.load() || !this->m_pipeline.empty());});
 
-// TODO: Make processing more fine granular.
-        if (nullptr != m_delegate) {
-            for(auto e : m_pipeline) {
-                // Call delegate.
-                m_delegate(std::move(e.m_data), std::move(e.m_from), std::move(e.m_sampleTime));
-            }
-        }
+        // The condition will automatically lock the mutex after waking up.
+        lck.unlock();
 
-        // All entries have been processed.
-        m_pipeline.clear();
+        uint32_t entries{0};
+        {
+            lck.lock();
+            entries = m_pipeline.size();
+            lck.unlock();
+        }
+        for(uint32_t i{0}; i < entries; i++) {
+            auto entry{m_pipeline.front()};
+            if (nullptr != m_delegate) {
+                m_delegate(std::move(entry.m_data), std::move(entry.m_from), std::move(entry.m_sampleTime));
+            }
+            m_pipeline.pop_front();
+        }
     }
 }
 
@@ -340,7 +346,6 @@ void UDPReceiver::readFromSocket() noexcept {
                     std::unique_lock<std::mutex> lck(m_pipelineMutex);
                     m_pipeline.emplace_back(pe);
                 }
-                m_pipelineCondition.notify_all();
 
 //                // Call delegate.
 //                m_delegate(std::string(buffer.data(), static_cast<size_t>(currentBytesRead)),
@@ -349,9 +354,11 @@ void UDPReceiver::readFromSocket() noexcept {
 
 bytesRead += currentBytesRead;
             }
-
-
             } while(currentBytesRead > 0);
+
+            if (bytesRead > 0) {
+                m_pipelineCondition.notify_all();
+            }
         } else {
 //            // Let the operating system yield other threads.
 //            using namespace std::literals::chrono_literals; // NOLINT
