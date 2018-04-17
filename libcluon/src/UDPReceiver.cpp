@@ -147,7 +147,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
 #else
                 auto errorCode = errno; // LCOV_EXCL_LINE
 #endif                                  // LCOV_EXCL_LINE
-                std::cerr << "[cluon::UDPReceiver] Error while trying to set SO_RCVBUF to " << recvBuffer << ": " << errorCode << std::endl;
+                std::cerr << "[cluon::UDPReceiver] Error while trying to set SO_RCVBUF to " << recvBuffer << ": " << errorCode << std::endl; // LCOV_EXCL_LINE
             }
         }
 
