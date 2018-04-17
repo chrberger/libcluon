@@ -376,9 +376,6 @@ void UDPReceiver::readFromSocket() noexcept {
             std::this_thread::sleep_for(1ms);
         }
 
-//        using namespace std::literals::chrono_literals; // NOLINT
-//        std::this_thread::sleep_for(1ms);
-
         if (totalBytesRead > 0) {
             m_pipelineCondition.notify_all();
         }
