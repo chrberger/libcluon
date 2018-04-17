@@ -139,8 +139,16 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
 
         if (!(m_socket < 0)) {
             // Try setting receiving buffer.
-            int recvBuffer{1024 * 1024};
-            ::setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char *>(&recvBuffer), sizeof(recvBuffer));
+            int recvBuffer{26214400};
+            auto retVal = ::setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char *>(&recvBuffer), sizeof(recvBuffer));
+            if (retVal < 0) {
+#ifdef WIN32 // LCOV_EXCL_LINE
+                auto errorCode = WSAGetLastError();
+#else
+                auto errorCode = errno; // LCOV_EXCL_LINE
+#endif                                  // LCOV_EXCL_LINE
+                std::cerr << "[cluon::UDPReceiver] Error while trying to set SO_RCVBUF to " << recvBuffer << ": " << errorCode << std::endl;
+            }
         }
 
         if (!(m_socket < 0)) {
