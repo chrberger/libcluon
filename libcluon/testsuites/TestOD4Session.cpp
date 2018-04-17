@@ -421,7 +421,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
     // Wait for processing the sent data.
     std::this_thread::sleep_for(1s);
 
-    constexpr int32_t MAX_ENVELOPES{10* 1000};
+    constexpr int32_t MAX_ENVELOPES{5* 1000};
 
     std::cout << "Sending of 3 times " << MAX_ENVELOPES << " in parallel took " << cluon::time::deltaInMicroseconds(after, before)/1000 << " ms. Received " << receiving.size() << " envelopes." << std::endl;
 
