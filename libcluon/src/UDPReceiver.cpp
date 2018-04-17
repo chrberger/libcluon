@@ -117,11 +117,13 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
 
         if (!(m_socket < 0)) {
             // Trying to enable non_block mode.
-//fcntl(m_socket, F_SETFL, O_NONBLOCK);
-//int n = 1024 * 1024;
-//if (setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n)) == -1) {
-//    std::cerr << "Could not set SO_RCVBUF" << std::endl;
-//}
+#ifdef WIN32 // LCOV_EXCL_LINE
+            u_long nonBlocking = 1;
+            m_isBlockingSocket = !(NO_ERROR == ::ioctlsocket(m_socket, FIONBIO, &nonBlocking));
+#else
+            const int FLAGS = ::fcntl(m_socket, F_GETFL, 0);
+            m_isBlockingSocket = !(0 == ::fcntl(m_socket, F_SETFL, FLAGS | O_NONBLOCK));
+#endif
         }
 
         if (!(m_socket < 0)) {
@@ -194,6 +196,7 @@ UDPReceiver::~UDPReceiver() noexcept {
 
     {
         m_pipelineThreadRunning.store(false);
+
         // Wake any waiting threads.
         m_pipelineCondition.notify_all();
 
@@ -254,20 +257,32 @@ void UDPReceiver::processPipeline() noexcept {
         m_pipelineCondition.wait(lck, [this]{return (!this->m_pipelineThreadRunning.load() || !this->m_pipeline.empty());});
 
         // The condition will automatically lock the mutex after waking up.
+        // As we are locking per entry, we need to unlock the mutex first.
         lck.unlock();
 
         uint32_t entries{0};
         {
             lck.lock();
-            entries = m_pipeline.size();
+            entries = static_cast<uint32_t>(m_pipeline.size());
             lck.unlock();
         }
-        for(uint32_t i{0}; i < entries; i++) {
-            auto entry{m_pipeline.front()};
+        for (uint32_t i{0}; i < entries; i++) {
+            PipelineEntry entry;
+            {
+                lck.lock();
+                entry = m_pipeline.front();
+                lck.unlock();
+            }
+
             if (nullptr != m_delegate) {
                 m_delegate(std::move(entry.m_data), std::move(entry.m_from), std::move(entry.m_sampleTime));
             }
-            m_pipeline.pop_front();
+
+            {
+                lck.lock();
+                m_pipeline.pop_front();
+                lck.unlock();
+            }
         }
     }
 }
@@ -281,10 +296,10 @@ void UDPReceiver::readFromSocket() noexcept {
 
     // Define timeout for select system call.
     struct timeval timeout {};
-//    timeout.tv_sec  = 0;
-//    timeout.tv_usec = 20 * 1000; // Check for new data with 50Hz.
     timeout.tv_sec  = 1;
     timeout.tv_usec = 0;
+//    timeout.tv_sec  = 0;
+//    timeout.tv_usec = 20 * 1000; // Check for new data with 50Hz.
 
     // Define file descriptor set to watch for read operations.
     fd_set setOfFiledescriptorsToReadFrom{};
@@ -303,8 +318,9 @@ void UDPReceiver::readFromSocket() noexcept {
         FD_ZERO(&setOfFiledescriptorsToReadFrom);          // NOLINT
         FD_SET(m_socket, &setOfFiledescriptorsToReadFrom); // NOLINT
         ::select(m_socket + 1, &setOfFiledescriptorsToReadFrom, nullptr, nullptr, &timeout);
+
+        ssize_t totalBytesRead{0};
         if (FD_ISSET(m_socket, &setOfFiledescriptorsToReadFrom)) { // NOLINT
-            ssize_t totalBytesRead{0};
             ssize_t bytesRead{0};
             do {
                 bytesRead = ::recvfrom(m_socket,
@@ -338,26 +354,33 @@ void UDPReceiver::readFromSocket() noexcept {
                                 remoteAddress.max_size());
                     const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
 
-                    PipelineEntry pe;
-                    pe.m_data = std::move(std::string(buffer.data(), static_cast<size_t>(bytesRead)));
-                    pe.m_from = std::move(std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT));
-                    pe.m_sampleTime = timestamp;
-
+                    // Create a pipeline entry to be processed concurrently.
                     {
-                        std::unique_lock<std::mutex> lck(m_pipelineMutex);
-                        m_pipeline.emplace_back(pe);
+                        PipelineEntry pe;
+                        pe.m_data = std::string(buffer.data(), static_cast<size_t>(bytesRead));
+                        pe.m_from = std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT);
+                        pe.m_sampleTime = timestamp;
+
+                        // Store entry in queue.
+                        {
+                            std::unique_lock<std::mutex> lck(m_pipelineMutex);
+                            m_pipeline.emplace_back(pe);
+                        }
                     }
                     totalBytesRead += bytesRead;
                 }
             } while (!m_isBlockingSocket && (bytesRead > 0));
-
-            if (totalBytesRead > 0) {
-                m_pipelineCondition.notify_all();
-            }
         } else {
 //            // Let the operating system yield other threads.
 //            using namespace std::literals::chrono_literals; // NOLINT
 //            std::this_thread::sleep_for(1ms);
+        }
+
+        using namespace std::literals::chrono_literals; // NOLINT
+        std::this_thread::sleep_for(1ms);
+
+        if (totalBytesRead > 0) {
+            m_pipelineCondition.notify_all();
         }
     }
 }

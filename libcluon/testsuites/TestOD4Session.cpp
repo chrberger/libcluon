@@ -338,7 +338,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
 
     REQUIRE(od4.isRunning());
 
-    for(uint32_t i{0}; i < 10000; i++) {
+    for(int32_t i{0}; i < 10000; i++) {
         cluon::data::TimeStamp tsSampleTime;
         tsSampleTime.seconds(0).microseconds(i);
 
@@ -347,7 +347,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
 
     // Wait for one second to process sent data.
     using namespace std::literals::chrono_literals; // NOLINT
-    std::this_thread::sleep_for(1s);
+    std::this_thread::sleep_for(10ms);
 
     std::cout << "Received: " << receiving.size() << std::endl;
 }
