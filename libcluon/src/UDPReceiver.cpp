@@ -115,11 +115,14 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             }
         }
 
-fcntl(m_socket, F_SETFL, O_NONBLOCK);
-int n = 1024 * 1024;
-if (setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n)) == -1) {
-    std::cerr << "Could not set SO_RCVBUF" << std::endl;
-}
+        if (!(m_socket < 0)) {
+            // Trying to enable non_block mode.
+//fcntl(m_socket, F_SETFL, O_NONBLOCK);
+//int n = 1024 * 1024;
+//if (setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, &n, sizeof(n)) == -1) {
+//    std::cerr << "Could not set SO_RCVBUF" << std::endl;
+//}
+        }
 
         if (!(m_socket < 0)) {
             // Bind to receive address/port.
@@ -286,8 +289,6 @@ void UDPReceiver::readFromSocket() noexcept {
     // Define file descriptor set to watch for read operations.
     fd_set setOfFiledescriptorsToReadFrom{};
 
-    ssize_t bytesRead{0};
-
     // Sender address and port.
     constexpr uint16_t MAX_ADDR_SIZE{1024};
     std::array<char, MAX_ADDR_SIZE> remoteAddress{};
@@ -303,60 +304,54 @@ void UDPReceiver::readFromSocket() noexcept {
         FD_SET(m_socket, &setOfFiledescriptorsToReadFrom); // NOLINT
         ::select(m_socket + 1, &setOfFiledescriptorsToReadFrom, nullptr, nullptr, &timeout);
         if (FD_ISSET(m_socket, &setOfFiledescriptorsToReadFrom)) { // NOLINT
-            ssize_t currentBytesRead{0};
+            ssize_t totalBytesRead{0};
+            ssize_t bytesRead{0};
             do {
+                bytesRead = ::recvfrom(m_socket,
+                                       buffer.data(),
+                                       buffer.max_size(),
+                                       0,
+                                       reinterpret_cast<struct sockaddr *>(&remote), // NOLINT
+                                       reinterpret_cast<socklen_t *>(&addrLength));  // NOLINT
 
-            currentBytesRead = ::recvfrom(m_socket,
-                                   buffer.data(),
-                                   buffer.max_size(),
-                                   0,
-                                   reinterpret_cast<struct sockaddr *>(&remote), // NOLINT
-                                   reinterpret_cast<socklen_t *>(&addrLength));  // NOLINT
-
-            if ((0 < currentBytesRead) && (nullptr != m_delegate)) {
+                if ((0 < bytesRead) && (nullptr != m_delegate)) {
 #ifdef __linux__
-                std::chrono::system_clock::time_point timestamp;
-                struct timeval receivedTimeStamp {};
-                if (0 == ::ioctl(m_socket, SIOCGSTAMP, &receivedTimeStamp)) { // NOLINT
-                    // Transform struct timeval to C++ chrono.
-                    std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> transformedTimePoint(
-                        std::chrono::microseconds(receivedTimeStamp.tv_sec * 1000000L + receivedTimeStamp.tv_usec));
-                    timestamp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(transformedTimePoint);
-                } else { // LCOV_EXCL_LINE
-                    // In case the ioctl failed, fall back to chrono. // LCOV_EXCL_LINE
-                    timestamp = std::chrono::system_clock::now(); // LCOV_EXCL_LINE
-                }
+                    std::chrono::system_clock::time_point timestamp;
+                    struct timeval receivedTimeStamp {};
+                    if (0 == ::ioctl(m_socket, SIOCGSTAMP, &receivedTimeStamp)) { // NOLINT
+                        // Transform struct timeval to C++ chrono.
+                        std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> transformedTimePoint(
+                            std::chrono::microseconds(receivedTimeStamp.tv_sec * 1000000L + receivedTimeStamp.tv_usec));
+                        timestamp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(transformedTimePoint);
+                    } else { // LCOV_EXCL_LINE
+                        // In case the ioctl failed, fall back to chrono. // LCOV_EXCL_LINE
+                        timestamp = std::chrono::system_clock::now(); // LCOV_EXCL_LINE
+                    }
 #else
-                std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now();
+                    std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now();
 #endif
 
-                // Transform sender address to C-string.
-                ::inet_ntop(remote.ss_family,
-                            &((reinterpret_cast<struct sockaddr_in *>(&remote))->sin_addr), // NOLINT
-                            remoteAddress.data(),
-                            remoteAddress.max_size());
-                const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
+                    // Transform sender address to C-string.
+                    ::inet_ntop(remote.ss_family,
+                                &((reinterpret_cast<struct sockaddr_in *>(&remote))->sin_addr), // NOLINT
+                                remoteAddress.data(),
+                                remoteAddress.max_size());
+                    const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
 
-                PipelineEntry pe;
-                pe.m_data = std::move(std::string(buffer.data(), static_cast<size_t>(currentBytesRead)));
-                pe.m_from = std::move(std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT));
-                pe.m_sampleTime = timestamp;
+                    PipelineEntry pe;
+                    pe.m_data = std::move(std::string(buffer.data(), static_cast<size_t>(bytesRead)));
+                    pe.m_from = std::move(std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT));
+                    pe.m_sampleTime = timestamp;
 
-                {
-                    std::unique_lock<std::mutex> lck(m_pipelineMutex);
-                    m_pipeline.emplace_back(pe);
+                    {
+                        std::unique_lock<std::mutex> lck(m_pipelineMutex);
+                        m_pipeline.emplace_back(pe);
+                    }
+                    totalBytesRead += bytesRead;
                 }
+            } while (!m_isBlockingSocket && (bytesRead > 0));
 
-//                // Call delegate.
-//                m_delegate(std::string(buffer.data(), static_cast<size_t>(currentBytesRead)),
-//                           std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT),
-//                           timestamp);
-
-bytesRead += currentBytesRead;
-            }
-            } while(currentBytesRead > 0);
-
-            if (bytesRead > 0) {
+            if (totalBytesRead > 0) {
                 m_pipelineCondition.notify_all();
             }
         } else {

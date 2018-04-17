@@ -117,6 +117,7 @@ class LIBCLUON_API UDPReceiver {
 
    private:
     int32_t m_socket{-1};
+    bool m_isBlockingSocket{true};
     struct sockaddr_in m_receiveFromAddress {};
     struct ip_mreq m_mreq {};
     bool m_isMulticast{false};
