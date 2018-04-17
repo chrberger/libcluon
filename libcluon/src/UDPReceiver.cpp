@@ -140,7 +140,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
         if (!(m_socket < 0)) {
             // Try setting receiving buffer.
             int recvBuffer{1024 * 1024};
-            ::setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, &recvBuffer, sizeof(recvBuffer));
+            ::setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char *>(&recvBuffer), sizeof(recvBuffer));
         }
 
         if (!(m_socket < 0)) {

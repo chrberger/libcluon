@@ -339,7 +339,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
     REQUIRE(od4.isRunning());
 
     cluon::data::TimeStamp before{cluon::time::now()};
-    constexpr int32_t MAX_ENVELOPES{100* 1000};
+    constexpr int32_t MAX_ENVELOPES{30* 1000};
     for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
         cluon::data::TimeStamp tsSampleTime;
         tsSampleTime.seconds(0).microseconds(i);
@@ -351,8 +351,72 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
     // Wait for processing the sent data.
     std::this_thread::sleep_for(1s);
 
-    std::cout << "Sent " << MAX_ENVELOPES << " (took " << cluon::time::deltaInMicroseconds(after, before) << " microseconds. Received " << receiving.size() << " envelopes." << std::endl;
+    std::cout << "Sent " << MAX_ENVELOPES << " (took " << cluon::time::deltaInMicroseconds(after, before)/1000 << " ms). Received " << receiving.size() << " envelopes." << std::endl;
 
     REQUIRE(receiving.size() > .9f*MAX_ENVELOPES); // At least 90% of the packets must be processed.
+}
+
+TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 threads.") {
+    std::mutex receivingMutex;
+    std::vector<cluon::data::Envelope> receiving;
+
+    cluon::OD4Session od4(89);
+
+    auto dataTrigger = [&receivingMutex, &receiving](cluon::data::Envelope &&envelope) {
+        std::lock_guard<std::mutex> lck(receivingMutex);
+        receiving.push_back(envelope);
+    };
+
+    bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), dataTrigger);
+    REQUIRE(retVal);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    cluon::data::TimeStamp before{cluon::time::now()};
+
+    std::thread sender1([&od4](){
+        constexpr int32_t MAX_ENVELOPES{10* 1000};
+        for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+            cluon::data::TimeStamp tsSampleTime;
+            tsSampleTime.seconds(0).microseconds(i);
+
+            od4.send(tsSampleTime);
+        }
+    });
+    std::thread sender2([&od4](){
+        constexpr int32_t MAX_ENVELOPES{10* 1000};
+        for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+            cluon::data::TimeStamp tsSampleTime;
+            tsSampleTime.seconds(0).microseconds(i);
+
+            od4.send(tsSampleTime);
+        }
+    });
+    std::thread sender3([&od4](){
+        constexpr int32_t MAX_ENVELOPES{10* 1000};
+        for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+            cluon::data::TimeStamp tsSampleTime;
+            tsSampleTime.seconds(0).microseconds(i);
+
+            od4.send(tsSampleTime);
+        }
+    });
+
+    sender1.join();
+    sender2.join();
+    sender3.join();
+    cluon::data::TimeStamp after{cluon::time::now()};
+
+    // Wait for processing the sent data.
+    std::this_thread::sleep_for(1s);
+
+    constexpr int32_t MAX_ENVELOPES{10* 1000};
+
+    std::cout << "Sending of 3 times " << MAX_ENVELOPES << " in parallel took " << cluon::time::deltaInMicroseconds(after, before)/1000 << " ms. Received " << receiving.size() << " envelopes." << std::endl;
+
+    REQUIRE(receiving.size() > .9f*3*MAX_ENVELOPES); // At least 90% of the packets must be processed.
 }
 
