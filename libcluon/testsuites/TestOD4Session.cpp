@@ -338,7 +338,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
 
     REQUIRE(od4.isRunning());
 
-    constexpr int32_t MAX_ENVELOPES{10000};
+    constexpr int32_t MAX_ENVELOPES{50000};
     for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
         cluon::data::TimeStamp tsSampleTime;
         tsSampleTime.seconds(0).microseconds(i);
@@ -346,9 +346,10 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
         od4.send(tsSampleTime);
     }
 
-    // Wait for one second to process sent data.
-    using namespace std::literals::chrono_literals; // NOLINT
-    std::this_thread::sleep_for(10ms);
+    // Wait for processing the sent data.
+    std::this_thread::sleep_for(1s);
+
+    std::cout << "Received " << receiving.size() << " envelopes." << std::endl;
 
     REQUIRE(receiving.size() > .9f*MAX_ENVELOPES); // At least 90% of the packets must be processed.
 }
