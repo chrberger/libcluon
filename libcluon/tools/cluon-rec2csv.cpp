@@ -72,9 +72,20 @@ int32_t main(int32_t argc, char **argv) {
             constexpr bool THREADING{false};
             cluon::Player player(commandlineArguments["rec"], AUTOREWIND, THREADING);
 
+
+            uint32_t envelopeCounter{0};
+            int32_t oldPercentage = -1;
             while (player.hasMoreData()) {
                 auto next = player.getNextEnvelopeToBeReplayed();
                 if (next.first) {
+                    {
+                        envelopeCounter++;
+                        const int32_t percentage = static_cast<int32_t>((static_cast<float>(envelopeCounter)*100.0f)/static_cast<float>(player.getTotalNumberOfEnvelopesInRecFile()));
+                        if ( (percentage % 5 == 0) && (percentage != oldPercentage) ) {
+                            std::cerr << argv[0] << ": Processed " << percentage << "%." << std::endl;
+                            oldPercentage = percentage;
+                        }
+                    }
                     cluon::data::Envelope env{std::move(next.second)};
                     if (scope.count(env.dataType()) > 0) {
                         cluon::FromProtoVisitor protoDecoder;

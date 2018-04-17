@@ -100,13 +100,13 @@ inline std::pair<bool, cluon::data::Envelope> extractEnvelope(std::istream &in) 
             if ((0x0D == static_cast<uint8_t>(buffer[0])) && (0xA4 == static_cast<uint8_t>(buffer[1]))) {
                 const uint32_t LENGTH{le32toh(*reinterpret_cast<uint32_t *>(&buffer[1])) >> 8};
                 buffer.reserve(LENGTH);
-#ifdef WIN32                                          // LCOV_EXCL_LINE
-                buffer.clear();                       // LCOV_EXCL_LINE
-                for (uint8_t i{0}; i < LENGTH; i++) { // LCOV_EXCL_LINE
-                    char c;                           // LCOV_EXCL_LINE
-                    in.get(c);                        // LCOV_EXCL_LINE
-                    retVal &= in.good();              // LCOV_EXCL_LINE
-                    buffer.push_back(c);              // LCOV_EXCL_LINE
+#ifdef WIN32                                           // LCOV_EXCL_LINE
+                buffer.clear();                        // LCOV_EXCL_LINE
+                for (uint32_t i{0}; i < LENGTH; i++) { // LCOV_EXCL_LINE
+                    char c;                            // LCOV_EXCL_LINE
+                    in.get(c);                         // LCOV_EXCL_LINE
+                    retVal &= in.good();               // LCOV_EXCL_LINE
+                    buffer.push_back(c);               // LCOV_EXCL_LINE
                 }
 #else // LCOV_EXCL_LINE
                 in.read(&buffer[0], static_cast<std::streamsize>(LENGTH));
