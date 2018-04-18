@@ -1,3 +1,15 @@
+libcluon (0.0.73) xenial; urgency=low
+
+  * Adding pipeline to UDPReceiver to separate receiving thread from processing thread
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 17 Apr 2018 23:01:44 +0200
+
+libcluon (0.0.72) xenial; urgency=low
+
+  * Bugfix for Win32/Win64; cluon-rec2csv is more verbose
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 17 Apr 2018 11:12:00 +0200
+
 libcluon (0.0.71) xenial; urgency=low
 
   * Adding tool cluon-rec2csv

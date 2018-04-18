@@ -131,8 +131,7 @@ set(GCC6_CXX_WARNING_FLAGS " \
     -Wno-error=strict-aliasing \
     -Wstrict-aliasing=3 \
     -Wstrict-null-sentinel \
-    -Wstrict-overflow \
-    -Wstrict-overflow=5 \
+    -Wno-error=strict-overflow \
     -Wno-error=suggest-attribute=const \
     -Wno-error=suggest-attribute=format \
     -Wno-error=suggest-attribute=noreturn \

@@ -23,10 +23,14 @@
 #include "cluon/Time.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
+#include <iostream>
+
 #include <atomic>
 #include <chrono>
+#include <mutex>
 #include <sstream>
 #include <thread>
+#include <vector>
 
 TEST_CASE("Create OD4 session without lambda.") {
     cluon::OD4Session od4(78);
@@ -272,7 +276,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate with invalid freq.") {
     od4.timeTrigger(0, timeTrigger);
     cluon::data::TimeStamp after{cluon::time::now()};
     REQUIRE(2 == counter);
-    REQUIRE(2 * 1000 * 1000 <= ((after.seconds() * 1000 * 1000 + after.microseconds()) - (before.seconds() * 1000 * 1000 + before.microseconds())));
+    REQUIRE(2 * 1000 * 1000 <= cluon::time::deltaInMicroseconds(after, before));
 }
 
 TEST_CASE("Create OD4 session timeTrigger delegate throwing exception cancels timeTrigger.") {
@@ -312,5 +316,126 @@ TEST_CASE("Create OD4 session timeTrigger delegate running too slowly results in
     od4.timeTrigger(10, timeTrigger);
     cluon::data::TimeStamp after{cluon::time::now()};
     REQUIRE(2 == counter);
-    REQUIRE(200 * 1000 <= ((after.seconds() * 1000 * 1000 + after.microseconds()) - (before.seconds() * 1000 * 1000 + before.microseconds())));
+    REQUIRE(200 * 1000 <= cluon::time::deltaInMicroseconds(after, before));
 }
+
+TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
+#ifndef __arm__
+    std::mutex receivingMutex;
+    std::vector<cluon::data::Envelope> receiving;
+
+    cluon::OD4Session od4(88);
+
+    auto dataTrigger = [&receivingMutex, &receiving](cluon::data::Envelope &&envelope) {
+        std::lock_guard<std::mutex> lck(receivingMutex);
+        receiving.push_back(envelope);
+    };
+
+    bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), dataTrigger);
+    REQUIRE(retVal);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    cluon::data::TimeStamp before{cluon::time::now()};
+    constexpr int32_t MAX_ENVELOPES{10* 1000};
+    for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+        cluon::data::TimeStamp tsSampleTime;
+        tsSampleTime.seconds(0).microseconds(i);
+
+        od4.send(tsSampleTime);
+    }
+    cluon::data::TimeStamp after{cluon::time::now()};
+
+    // Wait for processing the sent data.
+    std::this_thread::sleep_for(1s);
+
+    std::cout << "Sent " << MAX_ENVELOPES << " (took " << cluon::time::deltaInMicroseconds(after, before)/1000 << " ms). Received " << receiving.size() << " envelopes." << std::endl;
+
+    int32_t maxWaitingInSeconds{60};
+    do { std::this_thread::sleep_for(1s); } while ( (receiving.size() < .9f*MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
+
+// The success rate depends on the concrete system at hand; thus, disable this check and just report.
+//    REQUIRE(receiving.size() > .9f*MAX_ENVELOPES); // At least 90% of the packets must be processed.
+#ifdef WIN32
+    // Allow for delivery of data.
+    std::this_thread::sleep_for(10s);
+#endif
+#endif
+}
+
+TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 threads.") {
+#ifndef __arm__
+    std::mutex receivingMutex;
+    std::vector<cluon::data::Envelope> receiving;
+
+    cluon::OD4Session od4(89);
+
+    auto dataTrigger = [&receivingMutex, &receiving](cluon::data::Envelope &&envelope) {
+        std::lock_guard<std::mutex> lck(receivingMutex);
+        receiving.push_back(envelope);
+    };
+
+    bool retVal = od4.dataTrigger(cluon::data::TimeStamp::ID(), dataTrigger);
+    REQUIRE(retVal);
+
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    cluon::data::TimeStamp before{cluon::time::now()};
+
+    std::thread sender1([&od4](){
+        constexpr int32_t MAX_ENVELOPES{5* 1000};
+        for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+            cluon::data::TimeStamp tsSampleTime;
+            tsSampleTime.seconds(0).microseconds(i);
+
+            od4.send(tsSampleTime);
+        }
+    });
+    std::thread sender2([&od4](){
+        constexpr int32_t MAX_ENVELOPES{5* 1000};
+        for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+            cluon::data::TimeStamp tsSampleTime;
+            tsSampleTime.seconds(0).microseconds(i);
+
+            od4.send(tsSampleTime);
+        }
+    });
+    std::thread sender3([&od4](){
+        constexpr int32_t MAX_ENVELOPES{5* 1000};
+        for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+            cluon::data::TimeStamp tsSampleTime;
+            tsSampleTime.seconds(0).microseconds(i);
+
+            od4.send(tsSampleTime);
+        }
+    });
+
+    sender1.join();
+    sender2.join();
+    sender3.join();
+    cluon::data::TimeStamp after{cluon::time::now()};
+
+    // Wait for processing the sent data.
+    std::this_thread::sleep_for(1s);
+
+    constexpr int32_t MAX_ENVELOPES{5* 1000};
+
+    std::cout << "Sending of 3 times " << MAX_ENVELOPES << " in parallel took " << cluon::time::deltaInMicroseconds(after, before)/1000 << " ms. Received " << receiving.size() << " envelopes." << std::endl;
+
+    int32_t maxWaitingInSeconds{60};
+    do { std::this_thread::sleep_for(1s); } while ( (receiving.size() < .9f*MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
+
+// The success rate depends on the concrete system at hand; thus, disable this check and just report.
+#ifdef WIN32
+    // Allow for delivery of data.
+    std::this_thread::sleep_for(10s);
+#endif
+#endif
+}
+
