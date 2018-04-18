@@ -401,7 +401,7 @@ void UDPReceiver::readFromSocket() noexcept {
             std::this_thread::sleep_for(1ms);
         }
 
-        if (totalBytesRead > 0) {
+        if (static_cast<int32_t>(totalBytesRead) > 0) {
             m_pipelineCondition.notify_all();
         }
     }

@@ -320,6 +320,7 @@ TEST_CASE("Create OD4 session timeTrigger delegate running too slowly results in
 }
 
 TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
+#ifndef __arm__
     std::mutex receivingMutex;
     std::vector<cluon::data::Envelope> receiving;
 
@@ -362,9 +363,11 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
     // Allow for delivery of data.
     std::this_thread::sleep_for(10s);
 #endif
+#endif
 }
 
 TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 threads.") {
+#ifndef __arm__
     std::mutex receivingMutex;
     std::vector<cluon::data::Envelope> receiving;
 
@@ -432,6 +435,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
 #ifdef WIN32
     // Allow for delivery of data.
     std::this_thread::sleep_for(10s);
+#endif
 #endif
 }
 
