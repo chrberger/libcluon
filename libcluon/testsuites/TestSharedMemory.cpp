@@ -59,3 +59,21 @@ TEST_CASE("Trying to create SharedMemory with correct name.") {
     REQUIRE(12345 == tmp);
 }
 
+TEST_CASE("Trying to create SharedMemory with correct name and separate thread to read from.") {
+    cluon::SharedMemory sm1{"/GHI", 4};
+    REQUIRE(sm1.valid());
+    REQUIRE(nullptr != sm1.data());
+    REQUIRE("/GHI" == sm1.name());
+    sm1.lock();
+    uint32_t *data = reinterpret_cast<uint32_t*>(sm1.data());
+    REQUIRE(0 == *data);
+    *data = 54321;
+    sm1.unlock();
+
+    sm1.lock();
+    uint32_t *data2 = reinterpret_cast<uint32_t*>(sm1.data());
+    uint32_t tmp = *data2;
+    sm1.unlock();
+    REQUIRE(54321 == tmp);
+}
+

@@ -61,6 +61,9 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                 if (0 == ::ftruncate(m_fd, sizeof(SharedMemoryHeader) + m_size)) {
                     m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
                     if ( (void*)-1 != m_sharedMemory) {
+                        // Set shared memory area to 0.
+                        ::memset(m_sharedMemory, 0, sizeof(SharedMemoryHeader) + m_size);
+
                         m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
                         m_sharedMemoryHeader->__size = m_size;
                         m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
