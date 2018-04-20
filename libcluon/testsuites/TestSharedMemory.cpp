@@ -19,9 +19,13 @@
 
 #include "cluon/SharedMemory.hpp"
 
+#include <chrono>
+#include <thread>
+
 TEST_CASE("Trying to open SharedMemory with empty name.") {
     cluon::SharedMemory sm1{""};
     REQUIRE(!sm1.valid());
+    REQUIRE(0 == sm1.size());
     REQUIRE(nullptr == sm1.data());
     REQUIRE(sm1.name().empty());
 }
@@ -29,6 +33,7 @@ TEST_CASE("Trying to open SharedMemory with empty name.") {
 TEST_CASE("Trying to open SharedMemory with name without leading /.") {
     cluon::SharedMemory sm1{"ABC"};
     REQUIRE(!sm1.valid());
+    REQUIRE(0 == sm1.size());
     REQUIRE(nullptr == sm1.data());
     REQUIRE("/ABC" == sm1.name());
 }
@@ -45,6 +50,7 @@ TEST_CASE("Trying to open SharedMemory with name without leading / and too long 
 TEST_CASE("Trying to create SharedMemory with correct name.") {
     cluon::SharedMemory sm1{"/DEF", 4};
     REQUIRE(sm1.valid());
+    REQUIRE(4 == sm1.size());
     REQUIRE(nullptr != sm1.data());
     REQUIRE("/DEF" == sm1.name());
     sm1.lock();
@@ -59,21 +65,43 @@ TEST_CASE("Trying to create SharedMemory with correct name.") {
     REQUIRE(12345 == tmp);
 }
 
-TEST_CASE("Trying to create SharedMemory with correct name and separate thread to read from.") {
+TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory.") {
     cluon::SharedMemory sm1{"/GHI", 4};
     REQUIRE(sm1.valid());
+    REQUIRE(4 == sm1.size());
     REQUIRE(nullptr != sm1.data());
     REQUIRE("/GHI" == sm1.name());
     sm1.lock();
     uint32_t *data = reinterpret_cast<uint32_t*>(sm1.data());
     REQUIRE(0 == *data);
-    *data = 54321;
     sm1.unlock();
 
-    sm1.lock();
-    uint32_t *data2 = reinterpret_cast<uint32_t*>(sm1.data());
-    uint32_t tmp = *data2;
-    sm1.unlock();
+    // Spawning thread to attach and change data.
+    std::thread producer([](){
+        cluon::SharedMemory inner_sm1{"/GHI"};
+        REQUIRE(inner_sm1.valid());
+        REQUIRE(nullptr != inner_sm1.data());
+        REQUIRE("/GHI" == inner_sm1.name());
+        inner_sm1.lock();
+        uint32_t *data = reinterpret_cast<uint32_t*>(inner_sm1.data());
+        REQUIRE(0 == *data);
+        *data = 54321;
+        REQUIRE(54321 == *data);
+        inner_sm1.unlock();
+    });
+
+    uint32_t tmp{0};
+    do {
+        sm1.lock();
+        tmp = *(reinterpret_cast<uint32_t*>(sm1.data()));
+        sm1.unlock();
+
+        using namespace std::literals::chrono_literals; // NOLINT
+        std::this_thread::sleep_for(10ms);
+    } while (0 == tmp);
+
+    producer.join();
+
     REQUIRE(54321 == tmp);
 }
 

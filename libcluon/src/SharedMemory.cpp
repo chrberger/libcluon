@@ -57,16 +57,26 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
             std::cerr << "[cluon::SharedMemory] Failed to open shared memory '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
         }
         else {
+            bool retVal{true};
+
+            // When creating a shared memory segment, truncate it.
             if (0 < m_size) {
-                if (0 == ::ftruncate(m_fd, sizeof(SharedMemoryHeader) + m_size)) {
-                    m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
-                    if ( (void*)-1 != m_sharedMemory) {
+                retVal = (0 == ::ftruncate(m_fd, sizeof(SharedMemoryHeader) + m_size));
+                if (!retVal) {
+                    std::cerr << "[cluon::SharedMemory] Failed to ftruncate '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                }
+            }
+
+            // Open shared memory segment.
+            if (retVal) {
+                m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
+                if ( (void*)-1 != m_sharedMemory) {
+                    m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
+
+                    // Erase newly created memory segments.
+                    if (0 < m_size) {
                         // Set shared memory area to 0.
                         ::memset(m_sharedMemory, 0, sizeof(SharedMemoryHeader) + m_size);
-
-                        m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
-                        m_sharedMemoryHeader->__size = m_size;
-                        m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
 
                         // Create shared mutex.
                         pthread_mutexattr_t mutexAttribute;
@@ -74,13 +84,33 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         ::pthread_mutexattr_setpshared(&mutexAttribute, PTHREAD_PROCESS_SHARED);
                         ::pthread_mutex_init(&(m_sharedMemoryHeader->__mutex), &mutexAttribute);
                         ::pthread_mutexattr_destroy(&mutexAttribute);
+
+                        m_sharedMemoryHeader->__size = m_size;
                     }
                     else {
-                        std::cerr << "[cluon::SharedMemory] Failed to mmap '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                        // Read size as we are attaching to an existing shared memory.
+                        m_size = m_sharedMemoryHeader->__size;
+
+                        // Now, as we know the real size, unmap the first mapping...
+                        if ( (nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader)) ) {
+                            std::cerr << "[cluon::SharedMemory] Failed to munmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                        }
+                        m_sharedMemory = nullptr;
+                        m_sharedMemoryHeader = nullptr;
+
+                        // ...and re-map with the correct size parameter.
+                        m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
+                        if ( (void*)-1 != m_sharedMemory) {
+                            m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
+                        }
                     }
                 }
                 else {
-                    std::cerr << "[cluon::SharedMemory] Failed to ftruncate '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    std::cerr << "[cluon::SharedMemory] Failed to mmap '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                }
+
+                if ( (void*)-1 != m_sharedMemory) {
+                    m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
                 }
             }
         }
