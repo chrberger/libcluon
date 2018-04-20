@@ -67,38 +67,42 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                 }
             }
 
-            // Open shared memory segment.
+            // Accessing shared memory segment.
             if (retVal) {
+                // On opening (i.e., NOT creating) a shared memory segment, m_size is still 0 and we need to figure out the size first.
                 m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
                 if ( (void*)-1 != m_sharedMemory) {
                     m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
 
-                    // Erase newly created memory segments.
+                    // On creating (i.e., NOT opening) a shared memory segment, erase newly created memory segment.
                     if (0 < m_size) {
                         // Set shared memory area to 0.
                         ::memset(m_sharedMemory, 0, sizeof(SharedMemoryHeader) + m_size);
 
-                        // Create shared mutex.
+                        // Create shared mutex therein.
                         pthread_mutexattr_t mutexAttribute;
                         ::pthread_mutexattr_init(&mutexAttribute);
                         ::pthread_mutexattr_setpshared(&mutexAttribute, PTHREAD_PROCESS_SHARED);
                         ::pthread_mutex_init(&(m_sharedMemoryHeader->__mutex), &mutexAttribute);
                         ::pthread_mutexattr_destroy(&mutexAttribute);
 
+                        // Store correct size in shared memory.
                         m_sharedMemoryHeader->__size = m_size;
                     }
                     else {
                         // Read size as we are attaching to an existing shared memory.
                         m_size = m_sharedMemoryHeader->__size;
 
-                        // Now, as we know the real size, unmap the first mapping...
+                        // Now, as we know the real size, unmap the first mapping that did not the size.
                         if ( (nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader)) ) {
                             std::cerr << "[cluon::SharedMemory] Failed to munmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
                         }
+
+                        // Invalidate all pointers.
                         m_sharedMemory = nullptr;
                         m_sharedMemoryHeader = nullptr;
 
-                        // ...and re-map with the correct size parameter.
+                        // Re-map with the correct size parameter.
                         m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
                         if ( (void*)-1 != m_sharedMemory) {
                             m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
@@ -109,6 +113,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                     std::cerr << "[cluon::SharedMemory] Failed to mmap '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
                 }
 
+                // If the shared memory segment is correctly available, store the pointer for the user data.
                 if ( (void*)-1 != m_sharedMemory) {
                     m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
                 }
