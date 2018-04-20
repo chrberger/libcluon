@@ -55,8 +55,23 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
         m_fd = ::shm_open(m_name.c_str(), flags, S_IRUSR|S_IWUSR);
         if (-1 == m_fd) {
             std::cerr << "[cluon::SharedMemory] Failed to open shared memory '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+            // Try to remove existing shared memory segment and try again.
+            if ( (flags & O_CREAT) == O_CREAT ) {
+                std::clog << "[cluon::SharedMemory] Trying to remove existing shared memory '" << m_name <<"' and trying again... ";
+                if ( 0 == ::shm_unlink(m_name.c_str()) ) {
+                    m_fd = ::shm_open(m_name.c_str(), flags, S_IRUSR|S_IWUSR);
+                }
+
+                if (-1 == m_fd) {
+                    std::cerr << "failed: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                }
+                else {
+                    std::cerr << "succeeded." << std::endl;
+                }
+            }
         }
-        else {
+
+        if (-1 != m_fd) {
             bool retVal{true};
 
             // When creating a shared memory segment, truncate it.
