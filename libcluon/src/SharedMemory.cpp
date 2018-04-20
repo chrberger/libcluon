@@ -71,7 +71,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
             if (retVal) {
                 // On opening (i.e., NOT creating) a shared memory segment, m_size is still 0 and we need to figure out the size first.
                 m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
-                if ( (void*)-1 != m_sharedMemory) {
+                if ( MAP_FAILED != m_sharedMemory) {
                     m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
 
                     // On creating (i.e., NOT opening) a shared memory segment, erase newly created memory segment.
@@ -104,7 +104,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
 
                         // Re-map with the correct size parameter.
                         m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
-                        if ( (void*)-1 != m_sharedMemory) {
+                        if ( MAP_FAILED != m_sharedMemory) {
                             m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
                         }
                     }
@@ -114,7 +114,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                 }
 
                 // If the shared memory segment is correctly available, store the pointer for the user data.
-                if ( (void*)-1 != m_sharedMemory) {
+                if ( MAP_FAILED != m_sharedMemory) {
                     m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
                 }
             }

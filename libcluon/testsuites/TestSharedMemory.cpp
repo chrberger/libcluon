@@ -83,10 +83,10 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
         REQUIRE(nullptr != inner_sm1.data());
         REQUIRE("/GHI" == inner_sm1.name());
         inner_sm1.lock();
-        uint32_t *data = reinterpret_cast<uint32_t*>(inner_sm1.data());
-        REQUIRE(0 == *data);
-        *data = 54321;
-        REQUIRE(54321 == *data);
+        uint32_t *inner_data = reinterpret_cast<uint32_t*>(inner_sm1.data());
+        REQUIRE(0 == *inner_data);
+        *inner_data = 54321;
+        REQUIRE(54321 == *inner_data);
         inner_sm1.unlock();
     });
 
