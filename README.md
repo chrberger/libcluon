@@ -145,6 +145,7 @@ make install
 ## Tutorials & API Documentation
 * [API Documentation](https://chrberger.github.io/libcluon/)
 * [Getting Started Tutorial (using an online C++ compiler)](https://wandbox.org/permlink/PBUsOPs9nuPRncZd)
+* [Using `libcluon` to realize an application communicating between JavaScript and C++](https://github.com/chrberger/cluon-javascript)
 * [How to send data via a UDP socket](docs/cluon-UDPSender.md)
 * [How to receive data via a UDP socket](docs/cluon-UDPReceiver.md)
 * [Example: Timestamping (using an online C++ compiler)](https://wandbox.org/permlink/HVLDReiIrXJxhMZd)
