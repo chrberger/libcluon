@@ -47,11 +47,15 @@ TEST_CASE("Trying to create SharedMemory with correct name.") {
     REQUIRE(sm1.valid());
     REQUIRE(nullptr != sm1.data());
     REQUIRE("/DEF" == sm1.name());
+    sm1.lock();
     uint32_t *data = reinterpret_cast<uint32_t*>(sm1.data());
     *data = 12345;
+    sm1.unlock();
 
+    sm1.lock();
     uint32_t *data2 = reinterpret_cast<uint32_t*>(sm1.data());
     uint32_t tmp = *data2;
+    sm1.unlock();
     REQUIRE(12345 == tmp);
 }
 

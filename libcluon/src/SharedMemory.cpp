@@ -64,6 +64,13 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
                         m_sharedMemoryHeader->__size = m_size;
                         m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
+
+                        // Create shared mutex.
+                        pthread_mutexattr_t mutexAttribute;
+                        ::pthread_mutexattr_init(&mutexAttribute);
+                        ::pthread_mutexattr_setpshared(&mutexAttribute, PTHREAD_PROCESS_SHARED);
+                        ::pthread_mutex_init(&(m_sharedMemoryHeader->__mutex), &mutexAttribute);
+                        ::pthread_mutexattr_destroy(&mutexAttribute);
                     }
                     else {
                         std::cerr << "[cluon::SharedMemory] Failed to mmap '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
@@ -80,6 +87,9 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
 
 SharedMemory::~SharedMemory() noexcept {
 #ifndef WIN32
+    if (nullptr != m_sharedMemoryHeader) {
+        ::pthread_mutex_destroy(&(m_sharedMemoryHeader->__mutex));
+    }
     if ( (nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size) ) {
         std::cerr << "[cluon::SharedMemory] Failed to munmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
     }
@@ -89,9 +99,17 @@ SharedMemory::~SharedMemory() noexcept {
 #endif
 }
 
-void SharedMemory::lock() noexcept {}
+void SharedMemory::lock() noexcept {
+    if (nullptr != m_sharedMemoryHeader) {
+        ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex));
+    }
+}
 
-void SharedMemory::unlock() noexcept {}
+void SharedMemory::unlock() noexcept {
+    if (nullptr != m_sharedMemoryHeader) {
+        ::pthread_mutex_unlock(&(m_sharedMemoryHeader->__mutex));
+    }
+}
 
 char* SharedMemory::data() noexcept {
     return m_userAccessibleSharedMemory;
@@ -107,12 +125,9 @@ const std::string SharedMemory::name() const noexcept {
 
 bool SharedMemory::valid() noexcept {
     bool valid{-1 != m_fd};
-    {
-        lock();
-        valid &= (nullptr != m_sharedMemory);
-        unlock();
-    }
-    return (0 < m_size) && valid && (nullptr != m_sharedMemoryHeader);
+    valid &= (nullptr != m_sharedMemory);
+    valid &= (0 < m_size);
+    return valid;
 }
 
 } // namespace cluon

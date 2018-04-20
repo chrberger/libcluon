@@ -20,8 +20,11 @@
 
 #include "cluon/cluon.hpp"
 
+// clang-format off
 #ifndef WIN32
+    #include <pthread.h>
 #endif
+// clang-format on
 
 #include <cstddef>
 #include <cstdint>
