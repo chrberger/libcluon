@@ -19,44 +19,83 @@
 
 // clang-format off
 #ifndef WIN32
+    #include <fcntl.h>
     #include <sys/mman.h>
     #include <sys/stat.h>
-    #include <fcntl.h>
+    #include <unistd.h>
 #endif
 // clang-format on
 
+#include <cstring>
+#include <iostream>
+
 namespace cluon {
 
-SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept {
-    (void)size;
+SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept 
+    : m_size(size) {
     if (!name.empty()) {
-        const std::string n{name.substr(0, (name.size() > 255 ? 255 : name.size()))};
+        constexpr int MAX_LENGTH_NAME{254};
+        const std::string n{name.substr(0, (name.size() > MAX_LENGTH_NAME ? MAX_LENGTH_NAME : name.size()))};
         if ('/' != n[0]) {
             m_name = "/";
         }
         m_name += n;
-        if (m_name.size() > 255) {
-            m_name = m_name.substr(0, 255);
+        if (m_name.size() > MAX_LENGTH_NAME) {
+            m_name = m_name.substr(0, MAX_LENGTH_NAME);
+        }
+
+        // If size is greater than 0, the caller wants to create a new shared
+        // memory area. Otherwise, the caller wants to open an existing shared memory.
+        int flags = O_RDWR;
+        if (0 < size) {
+            flags |= O_CREAT|O_EXCL;
         }
 
 #ifndef WIN32
-    m_fd = ::shm_open(m_name.c_str(), O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
-//    ftruncate(fd_sync, sizeof(shared_memory_sync));
-//    void* addr_sync = mmap(0, sizeof(shared_memory_sync), PROT_READ|PROT_WRITE, MAP_SHARED, fd_sync, 0);
-//    shared_memory_sync* p_sync = static_cast<shared_memory_sync*> (addr_sync);
+        m_fd = ::shm_open(m_name.c_str(), flags, S_IRUSR|S_IWUSR);
+        if (-1 == m_fd) {
+            std::cerr << "[cluon::SharedMemory] Failed to open shared memory '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        }
+        else {
+            if (0 < m_size) {
+                if (0 == ::ftruncate(m_fd, sizeof(SharedMemoryHeader) + m_size)) {
+                    m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
+                    if ( (void*)-1 != m_sharedMemory) {
+                        m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
+                        m_sharedMemoryHeader->__size = m_size;
+                        m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
+                    }
+                    else {
+                        std::cerr << "[cluon::SharedMemory] Failed to mmap '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    }
+                }
+                else {
+                    std::cerr << "[cluon::SharedMemory] Failed to ftruncate '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                }
+            }
+        }
 #endif
     }
 }
 
 SharedMemory::~SharedMemory() noexcept {
 #ifndef WIN32
-    ::shm_unlink(m_name.c_str());
+    if ( (nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size) ) {
+        std::cerr << "[cluon::SharedMemory] Failed to munmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+    }
+    if ( (-1 != m_fd) && (-1 == ::shm_unlink(m_name.c_str()) && (ENOENT != errno)) ) {
+        std::cerr << "[cluon::SharedMemory] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+    }
 #endif
 }
 
 void SharedMemory::lock() noexcept {}
 
 void SharedMemory::unlock() noexcept {}
+
+char* SharedMemory::data() noexcept {
+    return m_userAccessibleSharedMemory;
+}
 
 uint32_t SharedMemory::size() const noexcept {
     return m_size;
@@ -70,10 +109,10 @@ bool SharedMemory::valid() noexcept {
     bool valid{-1 != m_fd};
     {
         lock();
-        valid = (nullptr != m_sharedMemory);
+        valid &= (nullptr != m_sharedMemory);
         unlock();
     }
-    return (0 < m_size) && valid;
+    return (0 < m_size) && valid && (nullptr != m_sharedMemoryHeader);
 }
 
 } // namespace cluon

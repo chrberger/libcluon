@@ -41,7 +41,7 @@ class LIBCLUON_API SharedMemory {
      * Constructor.
      *
      * @param name Name of the shared memory area; must start with / and must not be longer than NAME_MAX (255). If the name is missing a leading '/' or is longer than 255, it will be adjusted accordingly.
-     * @param size of the shared memory area; if size is 0, the class tries to attach to an existing area.
+     * @param size of the shared memory area to create; if size is 0, the class tries to attach to an existing area.
      */
     SharedMemory(const std::string &name, uint32_t size = 0) noexcept;
     ~SharedMemory() noexcept;
@@ -55,6 +55,11 @@ class LIBCLUON_API SharedMemory {
      * This method unlocks the shared memory area.
      */
     void unlock() noexcept;
+
+    /**
+     * @return Pointer to the raw shared memory or nullptr in case of invalid shared memory.
+     */
+    char* data() noexcept;
 
     /**
      * @return The size of the shared memory area.
@@ -76,6 +81,7 @@ class LIBCLUON_API SharedMemory {
     std::string m_name{""};
     uint32_t m_size{0};
     char *m_sharedMemory{nullptr};
+    char *m_userAccessibleSharedMemory{nullptr};
 
 #ifndef WIN32
     struct SharedMemoryHeader {
@@ -83,6 +89,7 @@ class LIBCLUON_API SharedMemory {
         pthread_mutex_t __mutex;
         pthread_cond_t __condition;
     };
+    SharedMemoryHeader *m_sharedMemoryHeader{nullptr};
 #endif
 };
 } // namespace cluon

@@ -19,29 +19,39 @@
 
 #include "cluon/SharedMemory.hpp"
 
-TEST_CASE("Trying to create SharedMemory with empty name.") {
+TEST_CASE("Trying to open SharedMemory with empty name.") {
     cluon::SharedMemory sm1{""};
     REQUIRE(!sm1.valid());
+    REQUIRE(nullptr == sm1.data());
     REQUIRE(sm1.name().empty());
 }
 
-TEST_CASE("Trying to create SharedMemory with name without leading /.") {
+TEST_CASE("Trying to open SharedMemory with name without leading /.") {
     cluon::SharedMemory sm1{"ABC"};
     REQUIRE(!sm1.valid());
+    REQUIRE(nullptr == sm1.data());
     REQUIRE("/ABC" == sm1.name());
 }
 
-TEST_CASE("Trying to create SharedMemory with name without leading / and too long name > 255.") {
+TEST_CASE("Trying to open SharedMemory with name without leading / and too long name > 255.") {
     const std::string NAME{"Vlrel3r6cZeWaRsWgvCWfAHtpPKX56fSgNYNM5bMjEcBnuiMOG3g4YJ4Y9KbPcNyes45xPI9jD5FjxEB1GR9WqaWmyqdH6po1O6is2aDecMe8GGlwqkVJtWH5YwlCYgoJ1EiQhqIUVfzp56IY00J6lXJS0uVJrpcMIZuiCsTGTQDG0vPC2EkdbMxe9BPV6a8BnMMumnGKYcqFxiCGrv1SVtLw40zLXTuelQQHiPCFANYlISyhRPt456PMNm7AQJUMHA5"};
-    const std::string NAME_255 = "/" + NAME.substr(0, 254);
+    const std::string NAME_254 = "/" + NAME.substr(0, 253);
     cluon::SharedMemory sm1{NAME};
     REQUIRE(!sm1.valid());
-    REQUIRE(NAME_255 == sm1.name());
+    REQUIRE(nullptr == sm1.data());
+    REQUIRE(NAME_254 == sm1.name());
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name.") {
-    cluon::SharedMemory sm1{"/ABC"};
-    REQUIRE(!sm1.valid());
-    REQUIRE("/ABC" == sm1.name());
+    cluon::SharedMemory sm1{"/DEF", 4};
+    REQUIRE(sm1.valid());
+    REQUIRE(nullptr != sm1.data());
+    REQUIRE("/DEF" == sm1.name());
+    uint32_t *data = reinterpret_cast<uint32_t*>(sm1.data());
+    *data = 12345;
+
+    uint32_t *data2 = reinterpret_cast<uint32_t*>(sm1.data());
+    uint32_t tmp = *data2;
+    REQUIRE(12345 == tmp);
 }
 
