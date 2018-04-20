@@ -60,6 +60,16 @@ class LIBCLUON_API SharedMemory {
     void unlock() noexcept;
 
     /**
+     * This method waits for being notified from the shared condition.
+     */
+    void wait() noexcept;
+
+    /**
+     * This method notifies all threads waiting on the shared condition.
+     */
+    void notifyAll() noexcept;
+
+    /**
      * @return Pointer to the raw shared memory or nullptr in case of invalid shared memory.
      */
     char* data() noexcept;
@@ -85,6 +95,7 @@ class LIBCLUON_API SharedMemory {
     uint32_t m_size{0};
     char *m_sharedMemory{nullptr};
     char *m_userAccessibleSharedMemory{nullptr};
+    bool m_hasOnlyAttachedToSharedMemory{false};
 
 #ifndef WIN32
     struct SharedMemoryHeader {

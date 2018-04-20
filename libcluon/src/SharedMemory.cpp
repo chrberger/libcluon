@@ -79,15 +79,22 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         // Set shared memory area to 0.
                         ::memset(m_sharedMemory, 0, sizeof(SharedMemoryHeader) + m_size);
 
-                        // Create shared mutex therein.
+                        // Store correct size in shared memory.
+                        m_sharedMemoryHeader->__size = m_size;
+
+                        // Create shared mutex.
                         pthread_mutexattr_t mutexAttribute;
                         ::pthread_mutexattr_init(&mutexAttribute);
                         ::pthread_mutexattr_setpshared(&mutexAttribute, PTHREAD_PROCESS_SHARED);
                         ::pthread_mutex_init(&(m_sharedMemoryHeader->__mutex), &mutexAttribute);
                         ::pthread_mutexattr_destroy(&mutexAttribute);
 
-                        // Store correct size in shared memory.
-                        m_sharedMemoryHeader->__size = m_size;
+                        // Create shared condition.
+                        pthread_condattr_t conditionAttribute;
+                        ::pthread_condattr_init(&conditionAttribute);
+                        ::pthread_condattr_setpshared(&conditionAttribute, PTHREAD_PROCESS_SHARED);
+                        ::pthread_cond_init(&(m_sharedMemoryHeader->__condition), &conditionAttribute);
+                        ::pthread_condattr_destroy(&conditionAttribute);
                     }
                     else {
                         // Read size as we are attaching to an existing shared memory.
@@ -107,6 +114,8 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         if ( MAP_FAILED != m_sharedMemory) {
                             m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
                         }
+
+                        m_hasOnlyAttachedToSharedMemory = true;
                     }
                 }
                 else {
@@ -125,7 +134,10 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
 
 SharedMemory::~SharedMemory() noexcept {
 #ifndef WIN32
-    if (nullptr != m_sharedMemoryHeader) {
+    if ( (nullptr != m_sharedMemoryHeader) && (!m_hasOnlyAttachedToSharedMemory) ) {
+        // Wake any waiting threads as we are going to end the shared memory session.
+        ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
+        ::pthread_cond_destroy(&(m_sharedMemoryHeader->__condition));
         ::pthread_mutex_destroy(&(m_sharedMemoryHeader->__mutex));
     }
     if ( (nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size) ) {
@@ -146,6 +158,20 @@ void SharedMemory::lock() noexcept {
 void SharedMemory::unlock() noexcept {
     if (nullptr != m_sharedMemoryHeader) {
         ::pthread_mutex_unlock(&(m_sharedMemoryHeader->__mutex));
+    }
+}
+
+void SharedMemory::wait() noexcept {
+    if (nullptr != m_sharedMemoryHeader) {
+        lock();
+        ::pthread_cond_wait(&(m_sharedMemoryHeader->__condition), &(m_sharedMemoryHeader->__mutex));
+        unlock();
+    }
+}
+
+void SharedMemory::notifyAll() noexcept {
+    if (nullptr != m_sharedMemoryHeader) {
+        ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
     }
 }
 

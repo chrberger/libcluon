@@ -105,3 +105,40 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
     REQUIRE(54321 == tmp);
 }
 
+TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory with condition variable for synchronization.") {
+    cluon::SharedMemory sm1{"/JKL", 4};
+    REQUIRE(sm1.valid());
+    REQUIRE(4 == sm1.size());
+    REQUIRE(nullptr != sm1.data());
+    REQUIRE("/JKL" == sm1.name());
+    sm1.lock();
+    uint32_t *data = reinterpret_cast<uint32_t*>(sm1.data());
+    REQUIRE(0 == *data);
+    sm1.unlock();
+
+    // Spawning thread to attach and change data.
+    std::thread producer([](){
+        cluon::SharedMemory inner_sm1{"/JKL"};
+        REQUIRE(inner_sm1.valid());
+        REQUIRE(nullptr != inner_sm1.data());
+        REQUIRE("/JKL" == inner_sm1.name());
+        inner_sm1.lock();
+        uint32_t *inner_data = reinterpret_cast<uint32_t*>(inner_sm1.data());
+        REQUIRE(0 == *inner_data);
+        *inner_data = 23456;
+        REQUIRE(23456 == *inner_data);
+        inner_sm1.unlock();
+
+        inner_sm1.notifyAll();
+    });
+
+    sm1.wait();
+    producer.join();
+
+    sm1.lock();
+    uint32_t tmp = *(reinterpret_cast<uint32_t*>(sm1.data()));
+    sm1.unlock();
+
+    REQUIRE(23456 == tmp);
+}
+
