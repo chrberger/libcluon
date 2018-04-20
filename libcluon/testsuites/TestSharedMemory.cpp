@@ -142,3 +142,65 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
     REQUIRE(23456 == tmp);
 }
 
+TEST_CASE("Trying to create SharedMemory with correct name and two separate threads to produce data for shared memory with condition variable for synchronization.") {
+    cluon::SharedMemory sm1{"/MNO", 4};
+    REQUIRE(sm1.valid());
+    REQUIRE(4 == sm1.size());
+    REQUIRE(nullptr != sm1.data());
+    REQUIRE("/MNO" == sm1.name());
+    sm1.lock();
+    uint32_t *data = reinterpret_cast<uint32_t*>(sm1.data());
+    REQUIRE(0 == *data);
+    sm1.unlock();
+
+    // Spawning first thread to attach and change data.
+    std::thread producerA([](){
+        cluon::SharedMemory inner_sm1{"/MNO"};
+        REQUIRE(inner_sm1.valid());
+        REQUIRE(nullptr != inner_sm1.data());
+        REQUIRE("/MNO" == inner_sm1.name());
+
+        inner_sm1.wait();
+
+        inner_sm1.lock();
+        uint32_t *inner_data = reinterpret_cast<uint32_t*>(inner_sm1.data());
+        *inner_data += 1;
+        inner_sm1.unlock();
+    });
+
+    // Spawning second thread to attach and change data.
+    std::thread producerB([](){
+        cluon::SharedMemory inner_sm2{"/MNO"};
+        REQUIRE(inner_sm2.valid());
+        REQUIRE(nullptr != inner_sm2.data());
+        REQUIRE("/MNO" == inner_sm2.name());
+
+        inner_sm2.wait();
+
+        inner_sm2.lock();
+        uint32_t *inner_data = reinterpret_cast<uint32_t*>(inner_sm2.data());
+        *inner_data += 2;
+        inner_sm2.unlock();
+    });
+
+    // Wait for threads to come alive.
+    using namespace std::literals::chrono_literals; // NOLINT
+    std::this_thread::sleep_for(100ms);
+
+    sm1.notifyAll();
+
+    uint32_t tmp{0};
+    do {
+        sm1.lock();
+        tmp = *(reinterpret_cast<uint32_t*>(sm1.data()));
+        sm1.unlock();
+
+        std::this_thread::sleep_for(10ms);
+    } while (0 == tmp);
+
+    producerA.join();
+    producerB.join();
+
+    REQUIRE(3 == tmp);
+}
+
