@@ -108,7 +108,9 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         // Create shared condition.
                         pthread_condattr_t conditionAttribute;
                         ::pthread_condattr_init(&conditionAttribute);
+#ifndef __APPLE__
                         ::pthread_condattr_setclock(&conditionAttribute, CLOCK_MONOTONIC);          // Use realtime clock for timed waits with non-negative jumps.
+#endif
                         ::pthread_condattr_setpshared(&conditionAttribute, PTHREAD_PROCESS_SHARED); // Share between unrelated processes.
                         ::pthread_cond_init(&(m_sharedMemoryHeader->__condition), &conditionAttribute);
                         ::pthread_condattr_destroy(&conditionAttribute);
