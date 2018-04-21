@@ -86,21 +86,20 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
             if (retVal) {
                 // On opening (i.e., NOT creating) a shared memory segment, m_size is still 0 and we need to figure out the size first.
                 m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
-                if ( MAP_FAILED != m_sharedMemory) {
+                if (MAP_FAILED != m_sharedMemory) {
                     m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
 
-                    // On creating (i.e., NOT opening) a shared memory segment, erase newly created memory segment.
+                    // On creating (i.e., NOT opening) a shared memory segment, setup the shared memory header.
                     if (0 < m_size) {
-                        // Set shared memory area to 0.
-                        ::memset(m_sharedMemory, 0, sizeof(SharedMemoryHeader) + m_size);
-
-                        // Store correct size in shared memory.
+                        // Store user accessible size in shared memory.
                         m_sharedMemoryHeader->__size = m_size;
 
-                        // Create shared mutex.
+                        // Create process-shared mutex (fastest approach, cf. Stevens & Rago: "Advanced Programming in the UNIX (R) Environment").
                         pthread_mutexattr_t mutexAttribute;
                         ::pthread_mutexattr_init(&mutexAttribute);
-                        ::pthread_mutexattr_setpshared(&mutexAttribute, PTHREAD_PROCESS_SHARED);
+                        ::pthread_mutexattr_setpshared(&mutexAttribute, PTHREAD_PROCESS_SHARED); // Share between unrelated processes.
+                        ::pthread_mutexattr_setrobust(&mutexAttribute, PTHREAD_MUTEX_ROBUST);    // Allow continuation of other processes waiting for this mutex when the currently holding process unexpectedly terminates.
+                        ::pthread_mutexattr_settype(&mutexAttribute, PTHREAD_MUTEX_NORMAL);      // Using regular mutex with deadlock behavior.
                         ::pthread_mutex_init(&(m_sharedMemoryHeader->__mutex), &mutexAttribute);
                         ::pthread_mutexattr_destroy(&mutexAttribute);
 
@@ -142,6 +141,14 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                     m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
                 }
             }
+            else {
+                if (-1 != m_fd) {
+                    if (-1 == ::shm_unlink(m_name.c_str())) {
+                        std::cerr << "[cluon::SharedMemory] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    }
+                }
+                m_fd = -1;
+            }
         }
 #endif
     }
@@ -167,7 +174,9 @@ SharedMemory::~SharedMemory() noexcept {
 void SharedMemory::lock() noexcept {
 #ifndef WIN32
     if (nullptr != m_sharedMemoryHeader) {
-        ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex));
+        if (EOWNERDEAD == ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex))) {
+            std::cerr << "[cluon::SharedMemory] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        }
     }
 #endif
 }
