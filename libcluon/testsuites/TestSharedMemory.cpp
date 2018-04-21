@@ -208,6 +208,8 @@ TEST_CASE("Trying to create SharedMemory with correct name and two separate thre
     producerA.join();
     producerB.join();
 
+    // Finally read the last value.
+    tmp = *(reinterpret_cast<uint32_t*>(sm1.data()));
     REQUIRE(3 == tmp);
 #endif
 }
