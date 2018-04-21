@@ -63,7 +63,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                 }
 
                 if (-1 == m_fd) {
-                    std::cerr << "failed: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    std::cerr << "failed: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
                 }
                 else {
                     std::cerr << "succeeded." << std::endl;
@@ -78,7 +78,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
             if (0 < m_size) {
                 retVal = (0 == ::ftruncate(m_fd, sizeof(SharedMemoryHeader) + m_size));
                 if (!retVal) {
-                    std::cerr << "[cluon::SharedMemory] Failed to truncate '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    std::cerr << "[cluon::SharedMemory] Failed to truncate '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
                 }
             }
 
@@ -124,7 +124,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
 
                         // Now, as we know the real size, unmap the first mapping that did not know the size.
                         if ( (nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader)) ) {
-                            std::cerr << "[cluon::SharedMemory] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                            std::cerr << "[cluon::SharedMemory] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
                         }
 
                         // Invalidate all pointers.
@@ -138,8 +138,8 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         }
                     }
                 }
-                else {
-                    std::cerr << "[cluon::SharedMemory] Failed to map '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                else { // LCOV_EXCL_LINE
+                    std::cerr << "[cluon::SharedMemory] Failed to map '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
                 }
 
                 // If the shared memory segment is correctly available, store the pointer for the user data.
@@ -152,13 +152,13 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                     }
                 }
             }
-            else {
-                if (-1 != m_fd) {
-                    if (-1 == ::shm_unlink(m_name.c_str())) {
-                        std::cerr << "[cluon::SharedMemory] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+            else { // LCOV_EXCL_LINE
+                if (-1 != m_fd) { // LCOV_EXCL_LINE
+                    if (-1 == ::shm_unlink(m_name.c_str())) { // LCOV_EXCL_LINE
+                        std::cerr << "[cluon::SharedMemory] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
                     }
                 }
-                m_fd = -1;
+                m_fd = -1; // LCOV_EXCL_LINE
             }
         }
 #endif
@@ -174,10 +174,10 @@ SharedMemory::~SharedMemory() noexcept {
         ::pthread_mutex_destroy(&(m_sharedMemoryHeader->__mutex));
     }
     if ( (nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size) ) {
-        std::cerr << "[cluon::SharedMemory] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        std::cerr << "[cluon::SharedMemory] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
     }
     if ( !m_hasOnlyAttachedToSharedMemory && (-1 != m_fd) && (-1 == ::shm_unlink(m_name.c_str()) && (ENOENT != errno)) ) {
-        std::cerr << "[cluon::SharedMemory] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        std::cerr << "[cluon::SharedMemory] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
     }
 #endif
 }
@@ -186,7 +186,7 @@ void SharedMemory::lock() noexcept {
 #ifndef WIN32
     if (nullptr != m_sharedMemoryHeader) {
         if (EOWNERDEAD == ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex))) {
-            std::cerr << "[cluon::SharedMemory] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+            std::cerr << "[cluon::SharedMemory] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
         }
     }
 #endif
