@@ -22,6 +22,7 @@ _Say you want to quickly realize a distributed software system where individual 
 ## Table of Contents
 * [Features](#features)
 * [Dependencies](#dependencies)
+* [Installation on Ubuntu 18.04 LTS](#installation-on-ubuntu-1804-lts)
 * [Installation on Ubuntu 16.04 LTS](#installation-on-ubuntu-1604-lts)
 * [Installation on Ubuntu 14.04 LTS](#installation-on-ubuntu-1404-lts)
 * [Installation on Alpine 3.7](#installation-on-alpine-37)
@@ -61,6 +62,20 @@ No dependencies! All you need is a C++14-compliant compiler (we are testing with
 ## Installation
 ### Installation as single-file, header-only library
 libcluon is provided as [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly), single-file library as well - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"` where you want to use libcluon, and compile your project with a modern C++ compiler (C++14 or newer)
+
+### Installation on Ubuntu 18.04 LTS
+We are providing pre-compiled binaries for Ubuntu 18.04 LTS (Bionic Beaver) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
+
+```
+sudo add-apt-repository ppa:chrberger/libcluon
+```
+
+Afterwards, update your package database and install `libcluon`:
+
+```
+sudo apt-get update
+sudo apt-get install libcluon
+```
 
 ### Installation on Ubuntu 16.04 LTS
 We are providing pre-compiled binaries for Ubuntu 16.04 LTS (Xenial Xerus) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
@@ -145,6 +160,7 @@ make install
 ## Tutorials & API Documentation
 * [API Documentation](https://chrberger.github.io/libcluon/)
 * [Getting Started Tutorial (using an online C++ compiler)](https://wandbox.org/permlink/PBUsOPs9nuPRncZd)
+* [Using libcluon to realize an application communicating between JavaScript and C++](https://github.com/chrberger/cluon-javascript)
 * [How to send data via a UDP socket](docs/cluon-UDPSender.md)
 * [How to receive data via a UDP socket](docs/cluon-UDPReceiver.md)
 * [Example: Timestamping (using an online C++ compiler)](https://wandbox.org/permlink/HVLDReiIrXJxhMZd)
