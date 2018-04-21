@@ -44,6 +44,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
             m_name = m_name.substr(0, MAX_LENGTH_NAME);
         }
 
+#ifndef WIN32
         // If size is greater than 0, the caller wants to create a new shared
         // memory area. Otherwise, the caller wants to open an existing shared memory.
         int flags = O_RDWR;
@@ -51,7 +52,6 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
             flags |= O_CREAT|O_EXCL;
         }
 
-#ifndef WIN32
         m_fd = ::shm_open(m_name.c_str(), flags, S_IRUSR|S_IWUSR);
         if (-1 == m_fd) {
             std::cerr << "[cluon::SharedMemory] Failed to open shared memory '" << m_name <<"': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
