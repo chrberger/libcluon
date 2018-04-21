@@ -121,7 +121,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             u_long nonBlocking = 1;
             m_isBlockingSocket = !(NO_ERROR == ::ioctlsocket(m_socket, FIONBIO, &nonBlocking));
 #else
-            const int FLAGS = ::fcntl(m_socket, F_GETFL, 0);
+            const int FLAGS    = ::fcntl(m_socket, F_GETFL, 0);
             m_isBlockingSocket = !(0 == ::fcntl(m_socket, F_SETFL, FLAGS | O_NONBLOCK));
 #endif
         }
@@ -132,7 +132,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             u_long nonBlocking = 1;
             m_isBlockingSocket = !(NO_ERROR == ::ioctlsocket(m_socket, FIONBIO, &nonBlocking));
 #else
-            const int FLAGS = ::fcntl(m_socket, F_GETFL, 0);
+            const int FLAGS    = ::fcntl(m_socket, F_GETFL, 0);
             m_isBlockingSocket = !(0 == ::fcntl(m_socket, F_SETFL, FLAGS | O_NONBLOCK));
 #endif
         }
@@ -146,7 +146,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                 auto errorCode = WSAGetLastError();
 #else
                 auto errorCode = errno; // LCOV_EXCL_LINE
-#endif                                  // LCOV_EXCL_LINE
+#endif                                                                                                                                       // LCOV_EXCL_LINE
                 std::cerr << "[cluon::UDPReceiver] Error while trying to set SO_RCVBUF to " << recvBuffer << ": " << errorCode << std::endl; // LCOV_EXCL_LINE
             }
         }
@@ -279,7 +279,7 @@ void UDPReceiver::processPipeline() noexcept {
     while (m_pipelineThreadRunning.load()) {
         std::unique_lock<std::mutex> lck(m_pipelineMutex);
         // Wait until the thread should stop or data is available.
-        m_pipelineCondition.wait(lck, [this]{return (!this->m_pipelineThreadRunning.load() || !this->m_pipeline.empty());});
+        m_pipelineCondition.wait(lck, [this] { return (!this->m_pipelineThreadRunning.load() || !this->m_pipeline.empty()); });
 
         // The condition will automatically lock the mutex after waking up.
         // As we are locking per entry, we need to unlock the mutex first.
@@ -323,8 +323,6 @@ void UDPReceiver::readFromSocket() noexcept {
     struct timeval timeout {};
     timeout.tv_sec  = 1;
     timeout.tv_usec = 0;
-//    timeout.tv_sec  = 0;
-//    timeout.tv_usec = 20 * 1000; // Check for new data with 50Hz.
 
     // Define file descriptor set to watch for read operations.
     fd_set setOfFiledescriptorsToReadFrom{};
@@ -382,8 +380,8 @@ void UDPReceiver::readFromSocket() noexcept {
                     // Create a pipeline entry to be processed concurrently.
                     {
                         PipelineEntry pe;
-                        pe.m_data = std::string(buffer.data(), static_cast<size_t>(bytesRead));
-                        pe.m_from = std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT);
+                        pe.m_data       = std::string(buffer.data(), static_cast<size_t>(bytesRead));
+                        pe.m_from       = std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT);
                         pe.m_sampleTime = timestamp;
 
                         // Store entry in queue.

@@ -340,8 +340,8 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
     REQUIRE(od4.isRunning());
 
     cluon::data::TimeStamp before{cluon::time::now()};
-    constexpr int32_t MAX_ENVELOPES{10* 1000};
-    for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+    constexpr int32_t MAX_ENVELOPES{10 * 1000};
+    for (int32_t i{0}; i < MAX_ENVELOPES; i++) {
         cluon::data::TimeStamp tsSampleTime;
         tsSampleTime.seconds(0).microseconds(i);
 
@@ -352,10 +352,11 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
     // Wait for processing the sent data.
     std::this_thread::sleep_for(1s);
 
-    std::cout << "Sent " << MAX_ENVELOPES << " (took " << cluon::time::deltaInMicroseconds(after, before)/1000 << " ms). Received " << receiving.size() << " envelopes." << std::endl;
+    std::cout << "Sent " << MAX_ENVELOPES << " (took " << cluon::time::deltaInMicroseconds(after, before) / 1000 << " ms). Received " << receiving.size()
+              << " envelopes." << std::endl;
 
     int32_t maxWaitingInSeconds{60};
-    do { std::this_thread::sleep_for(1s); } while ( (receiving.size() < .9f*MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
+    do { std::this_thread::sleep_for(1s); } while ((receiving.size() < .9f * MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
 
 // The success rate depends on the concrete system at hand; thus, disable this check and just report.
 //    REQUIRE(receiving.size() > .9f*MAX_ENVELOPES); // At least 90% of the packets must be processed.
@@ -388,27 +389,27 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
 
     cluon::data::TimeStamp before{cluon::time::now()};
 
-    std::thread sender1([&od4](){
-        constexpr int32_t MAX_ENVELOPES{5* 1000};
-        for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+    std::thread sender1([&od4]() {
+        constexpr int32_t MAX_ENVELOPES{5 * 1000};
+        for (int32_t i{0}; i < MAX_ENVELOPES; i++) {
             cluon::data::TimeStamp tsSampleTime;
             tsSampleTime.seconds(0).microseconds(i);
 
             od4.send(tsSampleTime);
         }
     });
-    std::thread sender2([&od4](){
-        constexpr int32_t MAX_ENVELOPES{5* 1000};
-        for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+    std::thread sender2([&od4]() {
+        constexpr int32_t MAX_ENVELOPES{5 * 1000};
+        for (int32_t i{0}; i < MAX_ENVELOPES; i++) {
             cluon::data::TimeStamp tsSampleTime;
             tsSampleTime.seconds(0).microseconds(i);
 
             od4.send(tsSampleTime);
         }
     });
-    std::thread sender3([&od4](){
-        constexpr int32_t MAX_ENVELOPES{5* 1000};
-        for(int32_t i{0}; i < MAX_ENVELOPES; i++) {
+    std::thread sender3([&od4]() {
+        constexpr int32_t MAX_ENVELOPES{5 * 1000};
+        for (int32_t i{0}; i < MAX_ENVELOPES; i++) {
             cluon::data::TimeStamp tsSampleTime;
             tsSampleTime.seconds(0).microseconds(i);
 
@@ -424,12 +425,13 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
     // Wait for processing the sent data.
     std::this_thread::sleep_for(1s);
 
-    constexpr int32_t MAX_ENVELOPES{5* 1000};
+    constexpr int32_t MAX_ENVELOPES{5 * 1000};
 
-    std::cout << "Sending of 3 times " << MAX_ENVELOPES << " in parallel took " << cluon::time::deltaInMicroseconds(after, before)/1000 << " ms. Received " << receiving.size() << " envelopes." << std::endl;
+    std::cout << "Sending of 3 times " << MAX_ENVELOPES << " in parallel took " << cluon::time::deltaInMicroseconds(after, before) / 1000 << " ms. Received "
+              << receiving.size() << " envelopes." << std::endl;
 
     int32_t maxWaitingInSeconds{60};
-    do { std::this_thread::sleep_for(1s); } while ( (receiving.size() < .9f*MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
+    do { std::this_thread::sleep_for(1s); } while ((receiving.size() < .9f * MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
 
 // The success rate depends on the concrete system at hand; thus, disable this check and just report.
 #ifdef WIN32
@@ -438,4 +440,3 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
 #endif
 #endif
 }
-

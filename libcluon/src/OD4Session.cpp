@@ -32,10 +32,10 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
     , m_delegate(std::move(delegate))
     , m_mapOfDataTriggeredDelegatesMutex{}
     , m_mapOfDataTriggeredDelegates{} {
-    m_receiver = std::make_unique<cluon::UDPReceiver>("225.0.0." + std::to_string(CID), 12175,
-                 [this](std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) {
-                     this->callback(std::move(data), std::move(from), std::move(timepoint));
-                 });
+    m_receiver = std::make_unique<cluon::UDPReceiver>(
+        "225.0.0." + std::to_string(CID), 12175, [this](std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) {
+            this->callback(std::move(data), std::move(from), std::move(timepoint));
+        });
 }
 
 void OD4Session::timeTrigger(float freq, std::function<bool()> delegate) noexcept {
@@ -86,7 +86,7 @@ bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon
     return retVal;
 }
 
-void OD4Session::callback(std::string &&data, std::string &&/*from*/, std::chrono::system_clock::time_point &&timepoint) noexcept {
+void OD4Session::callback(std::string &&data, std::string && /*from*/, std::chrono::system_clock::time_point &&timepoint) noexcept {
     std::stringstream sstr(data);
     auto retVal = extractEnvelope(sstr);
 
