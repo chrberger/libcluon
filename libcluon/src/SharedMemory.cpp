@@ -229,7 +229,9 @@ const std::string SharedMemory::name() const noexcept {
 bool SharedMemory::valid() noexcept {
     bool valid{-1 != m_fd};
     valid &= (nullptr != m_sharedMemory);
+#ifndef WIN32
     valid &= (MAP_FAILED != m_sharedMemory);
+#endif
     valid &= (0 < m_size);
     return valid;
 }
