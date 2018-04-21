@@ -106,7 +106,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
     producer.join();
 
     REQUIRE(54321 == tmp);
-#endif WIN32
+#endif
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory with condition variable for synchronization.") {
@@ -145,7 +145,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
     sm1.unlock();
 
     REQUIRE(23456 == tmp);
-#endif WIN32
+#endif
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name and two separate threads to produce data for shared memory with condition variable for synchronization.") {
