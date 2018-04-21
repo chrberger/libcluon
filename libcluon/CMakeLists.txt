@@ -37,9 +37,11 @@ find_package(Threads REQUIRED)
 set(LIBRARIES ${LIBRARIES} Threads::Threads)
 
 if(UNIX)
-    find_package(LibRT REQUIRED)
-    set(LIBRARIES ${LIBRARIES} ${LIBRT_LIBRARIES})
-    include_directories(SYSTEM ${LIBRT_INCLUDE_DIR})
+    if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
+        find_package(LibRT REQUIRED)
+        set(LIBRARIES ${LIBRARIES} ${LIBRT_LIBRARIES})
+        include_directories(SYSTEM ${LIBRT_INCLUDE_DIR})
+    endif()
 endif()
 
 ################################################################################
