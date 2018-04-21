@@ -98,7 +98,9 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         pthread_mutexattr_t mutexAttribute;
                         ::pthread_mutexattr_init(&mutexAttribute);
                         ::pthread_mutexattr_setpshared(&mutexAttribute, PTHREAD_PROCESS_SHARED); // Share between unrelated processes.
+#ifndef __APPLE__
                         ::pthread_mutexattr_setrobust(&mutexAttribute, PTHREAD_MUTEX_ROBUST);    // Allow continuation of other processes waiting for this mutex when the currently holding process unexpectedly terminates.
+#endif
                         ::pthread_mutexattr_settype(&mutexAttribute, PTHREAD_MUTEX_NORMAL);      // Using regular mutex with deadlock behavior.
                         ::pthread_mutex_init(&(m_sharedMemoryHeader->__mutex), &mutexAttribute);
                         ::pthread_mutexattr_destroy(&mutexAttribute);
