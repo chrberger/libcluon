@@ -106,11 +106,15 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         // Create shared condition.
                         pthread_condattr_t conditionAttribute;
                         ::pthread_condattr_init(&conditionAttribute);
-                        ::pthread_condattr_setpshared(&conditionAttribute, PTHREAD_PROCESS_SHARED);
+                        ::pthread_condattr_setclock(&conditionAttribute, CLOCK_MONOTONIC);          // Use realtime clock for timed waits with non-negative jumps.
+                        ::pthread_condattr_setpshared(&conditionAttribute, PTHREAD_PROCESS_SHARED); // Share between unrelated processes.
                         ::pthread_cond_init(&(m_sharedMemoryHeader->__condition), &conditionAttribute);
                         ::pthread_condattr_destroy(&conditionAttribute);
                     }
                     else {
+                        // Indicate that this instance is attaching to an existing shared memory segment.
+                        m_hasOnlyAttachedToSharedMemory = true;
+
                         // Read size as we are attaching to an existing shared memory.
                         m_size = m_sharedMemoryHeader->__size;
 
@@ -125,11 +129,9 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
 
                         // Re-map with the correct size parameter.
                         m_sharedMemory = static_cast<char*>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ|PROT_WRITE, MAP_SHARED, m_fd, 0));
-                        if ( MAP_FAILED != m_sharedMemory) {
+                        if (MAP_FAILED != m_sharedMemory) {
                             m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader*>(m_sharedMemory);
                         }
-
-                        m_hasOnlyAttachedToSharedMemory = true;
                     }
                 }
                 else {
@@ -137,8 +139,13 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                 }
 
                 // If the shared memory segment is correctly available, store the pointer for the user data.
-                if ( MAP_FAILED != m_sharedMemory) {
+                if (MAP_FAILED != m_sharedMemory) {
                     m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
+
+                    // Lock the shared memory into RAM for performance reasons.
+                    if (-1 == ::mlock(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size)) {
+                        std::cerr << "[cluon::SharedMemory] Failed to mlock shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    }
                 }
             }
             else {
@@ -222,6 +229,7 @@ const std::string SharedMemory::name() const noexcept {
 bool SharedMemory::valid() noexcept {
     bool valid{-1 != m_fd};
     valid &= (nullptr != m_sharedMemory);
+    valid &= (MAP_FAILED != m_sharedMemory);
     valid &= (0 < m_size);
     return valid;
 }
