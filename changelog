@@ -1,3 +1,9 @@
+libcluon (0.0.74) xenial; urgency=low
+
+  * Class SharedMemory to access shared memory in POSIX style
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 21 Apr 2018 23:25:08 +0200
+
 libcluon (0.0.73) xenial; urgency=low
 
   * Adding pipeline to UDPReceiver to separate receiving thread from processing thread
