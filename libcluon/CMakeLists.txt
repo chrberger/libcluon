@@ -36,16 +36,18 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 set(LIBRARIES ${LIBRARIES} Threads::Threads)
 
-if(UNIX)
-    if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
-        find_package(LibRT REQUIRED)
-        set(LIBRARIES ${LIBRARIES} ${LIBRT_LIBRARIES})
-        include_directories(SYSTEM ${LIBRT_INCLUDE_DIR})
+if( ("${WEB}" STREQUAL "") OR ("${WEB}" STREQUAL "0") )
+    if(UNIX)
+        if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
+            find_package(LibRT REQUIRED)
+            set(LIBRARIES ${LIBRARIES} ${LIBRT_LIBRARIES})
+            include_directories(SYSTEM ${LIBRT_INCLUDE_DIR})
+        endif()
     endif()
 endif()
 
 ################################################################################
-# Check wether code for JavaScript is generated.
+# Check whether code for JavaScript is generated.
 if("${WEB}" STREQUAL "1")
     message("Compiling for JavaScript.")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++14 --bind -s NO_EXIT_RUNTIME=1 -s MODULARIZE=1 -s EXPORT_NAME=\"'libcluon'\" -Oz --memory-init-file 0")
