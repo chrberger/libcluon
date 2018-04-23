@@ -356,7 +356,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
               << " envelopes." << std::endl;
 
     int32_t maxWaitingInSeconds{60};
-    do { std::this_thread::sleep_for(1s); } while ((receiving.size() < .9f * MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
+    do { std::this_thread::sleep_for(1s); } while ((static_cast<float>(receiving.size()) < .9f * MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
 
 // The success rate depends on the concrete system at hand; thus, disable this check and just report.
 //    REQUIRE(receiving.size() > .9f*MAX_ENVELOPES); // At least 90% of the packets must be processed.
@@ -389,7 +389,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
 
     cluon::data::TimeStamp before{cluon::time::now()};
 
-    std::thread sender1([&od4]() {
+    std::thread sender1([&od4]() noexcept {
         constexpr int32_t MAX_ENVELOPES{5 * 1000};
         for (int32_t i{0}; i < MAX_ENVELOPES; i++) {
             cluon::data::TimeStamp tsSampleTime;
@@ -398,7 +398,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
             od4.send(tsSampleTime);
         }
     });
-    std::thread sender2([&od4]() {
+    std::thread sender2([&od4]() noexcept {
         constexpr int32_t MAX_ENVELOPES{5 * 1000};
         for (int32_t i{0}; i < MAX_ENVELOPES; i++) {
             cluon::data::TimeStamp tsSampleTime;
@@ -407,7 +407,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
             od4.send(tsSampleTime);
         }
     });
-    std::thread sender3([&od4]() {
+    std::thread sender3([&od4]() noexcept {
         constexpr int32_t MAX_ENVELOPES{5 * 1000};
         for (int32_t i{0}; i < MAX_ENVELOPES; i++) {
             cluon::data::TimeStamp tsSampleTime;
@@ -431,7 +431,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
               << receiving.size() << " envelopes." << std::endl;
 
     int32_t maxWaitingInSeconds{60};
-    do { std::this_thread::sleep_for(1s); } while ((receiving.size() < .9f * MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
+    do { std::this_thread::sleep_for(1s); } while ((static_cast<float>(receiving.size()) < .9f * MAX_ENVELOPES) && maxWaitingInSeconds-- > 0);
 
 // The success rate depends on the concrete system at hand; thus, disable this check and just report.
 #ifdef WIN32
