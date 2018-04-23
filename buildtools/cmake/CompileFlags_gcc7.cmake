@@ -15,6 +15,8 @@
 
 # Warning flags based on and generated from: https://raw.githubusercontent.com/Barro/compiler-warnings/master/gcc/warnings-gcc-7.txt
 set(GCC7_CXX_WARNING_FLAGS " \
+    -fno-pie \
+    -no-pie \
     -pedantic \
     -pedantic-errors \
     -Werror \

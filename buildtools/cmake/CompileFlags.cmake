@@ -60,8 +60,6 @@ else()
     set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
         -D_XOPEN_SOURCE=700 \
         -fstack-protector \
-        -fno-pie \
-        -no-pie \
         -pipe ")
 
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} \
