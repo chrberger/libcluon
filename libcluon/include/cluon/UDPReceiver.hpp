@@ -23,6 +23,7 @@
 // clang-format off
 #ifdef WIN32
     #include <Winsock2.h> // for WSAStartUp
+    #include <ws2tcpip.h> // for SOCKET
 #else
     #include <netinet/in.h>
 #endif
