@@ -25,6 +25,7 @@ _Say you want to quickly realize a distributed software system where individual 
 * [Installation on Ubuntu 18.04 LTS](#installation-on-ubuntu-1804-lts)
 * [Installation on Ubuntu 16.04 LTS](#installation-on-ubuntu-1604-lts)
 * [Installation on Ubuntu 14.04 LTS](#installation-on-ubuntu-1404-lts)
+* [Installation on Debian](#installation-on-debian)
 * [Installation on Alpine 3.7](#installation-on-alpine-37)
 * [Installation on Windows](#installation-on-windows)
 * [Build from sources on the example of Ubuntu 16.04 LTS](#build-from-sources-on-the-example-of-ubuntu-1604-lts)
@@ -61,7 +62,7 @@ No dependencies! All you need is a C++14-compliant compiler (we are testing with
 
 ## Installation
 ### Installation as single-file, header-only library
-libcluon is provided as [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly), single-file library as well - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"` where you want to use libcluon, and compile your project with a modern C++ compiler (C++14 or newer)
+`libcluon` is provided as [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly), single-file library as well - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"` where you want to use libcluon, and compile your project with a modern C++ compiler (C++14 or newer)
 
 ### Installation on Ubuntu 18.04 LTS
 We are providing pre-compiled binaries for Ubuntu 18.04 LTS (Bionic Beaver) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
@@ -109,19 +110,24 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /u
 Now, you can continue with [building `libcluon` from sources](#build-from-sources-on-the-example-of-ubuntu-1604-lts).
 
 ### Installation on Debian
-Add the key
+To use `libcluon` on Debian, you need to add the repository key first:
+
 ```
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8EA63C9470BA0E595B75BBA2A92E492AC0B8C7EC
 ```
-Install add-apt-repository and its dependencies
+
+Afterwards, install `add-apt-repository` and its dependencies:
+
 ```
 sudo apt install dirmngr software-properties-common
 ```
-Add libcluon repository
+
+Then, you can add the `libcluon` repository:
 ```
 sudo add-apt-repository ppa:chrberger/libcluon
 ```
-Finally install libcluon
+
+Now, you can finally install `libcluon`:
 ```
 sudo apt update && sudo apt install libcluon
 ```
