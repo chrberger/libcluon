@@ -108,7 +108,23 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /u
 
 Now, you can continue with [building `libcluon` from sources](#build-from-sources-on-the-example-of-ubuntu-1604-lts).
 
-
+### Installation on Debian
+Add the key
+```
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8EA63C9470BA0E595B75BBA2A92E492AC0B8C7EC
+```
+Install add-apt-repository and its dependencies
+```
+sudo apt install dirmngr software-properties-common
+```
+Add libcluon repository
+```
+sudo add-apt-repository ppa:chrberger/libcluon
+```
+Finally install libcluon
+```
+sudo apt update && sudo apt install libcluon
+```
 ### Installation on Alpine 3.7
 We are providing pre-compiled binaries for Alpine 3.7 for `x86_64`, `armfh`, and `aarch64`; simply install the pre-compile `.apk` package as follows:
 
