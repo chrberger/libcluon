@@ -1,3 +1,9 @@
+libcluon (0.0.76) xenial; urgency=low
+
+  * Improving timeout handling for select
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 27 Apr 2018 09:54:41 +0200
+
 libcluon (0.0.75) xenial; urgency=low
 
   * Fixing libcluonConfig.cmake to search for librt
