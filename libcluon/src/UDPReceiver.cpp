@@ -319,10 +319,7 @@ void UDPReceiver::readFromSocket() noexcept {
                                     - static_cast<uint16_t>(UDPPacketSizeConstraints::SIZE_UDP_HEADER);
     std::array<char, MAX_LENGTH> buffer{};
 
-    // Define timeout for select system call.
     struct timeval timeout {};
-    timeout.tv_sec  = 1;
-    timeout.tv_usec = 0;
 
     // Define file descriptor set to watch for read operations.
     fd_set setOfFiledescriptorsToReadFrom{};
@@ -338,6 +335,12 @@ void UDPReceiver::readFromSocket() noexcept {
     m_readFromSocketThreadRunning.store(true);
 
     while (m_readFromSocketThreadRunning.load()) {
+        // Define timeout for select system call. The timeval struct must be
+        // reinitialized for every select call as it might be modified containing
+        // the actual time slept.
+        timeout.tv_sec  = 0;
+        timeout.tv_usec = 20 * 1000; // Check for new data with 50Hz.
+
         FD_ZERO(&setOfFiledescriptorsToReadFrom);          // NOLINT
         FD_SET(m_socket, &setOfFiledescriptorsToReadFrom); // NOLINT
         ::select(m_socket + 1, &setOfFiledescriptorsToReadFrom, nullptr, nullptr, &timeout);
@@ -393,10 +396,6 @@ void UDPReceiver::readFromSocket() noexcept {
                     totalBytesRead += bytesRead;
                 }
             } while (!m_isBlockingSocket && (bytesRead > 0));
-        } else {
-            // Let the operating system yield other threads.
-            using namespace std::literals::chrono_literals; // NOLINT
-            std::this_thread::sleep_for(1ms);
         }
 
         if (static_cast<int32_t>(totalBytesRead) > 0) {

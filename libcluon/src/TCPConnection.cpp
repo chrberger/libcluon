@@ -175,10 +175,7 @@ void TCPConnection::readFromSocket() noexcept {
     constexpr uint16_t MAX_LENGTH{65535};
     std::array<char, MAX_LENGTH> buffer{};
 
-    // Define timeout for select system call.
     struct timeval timeout {};
-    timeout.tv_sec  = 0;
-    timeout.tv_usec = 20 * 1000; // Check for new data with 50Hz.
 
     // Define file descriptor set to watch for read operations.
     fd_set setOfFiledescriptorsToReadFrom{};
@@ -188,6 +185,12 @@ void TCPConnection::readFromSocket() noexcept {
     m_readFromSocketThreadRunning.store(true);
 
     while (m_readFromSocketThreadRunning.load()) {
+        // Define timeout for select system call. The timeval struct must be
+        // reinitialized for every select call as it might be modified containing
+        // the actual time slept.
+        timeout.tv_sec  = 0;
+        timeout.tv_usec = 20 * 1000; // Check for new data with 50Hz.
+
         FD_ZERO(&setOfFiledescriptorsToReadFrom);
         FD_SET(m_socket, &setOfFiledescriptorsToReadFrom);
         ::select(m_socket + 1, &setOfFiledescriptorsToReadFrom, nullptr, nullptr, &timeout);
@@ -220,10 +223,6 @@ void TCPConnection::readFromSocket() noexcept {
                 // Call newDataDelegate.
                 m_newDataDelegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)), timestamp);
             }
-        } else {
-            // Let the operating system yield other threads.
-            using namespace std::literals::chrono_literals;
-            std::this_thread::sleep_for(1ms);
         }
     }
 }
