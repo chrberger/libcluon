@@ -16,6 +16,7 @@
  */
 
 #include "cluon/TCPConnection.hpp"
+#include "cluon/TerminateHandler.hpp"
 
 // clang-format off
 #ifdef WIN32
@@ -143,7 +144,7 @@ void TCPConnection::closeSocket(int errorCode) noexcept {
 }
 
 bool TCPConnection::isRunning() const noexcept {
-    return m_readFromSocketThreadRunning.load();
+    return (m_readFromSocketThreadRunning.load() && !TerminateHandler::instance().isTerminated.load());
 }
 
 std::pair<ssize_t, int32_t> TCPConnection::send(std::string &&data) const noexcept {

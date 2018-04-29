@@ -71,6 +71,7 @@ for i in \
     cluon/cluon.hpp \
     cluon/MetaMessage.hpp \
     cluon/MessageParser.hpp \
+    cluon/TerminateHandler.hpp \
     cluon/UDPPacketSizeConstraints.hpp \
     cluon/UDPSender.hpp \
     cluon/UDPReceiver.hpp \
@@ -107,6 +108,7 @@ for i in \
     cluon.cpp \
     MetaMessage.cpp \
     MessageParser.cpp \
+    TerminateHandler.cpp \
     UDPSender.cpp \
     UDPReceiver.cpp \
     TCPConnection.cpp \

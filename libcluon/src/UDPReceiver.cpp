@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "cluon/TerminateHandler.hpp"
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/UDPPacketSizeConstraints.hpp"
 
@@ -269,7 +270,7 @@ void UDPReceiver::closeSocket(int errorCode) noexcept {
 }
 
 bool UDPReceiver::isRunning() const noexcept {
-    return m_readFromSocketThreadRunning.load();
+    return (m_readFromSocketThreadRunning.load() && !TerminateHandler::instance().isTerminated.load());
 }
 
 void UDPReceiver::processPipeline() noexcept {

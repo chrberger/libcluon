@@ -64,7 +64,7 @@ void OD4Session::timeTrigger(float freq, std::function<bool()> delegate) noexcep
             } else {
                 std::cerr << "[cluon::OD4Session]: time-triggered delegate violated allocated time slice." << std::endl;
             }
-        } while (delegateIsRunning);
+        } while (delegateIsRunning && !TerminateHandler::instance().isTerminated.load());
     }
 }
 

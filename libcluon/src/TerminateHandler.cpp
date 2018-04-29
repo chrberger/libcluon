@@ -17,16 +17,43 @@
 
 #include "cluon/TerminateHandler.hpp"
 
+#include <cstring>
+#include <cstdlib>
 #include <iostream>
 
 namespace cluon {
 
-TerminateHandler::TerminateHandler() noexcept {
-    std::clog << "[cluon::TerminateHandler] Constructor." << std::endl;
+inline void cluon_handleExit() {
+    TerminateHandler::instance().isTerminated.store(true);
 }
 
-TerminateHandler::~TerminateHandler() noexcept {
-    std::clog << "[cluon::TerminateHandler] Destructor." << std::endl;
+inline void cluon_handleSignal(int32_t /*signal*/) {
+    TerminateHandler::instance().isTerminated.store(true);
+}
+
+TerminateHandler::TerminateHandler() noexcept {
+    if (0 != std::atexit(cluon_handleExit)) {
+        std::cerr << "[cluon::TerminateHandler] Failed to register cluon_exitHandler()." << std::endl;
+    }
+
+#ifdef WIN32
+    if (SIG_ERR == ::signal(SIGINT, &cluon_handleSignal)) {
+        std::cerr << "[cluon::TerminateHandler] Failed to register signal SIGINT." << std::endl;
+    }
+    if (SIG_ERR == ::signal(SIGTERM, &cluon_handleSignal)) {
+        std::cerr << "[cluon::TerminateHandler] Failed to register signal SIGTERM." << std::endl;
+    }
+#else
+    std::memset(&m_signalHandler, 0, sizeof(m_signalHandler));
+    m_signalHandler.sa_handler = &cluon_handleSignal;
+
+    if (::sigaction(SIGINT, &m_signalHandler, NULL) < 0) {
+        std::cerr << "[cluon::TerminateHandler] Failed to register signal SIGINT." << std::endl;
+    }
+    if (::sigaction(SIGTERM, &m_signalHandler, NULL) < 0) {
+        std::cerr << "[cluon::TerminateHandler] Failed to register signal SIGTERM." << std::endl;
+    }
+#endif
 }
 
 } // namespace cluon

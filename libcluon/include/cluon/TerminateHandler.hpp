@@ -20,6 +20,10 @@
 
 #include "cluon/cluon.hpp"
 
+#include <signal.h>
+
+#include <atomic>
+
 namespace cluon {
 
 class LIBCLUON_API TerminateHandler {
@@ -39,10 +43,17 @@ class LIBCLUON_API TerminateHandler {
         return instance;
     }
 
-    ~TerminateHandler() noexcept;
+    ~TerminateHandler() = default;
+
+   public:
+    std::atomic<bool> isTerminated{false};
 
    private:
     TerminateHandler() noexcept;
+
+#ifndef WIN32
+    struct sigaction m_signalHandler{};
+#endif
 };
 } // namespace cluon
 
