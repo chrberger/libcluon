@@ -18,6 +18,7 @@
 #include "cluon/OD4Session.hpp"
 #include "cluon/Envelope.hpp"
 #include "cluon/FromProtoVisitor.hpp"
+#include "cluon/TerminateHandler.hpp"
 #include "cluon/Time.hpp"
 
 #include <iostream>
@@ -35,7 +36,7 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
     m_receiver = std::make_unique<cluon::UDPReceiver>(
         "225.0.0." + std::to_string(CID), 12175, [this](std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) {
             this->callback(std::move(data), std::move(from), std::move(timepoint));
-        });
+    });
 }
 
 void OD4Session::timeTrigger(float freq, std::function<bool()> delegate) noexcept {

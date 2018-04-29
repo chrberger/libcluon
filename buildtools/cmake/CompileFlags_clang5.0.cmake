@@ -137,7 +137,7 @@ set(CLANG50_CXX_WARNING_FLAGS " \
     -Wenum-conversion \
     -Wenum-too-large \
     -Wexceptions \
-    -Wexit-time-destructors \
+    -Wno-error=exit-time-destructors \
     -Wexpansion-to-defined \
     -Wexplicit-initialize-call \
     -Wextern-c-compat \
