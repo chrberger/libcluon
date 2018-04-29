@@ -27,13 +27,13 @@ inline void cluon_handleExit() {
     TerminateHandler::instance().isTerminated.store(true);
 }
 
-inline void cluon_handleSignal(int32_t /*signal*/) {
-    TerminateHandler::instance().isTerminated.store(true);
+inline void cluon_handleSignal(int32_t /*signal*/) { // LCOV_EXCL_LINE
+    TerminateHandler::instance().isTerminated.store(true); // LCOV_EXCL_LINE
 }
 
 TerminateHandler::TerminateHandler() noexcept {
     if (0 != std::atexit(cluon_handleExit)) {
-        std::cerr << "[cluon::TerminateHandler] Failed to register cluon_exitHandler()." << std::endl;
+        std::cerr << "[cluon::TerminateHandler] Failed to register cluon_exitHandler()." << std::endl; // LCOV_EXCL_LINE
     }
 
 #ifdef WIN32
@@ -48,10 +48,10 @@ TerminateHandler::TerminateHandler() noexcept {
     m_signalHandler.sa_handler = &cluon_handleSignal;
 
     if (::sigaction(SIGINT, &m_signalHandler, NULL) < 0) {
-        std::cerr << "[cluon::TerminateHandler] Failed to register signal SIGINT." << std::endl;
+        std::cerr << "[cluon::TerminateHandler] Failed to register signal SIGINT." << std::endl; // LCOV_EXCL_LINE
     }
     if (::sigaction(SIGTERM, &m_signalHandler, NULL) < 0) {
-        std::cerr << "[cluon::TerminateHandler] Failed to register signal SIGTERM." << std::endl;
+        std::cerr << "[cluon::TerminateHandler] Failed to register signal SIGTERM." << std::endl; // LCOV_EXCL_LINE
     }
 #endif
 }

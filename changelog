@@ -1,3 +1,9 @@
+libcluon (0.0.77) xenial; urgency=low
+
+  * Added TerminateHandler to properly terminate a running OD4Session on SIGTERM, SIGINT, and atexit
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 29 Apr 2018 21:56:34 +0200
+
 libcluon (0.0.76) xenial; urgency=low
 
   * Improving timeout handling for select
