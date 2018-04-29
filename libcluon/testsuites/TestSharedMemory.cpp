@@ -20,6 +20,7 @@
 #include "cluon/SharedMemory.hpp"
 
 #include <chrono>
+#include <fstream>
 #include <thread>
 
 TEST_CASE("Trying to open SharedMemory with empty name.") {
@@ -207,3 +208,27 @@ TEST_CASE(
     REQUIRE(3 == tmp);
 #endif
 }
+
+TEST_CASE("Trying to create SharedMemory that existed before to remove it.") {
+#ifdef __linux__
+    std::fstream fout("/dev/shm/PQRABCDEFGHI", std::ios::out|std::ios::trunc);
+    fout.close();
+
+    cluon::SharedMemory sm1{"/PQRABCDEFGHI", 4};
+    REQUIRE(sm1.valid());
+    REQUIRE(4 == sm1.size());
+    REQUIRE(nullptr != sm1.data());
+    REQUIRE("/PQRABCDEFGHI" == sm1.name());
+    sm1.lock();
+    uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+    *data          = 34567;
+    sm1.unlock();
+
+    sm1.lock();
+    uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
+    uint32_t tmp    = *data2;
+    sm1.unlock();
+    REQUIRE(34567 == tmp);
+#endif
+}
+
