@@ -225,6 +225,7 @@ TEST_CASE("Create simple player for file with three entries.") {
         }
         recordingFile.close();
     }
+
     cluon::Player player("rec3", AUTO_REWIND, THREADING);
 
     REQUIRE(player.hasMoreData());
@@ -409,7 +410,7 @@ TEST_CASE("Create simple player for file with three entries with manual rewind."
     UNLINK("rec5");
 }
 
-TEST_CASE("Create simple player for file with 6,000 entries to test look-ahead with threading.") {
+TEST_CASE("Create simple player for file with 6,000 entries to test look-ahead with threading and player listener.") {
     constexpr bool AUTO_REWIND{false};
     constexpr bool THREADING{true};
 
@@ -445,6 +446,9 @@ TEST_CASE("Create simple player for file with 6,000 entries to test look-ahead w
     }
     cluon::Player player("rec6", AUTO_REWIND, THREADING);
 
+    bool calledPlayerListener{false};
+    player.setPlayerListener([&calledPlayerListener](cluon::data::PlayerStatus playerStatus){calledPlayerListener = true;});
+
     REQUIRE(player.hasMoreData());
     REQUIRE(MAX_ENTRIES == player.totalNumberOfEnvelopesInRecFile());
 
@@ -478,6 +482,7 @@ TEST_CASE("Create simple player for file with 6,000 entries to test look-ahead w
         std::chrono::duration<uint32_t, std::micro> delay{player.delay()/2000};
         std::this_thread::sleep_for(delay);
     }
+    REQUIRE(calledPlayerListener);
     REQUIRE(MAX_ENTRIES == retrievedEntries);
     UNLINK("rec6");
 }
