@@ -292,12 +292,12 @@ void Player::checkAvailabilityOfNextEnvelopeToBeReplayed() noexcept {
 
 ////////////////////////////////////////////////////////////////////////
 
-uint32_t Player::getTotalNumberOfEnvelopesInRecFile() const noexcept {
+uint32_t Player::totalNumberOfEnvelopesInRecFile() const noexcept {
     std::lock_guard<std::mutex> lck(m_indexMutex);
     return static_cast<uint32_t>(m_index.size());
 }
 
-uint32_t Player::getDelay() const noexcept {
+uint32_t Player::delay() const noexcept {
     std::lock_guard<std::mutex> lck(m_indexMutex);
     // Make sure that delay is not exceeding the specified maximum delay.
     return std::min<uint32_t>(m_delay, Player::MAX_DELAY_IN_MICROSECONDS);

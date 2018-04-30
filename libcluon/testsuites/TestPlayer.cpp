@@ -32,7 +32,8 @@ TEST_CASE("Create simple player for non existing file.") {
     cluon::Player player("/pmt/this/file/does/not/exist", AUTO_REWIND, THREADING);
 
     REQUIRE(!player.hasMoreData());
-    REQUIRE(0 == player.getTotalNumberOfEnvelopesInRecFile());
+    REQUIRE(0 == player.totalNumberOfEnvelopesInRecFile());
     REQUIRE(!player.getNextEnvelopeToBeReplayed().first);
+    REQUIRE(0 == player.delay());
 }
 

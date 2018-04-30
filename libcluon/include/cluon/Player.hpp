@@ -83,7 +83,7 @@ class LIBCLUON_API Player {
         /**
          * @return real delay in microseconds to be waited before the next cluon::data::Envelope should be delivered.
          */
-        uint32_t getDelay() const noexcept;
+        uint32_t delay() const noexcept;
 
         /**
          * @return true if there is more data to replay.
@@ -100,7 +100,7 @@ class LIBCLUON_API Player {
         /**
          * @return total amount of cluon::data::Envelopes in the .rec file.
          */
-        uint32_t getTotalNumberOfEnvelopesInRecFile() const noexcept;
+        uint32_t totalNumberOfEnvelopesInRecFile() const noexcept;
 
     private:
         // Internal methods without Lock.

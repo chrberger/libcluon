@@ -80,7 +80,7 @@ int32_t main(int32_t argc, char **argv) {
                 if (next.first) {
                     {
                         envelopeCounter++;
-                        const int32_t percentage = static_cast<int32_t>((static_cast<float>(envelopeCounter)*100.0f)/static_cast<float>(player.getTotalNumberOfEnvelopesInRecFile()));
+                        const int32_t percentage = static_cast<int32_t>((static_cast<float>(envelopeCounter)*100.0f)/static_cast<float>(player.totalNumberOfEnvelopesInRecFile()));
                         if ( (percentage % 5 == 0) && (percentage != oldPercentage) ) {
                             std::cerr << argv[0] << ": Processed " << percentage << "%." << std::endl;
                             oldPercentage = percentage;

@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 
             {
                 std::string s;
-                playerStatus.numberOfEntries(player.getTotalNumberOfEnvelopesInRecFile());
+                playerStatus.numberOfEntries(player.totalNumberOfEnvelopesInRecFile());
                 playerStatus.state(2); // playback file
                 {
                     std::lock_guard<std::mutex> lck(playerStatusMutex);
@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
                             std::cout << cluon::serializeEnvelope(std::move(next.second));
                             std::cout.flush();
                         }
-                        std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(player.getDelay()));
+                        std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(player.delay()));
                     }
                 }
                 else {
