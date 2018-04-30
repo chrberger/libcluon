@@ -123,7 +123,7 @@ std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelo
 
 // clang-format off
 std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp) noexcept {
-// clang-format on
+    // clang-format on
     std::string retVal;
     if (0 < m_scopeOfMetaMessages.count(messageIdentifier)) {
         // Get specification for message to be created.

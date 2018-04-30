@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/TerminateHandler.hpp"
 #include "cluon/UDPReceiver.hpp"
+#include "cluon/TerminateHandler.hpp"
 #include "cluon/UDPPacketSizeConstraints.hpp"
 
 // clang-format off

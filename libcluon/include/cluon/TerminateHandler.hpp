@@ -38,7 +38,7 @@ class LIBCLUON_API TerminateHandler {
      * Define singleton behavior using static initializer (cf. http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/n3242.pdf, Sec. 6.7.4).
      * @return singleton for an instance of this class.
      */
-    static TerminateHandler& instance() noexcept {
+    static TerminateHandler &instance() noexcept {
         static TerminateHandler instance;
         return instance;
     }
@@ -52,7 +52,7 @@ class LIBCLUON_API TerminateHandler {
     TerminateHandler() noexcept;
 
 #ifndef WIN32
-    struct sigaction m_signalHandler{};
+    struct sigaction m_signalHandler {};
 #endif
 };
 } // namespace cluon

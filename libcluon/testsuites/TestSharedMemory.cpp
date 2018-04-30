@@ -211,7 +211,7 @@ TEST_CASE(
 
 TEST_CASE("Trying to create SharedMemory that existed before to remove it.") {
 #ifdef __linux__
-    std::fstream fout("/dev/shm/PQRABCDEFGHI", std::ios::out|std::ios::trunc);
+    std::fstream fout("/dev/shm/PQRABCDEFGHI", std::ios::out | std::ios::trunc);
     fout.close();
 
     cluon::SharedMemory sm1{"/PQRABCDEFGHI", 4};
@@ -231,4 +231,3 @@ TEST_CASE("Trying to create SharedMemory that existed before to remove it.") {
     REQUIRE(34567 == tmp);
 #endif
 }
-

@@ -17,8 +17,8 @@
 
 #include "cluon/TerminateHandler.hpp"
 
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 
 namespace cluon {
@@ -27,7 +27,7 @@ inline void cluon_handleExit() {
     TerminateHandler::instance().isTerminated.store(true);
 }
 
-inline void cluon_handleSignal(int32_t /*signal*/) { // LCOV_EXCL_LINE
+inline void cluon_handleSignal(int32_t /*signal*/) {       // LCOV_EXCL_LINE
     TerminateHandler::instance().isTerminated.store(true); // LCOV_EXCL_LINE
 }
 
@@ -57,4 +57,3 @@ TerminateHandler::TerminateHandler() noexcept {
 }
 
 } // namespace cluon
-

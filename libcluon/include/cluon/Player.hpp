@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// clang-format off
+
 #ifndef CLUON_PLAYER_HPP
 #define CLUON_PLAYER_HPP
 
@@ -223,3 +225,5 @@ class LIBCLUON_API Player {
 }
 
 #endif
+
+// clang-format on

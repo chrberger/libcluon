@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// clang-format off
 
 #include "cluon/Envelope.hpp"
 #include "cluon/Player.hpp"
@@ -461,3 +462,5 @@ float Player::checkRefillingCache(const uint32_t &numberOfEntries, float refillM
 }
 
 }
+
+// clang-format on
