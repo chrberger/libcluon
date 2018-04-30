@@ -123,7 +123,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         m_size = m_sharedMemoryHeader->__size;
 
                         // Now, as we know the real size, unmap the first mapping that did not know the size.
-                        if ((nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader))) {
+                        if (::munmap(m_sharedMemory, sizeof(SharedMemoryHeader))) {
                             std::cerr << "[cluon::SharedMemory] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" // LCOV_EXCL_LINE
                                       << std::endl;                                                                                           // LCOV_EXCL_LINE
                         }
