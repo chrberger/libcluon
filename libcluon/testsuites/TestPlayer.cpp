@@ -717,3 +717,79 @@ TEST_CASE("Create simple player for file with three entries with seeking with th
     UNLINK("rec8");
 }
 
+TEST_CASE("Create simple player for file with three entries with manual rewind and threading.") {
+    constexpr bool AUTO_REWIND{false};
+    constexpr bool THREADING{true};
+
+    UNLINK("rec9");
+    constexpr int32_t MAX_ENTRIES{3};
+    {
+        std::fstream recordingFile("rec9", std::ios::out|std::ios::binary|std::ios::trunc);
+        REQUIRE(recordingFile.good());
+
+        for(int32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
+            testdata::MyTestMessage5 msg;
+            msg.attribute6(entryCounter+1);
+
+            cluon::ToProtoVisitor proto;
+            msg.accept(proto);
+
+            cluon::data::Envelope env;
+            cluon::data::TimeStamp sent; sent.seconds(1000).microseconds(entryCounter);
+            cluon::data::TimeStamp received; received.seconds(5000).microseconds(entryCounter);
+            cluon::data::TimeStamp sampleTimeStamp; sampleTimeStamp.seconds(10000).microseconds(entryCounter);
+
+            env.serializedData(proto.encodedData());
+            env.dataType(testdata::MyTestMessage5::ID())
+               .sent(sent)
+               .received(received)
+               .sampleTimeStamp(sampleTimeStamp);
+
+            const std::string tmp{cluon::serializeEnvelope(std::move(env))};
+            recordingFile.write(tmp.c_str(), static_cast<std::streamsize>(tmp.size()));
+            recordingFile.flush();
+        }
+        recordingFile.close();
+    }
+    cluon::Player player("rec9", AUTO_REWIND, THREADING);
+
+    REQUIRE(player.hasMoreData());
+    REQUIRE(MAX_ENTRIES == player.totalNumberOfEnvelopesInRecFile());
+
+    bool rewinded{false};
+    int32_t retrievedEntries{0};
+    while(player.hasMoreData()) {
+        auto entry = player.getNextEnvelopeToBeReplayed();
+        REQUIRE(entry.first);
+
+        cluon::data::Envelope env = entry.second;
+        REQUIRE(testdata::MyTestMessage5::ID() == env.dataType());
+
+        REQUIRE(1000 == env.sent().seconds());
+        REQUIRE(retrievedEntries%3 == env.sent().microseconds());
+        REQUIRE(5000 == env.received().seconds());
+        REQUIRE(retrievedEntries%3 == env.received().microseconds());
+        REQUIRE(10000 == env.sampleTimeStamp().seconds());
+        REQUIRE(retrievedEntries%3 == env.sampleTimeStamp().microseconds());
+
+        retrievedEntries++;
+
+        testdata::MyTestMessage5 msg = cluon::extractMessage<testdata::MyTestMessage5>(std::move(env));
+        REQUIRE(((retrievedEntries-1)%3)+1 == msg.attribute6());
+
+        if (1 == ((retrievedEntries-1)%3)+1) {
+            REQUIRE(0 == player.delay());
+        }
+        else {
+            REQUIRE(1 == player.delay());
+        }
+
+        if (!rewinded && (3 == retrievedEntries)) {
+            player.rewind();
+            rewinded = true;
+        }
+    }
+    REQUIRE(6 == retrievedEntries);
+    UNLINK("rec9");
+}
+
