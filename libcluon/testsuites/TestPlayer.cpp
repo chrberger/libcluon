@@ -23,15 +23,27 @@
 #include "cluon/cluonDataStructures.hpp"
 #include "cluon/cluonTestDataStructures.hpp"
 
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <utility>
 
+// clang-format off
+#ifdef WIN32
+    #define UNLINK _unlink
+#else
+    #include <unistd.h>
+    #define UNLINK unlink
+#endif
+// clang-format on
+
+
 TEST_CASE("Create simple player for non existing file.") {
     constexpr bool AUTO_REWIND{false};
     constexpr bool THREADING{false};
 
+    UNLINK("/pmt/this/file/does/not/exist");
     {
         std::fstream fileDoesNotExist("/pmt/this/file/does/not/exist", std::ios::in);
         REQUIRE(!fileDoesNotExist.good());
@@ -48,7 +60,8 @@ TEST_CASE("Create simple player for file with one entry.") {
     constexpr bool AUTO_REWIND{false};
     constexpr bool THREADING{false};
 
-    constexpr uint32_t MAX_ENTRIES{1};
+    UNLINK("rec1");
+    constexpr int32_t MAX_ENTRIES{1};
     {
         std::fstream recordingFile("rec1", std::ios::out|std::ios::binary|std::ios::trunc);
         REQUIRE(recordingFile.good());
@@ -105,18 +118,20 @@ TEST_CASE("Create simple player for file with one entry.") {
         REQUIRE(0 == player.delay());
     }
     REQUIRE(MAX_ENTRIES == retrievedEntries);
+    UNLINK("rec1");
 }
 
 TEST_CASE("Create simple player for file with two entries.") {
     constexpr bool AUTO_REWIND{false};
     constexpr bool THREADING{false};
 
-    constexpr uint32_t MAX_ENTRIES{2};
+    UNLINK("rec2");
+    constexpr int32_t MAX_ENTRIES{2};
     {
         std::fstream recordingFile("rec2", std::ios::out|std::ios::binary|std::ios::trunc);
         REQUIRE(recordingFile.good());
 
-        for(uint32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
+        for(int32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
             testdata::MyTestMessage5 msg;
             msg.attribute6(entryCounter+1);
 
@@ -173,18 +188,20 @@ TEST_CASE("Create simple player for file with two entries.") {
         }
     }
     REQUIRE(MAX_ENTRIES == retrievedEntries);
+    UNLINK("rec2");
 }
 
 TEST_CASE("Create simple player for file with three entries.") {
     constexpr bool AUTO_REWIND{false};
     constexpr bool THREADING{false};
 
-    constexpr uint32_t MAX_ENTRIES{3};
+    UNLINK("rec3");
+    constexpr int32_t MAX_ENTRIES{3};
     {
         std::fstream recordingFile("rec3", std::ios::out|std::ios::binary|std::ios::trunc);
         REQUIRE(recordingFile.good());
 
-        for(uint32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
+        for(int32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
             testdata::MyTestMessage5 msg;
             msg.attribute6(entryCounter+1);
 
@@ -241,5 +258,79 @@ TEST_CASE("Create simple player for file with three entries.") {
         }
     }
     REQUIRE(MAX_ENTRIES == retrievedEntries);
+    UNLINK("rec3");
+}
+
+TEST_CASE("Create simple player for file with 6,000 entries to test look-ahead with threading.") {
+    constexpr bool AUTO_REWIND{false};
+    constexpr bool THREADING{true};
+
+    UNLINK("rec5");
+    constexpr int32_t MAX_ENTRIES{6000};
+    {
+        std::fstream recordingFile("rec5", std::ios::out|std::ios::binary|std::ios::trunc);
+        REQUIRE(recordingFile.good());
+
+        for(int32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
+            testdata::MyTestMessage5 msg;
+            msg.attribute6(entryCounter+1);
+
+            cluon::ToProtoVisitor proto;
+            msg.accept(proto);
+
+            cluon::data::Envelope env;
+            cluon::data::TimeStamp sent; sent.seconds(1000).microseconds(entryCounter);
+            cluon::data::TimeStamp received; received.seconds(5000).microseconds(entryCounter);
+            cluon::data::TimeStamp sampleTimeStamp; sampleTimeStamp.seconds(entryCounter).microseconds(entryCounter);
+
+            env.serializedData(proto.encodedData());
+            env.dataType(testdata::MyTestMessage5::ID())
+               .sent(sent)
+               .received(received)
+               .sampleTimeStamp(sampleTimeStamp);
+
+            const std::string tmp{cluon::serializeEnvelope(std::move(env))};
+            recordingFile.write(tmp.c_str(), static_cast<std::streamsize>(tmp.size()));
+            recordingFile.flush();
+        }
+        recordingFile.close();
+    }
+    cluon::Player player("rec5", AUTO_REWIND, THREADING);
+
+    REQUIRE(player.hasMoreData());
+    REQUIRE(MAX_ENTRIES == player.totalNumberOfEnvelopesInRecFile());
+
+    int32_t retrievedEntries{0};
+    while(player.hasMoreData()) {
+        auto entry = player.getNextEnvelopeToBeReplayed();
+        REQUIRE(entry.first);
+
+        cluon::data::Envelope env = entry.second;
+        REQUIRE(testdata::MyTestMessage5::ID() == env.dataType());
+
+        REQUIRE(1000 == env.sent().seconds());
+        REQUIRE(retrievedEntries == env.sent().microseconds());
+        REQUIRE(5000 == env.received().seconds());
+        REQUIRE(retrievedEntries == env.received().microseconds());
+        REQUIRE(retrievedEntries == env.sampleTimeStamp().seconds());
+        REQUIRE(retrievedEntries == env.sampleTimeStamp().microseconds());
+
+        retrievedEntries++;
+
+        testdata::MyTestMessage5 msg = cluon::extractMessage<testdata::MyTestMessage5>(std::move(env));
+        REQUIRE(retrievedEntries == msg.attribute6());
+
+        if (1 == retrievedEntries) {
+            REQUIRE(0 == player.delay());
+        }
+        else {
+            REQUIRE(static_cast<int64_t>(1000*1000) == static_cast<int64_t>(player.delay()));
+        }
+
+        std::chrono::duration<uint32_t, std::micro> delay{player.delay()/2000};
+        std::this_thread::sleep_for(delay);
+    }
+    REQUIRE(MAX_ENTRIES == retrievedEntries);
+    UNLINK("rec5");
 }
 
