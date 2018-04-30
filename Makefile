@@ -67,7 +67,7 @@ define runOnCode
 			-v $(PATH_FOR_INSTALL):/opt/install \
 			-v $(PATH_CCACHE):/opt/ccache \
 			-w /opt/build \
-			$(BASE_IMAGE_DEV) \
+			$(BASE_IMAGE_DEV):$(BASE_IMAGE_DEV_VERSION) \
 			/opt/build.sh $1 ./$(SOURCE_FOLDER)/
 endef
 

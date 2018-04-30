@@ -17,9 +17,15 @@
 
 #include "catch.hpp"
 
+#include "cluon/Envelope.hpp"
 #include "cluon/Player.hpp"
+#include "cluon/ToProtoVisitor.hpp"
+#include "cluon/cluonDataStructures.hpp"
+#include "cluon/cluonTestDataStructures.hpp"
 
 #include <fstream>
+#include <string>
+#include <utility>
 
 TEST_CASE("Create simple player for non existing file.") {
     constexpr bool AUTO_REWIND{false};
