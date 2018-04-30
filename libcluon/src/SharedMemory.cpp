@@ -149,8 +149,8 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
 
                     // Lock the shared memory into RAM for performance reasons.
                     if (-1 == ::mlock(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size)) {
-                        std::cerr << "[cluon::SharedMemory] Failed to mlock shared memory: " << ::strerror(errno) << " (" << errno << ")"
-                                  << std::endl; // LCOV_EXCL_LINE
+                        std::cerr << "[cluon::SharedMemory] Failed to mlock shared memory: " // LCOV_EXCL_LINE
+                                  << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
                     }
                 }
             } else {                                                                                                                       // LCOV_EXCL_LINE
@@ -188,7 +188,7 @@ void SharedMemory::lock() noexcept {
 #ifndef WIN32
     if (nullptr != m_sharedMemoryHeader) {
         if (EOWNERDEAD == ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex))) {
-            std::cerr << "[cluon::SharedMemory] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name
+            std::cerr << "[cluon::SharedMemory] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name // LCOV_EXCL_LINE
                       << "': " << ::strerror(errno)         // LCOV_EXCL_LINE
                       << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
         }
