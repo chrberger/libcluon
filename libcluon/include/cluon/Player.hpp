@@ -38,13 +38,13 @@ namespace cluon {
 
 class LIBCLUON_API IndexEntry {
     public:
-        IndexEntry() noexcept;
+        IndexEntry() = default;
         IndexEntry(const int64_t &sampleTimeStamp, const uint64_t &filePosition) noexcept;
 
     public:
-        int64_t m_sampleTimeStamp;
-        uint64_t m_filePosition;
-        bool m_available;
+        int64_t m_sampleTimeStamp{0};
+        uint64_t m_filePosition{0};
+        bool m_available{0};
 };
 
 class LIBCLUON_API Player {

@@ -33,9 +33,6 @@
 
 namespace cluon {
 
-IndexEntry::IndexEntry() noexcept :
-    IndexEntry(0, 0) {}
-
 IndexEntry::IndexEntry(const int64_t &sampleTimeStamp, const uint64_t &filePosition) noexcept :
     m_sampleTimeStamp(sampleTimeStamp),
     m_filePosition(filePosition),
@@ -149,7 +146,7 @@ void Player::resetCaches() noexcept {
         m_numberOfReturnedEnvelopesInTotal = 0;
         m_envelopeCache.clear();
     }
-    catch (...) {}
+    catch (...) {} // LCOV_EXCL_LINE
 }
 
 void Player::resetIterators() noexcept {
@@ -163,7 +160,7 @@ void Player::resetIterators() noexcept {
         // Invalidate iterator for erasing entries point.
         m_previousPreviousEnvelopeAlreadyReplayed = m_index.end();
     }
-    catch (...) {}
+    catch (...) {} // LCOV_EXCL_LINE
 }
 
 void Player::computeInitialCacheLevelAndFillCache() noexcept {
@@ -206,7 +203,7 @@ uint32_t Player::fillEnvelopeCache(const uint32_t &maxNumberOfEntriesToReadFromF
                     std::lock_guard<std::mutex> lck(m_indexMutex);
                     m_nextEntryToReadFromRecFile->second.m_available = m_envelopeCache.emplace(std::make_pair(m_nextEntryToReadFromRecFile->second.m_filePosition, retVal.second)).second;
                 }
-                catch (...) {}
+                catch (...) {} // LCOV_EXCL_LINE
 
                 m_nextEntryToReadFromRecFile++;
                 entriesReadFromFile++;
@@ -267,7 +264,7 @@ std::pair<bool, cluon::data::Envelope> Player::getNextEnvelopeToBeReplayed() noe
             // Store sample time stamp as int64 to avoid unnecessary copying of Envelopes.
             hasEnvelopeToReturn = true;
         }
-        catch (...) {}
+        catch (...) {} // LCOV_EXCL_LINE
     }
     return std::make_pair(hasEnvelopeToReturn, envelopeToReturn);
 }
@@ -280,11 +277,11 @@ void Player::checkAvailabilityOfNextEnvelopeToBeReplayed() noexcept {
                 std::lock_guard<std::mutex> lck(m_indexMutex);
                 numberOfEntries = m_envelopeCache.size();
             }
-            catch (...) {}
+            catch (...) {} // LCOV_EXCL_LINE
         }
         if (0 == numberOfEntries) {
-            using namespace std::chrono_literals;
-            std::this_thread::sleep_for(10ms);
+            using namespace std::chrono_literals; // LCOV_EXCL_LINE
+            std::this_thread::sleep_for(10ms);    // LCOV_EXCL_LINE
         }
     }
     while (0 == numberOfEntries);
@@ -339,7 +336,7 @@ void Player::seekTo(float ratio) noexcept {
             std::lock_guard<std::mutex> lck(m_indexMutex);
             numberOfEntriesInIndex = static_cast<uint32_t>(m_index.size());
         }
-        catch (...) {}
+        catch (...) {} // LCOV_EXCL_LINE
 
         // Fast forward.
         m_numberOfReturnedEnvelopesInTotal = 0;
@@ -406,7 +403,7 @@ void Player::manageCache() noexcept {
             std::lock_guard<std::mutex> lck(m_indexMutex);
             numberOfEntries = static_cast<uint32_t>(m_envelopeCache.size());
         }
-        catch (...) {}
+        catch (...) {} // LCOV_EXCL_LINE
 
         // Check if refilling of the cache is needed.
         refillMultiplicator = checkRefillingCache(numberOfEntries, refillMultiplicator);
@@ -426,7 +423,7 @@ void Player::manageCache() noexcept {
                 numberOfReturnedEnvelopesInTotal = m_numberOfReturnedEnvelopesInTotal;
                 totalNumberOfEnvelopes = static_cast<uint32_t>(m_index.size());
             }
-            catch (...) {}
+            catch (...) {} // LCOV_EXCL_LINE
 
             try {
                 std::lock_guard<std::mutex> lck(m_playerListenerMutex);
@@ -438,7 +435,7 @@ void Player::manageCache() noexcept {
                     m_playerListener(ps);
                 }
             }
-            catch (...) {}
+            catch (...) {} // LCOV_EXCL_LINE
 
             statisticsCounter = 0;
         }
