@@ -53,9 +53,9 @@ TEST_CASE("Create simple player for file with one entry.") {
         std::fstream recordingFile("rec1", std::ios::out|std::ios::binary|std::ios::trunc);
         REQUIRE(recordingFile.good());
 
-        for(uint32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
+        for(int32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
             testdata::MyTestMessage5 msg;
-            msg.attribute5(entryCounter+1);
+            msg.attribute6(entryCounter+1);
 
             cluon::ToProtoVisitor proto;
             msg.accept(proto);
@@ -72,7 +72,7 @@ TEST_CASE("Create simple player for file with one entry.") {
                .sampleTimeStamp(sampleTimeStamp);
 
             const std::string tmp{cluon::serializeEnvelope(std::move(env))};
-            recordingFile.write(tmp.c_str(), tmp.size());
+            recordingFile.write(tmp.c_str(), static_cast<std::streamsize>(tmp.size()));
             recordingFile.flush();
         }
         recordingFile.close();
@@ -80,9 +80,9 @@ TEST_CASE("Create simple player for file with one entry.") {
     cluon::Player player("rec1", AUTO_REWIND, THREADING);
 
     REQUIRE(player.hasMoreData());
-    REQUIRE(1 == player.totalNumberOfEnvelopesInRecFile());
+    REQUIRE(MAX_ENTRIES == player.totalNumberOfEnvelopesInRecFile());
 
-    uint32_t retrievedEntries{0};
+    int32_t retrievedEntries{0};
     while(player.hasMoreData()) {
         auto entry = player.getNextEnvelopeToBeReplayed();
         REQUIRE(entry.first);
@@ -100,7 +100,7 @@ TEST_CASE("Create simple player for file with one entry.") {
         retrievedEntries++;
 
         testdata::MyTestMessage5 msg = cluon::extractMessage<testdata::MyTestMessage5>(std::move(env));
-        REQUIRE(retrievedEntries == msg.attribute5());
+        REQUIRE(retrievedEntries == msg.attribute6());
 
         REQUIRE(0 == player.delay());
     }
@@ -118,7 +118,7 @@ TEST_CASE("Create simple player for file with two entries.") {
 
         for(uint32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
             testdata::MyTestMessage5 msg;
-            msg.attribute5(entryCounter+1);
+            msg.attribute6(entryCounter+1);
 
             cluon::ToProtoVisitor proto;
             msg.accept(proto);
@@ -135,7 +135,7 @@ TEST_CASE("Create simple player for file with two entries.") {
                .sampleTimeStamp(sampleTimeStamp);
 
             const std::string tmp{cluon::serializeEnvelope(std::move(env))};
-            recordingFile.write(tmp.c_str(), tmp.size());
+            recordingFile.write(tmp.c_str(), static_cast<std::streamsize>(tmp.size()));
             recordingFile.flush();
         }
         recordingFile.close();
@@ -143,9 +143,9 @@ TEST_CASE("Create simple player for file with two entries.") {
     cluon::Player player("rec2", AUTO_REWIND, THREADING);
 
     REQUIRE(player.hasMoreData());
-    REQUIRE(2 == player.totalNumberOfEnvelopesInRecFile());
+    REQUIRE(MAX_ENTRIES == player.totalNumberOfEnvelopesInRecFile());
 
-    uint32_t retrievedEntries{0};
+    int32_t retrievedEntries{0};
     while(player.hasMoreData()) {
         auto entry = player.getNextEnvelopeToBeReplayed();
         REQUIRE(entry.first);
@@ -163,7 +163,75 @@ TEST_CASE("Create simple player for file with two entries.") {
         retrievedEntries++;
 
         testdata::MyTestMessage5 msg = cluon::extractMessage<testdata::MyTestMessage5>(std::move(env));
-        REQUIRE(retrievedEntries == msg.attribute5());
+        REQUIRE(retrievedEntries == msg.attribute6());
+
+        if (1 == retrievedEntries) {
+            REQUIRE(0 == player.delay());
+        }
+        else {
+            REQUIRE(1 == player.delay());
+        }
+    }
+    REQUIRE(MAX_ENTRIES == retrievedEntries);
+}
+
+TEST_CASE("Create simple player for file with three entries.") {
+    constexpr bool AUTO_REWIND{false};
+    constexpr bool THREADING{false};
+
+    constexpr uint32_t MAX_ENTRIES{3};
+    {
+        std::fstream recordingFile("rec3", std::ios::out|std::ios::binary|std::ios::trunc);
+        REQUIRE(recordingFile.good());
+
+        for(uint32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
+            testdata::MyTestMessage5 msg;
+            msg.attribute6(entryCounter+1);
+
+            cluon::ToProtoVisitor proto;
+            msg.accept(proto);
+
+            cluon::data::Envelope env;
+            cluon::data::TimeStamp sent; sent.seconds(1000).microseconds(entryCounter);
+            cluon::data::TimeStamp received; received.seconds(5000).microseconds(entryCounter);
+            cluon::data::TimeStamp sampleTimeStamp; sampleTimeStamp.seconds(10000).microseconds(entryCounter);
+
+            env.serializedData(proto.encodedData());
+            env.dataType(testdata::MyTestMessage5::ID())
+               .sent(sent)
+               .received(received)
+               .sampleTimeStamp(sampleTimeStamp);
+
+            const std::string tmp{cluon::serializeEnvelope(std::move(env))};
+            recordingFile.write(tmp.c_str(), static_cast<std::streamsize>(tmp.size()));
+            recordingFile.flush();
+        }
+        recordingFile.close();
+    }
+    cluon::Player player("rec3", AUTO_REWIND, THREADING);
+
+    REQUIRE(player.hasMoreData());
+    REQUIRE(MAX_ENTRIES == player.totalNumberOfEnvelopesInRecFile());
+
+    int32_t retrievedEntries{0};
+    while(player.hasMoreData()) {
+        auto entry = player.getNextEnvelopeToBeReplayed();
+        REQUIRE(entry.first);
+
+        cluon::data::Envelope env = entry.second;
+        REQUIRE(testdata::MyTestMessage5::ID() == env.dataType());
+
+        REQUIRE(1000 == env.sent().seconds());
+        REQUIRE(retrievedEntries == env.sent().microseconds());
+        REQUIRE(5000 == env.received().seconds());
+        REQUIRE(retrievedEntries == env.received().microseconds());
+        REQUIRE(10000 == env.sampleTimeStamp().seconds());
+        REQUIRE(retrievedEntries == env.sampleTimeStamp().microseconds());
+
+        retrievedEntries++;
+
+        testdata::MyTestMessage5 msg = cluon::extractMessage<testdata::MyTestMessage5>(std::move(env));
+        REQUIRE(retrievedEntries == msg.attribute6());
 
         if (1 == retrievedEntries) {
             REQUIRE(0 == player.delay());
