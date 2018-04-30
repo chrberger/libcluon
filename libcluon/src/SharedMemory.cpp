@@ -189,8 +189,8 @@ void SharedMemory::lock() noexcept {
     if (nullptr != m_sharedMemoryHeader) {
         if (EOWNERDEAD == ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex))) {
             std::cerr << "[cluon::SharedMemory] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name // LCOV_EXCL_LINE
-                      << "': " << ::strerror(errno)         // LCOV_EXCL_LINE
-                      << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
+                      << "': " << ::strerror(errno)                                                                                // LCOV_EXCL_LINE
+                      << " (" << errno << ")" << std::endl;                                                                        // LCOV_EXCL_LINE
         }
     }
 #endif
