@@ -1,3 +1,9 @@
+libcluon (0.0.78) bionic; urgency=low
+
+  * Test cases and minor improvements when seeking for Player
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 30 Apr 2018 23:22:52 +0200
+
 libcluon (0.0.77) xenial; urgency=low
 
   * Added TerminateHandler to properly terminate a running OD4Session on SIGTERM, SIGINT, and atexit
