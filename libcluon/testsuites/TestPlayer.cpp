@@ -447,7 +447,8 @@ TEST_CASE("Create simple player for file with 6,000 entries to test look-ahead w
     cluon::Player player("rec6", AUTO_REWIND, THREADING);
 
     bool calledPlayerListener{false};
-    player.setPlayerListener([&calledPlayerListener](cluon::data::PlayerStatus playerStatus){calledPlayerListener = true;});
+    cluon::data::PlayerStatus playerStatus;
+    player.setPlayerListener([&calledPlayerListener, &playerStatus](cluon::data::PlayerStatus ps){calledPlayerListener = true; playerStatus = ps;});
 
     REQUIRE(player.hasMoreData());
     REQUIRE(MAX_ENTRIES == player.totalNumberOfEnvelopesInRecFile());
@@ -483,6 +484,8 @@ TEST_CASE("Create simple player for file with 6,000 entries to test look-ahead w
         std::this_thread::sleep_for(delay);
     }
     REQUIRE(calledPlayerListener);
+    REQUIRE(2 == playerStatus.state());
+    REQUIRE(MAX_ENTRIES == playerStatus.numberOfEntries());
     REQUIRE(MAX_ENTRIES == retrievedEntries);
     UNLINK("rec6");
 }
