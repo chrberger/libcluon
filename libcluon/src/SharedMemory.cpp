@@ -75,7 +75,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
 
             // When creating a shared memory segment, truncate it.
             if (0 < m_size) {
-                retVal = (0 == ::ftruncate(m_fd, sizeof(SharedMemoryHeader) + m_size));
+                retVal = (0 == ::ftruncate(m_fd, static_cast<off_t>(sizeof(SharedMemoryHeader) + m_size)));
                 if (!retVal) {
                     std::cerr << "[cluon::SharedMemory] Failed to truncate '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" // LCOV_EXCL_LINE
                               << std::endl; // LCOV_EXCL_LINE
