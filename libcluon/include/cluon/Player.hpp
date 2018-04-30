@@ -20,6 +20,7 @@
 #ifndef CLUON_PLAYER_HPP
 #define CLUON_PLAYER_HPP
 
+#include "cluon/cluon.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
 #include <cstdint>
