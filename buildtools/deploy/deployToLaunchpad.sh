@@ -231,7 +231,7 @@ Description: libcluon is a small and efficient library written in modern C++
 EOF
 
 cat <<EOF >debian/changelog
-${PROJECT} (${RELEASE_VERSION}) bionic; urgency=low
+${PROJECT} (${RELEASE_VERSION}) xenial; urgency=low
 
   ${RELEASE_TEXT}
 

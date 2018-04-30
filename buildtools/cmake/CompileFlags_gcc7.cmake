@@ -33,7 +33,7 @@ set(GCC7_CXX_WARNING_FLAGS " \
     -Wbuiltin-macro-redefined \
     -Wno-error=c++11-compat \
     -Wc++14-compat \
-    -Wcast-align \
+    -Wno-error=cast-align \
     -Wcast-qual \
     -Wchar-subscripts \
     -Wchkp \
