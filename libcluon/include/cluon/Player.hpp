@@ -86,11 +86,6 @@ class LIBCLUON_API Player {
         uint32_t getDelay() const noexcept;
 
         /**
-         * @return delay in microseconds to be waited before the next cluon::data::Envelope should be delivered correct by the internal processing time.
-         */
-        uint32_t getCorrectedDelay() const noexcept;
-
-        /**
          * @return true if there is more data to replay.
          */
         bool hasMoreData() const noexcept;
@@ -182,7 +177,6 @@ class LIBCLUON_API Player {
         uint64_t m_numberOfReturnedEnvelopesInTotal;
 
         uint32_t m_delay;
-        uint32_t m_correctedDelay;
 
     private:
         /**

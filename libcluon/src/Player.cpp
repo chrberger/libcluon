@@ -59,7 +59,6 @@ Player::Player(const std::string &file, const bool &autoRewind, const bool &thre
     m_firstTimePointReturningAEnvelope(),
     m_numberOfReturnedEnvelopesInTotal(0),
     m_delay(0),
-    m_correctedDelay(0),
     m_envelopeCacheFillingThreadIsRunningMutex(),
     m_envelopeCacheFillingThreadIsRunning(false),
     m_envelopeCacheFillingThread(),
@@ -147,7 +146,6 @@ void Player::resetCaches() noexcept {
     try {
         std::lock_guard<std::mutex> lck(m_indexMutex);
         m_delay = 0;
-        m_correctedDelay = 0;
         m_numberOfReturnedEnvelopesInTotal = 0;
         m_envelopeCache.clear();
     }
@@ -243,7 +241,7 @@ std::pair<bool, cluon::data::Envelope> Player::getNextEnvelopeToBeReplayed() noe
                 cluon::data::Envelope &nextEnvelope = m_envelopeCache[m_currentEnvelopeToReplay->second.m_filePosition];
                 envelopeToReturn = nextEnvelope;
 
-                m_correctedDelay = m_delay = static_cast<uint32_t>(m_currentEnvelopeToReplay->first - m_previousEnvelopeAlreadyReplayed->first);
+                m_delay = static_cast<uint32_t>(m_currentEnvelopeToReplay->first - m_previousEnvelopeAlreadyReplayed->first);
 
                 // TODO: Delegate deleting into own thread.
                 if (m_previousPreviousEnvelopeAlreadyReplayed != m_index.end()) {
@@ -303,12 +301,6 @@ uint32_t Player::getDelay() const noexcept {
     std::lock_guard<std::mutex> lck(m_indexMutex);
     // Make sure that delay is not exceeding the specified maximum delay.
     return std::min<uint32_t>(m_delay, Player::MAX_DELAY_IN_MICROSECONDS);
-}
-
-uint32_t Player::getCorrectedDelay() const noexcept {
-    std::lock_guard<std::mutex> lck(m_indexMutex);
-    // Make sure that delay is not exceeding the specified maximum delay.
-    return std::min<uint32_t>(m_correctedDelay, Player::MAX_DELAY_IN_MICROSECONDS);
 }
 
 void Player::rewind() noexcept {
