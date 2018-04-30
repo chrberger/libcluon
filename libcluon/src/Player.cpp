@@ -344,8 +344,10 @@ void Player::seekTo(float ratio) noexcept {
         // Fast forward.
         m_numberOfReturnedEnvelopesInTotal = 0;
         std::clog << "[cluon::Player]: Seeking to " << static_cast<float>(numberOfEntriesInIndex)*ratio << "/" << numberOfEntriesInIndex << std::endl;
-        for (m_numberOfReturnedEnvelopesInTotal = 0; m_numberOfReturnedEnvelopesInTotal < static_cast<uint32_t>(static_cast<float>(numberOfEntriesInIndex)*ratio)-1; m_numberOfReturnedEnvelopesInTotal++) {
-            m_currentEnvelopeToReplay++;
+        if (0 < ratio) {
+            for (m_numberOfReturnedEnvelopesInTotal = 0; m_numberOfReturnedEnvelopesInTotal < static_cast<uint32_t>(static_cast<float>(numberOfEntriesInIndex)*ratio)-1; m_numberOfReturnedEnvelopesInTotal++) {
+                m_currentEnvelopeToReplay++;
+            }
         }
         m_nextEntryToReadFromRecFile
             = m_previousEnvelopeAlreadyReplayed
@@ -355,8 +357,10 @@ void Player::seekTo(float ratio) noexcept {
         m_envelopeCache.clear();
         fillEnvelopeCache(static_cast<uint32_t>(static_cast<float>(m_desiredInitialLevel)*.3f));
 
-        // Correct iterators.
-        getNextEnvelopeToBeReplayed();
+        // Correct iterators if not at the beginning.
+        if ( (0 < ratio) && (ratio < 1) ) {
+            getNextEnvelopeToBeReplayed();
+        }
         std::clog << "[cluon::Player]: Seeking done." << std::endl;
 
         if (enableThreading) {
