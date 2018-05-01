@@ -36,6 +36,13 @@ read RELEASE_VERSION
 echo "One line description starting with * : "
 read RELEASE_TEXT
 
+# Create one release for each current LTS...
+for UBUNTU_CODE_NAME in xenial bionic; do
+
+UBUNTU_RELEASE="${RELEASE_VERSION}-1ppa1~${UBUNTU_CODE_NAME}1"
+
+echo "Building for ${UBUNTU_RELEASE}..."
+
 rm -fr debian && mkdir debian
 
 ################################################################################
@@ -231,7 +238,7 @@ Description: libcluon is a small and efficient library written in modern C++
 EOF
 
 cat <<EOF >debian/changelog
-${PROJECT} (${RELEASE_VERSION}) xenial; urgency=low
+${PROJECT} (${UBUNTU_RELEASE}) ${UBUNTU_CODE_NAME}; urgency=medium
 
   ${RELEASE_TEXT}
 
@@ -243,7 +250,7 @@ cat changelog >> debian/changelog
 
 ################################################################################
 
-rm -fr tmp.launchpad && mkdir -p tmp.launchpad/libcluon && mv debian tmp.launchpad/libcluon && tar cvfz tmp.launchpad/libcluon-${RELEASE_VERSION}.orig.tar.gz buildtools CODE_OF_CONDUCT.md libcluon Makefile README.md LICENSE && tar xvzf tmp.launchpad/libcluon-${RELEASE_VERSION}.orig.tar.gz -C tmp.launchpad/libcluon && cd tmp.launchpad/libcluon && debuild -S -sd && cd ..
+rm -fr tmp.launchpad && mkdir -p tmp.launchpad/libcluon && mv debian tmp.launchpad/libcluon && tar cvfz tmp.launchpad/libcluon-${UBUNTU_RELEASE}.orig.tar.gz buildtools CODE_OF_CONDUCT.md libcluon Makefile README.md LICENSE && tar xvzf tmp.launchpad/libcluon-${UBUNTU_RELEASE}.orig.tar.gz -C tmp.launchpad/libcluon && cd tmp.launchpad/libcluon && debuild -S -sd && cd ..
 
 x=5
 while [ $x -gt 0 ]; do
@@ -253,11 +260,14 @@ while [ $x -gt 0 ]; do
 done
 
 # Push Debian source package to Launchpad.
-dput ppa:chrberger/libcluon libcluon_${RELEASE_VERSION}_source.changes
+dput ppa:chrberger/libcluon libcluon_${UBUNTU_RELEASE}_source.changes
 
 cat libcluon/debian/changelog > ../changelog
 
 cd ..
+
+# ...from the list of Ubuntu releases.
+done
 
 echo $RELEASE_VERSION > VERSION
 
