@@ -29,7 +29,7 @@ fi
 echo "Cleaning repository: "
 make clean
 
-RELEASE_VERSION=$(head -n1 changelog|cut -f2 -d"("|cut -f1 -d")")
+RELEASE_VERSION=$(head -n1 changelog | cut -f2 -d"(" | cut -f1 -d"-")
 echo "Current version to be deployed: $RELEASE_VERSION"
 
 ################################################################################

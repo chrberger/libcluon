@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-RELEASE_VERSION=$(head -n1 changelog | cut -f2 -d"(" | cut -f1 -d")")
+RELEASE_VERSION=$(head -n1 changelog | cut -f2 -d"(" | cut -f1 -d"-")
 
 OLDPWD=$PWD
 

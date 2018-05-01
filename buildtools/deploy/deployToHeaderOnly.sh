@@ -21,7 +21,7 @@ RELEASER_EMAIL="christian.berger@gu.se"
 RELEASE_DATE=$(date -R)
 OLDPWD=$(pwd)
 
-RELEASE_VERSION=$(head -n1 changelog|cut -f2 -d"("|cut -f1 -d")")
+RELEASE_VERSION=$(head -n1 changelog | cut -f2 -d"(" | cut -f1 -d"-")
 echo "Current version to be deployed: $RELEASE_VERSION"
 
 rm -fr tmp.headeronly && mkdir -p tmp.headeronly
