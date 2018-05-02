@@ -50,7 +50,6 @@ TEST_CASE("Trying to open SharedMemory with name without leading / and too long 
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name.") {
-#ifndef WIN32
     cluon::SharedMemory sm1{"/DEF", 4};
     REQUIRE(sm1.valid());
     REQUIRE(4 == sm1.size());
@@ -66,11 +65,9 @@ TEST_CASE("Trying to create SharedMemory with correct name.") {
     uint32_t tmp    = *data2;
     sm1.unlock();
     REQUIRE(12345 == tmp);
-#endif
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory.") {
-#ifndef WIN32
     cluon::SharedMemory sm1{"/GHI", 4};
     REQUIRE(sm1.valid());
     REQUIRE(4 == sm1.size());
@@ -108,7 +105,6 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
     producer.join();
 
     REQUIRE(54321 == tmp);
-#endif
 }
 
 TEST_CASE(

@@ -21,7 +21,9 @@
 #include "cluon/cluon.hpp"
 
 // clang-format off
-#ifndef WIN32
+#ifdef WIN32
+    #include <Windows.h>
+#else
     #include <pthread.h>
 #endif
 // clang-format on
@@ -97,6 +99,11 @@ class LIBCLUON_API SharedMemory {
     char *m_sharedMemory{nullptr};
     char *m_userAccessibleSharedMemory{nullptr};
     bool m_hasOnlyAttachedToSharedMemory{false};
+
+#ifdef WIN32
+    HANDLE __mutex{nullptr};
+    HANDLE __sharedMemory{nullptr};
+#endif
 
 #ifndef WIN32
     struct SharedMemoryHeader {

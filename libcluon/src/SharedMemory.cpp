@@ -18,7 +18,9 @@
 #include "cluon/SharedMemory.hpp"
 
 // clang-format off
-#ifndef WIN32
+#ifdef WIN32
+    #include <limits>
+#else
     #include <fcntl.h>
     #include <sys/mman.h>
     #include <sys/stat.h>
@@ -43,6 +45,99 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
         if (m_name.size() > MAX_LENGTH_NAME) {
             m_name = m_name.substr(0, MAX_LENGTH_NAME);
         }
+
+#ifdef WIN32
+        const std::string mutexName = m_name + "_mutex";
+        if (0 < size) {
+            // Create a shared memory area and semaphores.
+            const LONG MUTEX_INITIAL_COUNT = 1;
+            const LONG MUTEX_MAX_COUNT = 1;
+            const DWORD FLAGS = 0; //Reserved.
+            __mutex = CreateSemaphoreEx(NULL, MUTEX_INITIAL_COUNT, MUTEX_MAX_COUNT, mutexName.c_str(), FLAGS, SEMAPHORE_ALL_ACCESS);
+            if (nullptr != __mutex) {
+                __sharedMemory = CreateFileMapping(INVALID_HANDLE_VALUE /*use paging file*/,
+                                                   NULL /*use default security*/,
+                                                   PAGE_READWRITE,
+                                                   0, m_size + sizeof(uint32_t) /*size + size-information (uint32_t)*/,
+                                                   m_name.c_str());
+                if (nullptr != __sharedMemory) {
+                    m_sharedMemory = (char*)MapViewOfFile(__sharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, m_size + sizeof(uint32_t));
+                    if (nullptr != m_sharedMemory) {
+                        // Provide size information at the beginning of the shared memory.
+                        *(uint32_t*)m_sharedMemory = m_size;
+                        m_userAccessibleSharedMemory = m_sharedMemory + sizeof(uint32_t);
+                    }
+                    else {
+                        std::cerr << "[cluon::SharedMemory] Failed to map shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                        CloseHandle(__sharedMemory);
+                        __mutex = nullptr;
+
+                        CloseHandle(__mutex);
+                        __mutex = nullptr;
+                    }
+                }
+                else {
+                    std::cerr << "[cluon::SharedMemory] Failed to request shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                    CloseHandle(__mutex);
+                    __mutex = nullptr;
+                }
+            }
+            else {
+                std::cerr << "[cluon::SharedMemory] Failed to create mutex '" << mutexName << "': " << " (" << GetLastError() << ")" << std::endl;
+                CloseHandle(__mutex);
+                __mutex = nullptr;
+            }
+        }
+        else {
+            // Open a shared memory area and semaphores.
+            m_hasOnlyAttachedToSharedMemory = true;
+            const BOOL INHERIT_HANDLE = FALSE;
+            __mutex = OpenSemaphore(SEMAPHORE_ALL_ACCESS, INHERIT_HANDLE, mutexName.c_str());
+            if (nullptr != __mutex) {
+                __sharedMemory = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE /*do not inherit the name*/, m_name.c_str());
+                if (nullptr != __sharedMemory) {
+                    // Firstly, map only for the size of a uint32_t to read the entire size.
+                    m_sharedMemory = (char*)MapViewOfFile(__sharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(uint32_t));
+                    if (nullptr != m_sharedMemory) {
+                        //  Now, read the real size...
+                        m_size = *(uint32_t*)m_sharedMemory;
+                        // ..unmap and re-map.
+                        UnmapViewOfFile(m_sharedMemory);
+                        m_sharedMemory = (char*)MapViewOfFile(__sharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, m_size + sizeof(uint32_t));
+                        if (nullptr != m_sharedMemory) {
+                            m_userAccessibleSharedMemory = m_sharedMemory + sizeof(uint32_t);
+                        }
+                        else {
+                            std::cerr << "[cluon::SharedMemory] Failed to finally map shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                            CloseHandle(__sharedMemory);
+                            __mutex = nullptr;
+
+                            CloseHandle(__mutex);
+                            __mutex = nullptr;
+                        }
+                    }
+                    else {
+                        std::cerr << "[cluon::SharedMemory] Failed to temporarily map shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                        CloseHandle(__sharedMemory);
+                        __mutex = nullptr;
+
+                        CloseHandle(__mutex);
+                        __mutex = nullptr;
+                    }
+                }
+                else {
+                    std::cerr << "[cluon::SharedMemory] Failed to open shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                    CloseHandle(__mutex);
+                    __mutex = nullptr;
+                }
+            }
+            else {
+                std::cerr << "[cluon::SharedMemory] Failed to open mutex '" << mutexName << "': " << " (" << GetLastError() << ")" << std::endl;
+                CloseHandle(__mutex);
+                __mutex = nullptr;
+            }
+        }
+#endif
 
 #ifndef WIN32
         // If size is greater than 0, the caller wants to create a new shared
@@ -168,7 +263,18 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
 }
 
 SharedMemory::~SharedMemory() noexcept {
-#ifndef WIN32
+#ifdef WIN32
+    if (nullptr != __mutex) {
+        unlock();
+        CloseHandle(__mutex);
+    }
+    if (nullptr != m_sharedMemory) {
+        UnmapViewOfFile(m_sharedMemory);
+    }
+    if (nullptr != __sharedMemory) {
+        CloseHandle(__sharedMemory);
+    }
+#else
     if ((nullptr != m_sharedMemoryHeader) && (!m_hasOnlyAttachedToSharedMemory)) {
         // Wake any waiting threads as we are going to end the shared memory session.
         ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
@@ -185,7 +291,11 @@ SharedMemory::~SharedMemory() noexcept {
 }
 
 void SharedMemory::lock() noexcept {
-#ifndef WIN32
+#ifdef WIN32
+    if (nullptr != __mutex) {
+        WaitForSingleObject(__mutex, INFINITE);
+    }
+#else
     if (nullptr != m_sharedMemoryHeader) {
         if (EOWNERDEAD == ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex))) {
             std::cerr << "[cluon::SharedMemory] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name // LCOV_EXCL_LINE
@@ -197,7 +307,12 @@ void SharedMemory::lock() noexcept {
 }
 
 void SharedMemory::unlock() noexcept {
-#ifndef WIN32
+#ifdef WIN32
+    if (nullptr != __mutex) {
+        const LONG RELEASE_COUNT = 1;
+        ReleaseSemaphore(__mutex, RELEASE_COUNT, 0);
+    }
+#else
     if (nullptr != m_sharedMemoryHeader) {
         ::pthread_mutex_unlock(&(m_sharedMemoryHeader->__mutex));
     }
@@ -235,7 +350,10 @@ const std::string SharedMemory::name() const noexcept {
 }
 
 bool SharedMemory::valid() noexcept {
-    bool valid{-1 != m_fd};
+    bool valid{true};
+#ifndef WIN32
+    valid &= (-1 != m_fd);
+#endif
     valid &= (nullptr != m_sharedMemory);
 #ifndef WIN32
     valid &= (MAP_FAILED != m_sharedMemory);
