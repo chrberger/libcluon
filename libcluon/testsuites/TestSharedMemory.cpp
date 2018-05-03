@@ -42,7 +42,11 @@ TEST_CASE("Trying to open SharedMemory with name without leading /.") {
 TEST_CASE("Trying to open SharedMemory with name without leading / and too long name > 255.") {
     const std::string NAME{"Vlrel3r6cZeWaRsWgvCWfAHtpPKX56fSgNYNM5bMjEcBnuiMOG3g4YJ4Y9KbPcNyes45xPI9jD5FjxEB1GR9WqaWmyqdH6po1O6is2aDecMe8GGlwqkVJtWH5YwlCYgoJ1E"
                            "iQhqIUVfzp56IY00J6lXJS0uVJrpcMIZuiCsTGTQDG0vPC2EkdbMxe9BPV6a8BnMMumnGKYcqFxiCGrv1SVtLw40zLXTuelQQHiPCFANYlISyhRPt456PMNm7AQJUMHA5"};
+#ifdef WIN32
+    const std::string NAME_254 = "/" + NAME.substr(0, MAX_PATH-1);
+#else
     const std::string NAME_254 = "/" + NAME.substr(0, 253);
+#endif
     cluon::SharedMemory sm1{NAME};
     REQUIRE(!sm1.valid());
     REQUIRE(nullptr == sm1.data());

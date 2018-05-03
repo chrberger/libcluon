@@ -36,7 +36,11 @@ namespace cluon {
 SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
     : m_size(size) {
     if (!name.empty()) {
+#ifdef WIN32
+        constexpr int MAX_LENGTH_NAME{MAX_PATH};
+#else
         constexpr int MAX_LENGTH_NAME{254};
+#endif
         const std::string n{name.substr(0, (name.size() > MAX_LENGTH_NAME ? MAX_LENGTH_NAME : name.size()))};
         if ('/' != n[0]) {
             m_name = "/";
@@ -47,7 +51,12 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
         }
 
 #ifdef WIN32
-        const std::string mutexName = m_name + "_mutex";
+        std::string mutexName = m_name;
+        if (mutexName.size() > MAX_LENGTH_NAME) {
+            mutexName = mutexName.substr(0, MAX_LENGTH_NAME - 6);
+        }
+        mutexName += "_mutex";
+
         if (0 < size) {
             // Create a shared memory area and semaphores.
             const LONG MUTEX_INITIAL_COUNT = 1;
