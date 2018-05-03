@@ -19,9 +19,7 @@
 
 // clang-format off
 #ifdef WIN32
-    #include <chrono>
     #include <limits>
-    #include <thread>
 #else
     #include <fcntl.h>
     #include <sys/mman.h>
@@ -393,11 +391,6 @@ void SharedMemory::notifyAll() noexcept {
 #ifdef WIN32
     if (nullptr != __conditionEvent) {
         SetEvent(__conditionEvent);
-        {
-            // Let the Windows kernel wake the sleeping processes.
-//            using namespace std::literals::chrono_literals;
-//            std::this_thread::sleep_for(2ms);
-        }
         ResetEvent(__conditionEvent);
     }
 #else
