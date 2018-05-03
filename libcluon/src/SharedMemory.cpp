@@ -19,7 +19,9 @@
 
 // clang-format off
 #ifdef WIN32
+    #include <chrono>
     #include <limits>
+    #include <thread>
 #else
     #include <fcntl.h>
     #include <sys/mman.h>
@@ -374,7 +376,11 @@ void SharedMemory::unlock() noexcept {
 }
 
 void SharedMemory::wait() noexcept {
-#ifndef WIN32
+#ifdef WIN32
+    if (nullptr != __conditionEvent) {
+        WaitForSingleObject(__conditionEvent, INFINITE);
+    }
+#else
     if (nullptr != m_sharedMemoryHeader) {
         lock();
         ::pthread_cond_wait(&(m_sharedMemoryHeader->__condition), &(m_sharedMemoryHeader->__mutex));
@@ -384,7 +390,17 @@ void SharedMemory::wait() noexcept {
 }
 
 void SharedMemory::notifyAll() noexcept {
-#ifndef WIN32
+#ifdef WIN32
+    if (nullptr != __conditionEvent) {
+        SetEvent(__conditionEvent);
+        {
+            // Let the Windows kernel wake the sleeping processes.
+//            using namespace std::literals::chrono_literals;
+//            std::this_thread::sleep_for(2ms);
+        }
+        ResetEvent(__conditionEvent);
+    }
+#else
     if (nullptr != m_sharedMemoryHeader) {
         ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
     }

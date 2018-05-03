@@ -113,7 +113,6 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
 
 TEST_CASE(
     "Trying to create SharedMemory with correct name and separate thread to produce data for shared memory with condition variable for synchronization.") {
-#ifndef WIN32
     cluon::SharedMemory sm1{"/JKL", 4};
     REQUIRE(sm1.valid());
     REQUIRE(4 == sm1.size());
@@ -148,12 +147,10 @@ TEST_CASE(
     sm1.unlock();
 
     REQUIRE(23456 == tmp);
-#endif
 }
 
 TEST_CASE(
     "Trying to create SharedMemory with correct name and two separate threads to produce data for shared memory with condition variable for synchronization.") {
-#ifndef WIN32
     cluon::SharedMemory sm1{"/MNO", 4};
     REQUIRE(sm1.valid());
     REQUIRE(4 == sm1.size());
@@ -206,7 +203,6 @@ TEST_CASE(
     // Finally read the last value.
     uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
     REQUIRE(3 == tmp);
-#endif
 }
 
 TEST_CASE("Trying to create SharedMemory that existed before to remove it.") {
