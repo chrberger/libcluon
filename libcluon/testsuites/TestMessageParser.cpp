@@ -268,6 +268,7 @@ TEST_CASE("Parsing message statement with extended name with two int8 fields "
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+/* Block comment */
 message myMessage.SubName [id = 1] {
     int8  attribute1; // Test comment
     int8  attribute2; /* Multi line
@@ -275,8 +276,14 @@ message myMessage.SubName [id = 1] {
 *
 */
 }
+
+//message myMessage.SubName [id = 1] { // Comment 2
+//    int8  attribute1;
+//}
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    auto retVal = mp.parse(std::string(tmp));
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(1 == retVal.first.size());
 }
 
 TEST_CASE("Parsing message statement with extended name with one uint8 field "

@@ -320,14 +320,9 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
     std::pair<std::vector<MetaMessage>, MessageParserErrorCodes> retVal{};
     std::string inputWithoutComments{input};
     try {
-#ifndef WIN32
-        const std::string MATCH_COMMENTS_REGEX = R"((//.*)|/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)";
-#else
-        // MSVC++'s regex has issues matching the line-break/new line characters.
-        const std::string MATCH_COMMENTS_REGEX = R"(/\*([\s\S]*?)\*/|//.*|/\*.*?\*/)";
-#endif
+        const std::string MATCH_COMMENTS_REGEX = R"(/\*([\s\S]*?)\*/|//.*)";
         inputWithoutComments = std::regex_replace(input, std::regex(MATCH_COMMENTS_REGEX), ""); // NOLINT
-    } catch (std::regex_error &r) { // LCOV_EXCL_LINE
+    } catch (std::regex_error &) {  // LCOV_EXCL_LINE
     } catch (std::bad_cast &) {     // LCOV_EXCL_LINE
     }
     try {
