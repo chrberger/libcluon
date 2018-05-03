@@ -1,3 +1,15 @@
+libcluon (0.0.81-1ppa1~bionic1) bionic; urgency=medium
+
+  * Completed SharedMemory implementation for Windows
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 03 May 2018 16:01:33 +0200
+
+libcluon (0.0.81-1ppa1~xenial1) xenial; urgency=medium
+
+  * Completed SharedMemory implementation for Windows
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 03 May 2018 16:01:33 +0200
+
 libcluon (0.0.80-1ppa1~bionic1) bionic; urgency=medium
 
   * Adjusted deployment scripts to deploy to Ubuntu 16.04 LTS (xenial) and Ubuntu 18.04 LTS (bionic)
