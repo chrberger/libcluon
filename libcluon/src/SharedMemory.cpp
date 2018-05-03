@@ -70,7 +70,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                     else {
                         std::cerr << "[cluon::SharedMemory] Failed to map shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
                         CloseHandle(__sharedMemory);
-                        __mutex = nullptr;
+                        __sharedMemory = nullptr;
 
                         CloseHandle(__mutex);
                         __mutex = nullptr;
@@ -110,7 +110,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                         else {
                             std::cerr << "[cluon::SharedMemory] Failed to finally map shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
                             CloseHandle(__sharedMemory);
-                            __mutex = nullptr;
+                            __sharedMemory = nullptr;
 
                             CloseHandle(__mutex);
                             __mutex = nullptr;
@@ -119,7 +119,7 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                     else {
                         std::cerr << "[cluon::SharedMemory] Failed to temporarily map shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
                         CloseHandle(__sharedMemory);
-                        __mutex = nullptr;
+                        __sharedMemory = nullptr;
 
                         CloseHandle(__mutex);
                         __mutex = nullptr;
