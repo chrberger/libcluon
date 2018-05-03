@@ -245,6 +245,40 @@ More comments
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
 }
 
+TEST_CASE("Parsing message statement with extended name with two int8 fields "
+    "and no field options and comment header.") {
+    cluon::MessageParser mp;
+
+    const char *tmp = R"(
+/*
+ * Copyright (C) 2018 Chalmers Revere
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+message myMessage.SubName [id = 1] {
+    int8  attribute1; // Test comment
+    int8  attribute2; /* Multi line
+* Comment
+*
+*/
+}
+)";
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+}
+
 TEST_CASE("Parsing message statement with extended name with one uint8 field "
           "and no field options.") {
     cluon::MessageParser mp;
