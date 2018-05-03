@@ -42,7 +42,11 @@ TEST_CASE("Trying to open SharedMemory with name without leading /.") {
 TEST_CASE("Trying to open SharedMemory with name without leading / and too long name > 255.") {
     const std::string NAME{"Vlrel3r6cZeWaRsWgvCWfAHtpPKX56fSgNYNM5bMjEcBnuiMOG3g4YJ4Y9KbPcNyes45xPI9jD5FjxEB1GR9WqaWmyqdH6po1O6is2aDecMe8GGlwqkVJtWH5YwlCYgoJ1E"
                            "iQhqIUVfzp56IY00J6lXJS0uVJrpcMIZuiCsTGTQDG0vPC2EkdbMxe9BPV6a8BnMMumnGKYcqFxiCGrv1SVtLw40zLXTuelQQHiPCFANYlISyhRPt456PMNm7AQJUMHA5"};
+#ifdef WIN32
+    const std::string NAME_254 = "/" + NAME.substr(0, MAX_PATH-1);
+#else
     const std::string NAME_254 = "/" + NAME.substr(0, 253);
+#endif
     cluon::SharedMemory sm1{NAME};
     REQUIRE(!sm1.valid());
     REQUIRE(nullptr == sm1.data());
@@ -50,7 +54,6 @@ TEST_CASE("Trying to open SharedMemory with name without leading / and too long 
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name.") {
-#ifndef WIN32
     cluon::SharedMemory sm1{"/DEF", 4};
     REQUIRE(sm1.valid());
     REQUIRE(4 == sm1.size());
@@ -66,11 +69,9 @@ TEST_CASE("Trying to create SharedMemory with correct name.") {
     uint32_t tmp    = *data2;
     sm1.unlock();
     REQUIRE(12345 == tmp);
-#endif
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory.") {
-#ifndef WIN32
     cluon::SharedMemory sm1{"/GHI", 4};
     REQUIRE(sm1.valid());
     REQUIRE(4 == sm1.size());
@@ -108,12 +109,10 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
     producer.join();
 
     REQUIRE(54321 == tmp);
-#endif
 }
 
 TEST_CASE(
     "Trying to create SharedMemory with correct name and separate thread to produce data for shared memory with condition variable for synchronization.") {
-#ifndef WIN32
     cluon::SharedMemory sm1{"/JKL", 4};
     REQUIRE(sm1.valid());
     REQUIRE(4 == sm1.size());
@@ -148,12 +147,10 @@ TEST_CASE(
     sm1.unlock();
 
     REQUIRE(23456 == tmp);
-#endif
 }
 
 TEST_CASE(
     "Trying to create SharedMemory with correct name and two separate threads to produce data for shared memory with condition variable for synchronization.") {
-#ifndef WIN32
     cluon::SharedMemory sm1{"/MNO", 4};
     REQUIRE(sm1.valid());
     REQUIRE(4 == sm1.size());
@@ -206,7 +203,6 @@ TEST_CASE(
     // Finally read the last value.
     uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
     REQUIRE(3 == tmp);
-#endif
 }
 
 TEST_CASE("Trying to create SharedMemory that existed before to remove it.") {
