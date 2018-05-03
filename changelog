@@ -1,3 +1,15 @@
+libcluon (0.0.82-1ppa1~bionic1) bionic; urgency=medium
+
+  * Fix for comments regex matching on Windows
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 03 May 2018 22:23:38 +0200
+
+libcluon (0.0.82-1ppa1~xenial1) xenial; urgency=medium
+
+  * Fix for comments regex matching on Windows
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 03 May 2018 22:23:38 +0200
+
 libcluon (0.0.81-1ppa1~bionic1) bionic; urgency=medium
 
   * Completed SharedMemory implementation for Windows
