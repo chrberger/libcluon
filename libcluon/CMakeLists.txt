@@ -62,6 +62,7 @@ endif()
 include_directories(SYSTEM thirdparty)
 # Configure this project's targets.
 include_directories(include)
+include_directories(tools)
 
 ################################################################################
 # Before we can build libcluon, we need to build a small helper tool to compile

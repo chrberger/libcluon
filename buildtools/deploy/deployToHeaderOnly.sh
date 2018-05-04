@@ -179,6 +179,7 @@ EOF
 cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 #ifdef HAVE_CLUON_REC2CSV
 EOF
+cat libcluon/tools/cluon-rec2csv.hpp >> tmp.headeronly/cluon-complete.hpp
 cat libcluon/tools/cluon-rec2csv.cpp >> tmp.headeronly/cluon-complete.hpp
 cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 #endif
