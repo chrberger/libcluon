@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This test for a compiler definition is necessary to preserve single-file, header-only compability.
+#ifndef HAVE_CLUON_REC2CSV
 #include "cluon-rec2csv.hpp"
+#endif
 
 #include <cstdint>
 
