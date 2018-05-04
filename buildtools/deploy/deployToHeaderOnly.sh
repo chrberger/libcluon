@@ -154,6 +154,7 @@ for i in \
 cat libcluon/src/$i >> tmp.headeronly/cluon-complete.hpp
 done
 
+cat libcluon/tools/cluon-msc.hpp >> tmp.headeronly/cluon-complete.hpp
 cat libcluon/tools/cluon-msc.cpp >> tmp.headeronly/cluon-complete.hpp
 
 cat <<EOF >> tmp.headeronly/cluon-complete.hpp

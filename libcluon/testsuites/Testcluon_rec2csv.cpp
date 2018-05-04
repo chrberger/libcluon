@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018  Christian Berger
+ * Copyright (C) 2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -158,6 +158,8 @@ message testdata.MyTestMessage5 [id = 30005] {
     REQUIRE(0 == cluon_rec2csv(argc, const_cast<char**>(argv)));
 
     std::fstream CSV("testdata.MyTestMessage5-0.csv", std::ios::in);
+    REQUIRE(CSV.good());
+
     std::stringstream sstrOutput;
     std::string output;
     while (getline(CSV, output)) {
