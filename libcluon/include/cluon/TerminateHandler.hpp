@@ -20,8 +20,7 @@
 
 #include "cluon/cluon.hpp"
 
-#include <signal.h>
-
+#include <csignal>
 #include <atomic>
 
 namespace cluon {

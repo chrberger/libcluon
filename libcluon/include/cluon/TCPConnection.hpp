@@ -136,8 +136,10 @@ class LIBCLUON_API TCPConnection {
     mutable std::mutex m_socketMutex{};
     int32_t m_socket{-1};
     struct sockaddr_in m_address {};
+
     std::atomic<bool> m_readFromSocketThreadRunning{false};
     std::thread m_readFromSocketThread{};
+
     std::function<void(std::string &&, std::chrono::system_clock::time_point)> m_newDataDelegate{};
     std::function<void()> m_connectionLostDelegate{};
 };

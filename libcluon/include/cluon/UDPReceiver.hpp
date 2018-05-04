@@ -120,13 +120,19 @@ class LIBCLUON_API UDPReceiver {
     struct sockaddr_in m_receiveFromAddress {};
     struct ip_mreq m_mreq {};
     bool m_isMulticast{false};
+
     std::atomic<bool> m_readFromSocketThreadRunning{false};
     std::thread m_readFromSocketThread{};
 
+   private:
+    std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point)> m_delegate{};
+
+   private:
     std::atomic<bool> m_pipelineThreadRunning{false};
     std::thread m_pipelineThread{};
     std::mutex m_pipelineMutex{};
     std::condition_variable m_pipelineCondition{};
+
     class PipelineEntry {
        public:
         std::string m_data;
@@ -134,8 +140,6 @@ class LIBCLUON_API UDPReceiver {
         std::chrono::system_clock::time_point m_sampleTime;
     };
     std::deque<PipelineEntry> m_pipeline{};
-
-    std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point)> m_delegate{};
 };
 } // namespace cluon
 
