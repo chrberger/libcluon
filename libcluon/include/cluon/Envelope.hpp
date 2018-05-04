@@ -22,7 +22,6 @@
 #include "cluon/ToProtoVisitor.hpp"
 #include "cluon/cluonDataStructures.hpp"
 
-#include <array>
 #include <cstring>
 #include <istream>
 #include <sstream>
@@ -42,24 +41,30 @@ namespace cluon {
 inline std::string serializeEnvelope(cluon::data::Envelope &&envelope) noexcept {
     std::string dataToSend;
     {
+        std::stringstream sstr;
+
         cluon::ToProtoVisitor protoEncoder;
         envelope.accept(protoEncoder);
 
         const std::string tmp{protoEncoder.encodedData()};
         uint32_t length{static_cast<uint32_t>(tmp.size())};
+        length <<= 8;
         length = htole32(length);
 
-        // Add OpenDaVINCI header.
-        std::array<char, 5> header;
-        header[0] = static_cast<char>(0x0D);
-        header[1] = static_cast<char>(0xA4);
-        header[2] = *(reinterpret_cast<char *>(&length) + 0);
-        header[3] = *(reinterpret_cast<char *>(&length) + 1);
-        header[4] = *(reinterpret_cast<char *>(&length) + 2);
+        // Add OD4 header.
+        constexpr unsigned char OD4_HEADER_BYTE0 = 0x0D;
+        constexpr unsigned char OD4_HEADER_BYTE1 = 0xA4;
+        sstr.put(static_cast<char>(OD4_HEADER_BYTE0));
+        auto posByte1 = sstr.tellp();
+        sstr.write(reinterpret_cast<char*>(&length), static_cast<std::streamsize>(sizeof(uint32_t)));
+        auto posByte5 = sstr.tellp();
+        sstr.seekp(posByte1);
+        sstr.put(static_cast<char>(OD4_HEADER_BYTE1));
+        sstr.seekp(posByte5);
 
-        std::stringstream sstr;
-        sstr.write(header.data(), static_cast<std::streamsize>(header.size()));
+        // Write payload.
         sstr.write(tmp.data(), static_cast<std::streamsize>(tmp.size()));
+
         dataToSend = sstr.str();
     }
     return dataToSend;
