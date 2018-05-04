@@ -23,6 +23,7 @@
 #include "cluon/MessageParser.hpp"
 #include "cluon/ToJSONVisitor.hpp"
 #include "cluon/ToProtoVisitor.hpp"
+#include "cluon/any/any.hpp"
 
 #include <algorithm>
 #include <sstream>
@@ -110,7 +111,7 @@ std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelo
             try {
                 // Catch possible linb::any exception.
                 gm.accept(payloadToJSON);
-            } catch (...) {} // LCOV_EXCL_LINE
+            } catch (const linb::bad_any_cast &) {} // LCOV_EXCL_LINE
 
             std::string tmp{payload.messageName()};
             std::replace(tmp.begin(), tmp.end(), '.', '_');

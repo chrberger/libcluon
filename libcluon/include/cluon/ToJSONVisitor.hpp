@@ -18,6 +18,7 @@
 #ifndef CLUON_TOJSONVISITOR_HPP
 #define CLUON_TOJSONVISITOR_HPP
 
+#include "cluon/any/any.hpp"
 #include "cluon/cluon.hpp"
 
 #include <cstdint>
@@ -87,9 +88,12 @@ class LIBCLUON_API ToJSONVisitor {
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
         (void)typeName;
         if ((0 == m_mask.count(id)) || m_mask[id]) {
-            ToJSONVisitor jsonVisitor;
-            value.accept(jsonVisitor);
-            m_buffer << '\"' << name << '\"' << ':' << jsonVisitor.json() << ',' << '\n';
+            try {
+                ToJSONVisitor jsonVisitor;
+                value.accept(jsonVisitor);
+                m_buffer << '\"' << name << '\"' << ':' << jsonVisitor.json() << ',' << '\n';
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
         }
     }
 
