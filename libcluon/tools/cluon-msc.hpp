@@ -103,8 +103,8 @@ inline int32_t cluon_msc(int32_t argc, char **argv) {
                 outputFile << content << std::endl;
                 outputFile.close();
             }
-            else {
-                std::cout << content << std::endl;
+            else { // LCOV_EXCL_LINE
+                std::cout << content << std::endl; // LCOV_EXCL_LINE
             }
         }
     }

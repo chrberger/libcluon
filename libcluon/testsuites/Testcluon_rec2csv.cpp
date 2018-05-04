@@ -38,36 +38,33 @@
 // clang-format on
 
 TEST_CASE("Test empty commandline parameters.") {
-    int32_t argc = 1;
-    const char *argv[]     = {static_cast<const char *>("cluon-rec2csv")};
-    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char**>(argv)));
+    int32_t argc       = 1;
+    const char *argv[] = {static_cast<const char *>("cluon-rec2csv")};
+    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char **>(argv)));
 }
 
 TEST_CASE("Test only --odvd parameter.") {
     UNLINK("ABC1.odvd");
     constexpr int32_t argc = 2;
-    const char *argv[]     = {static_cast<const char *>("cluon-rec2csv"),
-                              static_cast<const char *>("--odvd=ABC1.odvd")};
-    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char**>(argv)));
+    const char *argv[]     = {static_cast<const char *>("cluon-rec2csv"), static_cast<const char *>("--odvd=ABC1.odvd")};
+    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char **>(argv)));
 }
 
 TEST_CASE("Test only --rec parameter.") {
     UNLINK("DEF2.rec");
     constexpr int32_t argc = 2;
-    const char *argv[]     = {static_cast<const char *>("cluon-rec2csv"),
-                              static_cast<const char *>("--rec=DEF2.rec")};
-    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char**>(argv)));
+    const char *argv[]     = {static_cast<const char *>("cluon-rec2csv"), static_cast<const char *>("--rec=DEF2.rec")};
+    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char **>(argv)));
 }
 
 TEST_CASE("Test both parameters and non-existing ODVD file.") {
     UNLINK("ABC3.odvd");
     UNLINK("DEF3.rec");
     constexpr int32_t argc = 3;
-    const char *argv[]     = {static_cast<const char *>("cluon-rec2csv"),
-                              static_cast<const char *>("--odvd=ABC3.odvd"),
-                              static_cast<const char *>("--rec=DEF3.rec")};
+    const char *argv[]
+        = {static_cast<const char *>("cluon-rec2csv"), static_cast<const char *>("--odvd=ABC3.odvd"), static_cast<const char *>("--rec=DEF3.rec")};
     std::fstream rec("DEF3.rec", std::ios::out);
-    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char**>(argv)));
+    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char **>(argv)));
     UNLINK("DEF3.rec");
 }
 
@@ -75,9 +72,8 @@ TEST_CASE("Test both parameters and non-existing rec file.") {
     UNLINK("ABC4.odvd");
     UNLINK("DEF4.rec");
     constexpr int32_t argc = 3;
-    const char *argv[]     = {static_cast<const char *>("cluon-rec2csv"),
-                              static_cast<const char *>("--odvd=ABC4.odvd"),
-                              static_cast<const char *>("--rec=DEF4.rec")};
+    const char *argv[]
+        = {static_cast<const char *>("cluon-rec2csv"), static_cast<const char *>("--odvd=ABC4.odvd"), static_cast<const char *>("--rec=DEF4.rec")};
 
     const char *input = R"(
 message MyPackage.MyMessage1 [id = 1] {
@@ -90,7 +86,7 @@ message MyPackage.MyMessage1 [id = 1] {
     odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
     odvd.close();
 
-    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char**>(argv)));
+    REQUIRE(1 == cluon_rec2csv(argc, const_cast<char **>(argv)));
     UNLINK("ABC4.odvd");
 }
 
@@ -100,9 +96,8 @@ TEST_CASE("Test both parameters.") {
     UNLINK("testdata.MyTestMessage5-0.csv");
 
     constexpr int32_t argc = 3;
-    const char *argv[]     = {static_cast<const char *>("cluon-rec2csv"),
-                              static_cast<const char *>("--odvd=ABC5.odvd"),
-                              static_cast<const char *>("--rec=DEF5.rec")};
+    const char *argv[]
+        = {static_cast<const char *>("cluon-rec2csv"), static_cast<const char *>("--odvd=ABC5.odvd"), static_cast<const char *>("--rec=DEF5.rec")};
 
     const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
@@ -155,20 +150,19 @@ message testdata.MyTestMessage5 [id = 30005] {
         recordingFile.close();
     }
 
-    REQUIRE(0 == cluon_rec2csv(argc, const_cast<char**>(argv)));
+    REQUIRE(0 == cluon_rec2csv(argc, const_cast<char **>(argv)));
 
     std::fstream CSV("testdata.MyTestMessage5-0.csv", std::ios::in);
     REQUIRE(CSV.good());
 
     std::stringstream sstrOutput;
     std::string output;
-    while (getline(CSV, output)) {
-        sstrOutput << output << std::endl;
-    }
+    while (getline(CSV, output)) { sstrOutput << output << std::endl; }
     CSV.close();
     output = sstrOutput.str();
 
-    const char *expectedOutput = R"(sent.seconds;sent.microseconds;received.seconds;received.microseconds;sampleTimeStamp.seconds;sampleTimeStamp.microseconds;attribute1;attribute2;attribute3;attribute4;attribute5;attribute6;attribute7;attribute8;attribute9;attribute10;attribute11;
+    const char *expectedOutput
+        = R"(sent.seconds;sent.microseconds;received.seconds;received.microseconds;sampleTimeStamp.seconds;sampleTimeStamp.microseconds;attribute1;attribute2;attribute3;attribute4;attribute5;attribute6;attribute7;attribute8;attribute9;attribute10;attribute11;
 1000;0;5000;0;10000;0;1;-1;100;-100;10000;1;12345;-12345;-1.2345;-10.2345;"Hello World!";
 1000;1;5000;1;10000;1;1;-1;100;-100;10000;2;12345;-12345;-1.2345;-10.2345;"Hello World!";
 )";
@@ -179,4 +173,3 @@ message testdata.MyTestMessage5 [id = 30005] {
     UNLINK("DEF5.rec");
     UNLINK("testdata.MyTestMessage5-0.csv");
 }
-

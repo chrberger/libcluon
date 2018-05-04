@@ -33,9 +33,15 @@
 // clang-format on
 
 TEST_CASE("Test empty commandline parameters.") {
-    int32_t argc = 1;
-    const char *argv[]     = {static_cast<const char *>("cluon-msc")};
-    REQUIRE(1 == cluon_msc(argc, const_cast<char**>(argv)));
+    int32_t argc       = 1;
+    const char *argv[] = {static_cast<const char *>("cluon-msc")};
+    REQUIRE(1 == cluon_msc(argc, const_cast<char **>(argv)));
+}
+
+TEST_CASE("Test no conversion with non-existing ODVD.") {
+    constexpr int32_t argc = 2;
+    const char *argv[]     = {static_cast<const char *>("cluon-msc"), static_cast<const char *>("ABCnonexisting.odvd")};
+    REQUIRE(1 == cluon_msc(argc, const_cast<char **>(argv)));
 }
 
 TEST_CASE("Test no conversion with corrupt ODVD.") {
@@ -43,9 +49,7 @@ TEST_CASE("Test no conversion with corrupt ODVD.") {
     UNLINK("ABC0.out");
 
     constexpr int32_t argc = 3;
-    const char *argv[]     = {static_cast<const char *>("cluon-msc"),
-                              static_cast<const char *>("--out=ABC0.out"),
-                              static_cast<const char *>("ABC0.odvd")};
+    const char *argv[]     = {static_cast<const char *>("cluon-msc"), static_cast<const char *>("--out=ABC0.out"), static_cast<const char *>("ABC0.odvd")};
 
     const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
@@ -62,7 +66,7 @@ message testdata.MyTestMessage5 [id = 30005] {
     odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
     odvd.close();
 
-    REQUIRE(1 == cluon_msc(argc, const_cast<char**>(argv)));
+    REQUIRE(1 == cluon_msc(argc, const_cast<char **>(argv)));
 
     UNLINK("ABC0.odvd");
     UNLINK("ABC0.out");
@@ -73,9 +77,7 @@ TEST_CASE("Test no conversion with valid ODVD.") {
     UNLINK("ABC1.out");
 
     constexpr int32_t argc = 3;
-    const char *argv[]     = {static_cast<const char *>("cluon-msc"),
-                              static_cast<const char *>("--out=ABC1.out"),
-                              static_cast<const char *>("ABC1.odvd")};
+    const char *argv[]     = {static_cast<const char *>("cluon-msc"), static_cast<const char *>("--out=ABC1.out"), static_cast<const char *>("ABC1.odvd")};
 
     const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
@@ -98,16 +100,14 @@ message testdata.MyTestMessage5 [id = 30005] {
     odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
     odvd.close();
 
-    REQUIRE(0 == cluon_msc(argc, const_cast<char**>(argv)));
+    REQUIRE(0 == cluon_msc(argc, const_cast<char **>(argv)));
 
     std::fstream out("ABC1.out", std::ios::in);
     REQUIRE(out.good());
 
     std::stringstream sstrOutput;
     std::string output;
-    while (getline(out, output)) {
-        sstrOutput << output << std::endl;
-    }
+    while (getline(out, output)) { sstrOutput << output << std::endl; }
     out.close();
     output = sstrOutput.str();
 
@@ -126,9 +126,9 @@ TEST_CASE("Test Proto conversion with valid ODVD.") {
 
     constexpr int32_t argc = 4;
     const char *argv[]     = {static_cast<const char *>("cluon-msc"),
-                              static_cast<const char *>("--proto"),
-                              static_cast<const char *>("--out=ABC2.proto"),
-                              static_cast<const char *>("ABC2.odvd")};
+                          static_cast<const char *>("--proto"),
+                          static_cast<const char *>("--out=ABC2.proto"),
+                          static_cast<const char *>("ABC2.odvd")};
 
     const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
@@ -151,16 +151,14 @@ message testdata.MyTestMessage5 [id = 30005] {
     odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
     odvd.close();
 
-    REQUIRE(0 == cluon_msc(argc, const_cast<char**>(argv)));
+    REQUIRE(0 == cluon_msc(argc, const_cast<char **>(argv)));
 
     std::fstream out("ABC2.proto", std::ios::in);
     REQUIRE(out.good());
 
     std::stringstream sstrOutput;
     std::string output;
-    while (getline(out, output)) {
-        sstrOutput << output << std::endl;
-    }
+    while (getline(out, output)) { sstrOutput << output << std::endl; }
     out.close();
     output = sstrOutput.str();
 
@@ -215,9 +213,9 @@ TEST_CASE("Test .hpp conversion with valid ODVD.") {
 
     constexpr int32_t argc = 4;
     const char *argv[]     = {static_cast<const char *>("cluon-msc"),
-                              static_cast<const char *>("--cpp-headers"),
-                              static_cast<const char *>("--out=ABC3.hpp"),
-                              static_cast<const char *>("ABC3.odvd")};
+                          static_cast<const char *>("--cpp-headers"),
+                          static_cast<const char *>("--out=ABC3.hpp"),
+                          static_cast<const char *>("ABC3.odvd")};
 
     const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
@@ -240,16 +238,14 @@ message testdata.MyTestMessage5 [id = 30005] {
     odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
     odvd.close();
 
-    REQUIRE(0 == cluon_msc(argc, const_cast<char**>(argv)));
+    REQUIRE(0 == cluon_msc(argc, const_cast<char **>(argv)));
 
     std::fstream out("ABC3.hpp", std::ios::in);
     REQUIRE(out.good());
 
     std::stringstream sstrOutput;
     std::string output;
-    while (getline(out, output)) {
-        sstrOutput << output << std::endl;
-    }
+    while (getline(out, output)) { sstrOutput << output << std::endl; }
     out.close();
     output = sstrOutput.str();
 
@@ -512,9 +508,9 @@ TEST_CASE("Test .cpp conversion with valid ODVD and no additional include header
 
     constexpr int32_t argc = 4;
     const char *argv[]     = {static_cast<const char *>("cluon-msc"),
-                              static_cast<const char *>("--cpp-sources"),
-                              static_cast<const char *>("--out=ABC4.cpp"),
-                              static_cast<const char *>("ABC4.odvd")};
+                          static_cast<const char *>("--cpp-sources"),
+                          static_cast<const char *>("--out=ABC4.cpp"),
+                          static_cast<const char *>("ABC4.odvd")};
 
     const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
@@ -537,16 +533,14 @@ message testdata.MyTestMessage5 [id = 30005] {
     odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
     odvd.close();
 
-    REQUIRE(0 == cluon_msc(argc, const_cast<char**>(argv)));
+    REQUIRE(0 == cluon_msc(argc, const_cast<char **>(argv)));
 
     std::fstream out("ABC4.cpp", std::ios::in);
     REQUIRE(out.good());
 
     std::stringstream sstrOutput;
     std::string output;
-    while (getline(out, output)) {
-        sstrOutput << output << std::endl;
-    }
+    while (getline(out, output)) { sstrOutput << output << std::endl; }
     out.close();
     output = sstrOutput.str();
 
@@ -671,10 +665,10 @@ TEST_CASE("Test .cpp conversion with valid ODVD and additional include header.")
 
     constexpr int32_t argc = 5;
     const char *argv[]     = {static_cast<const char *>("cluon-msc"),
-                              static_cast<const char *>("--cpp-sources"),
-                              static_cast<const char *>("--cpp-add-include-file=ABC5.hpp"),
-                              static_cast<const char *>("--out=ABC5.cpp"),
-                              static_cast<const char *>("ABC5.odvd")};
+                          static_cast<const char *>("--cpp-sources"),
+                          static_cast<const char *>("--cpp-add-include-file=ABC5.hpp"),
+                          static_cast<const char *>("--out=ABC5.cpp"),
+                          static_cast<const char *>("ABC5.odvd")};
 
     const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
@@ -697,16 +691,14 @@ message testdata.MyTestMessage5 [id = 30005] {
     odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
     odvd.close();
 
-    REQUIRE(0 == cluon_msc(argc, const_cast<char**>(argv)));
+    REQUIRE(0 == cluon_msc(argc, const_cast<char **>(argv)));
 
     std::fstream out("ABC5.cpp", std::ios::in);
     REQUIRE(out.good());
 
     std::stringstream sstrOutput;
     std::string output;
-    while (getline(out, output)) {
-        sstrOutput << output << std::endl;
-    }
+    while (getline(out, output)) { sstrOutput << output << std::endl; }
     out.close();
     output = sstrOutput.str();
 
