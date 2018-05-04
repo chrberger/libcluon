@@ -56,7 +56,7 @@ inline std::string serializeEnvelope(cluon::data::Envelope &&envelope) noexcept 
         constexpr unsigned char OD4_HEADER_BYTE1 = 0xA4;
         sstr.put(static_cast<char>(OD4_HEADER_BYTE0));
         auto posByte1 = sstr.tellp();
-        sstr.write(reinterpret_cast<char*>(&length), static_cast<std::streamsize>(sizeof(uint32_t)));
+        sstr.write(reinterpret_cast<char *>(&length), static_cast<std::streamsize>(sizeof(uint32_t)));
         auto posByte5 = sstr.tellp();
         sstr.seekp(posByte1);
         sstr.put(static_cast<char>(OD4_HEADER_BYTE1));

@@ -321,9 +321,9 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
     std::string inputWithoutComments{input};
     try {
         const std::string MATCH_COMMENTS_REGEX = R"(/\*([\s\S]*?)\*/|//.*)";
-        inputWithoutComments = std::regex_replace(input, std::regex(MATCH_COMMENTS_REGEX), ""); // NOLINT
-    } catch (std::regex_error &) {  // LCOV_EXCL_LINE
-    } catch (std::bad_cast &) {     // LCOV_EXCL_LINE
+        inputWithoutComments                   = std::regex_replace(input, std::regex(MATCH_COMMENTS_REGEX), ""); // NOLINT
+    } catch (std::regex_error &) {                                                                                // LCOV_EXCL_LINE
+    } catch (std::bad_cast &) {                                                                                   // LCOV_EXCL_LINE
     }
     try {
         std::vector<MetaMessage> listOfMetaMessages{};

@@ -105,7 +105,7 @@ class LIBCLUON_API SharedMemory {
     HANDLE __mutex{nullptr};
     HANDLE __sharedMemory{nullptr};
 #else
-    int32_t m_fd{ -1 };
+    int32_t m_fd{-1};
     struct SharedMemoryHeader {
         uint32_t __size;
         pthread_mutex_t __mutex;

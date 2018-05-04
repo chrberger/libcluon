@@ -246,7 +246,7 @@ More comments
 }
 
 TEST_CASE("Parsing message statement with extended name with two int8 fields "
-    "and no field options and comment header.") {
+          "and no field options and comment header.") {
     cluon::MessageParser mp;
 
     const char *tmp = R"(
@@ -281,7 +281,7 @@ message myMessage.SubName [id = 1] {
 //    int8  attribute1;
 //}
 )";
-    auto retVal = mp.parse(std::string(tmp));
+    auto retVal     = mp.parse(std::string(tmp));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
     REQUIRE(1 == retVal.first.size());
 }

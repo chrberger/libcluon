@@ -61,29 +61,28 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
         if (0 < size) {
             // Create a shared memory area and semaphores.
             const LONG MUTEX_INITIAL_COUNT = 1;
-            const LONG MUTEX_MAX_COUNT = 1;
-            const DWORD FLAGS = 0; //Reserved.
-            __mutex = CreateSemaphoreEx(NULL, MUTEX_INITIAL_COUNT, MUTEX_MAX_COUNT, mutexName.c_str(), FLAGS, SEMAPHORE_ALL_ACCESS);
+            const LONG MUTEX_MAX_COUNT     = 1;
+            const DWORD FLAGS              = 0; // Reserved.
+            __mutex                        = CreateSemaphoreEx(NULL, MUTEX_INITIAL_COUNT, MUTEX_MAX_COUNT, mutexName.c_str(), FLAGS, SEMAPHORE_ALL_ACCESS);
             if (nullptr != __mutex) {
-                __conditionEvent = CreateEvent(NULL /*use default security*/,
-                                               TRUE /*manually resetting event*/,
-                                               FALSE /*initial state is not signaled*/,
-                                               conditionEventName.c_str());
+                __conditionEvent = CreateEvent(
+                    NULL /*use default security*/, TRUE /*manually resetting event*/, FALSE /*initial state is not signaled*/, conditionEventName.c_str());
                 if (nullptr != __conditionEvent) {
                     __sharedMemory = CreateFileMapping(INVALID_HANDLE_VALUE /*use paging file*/,
                                                        NULL /*use default security*/,
                                                        PAGE_READWRITE,
-                                                       0, m_size + sizeof(uint32_t) /*size + size-information (uint32_t)*/,
+                                                       0,
+                                                       m_size + sizeof(uint32_t) /*size + size-information (uint32_t)*/,
                                                        m_name.c_str());
                     if (nullptr != __sharedMemory) {
-                        m_sharedMemory = (char*)MapViewOfFile(__sharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, m_size + sizeof(uint32_t));
+                        m_sharedMemory = (char *)MapViewOfFile(__sharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, m_size + sizeof(uint32_t));
                         if (nullptr != m_sharedMemory) {
                             // Provide size information at the beginning of the shared memory.
-                            *(uint32_t*)m_sharedMemory = m_size;
+                            *(uint32_t *)m_sharedMemory  = m_size;
                             m_userAccessibleSharedMemory = m_sharedMemory + sizeof(uint32_t);
-                        }
-                        else {
-                            std::cerr << "[cluon::SharedMemory] Failed to map shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                        } else {
+                            std::cerr << "[cluon::SharedMemory] Failed to map shared memory '" << m_name << "': "
+                                      << " (" << GetLastError() << ")" << std::endl;
                             CloseHandle(__sharedMemory);
                             __sharedMemory = nullptr;
 
@@ -93,54 +92,53 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                             CloseHandle(__mutex);
                             __mutex = nullptr;
                         }
-                    }
-                    else {
-                        std::cerr << "[cluon::SharedMemory] Failed to request shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                    } else {
+                        std::cerr << "[cluon::SharedMemory] Failed to request shared memory '" << m_name << "': "
+                                  << " (" << GetLastError() << ")" << std::endl;
                         CloseHandle(__conditionEvent);
                         __conditionEvent = nullptr;
 
                         CloseHandle(__mutex);
                         __mutex = nullptr;
                     }
-                }
-                else {
-                    std::cerr << "[cluon::SharedMemory] Failed to request event '" << conditionEventName << "': " << " (" << GetLastError() << ")" << std::endl;
+                } else {
+                    std::cerr << "[cluon::SharedMemory] Failed to request event '" << conditionEventName << "': "
+                              << " (" << GetLastError() << ")" << std::endl;
                     CloseHandle(__conditionEvent);
                     __conditionEvent = nullptr;
 
                     CloseHandle(__mutex);
                     __mutex = nullptr;
                 }
-            }
-            else {
-                std::cerr << "[cluon::SharedMemory] Failed to create mutex '" << mutexName << "': " << " (" << GetLastError() << ")" << std::endl;
+            } else {
+                std::cerr << "[cluon::SharedMemory] Failed to create mutex '" << mutexName << "': "
+                          << " (" << GetLastError() << ")" << std::endl;
                 CloseHandle(__mutex);
                 __mutex = nullptr;
             }
-        }
-        else {
+        } else {
             // Open a shared memory area and semaphores.
             m_hasOnlyAttachedToSharedMemory = true;
-            const BOOL INHERIT_HANDLE = FALSE;
-            __mutex = OpenSemaphore(SEMAPHORE_ALL_ACCESS, INHERIT_HANDLE, mutexName.c_str());
+            const BOOL INHERIT_HANDLE       = FALSE;
+            __mutex                         = OpenSemaphore(SEMAPHORE_ALL_ACCESS, INHERIT_HANDLE, mutexName.c_str());
             if (nullptr != __mutex) {
                 __conditionEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE /*do not inherit the name*/, conditionEventName.c_str());
                 if (nullptr != __conditionEvent) {
                     __sharedMemory = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE /*do not inherit the name*/, m_name.c_str());
                     if (nullptr != __sharedMemory) {
                         // Firstly, map only for the size of a uint32_t to read the entire size.
-                        m_sharedMemory = (char*)MapViewOfFile(__sharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(uint32_t));
+                        m_sharedMemory = (char *)MapViewOfFile(__sharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(uint32_t));
                         if (nullptr != m_sharedMemory) {
                             //  Now, read the real size...
-                            m_size = *(uint32_t*)m_sharedMemory;
+                            m_size = *(uint32_t *)m_sharedMemory;
                             // ..unmap and re-map.
                             UnmapViewOfFile(m_sharedMemory);
-                            m_sharedMemory = (char*)MapViewOfFile(__sharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, m_size + sizeof(uint32_t));
+                            m_sharedMemory = (char *)MapViewOfFile(__sharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, m_size + sizeof(uint32_t));
                             if (nullptr != m_sharedMemory) {
                                 m_userAccessibleSharedMemory = m_sharedMemory + sizeof(uint32_t);
-                            }
-                            else {
-                                std::cerr << "[cluon::SharedMemory] Failed to finally map shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                            } else {
+                                std::cerr << "[cluon::SharedMemory] Failed to finally map shared memory '" << m_name << "': "
+                                          << " (" << GetLastError() << ")" << std::endl;
                                 CloseHandle(__sharedMemory);
                                 __sharedMemory = nullptr;
 
@@ -150,9 +148,9 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                                 CloseHandle(__mutex);
                                 __mutex = nullptr;
                             }
-                        }
-                        else {
-                            std::cerr << "[cluon::SharedMemory] Failed to temporarily map shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                        } else {
+                            std::cerr << "[cluon::SharedMemory] Failed to temporarily map shared memory '" << m_name << "': "
+                                      << " (" << GetLastError() << ")" << std::endl;
                             CloseHandle(__sharedMemory);
                             __sharedMemory = nullptr;
 
@@ -162,27 +160,27 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
                             CloseHandle(__mutex);
                             __mutex = nullptr;
                         }
-                    }
-                    else {
-                        std::cerr << "[cluon::SharedMemory] Failed to open shared memory '" << m_name << "': " << " (" << GetLastError() << ")" << std::endl;
+                    } else {
+                        std::cerr << "[cluon::SharedMemory] Failed to open shared memory '" << m_name << "': "
+                                  << " (" << GetLastError() << ")" << std::endl;
                         CloseHandle(__conditionEvent);
                         __conditionEvent = nullptr;
 
                         CloseHandle(__mutex);
                         __mutex = nullptr;
                     }
-                }
-                else {
-                    std::cerr << "[cluon::SharedMemory] Failed to open event '" << conditionEventName << "': " << " (" << GetLastError() << ")" << std::endl;
+                } else {
+                    std::cerr << "[cluon::SharedMemory] Failed to open event '" << conditionEventName << "': "
+                              << " (" << GetLastError() << ")" << std::endl;
                     CloseHandle(__conditionEvent);
                     __conditionEvent = nullptr;
 
                     CloseHandle(__mutex);
                     __mutex = nullptr;
                 }
-            }
-            else {
-                std::cerr << "[cluon::SharedMemory] Failed to open mutex '" << mutexName << "': " << " (" << GetLastError() << ")" << std::endl;
+            } else {
+                std::cerr << "[cluon::SharedMemory] Failed to open mutex '" << mutexName << "': "
+                          << " (" << GetLastError() << ")" << std::endl;
                 CloseHandle(__mutex);
                 __mutex = nullptr;
             }
