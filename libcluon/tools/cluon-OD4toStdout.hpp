@@ -27,7 +27,7 @@
 #include <string>
 #include <thread>
 
-int32_t cluon_OD4toStdout(int32_t argc, char **argv) {
+inline int32_t cluon_OD4toStdout(int32_t argc, char **argv) {
     int retVal{1};
     const std::string PROGRAM{argv[0]}; // NOLINT
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
