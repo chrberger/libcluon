@@ -33,7 +33,7 @@ int32_t cluon_OD4toStdout(int32_t argc, char **argv) {
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
     if (0 == commandlineArguments.count("cid")) {
         std::cerr << PROGRAM
-                  << " dumps Envelopes received from an OD4Session to stdout; any data read from stdin is tried to be relayed as Envelope into the OD4Session." << std::endl;
+                  << " dumps Envelopes received from an OD4Session to stdout." << std::endl;
         std::cerr << "Usage:   " << PROGRAM << " --cid=<OpenDaVINCI session>" << std::endl;
         std::cerr << "Example: " << PROGRAM << " --cid=111" << std::endl;
     }
@@ -46,13 +46,10 @@ int32_t cluon_OD4toStdout(int32_t argc, char **argv) {
             });
 
         if (od4Session.isRunning()) {
-            while (std::cin.good() && od4Session.isRunning()) {
-                auto tmp{cluon::extractEnvelope(std::cin)};
-                if (tmp.first) {
-                    od4Session.send(std::move(tmp.second));
-                }
+            using namespace std::literals::chrono_literals; // NOLINT
+            while (od4Session.isRunning()) {
+                std::this_thread::sleep_for(1s);
             }
-
             retVal = 0;
         }
     }
