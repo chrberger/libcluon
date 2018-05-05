@@ -28,8 +28,6 @@
 #include <streambuf>
 #include <thread>
 
-#include <iostream>
-
 // clang-format off
 #ifdef WIN32
     #define UNLINK _unlink

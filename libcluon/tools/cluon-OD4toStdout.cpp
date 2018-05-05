@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018  Christian Berger
+ * Copyright (C) 2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,40 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cluon/cluon.hpp"
-#include "cluon/Envelope.hpp"
-#include "cluon/OD4Session.hpp"
+#include "cluon-OD4toStdout.hpp"
 
-#include <iostream>
-#include <string>
-#include <thread>
+#include <cstdint>
 
-int main(int argc, char **argv) {
-    int retVal{1};
-    const std::string PROGRAM{argv[0]}; // NOLINT
-    auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
-    if (0 == commandlineArguments.count("cid")) {
-        std::cerr << PROGRAM
-                  << " dumps Envelopes received from an OD4Session to stdout; any data read from stdin is tried to be relayed as Envelope into the OD4Session." << std::endl;
-        std::cerr << "Usage:   " << PROGRAM << " --cid=<OpenDaVINCI session>" << std::endl;
-        std::cerr << "Example: " << PROGRAM << " --cid=111" << std::endl;
-    }
-    else {
-        // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
-        cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])),
-            [](cluon::data::Envelope &&envelope) noexcept {
-                std::cout << cluon::serializeEnvelope(std::move(envelope));
-                std::cout.flush();
-            });
-
-        while (std::cin.good() && od4Session.isRunning()) {
-            auto tmp{cluon::extractEnvelope(std::cin)};
-            if (tmp.first) {
-                od4Session.send(std::move(tmp.second));
-            }
-        }
-
-        retVal = 0;
-    }
-    return retVal;
+int32_t main(int32_t argc, char **argv) {
+    return cluon_OD4toStdout(argc, argv);
 }
