@@ -41,10 +41,6 @@ enum Color {
     DEFAULT = 39,
 };
 
-//void clearScreen();
-//void writeText(Color c, uint8_t y, uint8_t x, const std::string &text);
-//std::string formatTimeStamp(const cluon::data::TimeStamp &ts);
-
 inline void clearScreen() {
     std::cout << "\033[2J" << std::endl;
 }
