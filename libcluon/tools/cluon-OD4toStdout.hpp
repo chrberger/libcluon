@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CLUON_OD4TOJSON_HPP
-#define CLUON_OD4TOJSON_HPP
+#ifndef CLUON_OD4TOSTDOUT_HPP
+#define CLUON_OD4TOSTDOUT_HPP
 
 #include "cluon/cluon.hpp"
 #include "cluon/Envelope.hpp"
