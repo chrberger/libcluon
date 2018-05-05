@@ -164,6 +164,7 @@ EOF
 cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 #ifdef HAVE_CLUON_REPLAY
 EOF
+cat libcluon/tools/cluon-replay.hpp >> tmp.headeronly/cluon-complete.hpp
 cat libcluon/tools/cluon-replay.cpp >> tmp.headeronly/cluon-complete.hpp
 cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 #endif
@@ -172,6 +173,7 @@ EOF
 cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 #ifdef HAVE_CLUON_LIVEFEED
 EOF
+cat libcluon/tools/cluon-livefeed.hpp >> tmp.headeronly/cluon-complete.hpp
 cat libcluon/tools/cluon-livefeed.cpp >> tmp.headeronly/cluon-complete.hpp
 cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 #endif
