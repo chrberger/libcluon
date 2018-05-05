@@ -173,3 +173,66 @@ message testdata.MyTestMessage5 [id = 30005] {
     UNLINK("DEF5.rec");
     UNLINK("testdata.MyTestMessage5-0.csv");
 }
+
+TEST_CASE("Test both parameters but corrupt ODVD file.") {
+    UNLINK("ABC6.odvd");
+    UNLINK("DEF6.rec");
+    UNLINK("testdata.MyTestMessage5-0.csv");
+
+    constexpr int32_t argc = 3;
+    const char *argv[]
+        = {static_cast<const char *>("cluon-rec2csv"), static_cast<const char *>("--odvd=ABC6.odvd"), static_cast<const char *>("--rec=DEF6.rec")};
+
+    const char *input = R"(
+message testdata.MyTestMessage5 [id = 30005] {
+    uint8 attribute1 [ default = 1, id = 1 ];
+    int8 attribute2 [ default = -1, id = 2 ];
+    uint16 attribute3 [ default = 100, id = 3 ];
+    int16 attribute4 [ default = -100, id = 4 ];
+    uint32 attribute5 [ default = 10000, id = 5 ];
+)";
+    std::string messageSpecification(input);
+
+    std::fstream odvd("ABC6.odvd", std::ios::out);
+    odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
+    odvd.close();
+
+    constexpr int32_t MAX_ENTRIES{2};
+    {
+        std::fstream recordingFile("DEF6.rec", std::ios::out | std::ios::binary | std::ios::trunc);
+        REQUIRE(recordingFile.good());
+
+        for (int32_t entryCounter{0}; entryCounter < MAX_ENTRIES; entryCounter++) {
+            testdata::MyTestMessage5 msg;
+            msg.attribute6(entryCounter + 1);
+
+            cluon::ToProtoVisitor proto;
+            msg.accept(proto);
+
+            cluon::data::Envelope env;
+            cluon::data::TimeStamp sent;
+            sent.seconds(1000).microseconds(entryCounter);
+            cluon::data::TimeStamp received;
+            received.seconds(5000).microseconds(entryCounter);
+            cluon::data::TimeStamp sampleTimeStamp;
+            sampleTimeStamp.seconds(10000).microseconds(entryCounter);
+
+            env.serializedData(proto.encodedData());
+            env.dataType(testdata::MyTestMessage5::ID()).sent(sent).received(received).sampleTimeStamp(sampleTimeStamp);
+
+            const std::string tmp{cluon::serializeEnvelope(std::move(env))};
+            recordingFile.write(tmp.c_str(), static_cast<std::streamsize>(tmp.size()));
+            recordingFile.flush();
+        }
+        recordingFile.close();
+    }
+
+    REQUIRE(0 == cluon_rec2csv(argc, const_cast<char **>(argv)));
+
+    std::fstream CSV("testdata.MyTestMessage5-0.csv", std::ios::in);
+    REQUIRE(!CSV.good());
+
+    UNLINK("ABC6.odvd");
+    UNLINK("DEF6.rec");
+    UNLINK("testdata.MyTestMessage5-0.csv");
+}
