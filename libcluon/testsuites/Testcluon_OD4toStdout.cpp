@@ -102,7 +102,11 @@ TEST_CASE("Test starting cluon-OD4toStdout in thread and send one message.") {
 
     const std::string tmp = capturedCout.str();
 
+#ifdef __APPLE__
+    REQUIRE(100 < tmp.size());
+#else
     REQUIRE(107 == tmp.size());
+#endif
     REQUIRE(0xd == static_cast<uint32_t>(static_cast<uint8_t>(tmp.at(0))));
     REQUIRE(0xa4 == static_cast<uint32_t>(static_cast<uint8_t>(tmp.at(1))));
     REQUIRE(0x66 == static_cast<uint32_t>(static_cast<uint8_t>(tmp.at(2))));
