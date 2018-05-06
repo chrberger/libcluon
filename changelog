@@ -1,3 +1,15 @@
+libcluon (0.0.87-1ppa1~bionic1) bionic; urgency=medium
+
+  * Adjustments for Testcluon_OD4toStdout to match tested bytes sequence
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 06 May 2018 22:31:58 +0200
+
+libcluon (0.0.87-1ppa1~xenial1) xenial; urgency=medium
+
+  * Adjustments for Testcluon_OD4toStdout to match tested bytes sequence
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 06 May 2018 22:31:58 +0200
+
 libcluon (0.0.86-1ppa1~bionic1) bionic; urgency=medium
 
   * big endian fixes
