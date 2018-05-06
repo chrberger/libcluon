@@ -130,19 +130,27 @@ uint64_t FromProtoVisitor::ProtoKeyValue::valueAsVarInt() const noexcept {
 }
 
 float FromProtoVisitor::ProtoKeyValue::valueAsFloat() const noexcept {
-    float retVal{0};
+    union FloatValue {
+        uint32_t uint32Value;
+        float floatValue{0};
+    } retVal;
     if (!m_value.empty() && (length() == sizeof(float)) && (m_value.size() == sizeof(float)) && (type() == ProtoConstants::FOUR_BYTES)) {
-        std::memmove(&retVal, &m_value[0], sizeof(float));
+        std::memmove(&retVal.uint32Value, &m_value[0], sizeof(float));
+        retVal.uint32Value = le32toh(retVal.uint32Value);
     }
-    return retVal;
+    return retVal.floatValue;
 }
 
 double FromProtoVisitor::ProtoKeyValue::valueAsDouble() const noexcept {
-    double retVal{0};
+    union DoubleValue {
+        uint64_t uint64Value;
+        double doubleValue{0};
+    } retVal;
     if (!m_value.empty() && (length() == sizeof(double)) && (m_value.size() == sizeof(double)) && (type() == ProtoConstants::EIGHT_BYTES)) {
-        std::memmove(&retVal, &m_value[0], sizeof(double));
+        std::memmove(&retVal.uint64Value, &m_value[0], sizeof(double));
+        retVal.uint64Value = le64toh(retVal.uint64Value);
     }
-    return retVal;
+    return retVal.doubleValue;
 }
 
 std::string FromProtoVisitor::ProtoKeyValue::valueAsString() const noexcept {
