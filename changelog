@@ -1,3 +1,15 @@
+libcluon (0.0.86-1ppa1~bionic1) bionic; urgency=medium
+
+  * big endian fixes
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 06 May 2018 22:18:28 +0200
+
+libcluon (0.0.86-1ppa1~xenial1) xenial; urgency=medium
+
+  * big endian fixes
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 06 May 2018 22:18:28 +0200
+
 libcluon (0.0.85-1ppa1~bionic1) bionic; urgency=medium
 
   * Missing inline added
