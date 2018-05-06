@@ -154,15 +154,23 @@ TEST_CASE("Transform Envelope into JSON represention for simple payload.") {
         REQUIRE(0x8 == env2.serializedData().at(3));
     }
 
-    uint32_t length = static_cast<uint32_t>(envelopeAsProto.size()); // NOLINT
-    length          = htole32(length);
+    uint32_t length{static_cast<uint32_t>(envelopeAsProto.size())}; // NOLINT
     length <<= 8;
-    length |= 0xA4;
+    length = htole32(length);
 
     std::stringstream sstr;
-    constexpr char c{0x0D};
-    sstr.write(&c, sizeof(char));
-    sstr.write(reinterpret_cast<const char *>(&length), sizeof(uint32_t)); // NOLINT
+    // Add OD4 header.
+    constexpr unsigned char OD4_HEADER_BYTE0 = 0x0D;
+    constexpr unsigned char OD4_HEADER_BYTE1 = 0xA4;
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE0));
+    auto posByte1 = sstr.tellp();
+    sstr.write(reinterpret_cast<char *>(&length), static_cast<std::streamsize>(sizeof(uint32_t)));
+    auto posByte5 = sstr.tellp();
+    sstr.seekp(posByte1);
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE1));
+    sstr.seekp(posByte5);
+
+    // Write payload.
     sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
 
     const std::string output{sstr.str()};
@@ -309,15 +317,23 @@ TEST_CASE("Transform Envelope into JSON represention for complex payload.") {
         envelopeAsProto = proto.encodedData();
     }
 
-    uint32_t length = static_cast<uint32_t>(envelopeAsProto.size()); // NOLINT
-    length          = htole32(length);
+    uint32_t length{static_cast<uint32_t>(envelopeAsProto.size())}; // NOLINT
     length <<= 8;
-    length |= 0xA4;
+    length = htole32(length);
 
     std::stringstream sstr;
-    constexpr char c{0x0D};
-    sstr.write(&c, sizeof(char));
-    sstr.write(reinterpret_cast<const char *>(&length), sizeof(uint32_t)); // NOLINT
+    // Add OD4 header.
+    constexpr unsigned char OD4_HEADER_BYTE0 = 0x0D;
+    constexpr unsigned char OD4_HEADER_BYTE1 = 0xA4;
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE0));
+    auto posByte1 = sstr.tellp();
+    sstr.write(reinterpret_cast<char *>(&length), static_cast<std::streamsize>(sizeof(uint32_t)));
+    auto posByte5 = sstr.tellp();
+    sstr.seekp(posByte1);
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE1));
+    sstr.seekp(posByte5);
+
+    // Write payload.
     sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
 
     const std::string output{sstr.str()};
@@ -434,15 +450,23 @@ TEST_CASE("Transform Envelope into JSON represention for nested payloads.") {
         envelopeAsProto = proto.encodedData();
     }
 
-    uint32_t length = static_cast<uint32_t>(envelopeAsProto.size()); // NOLINT
-    length          = htole32(length);
+    uint32_t length{static_cast<uint32_t>(envelopeAsProto.size())}; // NOLINT
     length <<= 8;
-    length |= 0xA4;
+    length = htole32(length);
 
     std::stringstream sstr;
-    constexpr char c{0x0D};
-    sstr.write(&c, sizeof(char));
-    sstr.write(reinterpret_cast<const char *>(&length), sizeof(uint32_t)); // NOLINT
+    // Add OD4 header.
+    constexpr unsigned char OD4_HEADER_BYTE0 = 0x0D;
+    constexpr unsigned char OD4_HEADER_BYTE1 = 0xA4;
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE0));
+    auto posByte1 = sstr.tellp();
+    sstr.write(reinterpret_cast<char *>(&length), static_cast<std::streamsize>(sizeof(uint32_t)));
+    auto posByte5 = sstr.tellp();
+    sstr.seekp(posByte1);
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE1));
+    sstr.seekp(posByte5);
+
+    // Write payload.
     sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
 
     const std::string output{sstr.str()};
@@ -538,15 +562,23 @@ TEST_CASE("Transform Envelope into JSON represention for nested payloads with pu
         envelopeAsProto = proto.encodedData();
     }
 
-    uint32_t length = static_cast<uint32_t>(envelopeAsProto.size()); // NOLINT
-    length          = htole32(length);
+    uint32_t length{static_cast<uint32_t>(envelopeAsProto.size())}; // NOLINT
     length <<= 8;
-    length |= 0xA4;
+    length = htole32(length);
 
     std::stringstream sstr;
-    constexpr char c{0x0D};
-    sstr.write(&c, sizeof(char));
-    sstr.write(reinterpret_cast<const char *>(&length), sizeof(uint32_t)); // NOLINT
+    // Add OD4 header.
+    constexpr unsigned char OD4_HEADER_BYTE0 = 0x0D;
+    constexpr unsigned char OD4_HEADER_BYTE1 = 0xA4;
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE0));
+    auto posByte1 = sstr.tellp();
+    sstr.write(reinterpret_cast<char *>(&length), static_cast<std::streamsize>(sizeof(uint32_t)));
+    auto posByte5 = sstr.tellp();
+    sstr.seekp(posByte1);
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE1));
+    sstr.seekp(posByte5);
+
+    // Write payload.
     sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
 
     const std::string output{sstr.str()};

@@ -332,8 +332,6 @@ std::size_t FromProtoVisitor::fromVarInt(std::istream &in, uint64_t &value) noex
         }
     }
 
-    // VarInt is little endian.
-    value = le64toh(value);
     return size;
 }
 } // namespace cluon

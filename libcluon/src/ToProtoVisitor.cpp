@@ -211,9 +211,6 @@ uint64_t ToProtoVisitor::encodeKey(uint32_t fieldIdentifier, uint8_t protoType) 
 }
 
 std::size_t ToProtoVisitor::toVarInt(std::ostream &out, uint64_t v) noexcept {
-    // VarInt is little endian.
-    v = htole64(v);
-
     // Minimum size is of the encoded data.
     std::size_t size{1};
     uint8_t b{0};
