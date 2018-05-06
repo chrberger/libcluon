@@ -207,8 +207,8 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                         std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(player.delay()));
                     }
                 }
-                else {
-                    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100));
+                else { // LCOV_EXCL_LINE
+                    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100)); // LCOV_EXCL_LINE
                 }
             }
             retCode = 0;
