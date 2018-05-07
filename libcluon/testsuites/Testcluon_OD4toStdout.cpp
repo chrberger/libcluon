@@ -18,15 +18,15 @@
 #include "catch.hpp"
 
 #include "cluon-OD4toStdout.hpp"
-#include "cluon/cluonTestDataStructures.hpp"
 #include "cluon/Player.hpp"
 #include "cluon/TerminateHandler.hpp"
+#include "cluon/cluonTestDataStructures.hpp"
 
 #include <chrono>
 #include <fstream>
-#include <string>
 #include <sstream>
 #include <streambuf>
+#include <string>
 #include <thread>
 
 // clang-format off
@@ -41,12 +41,11 @@
 class RedirectCOUT {
    public:
     RedirectCOUT(std::streambuf *rdbuf)
-     : m_rdbuf(std::cout.rdbuf(rdbuf))
-    {}
-
-    ~RedirectCOUT() {
-        std::cout.rdbuf(m_rdbuf);
+        : m_rdbuf(std::cout.rdbuf(rdbuf)) {
+        std::ios::sync_with_stdio(true);
     }
+
+    ~RedirectCOUT() { std::cout.rdbuf(m_rdbuf); }
 
    private:
     std::streambuf *m_rdbuf;
@@ -59,16 +58,20 @@ TEST_CASE("Test empty commandline parameters.") {
 }
 
 TEST_CASE("Test wrong --cid.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     std::stringstream capturedCout;
     RedirectCOUT redirect(capturedCout.rdbuf());
 
     constexpr int32_t argc = 2;
     const char *argv[]     = {static_cast<const char *>("cluon-OD4toStdout"), static_cast<const char *>("--cid=345")};
     REQUIRE(1 == cluon_OD4toStdout(argc, const_cast<char **>(argv)));
+#endif
 }
 
-
 TEST_CASE("Test starting cluon-OD4toStdout in thread and send one message.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -79,7 +82,7 @@ TEST_CASE("Test starting cluon-OD4toStdout in thread and send one message.") {
 
     std::thread runOD4toStdout([]() {
         constexpr int32_t argc = 2;
-        const char *argv[] = {static_cast<const char *>("cluon-OD4toStdout"), static_cast<const char *>("--cid=71")};
+        const char *argv[]     = {static_cast<const char *>("cluon-OD4toStdout"), static_cast<const char *>("--cid=71")};
         REQUIRE(0 == cluon_OD4toStdout(argc, const_cast<char **>(argv)));
     });
 
@@ -118,7 +121,7 @@ TEST_CASE("Test starting cluon-OD4toStdout in thread and send one message.") {
 
     // Write received data into file and replay with Player.
     {
-        std::fstream fout("GHI.rec", std::ios::out|std::ios::binary|std::ios::trunc);
+        std::fstream fout("GHI.rec", std::ios::out | std::ios::binary | std::ios::trunc);
         fout << tmp;
         fout.flush();
         fout.close();
@@ -154,5 +157,5 @@ TEST_CASE("Test starting cluon-OD4toStdout in thread and send one message.") {
 
     runOD4toStdout.join();
     UNLINK("GHI.rec");
+#endif
 }
-

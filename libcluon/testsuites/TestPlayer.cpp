@@ -323,8 +323,9 @@ TEST_CASE("Create simple player for file with three entries auto auto-rewind.") 
             REQUIRE(1 == player.delay());
         }
 
-        if (10 < retrievedEntries)
+        if (10 < retrievedEntries) {
             break;
+        }
     }
     REQUIRE(11 == retrievedEntries);
     UNLINK("rec4");

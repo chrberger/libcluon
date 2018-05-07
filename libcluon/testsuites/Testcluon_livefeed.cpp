@@ -18,14 +18,14 @@
 #include "catch.hpp"
 
 #include "cluon-livefeed.hpp"
-#include "cluon/cluonTestDataStructures.hpp"
 #include "cluon/TerminateHandler.hpp"
+#include "cluon/cluonTestDataStructures.hpp"
 
 #include <chrono>
 #include <fstream>
-#include <string>
 #include <sstream>
 #include <streambuf>
+#include <string>
 #include <thread>
 
 // clang-format off
@@ -40,12 +40,11 @@
 class RedirectCOUT {
    public:
     RedirectCOUT(std::streambuf *rdbuf)
-     : m_rdbuf(std::cout.rdbuf(rdbuf))
-    {}
-
-    ~RedirectCOUT() {
-        std::cout.rdbuf(m_rdbuf);
+        : m_rdbuf(std::cout.rdbuf(rdbuf)) {
+        std::ios::sync_with_stdio(true);
     }
+
+    ~RedirectCOUT() { std::cout.rdbuf(m_rdbuf); }
 
    private:
     std::streambuf *m_rdbuf;
@@ -58,15 +57,20 @@ TEST_CASE("Test empty commandline parameters.") {
 }
 
 TEST_CASE("Test wrong --cid.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     std::stringstream capturedCout;
     RedirectCOUT redirect(capturedCout.rdbuf());
 
     constexpr int32_t argc = 2;
     const char *argv[]     = {static_cast<const char *>("cluon-livefeed"), static_cast<const char *>("--cid=345")};
     REQUIRE(1 == cluon_livefeed(argc, const_cast<char **>(argv)));
+#endif
 }
 
 TEST_CASE("Test starting cluon-livefeed in thread.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -86,9 +90,12 @@ TEST_CASE("Test starting cluon-livefeed in thread.") {
     cluon::TerminateHandler::instance().isTerminated.store(true);
 
     runlivefeed.join();
+#endif
 }
 
 TEST_CASE("Test starting cluon-livefeed in thread and send one message results in default display.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -138,9 +145,12 @@ TEST_CASE("Test starting cluon-livefeed in thread and send one message results i
     cluon::TerminateHandler::instance().isTerminated.store(true);
 
     runlivefeed.join();
+#endif
 }
 
 TEST_CASE("Test starting cluon-livefeed in thread with corrupt ODVD and send one message results in default display.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -150,7 +160,6 @@ TEST_CASE("Test starting cluon-livefeed in thread with corrupt ODVD and send one
     RedirectCOUT redirect(capturedCout.rdbuf());
 
     std::thread runlivefeed([]() {
-
         const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
     uint8 attribute1 [ default = 1, id = 1 ];
@@ -210,9 +219,12 @@ message testdata.MyTestMessage5 [id = 30005] {
     runlivefeed.join();
 
     UNLINK("ABC1.odvd");
+#endif
 }
 
 TEST_CASE("Test starting cluon-livefeed in thread with valid ODVD and send one message results in message name resolving.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -222,7 +234,6 @@ TEST_CASE("Test starting cluon-livefeed in thread with valid ODVD and send one m
     RedirectCOUT redirect(capturedCout.rdbuf());
 
     std::thread runlivefeed([]() {
-
         const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
     uint8 attribute1 [ default = 1, id = 1 ];
@@ -289,5 +300,5 @@ message testdata.MyTestMessage5 [id = 30005] {
     runlivefeed.join();
 
     UNLINK("ABC2.odvd");
+#endif
 }
-

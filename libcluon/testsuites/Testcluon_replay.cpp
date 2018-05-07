@@ -18,13 +18,13 @@
 #include "catch.hpp"
 
 #include "cluon-replay.hpp"
-#include "cluon/cluonTestDataStructures.hpp"
 #include "cluon/TerminateHandler.hpp"
+#include "cluon/cluonTestDataStructures.hpp"
 
 #include <chrono>
-#include <string>
 #include <sstream>
 #include <streambuf>
+#include <string>
 #include <thread>
 
 // clang-format off
@@ -39,12 +39,11 @@
 class RedirectCOUT {
    public:
     RedirectCOUT(std::streambuf *rdbuf)
-     : m_rdbuf(std::cout.rdbuf(rdbuf))
-    {}
-
-    ~RedirectCOUT() {
-        std::cout.rdbuf(m_rdbuf);
+        : m_rdbuf(std::cout.rdbuf(rdbuf)) {
+        std::ios::sync_with_stdio(true);
     }
+
+    ~RedirectCOUT() { std::cout.rdbuf(m_rdbuf); }
 
    private:
     std::streambuf *m_rdbuf;
@@ -57,6 +56,8 @@ TEST_CASE("Test empty commandline parameters.") {
 }
 
 TEST_CASE("Test non-existing rec-file.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -70,9 +71,12 @@ TEST_CASE("Test non-existing rec-file.") {
     REQUIRE(1 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
 
     UNLINK("abc.rec");
+#endif
 }
 
 TEST_CASE("Test playback rec-file to stdout.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -92,11 +96,11 @@ TEST_CASE("Test playback rec-file to stdout.") {
 
             cluon::data::Envelope env;
             cluon::data::TimeStamp sent;
-            sent.seconds(entryCounter/2).microseconds(entryCounter);
+            sent.seconds(entryCounter / 2).microseconds(entryCounter);
             cluon::data::TimeStamp received;
-            received.seconds(entryCounter/2).microseconds(entryCounter);
+            received.seconds(entryCounter / 2).microseconds(entryCounter);
             cluon::data::TimeStamp sampleTimeStamp;
-            sampleTimeStamp.seconds(entryCounter/2).microseconds(entryCounter);
+            sampleTimeStamp.seconds(entryCounter / 2).microseconds(entryCounter);
 
             env.serializedData(proto.encodedData());
             env.dataType(testdata::MyTestMessage5::ID()).sent(sent).received(received).sampleTimeStamp(sampleTimeStamp);
@@ -119,9 +123,12 @@ TEST_CASE("Test playback rec-file to stdout.") {
     REQUIRE(!tmp.empty());
 
     UNLINK("abc1.rec");
+#endif
 }
 
 TEST_CASE("Test playback rec-file to OD4Session.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -141,11 +148,11 @@ TEST_CASE("Test playback rec-file to OD4Session.") {
 
             cluon::data::Envelope env;
             cluon::data::TimeStamp sent;
-            sent.seconds(entryCounter/2).microseconds(entryCounter);
+            sent.seconds(entryCounter / 2).microseconds(entryCounter);
             cluon::data::TimeStamp received;
-            received.seconds(entryCounter/2).microseconds(entryCounter);
+            received.seconds(entryCounter / 2).microseconds(entryCounter);
             cluon::data::TimeStamp sampleTimeStamp;
-            sampleTimeStamp.seconds(entryCounter/2).microseconds(entryCounter);
+            sampleTimeStamp.seconds(entryCounter / 2).microseconds(entryCounter);
 
             env.serializedData(proto.encodedData());
             env.dataType(testdata::MyTestMessage5::ID()).sent(sent).received(received).sampleTimeStamp(sampleTimeStamp);
@@ -158,7 +165,11 @@ TEST_CASE("Test playback rec-file to OD4Session.") {
     }
 
     uint32_t envelopeCounter{0};
-    cluon::OD4Session od4(73, [&envelopeCounter](cluon::data::Envelope &&env){if (env.dataType() == testdata::MyTestMessage5::ID()) { envelopeCounter++; } });
+    cluon::OD4Session od4(73, [&envelopeCounter](cluon::data::Envelope &&env) {
+        if (env.dataType() == testdata::MyTestMessage5::ID()) {
+            envelopeCounter++;
+        }
+    });
 
     using namespace std::literals::chrono_literals;
     do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
@@ -177,9 +188,12 @@ TEST_CASE("Test playback rec-file to OD4Session.") {
 
     REQUIRE(MAX_ENTRIES == envelopeCounter);
     UNLINK("abc2.rec");
+#endif
 }
 
 TEST_CASE("Test playback rec-file to OD4Session with wrong cid results in playback to Stdout.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -199,11 +213,11 @@ TEST_CASE("Test playback rec-file to OD4Session with wrong cid results in playba
 
             cluon::data::Envelope env;
             cluon::data::TimeStamp sent;
-            sent.seconds(entryCounter/2).microseconds(entryCounter);
+            sent.seconds(entryCounter / 2).microseconds(entryCounter);
             cluon::data::TimeStamp received;
-            received.seconds(entryCounter/2).microseconds(entryCounter);
+            received.seconds(entryCounter / 2).microseconds(entryCounter);
             cluon::data::TimeStamp sampleTimeStamp;
-            sampleTimeStamp.seconds(entryCounter/2).microseconds(entryCounter);
+            sampleTimeStamp.seconds(entryCounter / 2).microseconds(entryCounter);
 
             env.serializedData(proto.encodedData());
             env.dataType(testdata::MyTestMessage5::ID()).sent(sent).received(received).sampleTimeStamp(sampleTimeStamp);
@@ -228,9 +242,12 @@ TEST_CASE("Test playback rec-file to OD4Session with wrong cid results in playba
     cluon::TerminateHandler::instance().isTerminated.store(true);
 
     UNLINK("abc3.rec");
+#endif
 }
 
 TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -250,11 +267,11 @@ TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
 
             cluon::data::Envelope env;
             cluon::data::TimeStamp sent;
-            sent.seconds(entryCounter/2).microseconds(entryCounter);
+            sent.seconds(entryCounter / 2).microseconds(entryCounter);
             cluon::data::TimeStamp received;
-            received.seconds(entryCounter/2).microseconds(entryCounter);
+            received.seconds(entryCounter / 2).microseconds(entryCounter);
             cluon::data::TimeStamp sampleTimeStamp;
-            sampleTimeStamp.seconds(entryCounter/2).microseconds(entryCounter);
+            sampleTimeStamp.seconds(entryCounter / 2).microseconds(entryCounter);
 
             env.serializedData(proto.encodedData());
             env.dataType(testdata::MyTestMessage5::ID()).sent(sent).received(received).sampleTimeStamp(sampleTimeStamp);
@@ -267,7 +284,11 @@ TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
     }
 
     uint32_t envelopeCounter{0};
-    cluon::OD4Session od4(74, [&envelopeCounter](cluon::data::Envelope &&env){if (env.dataType() == testdata::MyTestMessage5::ID()) { envelopeCounter++; } });
+    cluon::OD4Session od4(74, [&envelopeCounter](cluon::data::Envelope &&env) {
+        if (env.dataType() == testdata::MyTestMessage5::ID()) {
+            envelopeCounter++;
+        }
+    });
 
     using namespace std::literals::chrono_literals;
     do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
@@ -276,7 +297,10 @@ TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
     RedirectCOUT redirect(capturedCout.rdbuf());
 
     constexpr int32_t argc = 4;
-    const char *argv[]     = {static_cast<const char *>("cluon-replay"), static_cast<const char *>("--cid=74"), static_cast<const char *>("--stdout"), static_cast<const char *>("abc4.rec")};
+    const char *argv[]     = {static_cast<const char *>("cluon-replay"),
+                          static_cast<const char *>("--cid=74"),
+                          static_cast<const char *>("--stdout"),
+                          static_cast<const char *>("abc4.rec")};
     REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
 
     const std::string tmp = capturedCout.str();
@@ -286,5 +310,5 @@ TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
 
     REQUIRE(MAX_ENTRIES == envelopeCounter);
     UNLINK("abc4.rec");
+#endif
 }
-
