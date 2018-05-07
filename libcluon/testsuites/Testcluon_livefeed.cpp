@@ -18,14 +18,14 @@
 #include "catch.hpp"
 
 #include "cluon-livefeed.hpp"
-#include "cluon/cluonTestDataStructures.hpp"
 #include "cluon/TerminateHandler.hpp"
+#include "cluon/cluonTestDataStructures.hpp"
 
 #include <chrono>
 #include <fstream>
-#include <string>
 #include <sstream>
 #include <streambuf>
+#include <string>
 #include <thread>
 
 // clang-format off
@@ -40,13 +40,11 @@
 class RedirectCOUT {
    public:
     RedirectCOUT(std::streambuf *rdbuf)
-     : m_rdbuf(std::cout.rdbuf(rdbuf)) {
+        : m_rdbuf(std::cout.rdbuf(rdbuf)) {
         std::ios::sync_with_stdio(true);
     }
 
-    ~RedirectCOUT() {
-        std::cout.rdbuf(m_rdbuf);
-    }
+    ~RedirectCOUT() { std::cout.rdbuf(m_rdbuf); }
 
    private:
     std::streambuf *m_rdbuf;
@@ -162,7 +160,6 @@ TEST_CASE("Test starting cluon-livefeed in thread with corrupt ODVD and send one
     RedirectCOUT redirect(capturedCout.rdbuf());
 
     std::thread runlivefeed([]() {
-
         const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
     uint8 attribute1 [ default = 1, id = 1 ];
@@ -237,7 +234,6 @@ TEST_CASE("Test starting cluon-livefeed in thread with valid ODVD and send one m
     RedirectCOUT redirect(capturedCout.rdbuf());
 
     std::thread runlivefeed([]() {
-
         const char *input = R"(
 message testdata.MyTestMessage5 [id = 30005] {
     uint8 attribute1 [ default = 1, id = 1 ];
@@ -306,4 +302,3 @@ message testdata.MyTestMessage5 [id = 30005] {
     UNLINK("ABC2.odvd");
 #endif
 }
-
