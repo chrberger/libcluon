@@ -39,8 +39,9 @@
 class RedirectCOUT {
    public:
     RedirectCOUT(std::streambuf *rdbuf)
-     : m_rdbuf(std::cout.rdbuf(rdbuf))
-    {}
+     : m_rdbuf(std::cout.rdbuf(rdbuf)) {
+        std::ios::sync_with_stdio(true);
+    }
 
     ~RedirectCOUT() {
         std::cout.rdbuf(m_rdbuf);
@@ -57,6 +58,8 @@ TEST_CASE("Test empty commandline parameters.") {
 }
 
 TEST_CASE("Test non-existing rec-file.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -70,9 +73,12 @@ TEST_CASE("Test non-existing rec-file.") {
     REQUIRE(1 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
 
     UNLINK("abc.rec");
+#endif
 }
 
 TEST_CASE("Test playback rec-file to stdout.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -119,9 +125,12 @@ TEST_CASE("Test playback rec-file to stdout.") {
     REQUIRE(!tmp.empty());
 
     UNLINK("abc1.rec");
+#endif
 }
 
 TEST_CASE("Test playback rec-file to OD4Session.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -177,9 +186,12 @@ TEST_CASE("Test playback rec-file to OD4Session.") {
 
     REQUIRE(MAX_ENTRIES == envelopeCounter);
     UNLINK("abc2.rec");
+#endif
 }
 
 TEST_CASE("Test playback rec-file to OD4Session with wrong cid results in playback to Stdout.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -228,9 +240,12 @@ TEST_CASE("Test playback rec-file to OD4Session with wrong cid results in playba
     cluon::TerminateHandler::instance().isTerminated.store(true);
 
     UNLINK("abc3.rec");
+#endif
 }
 
 TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -286,5 +301,6 @@ TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
 
     REQUIRE(MAX_ENTRIES == envelopeCounter);
     UNLINK("abc4.rec");
+#endif
 }
 

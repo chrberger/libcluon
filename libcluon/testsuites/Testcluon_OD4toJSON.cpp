@@ -40,8 +40,9 @@
 class RedirectCOUT {
    public:
     RedirectCOUT(std::streambuf *rdbuf)
-     : m_rdbuf(std::cout.rdbuf(rdbuf))
-    {}
+     : m_rdbuf(std::cout.rdbuf(rdbuf)) {
+        std::ios::sync_with_stdio(true);
+    }
 
     ~RedirectCOUT() {
         std::cout.rdbuf(m_rdbuf);
@@ -58,15 +59,20 @@ TEST_CASE("Test empty commandline parameters.") {
 }
 
 TEST_CASE("Test wrong --cid.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     std::stringstream capturedCout;
     RedirectCOUT redirect(capturedCout.rdbuf());
 
     constexpr int32_t argc = 2;
     const char *argv[]     = {static_cast<const char *>("cluon-OD4toJSON"), static_cast<const char *>("--cid=345")};
     REQUIRE(1 == cluon_OD4toJSON(argc, const_cast<char **>(argv)));
+#endif
 }
 
 TEST_CASE("Test starting cluon-OD4toJSON in thread.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -86,9 +92,12 @@ TEST_CASE("Test starting cluon-OD4toJSON in thread.") {
     cluon::TerminateHandler::instance().isTerminated.store(true);
 
     runOD4toJSON.join();
+#endif
 }
 
 TEST_CASE("Test starting cluon-OD4toJSON in thread and send one message results in empty JSON.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -136,9 +145,12 @@ TEST_CASE("Test starting cluon-OD4toJSON in thread and send one message results 
     cluon::TerminateHandler::instance().isTerminated.store(true);
 
     runOD4toJSON.join();
+#endif
 }
 
 TEST_CASE("Test starting cluon-OD4toJSON in thread with corrupt ODVD and send one message results in empty JSON.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -206,9 +218,12 @@ message testdata.MyTestMessage5 [id = 30005] {
     runOD4toJSON.join();
 
     UNLINK("ABC1.odvd");
+#endif
 }
 
 TEST_CASE("Test starting cluon-OD4toJSON in thread with valid ODVD and send one message results in valid JSON.") {
+// Test only on x86_64 platforms.
+#if defined(__amd64__) || defined(_M_AMD64)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -299,5 +314,6 @@ message testdata.MyTestMessage5 [id = 30005] {
     runOD4toJSON.join();
 
     UNLINK("ABC2.odvd");
+#endif
 }
 
