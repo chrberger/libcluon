@@ -60,7 +60,7 @@ TEST_CASE("Test empty commandline parameters.") {
 
 TEST_CASE("Test wrong connection.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     std::stringstream capturedCout;
     RedirectCOUT redirect(capturedCout.rdbuf());
 
@@ -72,7 +72,7 @@ TEST_CASE("Test wrong connection.") {
 
 TEST_CASE("Test starting cluon-LCMtoJSON in thread.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -97,7 +97,7 @@ TEST_CASE("Test starting cluon-LCMtoJSON in thread.") {
 
 TEST_CASE("Test starting cluon-LCMtoJSON in thread and send one message results in empty JSON.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -152,7 +152,7 @@ TEST_CASE("Test starting cluon-LCMtoJSON in thread and send one message results 
 
 TEST_CASE("Test starting cluon-LCMtoJSON in thread with corrupt ODVD and send one message results in empty JSON.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -226,7 +226,7 @@ message EXAMPLE [id = 30005] {
 
 TEST_CASE("Test starting cluon-LCMtoJSON in thread with valid ODVD and send one message results in valid JSON.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 

@@ -57,7 +57,7 @@ TEST_CASE("Test empty commandline parameters.") {
 
 TEST_CASE("Test non-existing rec-file.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -76,7 +76,7 @@ TEST_CASE("Test non-existing rec-file.") {
 
 TEST_CASE("Test playback rec-file to stdout.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -128,7 +128,7 @@ TEST_CASE("Test playback rec-file to stdout.") {
 
 TEST_CASE("Test playback rec-file to OD4Session.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -193,7 +193,7 @@ TEST_CASE("Test playback rec-file to OD4Session.") {
 
 TEST_CASE("Test playback rec-file to OD4Session with wrong cid results in playback to Stdout.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
@@ -247,7 +247,7 @@ TEST_CASE("Test playback rec-file to OD4Session with wrong cid results in playba
 
 TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
 // Test only on x86_64 platforms.
-#if defined(__amd64__) || defined(_M_AMD64)
+#if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
     cluon::TerminateHandler::instance().isTerminated.store(false);
 
