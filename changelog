@@ -1,3 +1,15 @@
+libcluon (0.0.88-1ppa1~bionic1) bionic; urgency=medium
+
+  * Refactoring Testcluon_OD4toStdout to use cluon::Player for validation
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 07 May 2018 07:39:30 +0200
+
+libcluon (0.0.88-1ppa1~xenial1) xenial; urgency=medium
+
+  * Refactoring Testcluon_OD4toStdout to use cluon::Player for validation
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 07 May 2018 07:39:30 +0200
+
 libcluon (0.0.87-1ppa1~bionic1) bionic; urgency=medium
 
   * Adjustments for Testcluon_OD4toStdout to match tested bytes sequence
