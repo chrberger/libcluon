@@ -36,6 +36,7 @@
 #include <chrono>
 #include <functional>
 #include <mutex>
+#include <set>
 #include <string>
 #include <thread>
 
@@ -91,10 +92,12 @@ class LIBCLUON_API UDPReceiver {
      * @param receiveFromAddress Numerical IPv4 address to receive UDP packets from.
      * @param receiveFromPort Port to receive UDP packets from.
      * @param delegate Functional (noexcept) to handle received bytes; parameters are received data, sender, timestamp.
+     * @param localSendFromPort Port that an application is using to send data. This port (> 0) is ignored when data is received.
      */
     UDPReceiver(const std::string &receiveFromAddress,
                 uint16_t receiveFromPort,
-                std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate) noexcept;
+                std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate,
+                uint16_t localSendFromPort = 0) noexcept;
     ~UDPReceiver() noexcept;
 
     /**
@@ -117,6 +120,8 @@ class LIBCLUON_API UDPReceiver {
    private:
     int32_t m_socket{-1};
     bool m_isBlockingSocket{true};
+    std::set<unsigned long> m_listOfLocalIPAddresses{};
+    uint16_t m_localSendFromPort;
     struct sockaddr_in m_receiveFromAddress {};
     struct ip_mreq m_mreq {};
     bool m_isMulticast{false};

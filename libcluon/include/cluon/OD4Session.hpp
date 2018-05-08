@@ -38,7 +38,8 @@ namespace cluon {
 /**
 This class provides an interface to an OpenDaVINCI v4 session. An OpenDaVINCI
 v4 session allows the automatic exchange of time-stamped Envelopes carrying
-user-defined messages usually using UDP multicast.
+user-defined messages usually using UDP multicast. A running OD4Session will not
+receive the bytes the itself has sent to other microservices.
 
 There are two ways to participate in an OpenDaVINCI session. Variant A is simply
 calling a user-supplied lambda whenever a new Envelope is received:

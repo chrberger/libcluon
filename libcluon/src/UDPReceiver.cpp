@@ -31,6 +31,11 @@
     #include <fcntl.h>
     #include <unistd.h>
 #endif
+
+#ifdef __linux__
+    #include <ifaddrs.h>
+    #include <netdb.h>
+#endif
 // clang-format on
 
 #include <cstring>
@@ -46,8 +51,10 @@ namespace cluon {
 
 UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                          uint16_t receiveFromPort,
-                         std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate) noexcept
-    : m_receiveFromAddress()
+                         std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate,
+                         uint16_t localSendFromPort) noexcept
+    : m_localSendFromPort(localSendFromPort)
+    , m_receiveFromAddress()
     , m_mreq()
     , m_readFromSocketThread()
     , m_delegate(std::move(delegate)) {
@@ -186,6 +193,25 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                 closeSocket(EBADF);
             }
         }
+
+#ifdef __linux__
+        // Fill list of local IP address to avoid sending data to ourselves.
+        if (!(m_socket < 0)) {
+            struct ifaddrs *interfaceAddress;
+            if (0 == ::getifaddrs(&interfaceAddress)) {
+                for (struct ifaddrs *it = interfaceAddress; nullptr != it; it = it->ifa_next) {
+                    if ( (nullptr != it->ifa_addr) && (it->ifa_addr->sa_family == AF_INET) ) {
+                        if (0 == ::getnameinfo(it->ifa_addr, sizeof(struct sockaddr_in), nullptr, 0, nullptr, 0, NI_NUMERICHOST)) {
+                            std::memcpy(&tmpSocketAddress, it->ifa_addr, sizeof(tmpSocketAddress));
+                            const unsigned long LOCAL_IP = tmpSocketAddress.sin_addr.s_addr;
+                            m_listOfLocalIPAddresses.insert(LOCAL_IP);
+                        }
+                    }
+                }
+                ::freeifaddrs(interfaceAddress);
+            }
+        }
+#endif
 
         if (!(m_socket < 0)) {
             // Constructing the receiving thread could fail.
@@ -379,10 +405,19 @@ void UDPReceiver::readFromSocket() noexcept {
                                 &((reinterpret_cast<struct sockaddr_in *>(&remote))->sin_addr), // NOLINT
                                 remoteAddress.data(),
                                 remoteAddress.max_size());
+                    const unsigned long RECVFROM_IP{reinterpret_cast<struct sockaddr_in *>(&remote)->sin_addr.s_addr}; // NOLINT
                     const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
 
-                    // Create a pipeline entry to be processed concurrently.
+                    // Check if the bytes actually came from us.
+                    bool sentFromUs{false};
                     {
+                        auto pos = m_listOfLocalIPAddresses.find(RECVFROM_IP);
+                        const bool sentFromLocalIP = (pos != m_listOfLocalIPAddresses.end() && (*pos == RECVFROM_IP));
+                        sentFromUs = sentFromLocalIP && (m_localSendFromPort == RECVFROM_PORT);
+                    }
+
+                    // Create a pipeline entry to be processed concurrently.
+                    if (!sentFromUs) {
                         PipelineEntry pe;
                         pe.m_data       = std::string(buffer.data(), static_cast<size_t>(bytesRead));
                         pe.m_from       = std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT);

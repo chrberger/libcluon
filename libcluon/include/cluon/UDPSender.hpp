@@ -87,9 +87,16 @@ class LIBCLUON_API UDPSender {
      */
     std::pair<ssize_t, int32_t> send(std::string &&data) const noexcept;
 
+   public:
+    /**
+     * @return Port that this UDP sender will use for sending or 0 if no information available.
+     */
+    uint16_t getSendFromPort() const noexcept;
+
    private:
     mutable std::mutex m_socketMutex{};
     int32_t m_socket{-1};
+    uint32_t m_portToSentFrom{0};
     struct sockaddr_in m_sendToAddress {};
 };
 } // namespace cluon
