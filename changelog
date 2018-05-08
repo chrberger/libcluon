@@ -1,3 +1,15 @@
+libcluon (0.0.90-1ppa1~bionic1) bionic; urgency=medium
+
+  * Improving performance of OD4Session by avoiding receiving self-sent data
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 08 May 2018 19:12:47 +0200
+
+libcluon (0.0.90-1ppa1~xenial1) xenial; urgency=medium
+
+  * Improving performance of OD4Session by avoiding receiving self-sent data
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 08 May 2018 19:12:47 +0200
+
 libcluon (0.0.89-1ppa1~bionic1) bionic; urgency=medium
 
   * Update to any implementation
