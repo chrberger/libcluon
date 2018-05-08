@@ -43,6 +43,7 @@ TEST_CASE("Create OD4 session without lambda.") {
     cluon::data::TimeStamp tsRequest;
     tsRequest.seconds(1).microseconds(2);
 
+    // Create another OD4Session to send data to us.
     cluon::OD4Session od4ToSendFrom(78);
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4ToSendFrom.isRunning());
@@ -69,6 +70,8 @@ TEST_CASE("Create OD4 session and transmit data no sample time stamp.") {
 
     cluon::data::TimeStamp tsRequest;
     tsRequest.seconds(1).microseconds(2);
+
+    // Create another OD4Session to send data to us.
     cluon::OD4Session od4ToSendFrom(79);
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4ToSendFrom.isRunning());
@@ -109,6 +112,7 @@ TEST_CASE("Create OD4 session and transmit data with sample time stamp.") {
     cluon::data::TimeStamp tsRequest;
     tsRequest.seconds(1).microseconds(2);
 
+    // Create another OD4Session to send data to us.
     cluon::OD4Session od4ToSendFrom(80);
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4ToSendFrom.isRunning());
@@ -154,6 +158,8 @@ TEST_CASE("Create OD4 session with unrelated dataTrigger and transmit data with 
 
     cluon::data::TimeStamp tsRequest;
     tsRequest.seconds(3).microseconds(4);
+
+    // Create another OD4Session to send data to us.
     cluon::OD4Session od4ToSendFrom(81);
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4ToSendFrom.isRunning());
@@ -191,6 +197,8 @@ TEST_CASE("Create OD4 session with dataTrigger and transmit data with sample tim
 
     cluon::data::TimeStamp tsRequest;
     tsRequest.seconds(3).microseconds(4);
+
+    // Create another OD4Session to send data to us.
     cluon::OD4Session od4ToSendFrom(82);
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4ToSendFrom.isRunning());
@@ -246,6 +254,8 @@ TEST_CASE("Create OD4 session with catch-all delegate disables with dataTrigger 
 
     cluon::data::TimeStamp tsRequest;
     tsRequest.seconds(5).microseconds(6);
+
+    // Create another OD4Session to send data to us.
     cluon::OD4Session od4ToSendFrom(83);
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4ToSendFrom.isRunning());
@@ -365,6 +375,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm.") {
 
     REQUIRE(od4.isRunning());
 
+    // Create another OD4Session to send data to us.
     cluon::OD4Session od4ToSendFrom(88);
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4ToSendFrom.isRunning());
@@ -418,6 +429,7 @@ TEST_CASE("Create OD4 session with dataTrigger and transmission storm from 5 thr
 
     REQUIRE(od4.isRunning());
 
+    // Create another OD4Session to send data to us.
     cluon::OD4Session od4ToSendFrom(89);
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4ToSendFrom.isRunning());
