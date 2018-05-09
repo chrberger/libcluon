@@ -92,6 +92,27 @@ TEST_CASE("Create OD4 session and transmit data no sample time stamp.") {
     REQUIRE(2 == tsResponse.microseconds());
 }
 
+TEST_CASE("Create OD4 session and transmit data using the same OD4 session will not receive the data (Linux).") {
+#ifdef __linux__
+    std::atomic<bool> replyReceived{false};
+
+    cluon::OD4Session od4(77, [&replyReceived](cluon::data::Envelope &&/*envelope*/) {
+        replyReceived = true;
+    });
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
+
+    REQUIRE(od4.isRunning());
+
+    cluon::data::TimeStamp tsRequest;
+    tsRequest.seconds(1).microseconds(2);
+
+    od4.send(tsRequest);
+
+    REQUIRE(!replyReceived);
+#endif
+}
+
 TEST_CASE("Create OD4 session and transmit data with sample time stamp.") {
     std::atomic<bool> replyReceived{false};
     cluon::data::Envelope reply;
