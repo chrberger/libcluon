@@ -43,6 +43,8 @@
 
     // Link against ws2_32.lib for networking.
     #pragma comment(lib, "ws2_32.lib")
+    // Link against iphlpapi.lib for address resolving.
+    #pragma comment(lib, "iphlpapi.lib")
 
     // Avoid include definitions from Winsock v1.
     #define WIN32_LEAN_AND_MEAN

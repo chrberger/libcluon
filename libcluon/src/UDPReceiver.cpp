@@ -21,7 +21,13 @@
 
 // clang-format off
 #ifdef WIN32
-    #include <errno.h>
+    #include <cstdio>
+    #include <cerrno>
+
+    #include <winsock2.h>
+    #include <iphlpapi.h>
+    #include <ws2tcpip.h>
+
     #include <iostream>
 #else
     #include <arpa/inet.h>
@@ -194,9 +200,27 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             }
         }
 
-#ifndef WIN32
         // Fill list of local IP address to avoid sending data to ourselves.
         if (!(m_socket < 0)) {
+#ifdef WIN32
+            DWORD size{0};
+            if (ERROR_BUFFER_OVERFLOW == GetAdaptersAddresses(AF_UNSPEC, GAA_FLAG_INCLUDE_PREFIX, NULL, NULL, &size)) {
+                PIP_ADAPTER_ADDRESSES adapters = reinterpret_cast<PIP_ADAPTER_ADDRESSES>(malloc(size));
+                if (ERROR_SUCCESS == GetAdaptersAddresses(AF_UNSPEC, GAA_FLAG_INCLUDE_PREFIX, NULL, adapters, &size)) {
+                    for (PIP_ADAPTER_ADDRESSES adapter = adapters; nullptr != adapter; adapter = adapter->Next) {
+                        for (PIP_ADAPTER_UNICAST_ADDRESS unicastAddress = adapter->FirstUnicastAddress; unicastAddress != NULL; unicastAddress = unicastAddress->Next) {
+                            if (AF_INET == unicastAddress->Address.lpSockaddr->sa_family) {
+                                ::getnameinfo(unicastAddress->Address.lpSockaddr, unicastAddress->Address.iSockaddrLength, nullptr, 0, NULL, 0, NI_NUMERICHOST);
+                                std::memcpy(&tmpSocketAddress, unicastAddress->Address.lpSockaddr, sizeof(tmpSocketAddress));
+                                const unsigned long LOCAL_IP = tmpSocketAddress.sin_addr.s_addr;
+                                m_listOfLocalIPAddresses.insert(LOCAL_IP);
+                            }
+                        }
+                    }
+                }
+                free(adapters);
+            }
+#else
             struct ifaddrs *interfaceAddress;
             if (0 == ::getifaddrs(&interfaceAddress)) {
                 for (struct ifaddrs *it = interfaceAddress; nullptr != it; it = it->ifa_next) {
@@ -210,8 +234,8 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                 }
                 ::freeifaddrs(interfaceAddress);
             }
-        }
 #endif
+        }
 
         if (!(m_socket < 0)) {
             // Constructing the receiving thread could fail.
