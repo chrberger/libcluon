@@ -7,6 +7,9 @@
 [![License](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://raw.githubusercontent.com/chrberger/libcluon/master/LICENSE) [![API documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://chrberger.github.io/libcluon/) [![Win (x86_64)](https://img.shields.io/badge/Win-x86__64%20(installer)-blue.svg
 )](https://dl.bintray.com/chrberger/libcluon/) [![Ubuntu (x86_64)](https://img.shields.io/badge/deb-x86__64-blue.svg
 )](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Ubuntu (armhf)](https://img.shields.io/badge/deb-armhf-blue.svg
+)](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Ubuntu (aarch64)](https://img.shields.io/badge/deb-aarch64-blue.svg
+)](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Ubuntu (s390x)](https://img.shields.io/badge/deb-s390x-blue.svg
+)](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Ubuntu (powerpc)](https://img.shields.io/badge/deb-powerpc-blue.svg
 )](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Alpine (x86_64)](https://img.shields.io/badge/Alpine-x86__64-blue.svg
 )](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/x86_64/Dockerfile#L19) [![Alpine (armhf)](https://img.shields.io/badge/Alpine-armhf-blue.svg
 )](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/armhf/Dockerfile#L25) [![Alpine (aarch64)](https://img.shields.io/badge/Alpine-aarch64-blue.svg
