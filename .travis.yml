@@ -67,6 +67,63 @@ matrix:
         - BUILD=
         - DOCKER_BUILD_ARCH=armhf
 
+    # GCC 5: Build for pre-release to check if Linux/GCC-5 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=gcc-5
+        - COMPILER_CXX=g++-5
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - gcc-5
+            - g++-5
+
+    # GCC 6: Build for pre-release to check if Linux/GCC-6 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=gcc-6
+        - COMPILER_CXX=g++-6
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - gcc-6
+            - g++-6
+
+    # GCC 7: Build for pre-release to check if Linux/GCC-7 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=gcc-7
+        - COMPILER_CXX=g++-7
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - gcc-7
+            - g++-7
+
     # GCC 6: Regular build to run coverity_scan analysis.
     - os: linux
       if: branch = coverity_scan
@@ -87,7 +144,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages: # TODO: Check if the regular output from llvm-cov could work as well instead kcov.
+          packages:
             - gcc-6
             - g++-6
 

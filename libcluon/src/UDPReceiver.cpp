@@ -32,7 +32,7 @@
     #include <unistd.h>
 #endif
 
-#ifdef __linux__
+#ifndef WIN32
     #include <ifaddrs.h>
     #include <netdb.h>
 #endif
@@ -194,7 +194,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             }
         }
 
-#ifdef __linux__
+#ifndef WIN32
         // Fill list of local IP address to avoid sending data to ourselves.
         if (!(m_socket < 0)) {
             struct ifaddrs *interfaceAddress;
