@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     } else {
         const std::string ADDRESS(argv[1]); //NOLINT
         const std::string PORT(argv[2]); //NOLINT
-        cluon::UDPSender sender(ADDRESS, static_cast<const uint16_t>(std::stoi(PORT)));
+        cluon::UDPSender sender(ADDRESS, static_cast<uint16_t>(std::stoi(PORT)));
 
         while (std::cin.good()) {
             std::string data;
