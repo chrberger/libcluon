@@ -96,7 +96,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
             std::unique_ptr<cluon::OD4Session> od4;
             if (0 != commandlineArguments.count("cid")) {
                 // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
-                od4 = std::make_unique<cluon::OD4Session>(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])), [](auto){});
+                od4 = std::make_unique<cluon::OD4Session>(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])), [](auto){}); // LCOV_EXCL_LINE
             }
 
             {
