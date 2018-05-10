@@ -92,8 +92,7 @@ TEST_CASE("Create OD4 session and transmit data no sample time stamp.") {
     REQUIRE(2 == tsResponse.microseconds());
 }
 
-TEST_CASE("Create OD4 session and transmit data using the same OD4 session will not receive the data (non-Win32).") {
-#ifndef WIN32
+TEST_CASE("Create OD4 session and transmit data using the same OD4 session will not receive the data.") {
     std::atomic<bool> replyReceived{false};
 
     cluon::OD4Session od4(77, [&replyReceived](cluon::data::Envelope &&/*envelope*/) {
@@ -110,7 +109,6 @@ TEST_CASE("Create OD4 session and transmit data using the same OD4 session will 
     od4.send(tsRequest);
 
     REQUIRE(!replyReceived);
-#endif
 }
 
 TEST_CASE("Create OD4 session and transmit data with sample time stamp.") {

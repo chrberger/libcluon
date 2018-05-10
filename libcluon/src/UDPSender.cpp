@@ -65,22 +65,22 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
 
         m_socket = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-#ifndef WIN32
         // Bind to random address/port but store sender port.
-        struct sockaddr_in sendFromAddress;
-        std::memset(&sendFromAddress, 0, sizeof(sendFromAddress));
-        sendFromAddress.sin_family = AF_INET;
-        sendFromAddress.sin_port = 0; // Randomly choose a port to bind.
-        if (0 == ::bind(m_socket, reinterpret_cast<struct sockaddr *>(&sendFromAddress), sizeof(sendFromAddress))) { // NOLINT
-            struct sockaddr tmpAddr;
-            socklen_t length = sizeof(tmpAddr);
-            if (0 == ::getsockname(m_socket, &tmpAddr, &length)) {
-                struct sockaddr_in tmpAddrIn;
-                std::memcpy(&tmpAddrIn, &tmpAddr, sizeof(tmpAddrIn)); // NOLINT
-                m_portToSentFrom = ntohs(tmpAddrIn.sin_port);
+        if (!(m_socket < 0)) {
+            struct sockaddr_in sendFromAddress;
+            std::memset(&sendFromAddress, 0, sizeof(sendFromAddress));
+            sendFromAddress.sin_family = AF_INET;
+            sendFromAddress.sin_port = 0; // Randomly choose a port to bind.
+            if (0 == ::bind(m_socket, reinterpret_cast<struct sockaddr *>(&sendFromAddress), sizeof(sendFromAddress))) { // NOLINT
+                struct sockaddr tmpAddr;
+                socklen_t length = sizeof(tmpAddr);
+                if (0 == ::getsockname(m_socket, &tmpAddr, &length)) {
+                    struct sockaddr_in tmpAddrIn;
+                    std::memcpy(&tmpAddrIn, &tmpAddr, sizeof(tmpAddrIn)); // NOLINT
+                    m_portToSentFrom = ntohs(tmpAddrIn.sin_port);
+                }
             }
         }
-#endif
 
 #ifdef WIN32
         if (m_socket < 0) {
