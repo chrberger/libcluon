@@ -62,7 +62,7 @@ class LIBCLUON_API MetaMessage {
         MetaField &operator=(MetaField &&) = delete;
 
        public:
-        MetaField()                  = default;
+        MetaField() noexcept;
         MetaField(const MetaField &) = default;
         MetaField(MetaField &&)      = default;
         MetaField &operator=(const MetaField &) = default;

@@ -124,6 +124,25 @@ matrix:
             - gcc-7
             - g++-7
 
+    # GCC 8: Build for pre-release to check if Linux/GCC-8 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=gcc-8
+        - COMPILER_CXX=g++-8
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - gcc-8
+            - g++-8
+
     # GCC 6: Regular build to run coverity_scan analysis.
     - os: linux
       if: branch = coverity_scan

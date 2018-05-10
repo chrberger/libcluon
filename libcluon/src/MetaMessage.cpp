@@ -18,6 +18,9 @@
 #include "cluon/MetaMessage.hpp"
 
 namespace cluon {
+
+MetaMessage::MetaField::MetaField() noexcept {}
+
 MetaMessage::MetaField::MetaFieldDataTypes MetaMessage::MetaField::fieldDataType() const noexcept {
     return m_fieldDataType;
 }
