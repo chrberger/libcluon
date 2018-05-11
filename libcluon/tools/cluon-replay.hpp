@@ -58,26 +58,40 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
 
         std::fstream fin(recFile, std::ios::in|std::ios::binary);
         if (fin.good()) {
-            // Listen for data from stdin.
             std::atomic<bool> playCommandUpdate{false};
             std::mutex playerCommandMutex;
             cluon::data::PlayerCommand playerCommand;
+
+            auto playerCommandHandler = [&playCommandUpdate, &playerCommandMutex, &playerCommand](cluon::data::Envelope &&env){
+                cluon::data::PlayerCommand pc = cluon::extractMessage<cluon::data::PlayerCommand>(std::move(env));
+                {
+                    std::lock_guard<std::mutex> lck(playerCommandMutex);
+                    playerCommand = pc;
+                }
+                playCommandUpdate = true;
+            };
+
+            // OD4Session.
+            std::unique_ptr<cluon::OD4Session> od4;
+            if (0 != commandlineArguments.count("cid")) {
+                // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
+                od4 = std::make_unique<cluon::OD4Session>(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"]))); // LCOV_EXCL_LINE
+                if (od4 && !monitorSTDIN) {
+                    od4->dataTrigger(cluon::data::PlayerCommand::ID(), playerCommandHandler);
+                }
+            }
+
+            // Listen for data from stdin.
             if (monitorSTDIN) {
-                std::thread t([&playCommandUpdate, &playerCommandMutex, &playerCommand](){
-                    while (std::cin.good()) {
-                        auto tmp{cluon::extractEnvelope(std::cin)};
-                        if (tmp.first) {
-                            if (tmp.second.dataType() == cluon::data::PlayerCommand::ID()) {
-                                cluon::data::PlayerCommand pc = cluon::extractMessage<cluon::data::PlayerCommand>(std::move(tmp.second));
-                                {
-                                    std::lock_guard<std::mutex> lck(playerCommandMutex);
-                                    playerCommand = pc;
-                                }
-                                playCommandUpdate = true;
-                            }
+                std::thread t([&playerCommandHandler](){ // LCOV_EXCL_LINE
+                    while (std::cin.good()) { // LCOV_EXCL_LINE
+                        auto tmp{cluon::extractEnvelope(std::cin)}; // LCOV_EXCL_LINE
+                        if (tmp.first && (tmp.second.dataType() == cluon::data::PlayerCommand::ID())) { // LCOV_EXCL_LINE
+                            cluon::data::Envelope env = tmp.second; // LCOV_EXCL_LINE
+                            playerCommandHandler(std::move(env)); // LCOV_EXCL_LINE
                         }
                     }
-                });
+                }); // LCOV_EXCL_LINE
             }
 
             // Listen for PlayerStatus updates.
@@ -91,13 +105,6 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                 }
                 playerStatusUpdate = true;
             };
-
-            // OD4Session.
-            std::unique_ptr<cluon::OD4Session> od4;
-            if (0 != commandlineArguments.count("cid")) {
-                // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
-                od4 = std::make_unique<cluon::OD4Session>(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])), [](auto){}); // LCOV_EXCL_LINE
-            }
 
             {
                 std::string s;
@@ -207,8 +214,8 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                         std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(player.delay()));
                     }
                 }
-                else { // LCOV_EXCL_LINE
-                    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100)); // LCOV_EXCL_LINE
+                else {
+                    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100));
                 }
             }
             retCode = 0;

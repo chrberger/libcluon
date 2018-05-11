@@ -18,6 +18,7 @@
 #include "cluon/MetaMessage.hpp"
 
 namespace cluon {
+
 MetaMessage::MetaField::MetaFieldDataTypes MetaMessage::MetaField::fieldDataType() const noexcept {
     return m_fieldDataType;
 }
@@ -64,6 +65,8 @@ MetaMessage::MetaField &MetaMessage::MetaField::defaultInitializationValue(const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+MetaMessage::MetaMessage() noexcept {}
 
 std::string MetaMessage::packageName() const noexcept {
     return m_packageName;

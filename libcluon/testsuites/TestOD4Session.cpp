@@ -98,6 +98,7 @@ TEST_CASE("Create OD4 session and transmit data using the same OD4 session will 
     cluon::OD4Session od4(77, [&replyReceived](cluon::data::Envelope &&/*envelope*/) { // LCOV_EXCL_LINE
         replyReceived = true; // LCOV_EXCL_LINE
     }); // LCOV_EXCL_LINE
+
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!od4.isRunning());
 
