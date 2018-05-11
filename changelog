@@ -1,3 +1,15 @@
+libcluon (0.0.93-1ppa1~bionic1) bionic; urgency=medium
+
+  * Improved test coverage for cluon-replay
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 11 May 2018 22:57:25 +0200
+
+libcluon (0.0.93-1ppa1~xenial1) xenial; urgency=medium
+
+  * Improved test coverage for cluon-replay
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 11 May 2018 22:57:25 +0200
+
 libcluon (0.0.92-1ppa1~bionic1) bionic; urgency=medium
 
   * Release implementation of OD4Session for Win
