@@ -190,7 +190,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                 if (playCommandUpdate) {
                     std::lock_guard<std::mutex> lck(playerCommandMutex);
                     if ( (playerCommand.command() == 1) || (playerCommand.command() == 2) ) {
-                        play = !(2 == playerCommand.command());
+                        play = !(2 == playerCommand.command()); // LCOV_EXCL_LINE
                     }
 
                     std::clog << PROGRAM << ": Change state: " << +playerCommand.command() << ", play = " << play << std::endl;
@@ -215,8 +215,8 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                     }
                 }
                 else {
-                    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100));
-                }
+                    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100)); // LCOV_EXCL_LINE
+                } // LCOV_EXCL_LINE
             }
             retCode = 0;
         }

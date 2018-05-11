@@ -367,10 +367,10 @@ TEST_CASE("Test playback rec-file to OD4Session with external player control.") 
             pc.seekTo(0 /* go to beginning */);
             od4Sender.send(pc);
         }
-        if ( !seeked && (playerStatusCounter == 3) ) {
+        if ( !seeked && (playerStatusCounter == 10) ) {
             seeked = true;
             cluon::data::PlayerCommand pc;
-            pc.command(1 /* pause */);
+            pc.command(1 /* play */);
             od4Sender.send(pc);
         }
         if (env.dataType() == testdata::MyTestMessage5::ID()) {
@@ -388,17 +388,20 @@ TEST_CASE("Test playback rec-file to OD4Session with external player control.") 
     RedirectCOUT redirect(capturedCout.rdbuf());
 
     std::thread runcluon_replay([]() {
-        constexpr int32_t argc = 3;
-        const char *argv[]     = {static_cast<const char *>("cluon-replay"), static_cast<const char *>("--cid=75"), static_cast<const char *>("abc5.rec")};
+        constexpr int32_t argc = 4;
+        const char *argv[]     = {static_cast<const char *>("cluon-replay"),
+                                  static_cast<const char *>("--cid=75"),
+                                  static_cast<const char *>("--stdout"),
+                                  static_cast<const char *>("abc5.rec")};
         REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
     });
 
     // Join parallel thread.
     runcluon_replay.join();
 
-    // Only playback to OD4Session.
+    // Relay to OD4Session and stdout.
     const std::string tmp = capturedCout.str();
-    REQUIRE(tmp.empty());
+    REQUIRE(!tmp.empty());
 
     cluon::TerminateHandler::instance().isTerminated.store(true);
 
