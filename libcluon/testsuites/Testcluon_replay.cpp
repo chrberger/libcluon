@@ -356,21 +356,21 @@ TEST_CASE("Test playback rec-file to OD4Session with external player control.") 
     uint32_t envelopeCounter{0};
     cluon::OD4Session od4Sender(75);
     cluon::OD4Session od4(75, [&seeked, &playerStatusCounter, &envelopeCounter, &od4Sender](cluon::data::Envelope &&env) {
-        if (envelopeCounter == 2) {
+        if (!seeked && envelopeCounter == 2) {
             cluon::data::PlayerCommand pc;
             pc.command(2 /* pause */);
             od4Sender.send(pc);
         }
-        if (envelopeCounter == 3) {
+        if (!seeked && playerStatusCounter == 2) {
+            cluon::data::PlayerCommand pc;
+            pc.command(1 /* play */);
+            od4Sender.send(pc);
+        }
+        if (!seeked && envelopeCounter == 3) {
+            seeked = true;
             cluon::data::PlayerCommand pc;
             pc.command(3 /* seekTo */);
             pc.seekTo(0 /* go to beginning */);
-            od4Sender.send(pc);
-        }
-        if ( !seeked && (playerStatusCounter == 3) ) {
-            seeked = true;
-            cluon::data::PlayerCommand pc;
-            pc.command(1 /* pause */);
             od4Sender.send(pc);
         }
         if (env.dataType() == testdata::MyTestMessage5::ID()) {
