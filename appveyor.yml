@@ -20,12 +20,19 @@ environment:
 
 
 build_script:
-  - ps: cmake -E make_directory Win64
-  - ps: cd Win64
-  - ps: cmake "-G%CMAKE_GENERATOR%" -D CMAKE_BUILD_TYPE=%CMAKE_CONFIG% -D CMAKE_INSTALL_PREFIX=./install ../libcluon
-  - ps: cmake --build .
-  - ps: cd ..
-  - ps: $release = Get-Content C:\projects\libcluon\VERSION
+- ps: |
+    if ($isLinux) {
+      Write-Host "This is Linux!"
+    } else {
+      Write-Host "This is NOT a Linux!"
+        cmake -E make_directory Win64
+        cd Win64
+        cmake "-G%CMAKE_GENERATOR%" -D CMAKE_BUILD_TYPE=%CMAKE_CONFIG% -D CMAKE_INSTALL_PREFIX=./install ../libcluon
+        cmake --build .
+        cd ..
+        $release = Get-Content C:\projects\libcluon\VERSION
+    }
+
 
 
 test_script:
