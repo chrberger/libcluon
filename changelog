@@ -1,3 +1,15 @@
+libcluon (0.0.94-1ppa1~bionic1) bionic; urgency=medium
+
+  * Completed test cases for cluon-replay
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 12 May 2018 11:03:51 +0200
+
+libcluon (0.0.94-1ppa1~xenial1) xenial; urgency=medium
+
+  * Completed test cases for cluon-replay
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 12 May 2018 11:03:51 +0200
+
 libcluon (0.0.93-1ppa1~bionic1) bionic; urgency=medium
 
   * Improved test coverage for cluon-replay
