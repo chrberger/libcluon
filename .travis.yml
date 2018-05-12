@@ -158,7 +158,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          - sourceline: 'ppa:llvm-toolchain-trusty-3.4'
+          - sourceline: 'llvm-toolchain-trusty-3.4'
           packages:
             - clang-3.4
 
@@ -177,7 +177,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          - sourceline: 'ppa:llvm-toolchain-trusty-3.5'
+          - sourceline: 'llvm-toolchain-trusty-3.5'
           packages:
             - clang-3.5
 
@@ -196,7 +196,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          - sourceline: 'ppa:llvm-toolchain-trusty-3.6'
+          - sourceline: 'llvm-toolchain-trusty-3.6'
           packages:
             - clang-3.6
 
@@ -215,7 +215,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          - sourceline: 'ppa:llvm-toolchain-trusty-3.7'
+          - sourceline: 'llvm-toolchain-trusty-3.7'
           packages:
             - clang-3.7
 
@@ -234,7 +234,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          - sourceline: 'ppa:llvm-toolchain-trusty-3.8'
+          - sourceline: 'llvm-toolchain-trusty-3.8'
           packages:
             - clang-3.8
 
@@ -253,7 +253,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          - sourceline: 'ppa:llvm-toolchain-trusty-3.9'
+          - sourceline: 'llvm-toolchain-trusty-3.9'
           packages:
             - clang-3.9
 
@@ -272,7 +272,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          - sourceline: 'ppa:llvm-toolchain-trusty-4.0'
+          - sourceline: 'llvm-toolchain-trusty-4.0'
           packages:
             - clang-4.0
 
@@ -291,7 +291,7 @@ matrix:
         apt:
           sources:
           - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          - sourceline: 'ppa:llvm-toolchain-trusty-6.0'
+          - sourceline: 'llvm-toolchain-trusty-6.0'
           packages:
             - clang-6.0
 
