@@ -335,11 +335,11 @@ TEST_CASE("Test playback rec-file to OD4Session with external player control.") 
 
             cluon::data::Envelope env;
             cluon::data::TimeStamp sent;
-            sent.seconds(entryCounter*10).microseconds(entryCounter);
+            sent.seconds(entryCounter * 10).microseconds(entryCounter);
             cluon::data::TimeStamp received;
-            received.seconds(entryCounter*10).microseconds(entryCounter);
+            received.seconds(entryCounter * 10).microseconds(entryCounter);
             cluon::data::TimeStamp sampleTimeStamp;
-            sampleTimeStamp.seconds(entryCounter*10).microseconds(entryCounter);
+            sampleTimeStamp.seconds(entryCounter * 10).microseconds(entryCounter);
 
             env.serializedData(proto.encodedData());
             env.dataType(testdata::MyTestMessage5::ID()).sent(sent).received(received).sampleTimeStamp(sampleTimeStamp);
@@ -407,4 +407,3 @@ TEST_CASE("Test playback rec-file to OD4Session with external player control.") 
     UNLINK("abc5.rec");
 #endif
 }
-
