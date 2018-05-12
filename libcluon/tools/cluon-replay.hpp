@@ -179,13 +179,13 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                        .serializedData(s);
 
                     if (od4 && od4->isRunning()) {
-                        cluon::data::Envelope e = end;
+                        cluon::data::Envelope e = env;
                         od4->send(std::move(e));
                     }
                     if (playBackToStdout) {
-                        cluon::data::Envelope e = env;
-                        std::cout << cluon::serializeEnvelope(std::move(e));
-                        std::cout.flush();
+                        cluon::data::Envelope e = env; // LCOV_EXCL_LINE
+                        std::cout << cluon::serializeEnvelope(std::move(e)); // LCOV_EXCL_LINE
+                        std::cout.flush(); // LCOV_EXCL_LINE
                     }
                     playerStatusUpdate = false;
                 }
