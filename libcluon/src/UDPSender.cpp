@@ -70,7 +70,7 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
             struct sockaddr_in sendFromAddress;
             std::memset(&sendFromAddress, 0, sizeof(sendFromAddress));
             sendFromAddress.sin_family = AF_INET;
-            sendFromAddress.sin_port = 0; // Randomly choose a port to bind.
+            sendFromAddress.sin_port   = 0;                                                                              // Randomly choose a port to bind.
             if (0 == ::bind(m_socket, reinterpret_cast<struct sockaddr *>(&sendFromAddress), sizeof(sendFromAddress))) { // NOLINT
                 struct sockaddr tmpAddr;
                 socklen_t length = sizeof(tmpAddr);

@@ -208,7 +208,8 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                 PIP_ADAPTER_ADDRESSES adapters = reinterpret_cast<PIP_ADAPTER_ADDRESSES>(malloc(size));
                 if (ERROR_SUCCESS == GetAdaptersAddresses(AF_UNSPEC, GAA_FLAG_INCLUDE_PREFIX, NULL, adapters, &size)) {
                     for (PIP_ADAPTER_ADDRESSES adapter = adapters; nullptr != adapter; adapter = adapter->Next) {
-                        for (PIP_ADAPTER_UNICAST_ADDRESS unicastAddress = adapter->FirstUnicastAddress; unicastAddress != NULL; unicastAddress = unicastAddress->Next) {
+                        for (PIP_ADAPTER_UNICAST_ADDRESS unicastAddress = adapter->FirstUnicastAddress; unicastAddress != NULL;
+                             unicastAddress                             = unicastAddress->Next) {
                             if (AF_INET == unicastAddress->Address.lpSockaddr->sa_family) {
                                 ::getnameinfo(unicastAddress->Address.lpSockaddr, unicastAddress->Address.iSockaddrLength, nullptr, 0, NULL, 0, NI_NUMERICHOST);
                                 std::memcpy(&tmpSocketAddress, unicastAddress->Address.lpSockaddr, sizeof(tmpSocketAddress));
@@ -224,7 +225,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             struct ifaddrs *interfaceAddress;
             if (0 == ::getifaddrs(&interfaceAddress)) {
                 for (struct ifaddrs *it = interfaceAddress; nullptr != it; it = it->ifa_next) {
-                    if ( (nullptr != it->ifa_addr) && (it->ifa_addr->sa_family == AF_INET) ) {
+                    if ((nullptr != it->ifa_addr) && (it->ifa_addr->sa_family == AF_INET)) {
                         if (0 == ::getnameinfo(it->ifa_addr, sizeof(struct sockaddr_in), nullptr, 0, nullptr, 0, NI_NUMERICHOST)) {
                             std::memcpy(&tmpSocketAddress, it->ifa_addr, sizeof(tmpSocketAddress));
                             const unsigned long LOCAL_IP = tmpSocketAddress.sin_addr.s_addr;
@@ -430,14 +431,14 @@ void UDPReceiver::readFromSocket() noexcept {
                                 remoteAddress.data(),
                                 remoteAddress.max_size());
                     const unsigned long RECVFROM_IP{reinterpret_cast<struct sockaddr_in *>(&remote)->sin_addr.s_addr}; // NOLINT
-                    const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
+                    const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)};    // NOLINT
 
                     // Check if the bytes actually came from us.
                     bool sentFromUs{false};
                     {
-                        auto pos = m_listOfLocalIPAddresses.find(RECVFROM_IP);
+                        auto pos                   = m_listOfLocalIPAddresses.find(RECVFROM_IP);
                         const bool sentFromLocalIP = (pos != m_listOfLocalIPAddresses.end() && (*pos == RECVFROM_IP));
-                        sentFromUs = sentFromLocalIP && (m_localSendFromPort == RECVFROM_PORT);
+                        sentFromUs                 = sentFromLocalIP && (m_localSendFromPort == RECVFROM_PORT);
                     }
 
                     // Create a pipeline entry to be processed concurrently.

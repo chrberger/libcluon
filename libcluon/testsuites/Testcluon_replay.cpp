@@ -313,7 +313,7 @@ TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
 #endif
 }
 
-TEST_CASE("Test playback rec-file to OD4Session with external player control.") {
+TEST_CASE("Test playback rec-file to OD4Session and stdout with external player control.") {
 // Test only on x86_64 platforms.
 #if defined(__amd64__) && defined(__linux__)
     // Reset TerminateHandler.
@@ -335,11 +335,11 @@ TEST_CASE("Test playback rec-file to OD4Session with external player control.") 
 
             cluon::data::Envelope env;
             cluon::data::TimeStamp sent;
-            sent.seconds(entryCounter*10).microseconds(entryCounter);
+            sent.seconds(entryCounter * 10).microseconds(entryCounter);
             cluon::data::TimeStamp received;
-            received.seconds(entryCounter*10).microseconds(entryCounter);
+            received.seconds(entryCounter * 10).microseconds(entryCounter);
             cluon::data::TimeStamp sampleTimeStamp;
-            sampleTimeStamp.seconds(entryCounter*10).microseconds(entryCounter);
+            sampleTimeStamp.seconds(entryCounter * 10).microseconds(entryCounter);
 
             env.serializedData(proto.encodedData());
             env.dataType(testdata::MyTestMessage5::ID()).sent(sent).received(received).sampleTimeStamp(sampleTimeStamp);
@@ -352,32 +352,36 @@ TEST_CASE("Test playback rec-file to OD4Session with external player control.") 
     }
 
     bool seeked{false};
+    bool paused{false};
+    bool unpaused{false};
     uint32_t playerStatusCounter{0};
     uint32_t envelopeCounter{0};
     cluon::OD4Session od4Sender(75);
-    cluon::OD4Session od4(75, [&seeked, &playerStatusCounter, &envelopeCounter, &od4Sender](cluon::data::Envelope &&env) {
-        if (envelopeCounter == 2) {
-            cluon::data::PlayerCommand pc;
-            pc.command(2 /* pause */);
-            od4Sender.send(pc);
-        }
-        if (envelopeCounter == 3) {
-            cluon::data::PlayerCommand pc;
-            pc.command(3 /* seekTo */);
-            pc.seekTo(0 /* go to beginning */);
-            od4Sender.send(pc);
-        }
-        if ( !seeked && (playerStatusCounter == 10) ) {
-            seeked = true;
-            cluon::data::PlayerCommand pc;
-            pc.command(1 /* play */);
-            od4Sender.send(pc);
-        }
+    cluon::OD4Session od4(75, [&seeked, &paused, &unpaused, &playerStatusCounter, &envelopeCounter, &od4Sender](cluon::data::Envelope &&env) {
         if (env.dataType() == testdata::MyTestMessage5::ID()) {
             envelopeCounter++;
         }
         if (env.dataType() == cluon::data::PlayerStatus::ID()) {
             playerStatusCounter++;
+        }
+        if (!paused && envelopeCounter == 2) {
+            paused = true;
+            cluon::data::PlayerCommand pc;
+            pc.command(2 /* pause */);
+            od4Sender.send(pc);
+        }
+        if (!unpaused && playerStatusCounter == 4) {
+            unpaused = true;
+            cluon::data::PlayerCommand pc;
+            pc.command(1 /* play */);
+            od4Sender.send(pc);
+        }
+        if (!seeked && envelopeCounter == 4) {
+            seeked = true;
+            cluon::data::PlayerCommand pc;
+            pc.command(3 /* seekTo */);
+            pc.seekTo(0 /* go to beginning */);
+            od4Sender.send(pc);
         }
     });
 
@@ -399,7 +403,7 @@ TEST_CASE("Test playback rec-file to OD4Session with external player control.") 
     // Join parallel thread.
     runcluon_replay.join();
 
-    // Relay to OD4Session and stdout.
+    // Playback to OD4Session and stdout.
     const std::string tmp = capturedCout.str();
     REQUIRE(!tmp.empty());
 
@@ -410,4 +414,3 @@ TEST_CASE("Test playback rec-file to OD4Session with external player control.") 
     UNLINK("abc5.rec");
 #endif
 }
-
