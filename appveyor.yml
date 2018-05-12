@@ -3,6 +3,7 @@ image:
   - Visual Studio 2017
   - ubuntu
 skip_tags: true
+clone_depth: 1
 build:
   verbosity: quiet
 
@@ -21,25 +22,25 @@ environment:
 
 
 build_script:
-  - ps: cmake -E make_directory Win64
-  - ps: cd Win64
-  - ps: cmake "-G%CMAKE_GENERATOR%" -D CMAKE_BUILD_TYPE=%CMAKE_CONFIG% -D CMAKE_INSTALL_PREFIX=./install ../libcluon
-  - ps: cmake --build .
-  - ps: cd ..
+  - cmd: cmake -E make_directory Win64
+  - cmd: cd Win64
+  - cmd: cmake "-G%CMAKE_GENERATOR%" -D CMAKE_BUILD_TYPE=%CMAKE_CONFIG% -D CMAKE_INSTALL_PREFIX=./install ../libcluon
+  - cmd: cmake --build .
+  - cmd: cd ..
   - ps: $release = Get-Content C:\projects\libcluon\VERSION
 
 
 test_script:
-  - ps: cd Win64
-  - ps: ctest -VV --output-on-failure -C "%CMAKE_CONFIG%"
+  - cmd: cd Win64
+  - cmd: ctest -VV --output-on-failure -C "%CMAKE_CONFIG%"
 
 
 # scripts to run after tests
 after_test:
-  - ps: set PATH="C:\Program Files (x86)\Inno Setup 5";%PATH%
-  - ps: cmake --build . --target install
+  - cmd: set PATH="C:\Program Files (x86)\Inno Setup 5";%PATH%
+  - cmd: cmake --build . --target install
   - ps: Get-Content C:\projects\libcluon\buildtools\innosetup\setup.iss.template | Foreach-Object {$_ -replace "RELEASE", $release} | Set-Content C:\projects\libcluon\buildtools\innosetup\setup.iss
-  - ps: ISCC.exe C:\projects\libcluon\buildtools\innosetup\setup.iss
+  - cmd: ISCC.exe C:\projects\libcluon\buildtools\innosetup\setup.iss
 
 
 artifacts:
