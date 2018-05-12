@@ -58,7 +58,6 @@ deploy:
 - provider: BinTray
   on:
     branch: master
-    BUILDER_IS: Windows
   username: chrberger
   api_key:
     secure: UMVlea7yObUN1uFkjHKSaqozIOYedVU0FAr4DDHlQoK4JXE9OQC1RCHJw7IS9S2z
@@ -69,6 +68,7 @@ deploy:
   publish: true
   override: true
   explode: true
+  artifact: /.*libcluon-*\.exe/
 
 
 notifications:
