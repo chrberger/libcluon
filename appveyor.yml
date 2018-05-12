@@ -3,7 +3,6 @@ image:
   - Visual Studio 2017
   - ubuntu
 skip_tags: true
-clone_depth: 1
 build:
   verbosity: quiet
 
