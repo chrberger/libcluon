@@ -181,7 +181,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                     if (od4 && od4->isRunning()) {
                         od4->send(std::move(env));
                     }
-                    else {
+                    if (playBackToStdout) {
                         std::cout << cluon::serializeEnvelope(std::move(env));
                         std::cout.flush();
                     }
