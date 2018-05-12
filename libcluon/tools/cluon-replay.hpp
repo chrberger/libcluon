@@ -183,9 +183,9 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                         od4->send(std::move(e));
                     }
                     if (playBackToStdout) {
-                        cluon::data::Envelope e = env; // LCOV_EXCL_LINE
-                        std::cout << cluon::serializeEnvelope(std::move(e)); // LCOV_EXCL_LINE
-                        std::cout.flush(); // LCOV_EXCL_LINE
+                        cluon::data::Envelope e = env;
+                        std::cout << cluon::serializeEnvelope(std::move(e));
+                        std::cout.flush();
                     }
                     playerStatusUpdate = false;
                 }
