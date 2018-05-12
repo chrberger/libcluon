@@ -39,7 +39,7 @@ test_script:
   - cmd: cd Win64
   - cmd: ctest -VV --output-on-failure -C "%CMAKE_CONFIG%"
   - sh: cd Ubuntu
-  - sh: ctest -VV --output-on-failure
+  - sh: make test
 
 
 # scripts to run after tests
