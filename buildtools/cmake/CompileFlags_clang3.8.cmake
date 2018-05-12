@@ -48,7 +48,7 @@ set(CLANG38_CXX_WARNING_FLAGS " \
     -Wbackend-plugin \
     -Wbad-array-new-length \
     -Wbad-function-cast \
-    -Wbind-to-temporary-copy \
+    -Wno-error=bind-to-temporary-copy \
     -Wbitfield-constant-conversion \
     -Wbitfield-width \
     -Wbitwise-op-parentheses \
@@ -57,7 +57,6 @@ set(CLANG38_CXX_WARNING_FLAGS " \
     -Wbridge-cast \
     -Wbuiltin-macro-redefined \
     -Wbuiltin-requires-header \
-    -Wno-error=c++98-compat-bind-to-temporary-copy \
     -Wc++-compat \
     -Wc++14-binary-literal \
     -Wc++14-compat \
