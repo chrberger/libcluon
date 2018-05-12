@@ -179,10 +179,12 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                        .serializedData(s);
 
                     if (od4 && od4->isRunning()) {
-                        od4->send(std::move(env));
+                        cluon::data::Envelope e = end;
+                        od4->send(std::move(e));
                     }
                     if (playBackToStdout) {
-                        std::cout << cluon::serializeEnvelope(std::move(env));
+                        cluon::data::Envelope e = env;
+                        std::cout << cluon::serializeEnvelope(std::move(e));
                         std::cout.flush();
                     }
                     playerStatusUpdate = false;
@@ -205,10 +207,12 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                     auto next = player.getNextEnvelopeToBeReplayed();
                     if (next.first) {
                         if (od4 && od4->isRunning()) {
-                            od4->send(std::move(next.second));
+                            cluon::data::Envelope e = next.second;
+                            od4->send(std::move(e));
                         }
                         if (playBackToStdout) {
-                            std::cout << cluon::serializeEnvelope(std::move(next.second));
+                            cluon::data::Envelope e = next.second;
+                            std::cout << cluon::serializeEnvelope(std::move(e));
                             std::cout.flush();
                         }
                         std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(player.delay()));
