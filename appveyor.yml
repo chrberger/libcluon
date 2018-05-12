@@ -14,9 +14,10 @@ branches:
 
 environment:
   matrix:
-    - CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
+    - APPVEYOR_YML_DISABLE_PS_LINUX: true
+      CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
       CMAKE_CONFIG: Debug
-  APPVEYOR_YML_DISABLE_PS_LINUX: true
+
 
 
 build_script:
