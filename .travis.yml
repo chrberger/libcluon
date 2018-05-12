@@ -143,6 +143,159 @@ matrix:
             - gcc-8
             - g++-8
 
+    # clang 3.4: Build for pre-release to check if Linux/clang-3.4 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-3.4
+        - COMPILER_CXX=clang++-3.4
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          - sourceline: 'ppa:llvm-toolchain-trusty-3.4'
+          packages:
+            - clang-3.4
+
+    # clang 3.5: Build for pre-release to check if Linux/clang-3.5 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-3.5
+        - COMPILER_CXX=clang++-3.5
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          - sourceline: 'ppa:llvm-toolchain-trusty-3.5'
+          packages:
+            - clang-3.5
+
+    # clang 3.6: Build for pre-release to check if Linux/clang-3.6 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-3.6
+        - COMPILER_CXX=clang++-3.6
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          - sourceline: 'ppa:llvm-toolchain-trusty-3.6'
+          packages:
+            - clang-3.6
+
+    # clang 3.7: Build for pre-release to check if Linux/clang-3.7 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-3.7
+        - COMPILER_CXX=clang++-3.7
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          - sourceline: 'ppa:llvm-toolchain-trusty-3.7'
+          packages:
+            - clang-3.7
+
+    # clang 3.8: Build for pre-release to check if Linux/clang-3.8 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-3.8
+        - COMPILER_CXX=clang++-3.8
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          - sourceline: 'ppa:llvm-toolchain-trusty-3.8'
+          packages:
+            - clang-3.8
+
+    # clang 3.9: Build for pre-release to check if Linux/clang-3.9 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-3.9
+        - COMPILER_CXX=clang++-3.9
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          - sourceline: 'ppa:llvm-toolchain-trusty-3.9'
+          packages:
+            - clang-3.9
+
+    # clang 4.0: Build for pre-release to check if Linux/clang-4.0 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-4.0
+        - COMPILER_CXX=clang++-4.0
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          - sourceline: 'ppa:llvm-toolchain-trusty-4.0'
+          packages:
+            - clang-4.0
+
+    # clang 6.0: Build for pre-release to check if Linux/clang-6.0 could be built.
+    - os: linux
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-6.0
+        - COMPILER_CXX=clang++-6.0
+        - BUILD=Release
+      addons:
+        apt:
+          sources:
+          - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          - sourceline: 'ppa:llvm-toolchain-trusty-6.0'
+          packages:
+            - clang-6.0
+
+
     # GCC 6: Regular build to run coverity_scan analysis.
     - os: linux
       if: branch = coverity_scan
