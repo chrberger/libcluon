@@ -18,6 +18,9 @@ environment:
     - APPVEYOR_YML_DISABLE_PS_LINUX: true
       CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
       CMAKE_CONFIG: Debug
+      BUILDER_IS: Windows
+    - APPVEYOR_YML_DISABLE_PS_LINUX: true
+      BUILDER_IS: Ubuntu
 
 
 
@@ -51,6 +54,7 @@ deploy:
 - provider: BinTray
   on:
     branch: master
+    BUILDER_IS: Windows
   username: chrberger
   api_key:
     secure: UMVlea7yObUN1uFkjHKSaqozIOYedVU0FAr4DDHlQoK4JXE9OQC1RCHJw7IS9S2z
