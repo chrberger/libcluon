@@ -68,7 +68,6 @@ deploy:
   publish: true
   override: true
   explode: true
-  artifact: /.*libcluon-*\.exe/
 
 
 notifications:
