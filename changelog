@@ -1,3 +1,15 @@
+libcluon (0.0.96-1ppa1~bionic1) bionic; urgency=medium
+
+  * Refactored deployment to JavaScript
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 13 May 2018 21:25:21 +0200
+
+libcluon (0.0.96-1ppa1~xenial1) xenial; urgency=medium
+
+  * Refactored deployment to JavaScript
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 13 May 2018 21:25:21 +0200
+
 libcluon (0.0.95-1ppa1~bionic1) bionic; urgency=medium
 
   * Compile fix for older clang versions
