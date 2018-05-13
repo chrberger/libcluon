@@ -356,8 +356,8 @@ class LIB_API MyTestMessage5 {
         MyTestMessage5() = default;
         MyTestMessage5(const MyTestMessage5&) = default;
         MyTestMessage5& operator=(const MyTestMessage5&) = default;
-        MyTestMessage5(MyTestMessage5&&) noexcept = default; // NOLINT
-        MyTestMessage5& operator=(MyTestMessage5&&) noexcept = default; // NOLINT
+        MyTestMessage5(MyTestMessage5&&) = default; // NOLINT
+        MyTestMessage5& operator=(MyTestMessage5&&) = default; // NOLINT
         ~MyTestMessage5() = default;
 
     public:

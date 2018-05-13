@@ -136,8 +136,8 @@ class LIB_API {{%MESSAGE%}} {
         {{%MESSAGE%}}() = default;
         {{%MESSAGE%}}(const {{%MESSAGE%}}&) = default;
         {{%MESSAGE%}}& operator=(const {{%MESSAGE%}}&) = default;
-        {{%MESSAGE%}}({{%MESSAGE%}}&&) noexcept = default; // NOLINT
-        {{%MESSAGE%}}& operator=({{%MESSAGE%}}&&) noexcept = default; // NOLINT
+        {{%MESSAGE%}}({{%MESSAGE%}}&&) = default; // NOLINT
+        {{%MESSAGE%}}& operator=({{%MESSAGE%}}&&) = default; // NOLINT
         ~{{%MESSAGE%}}() = default;
 
     public:

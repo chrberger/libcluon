@@ -158,8 +158,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -366,8 +366,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -550,8 +550,8 @@ class LIB_API MyMessage2 {
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) noexcept = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) noexcept = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default; // NOLINT
+        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
         ~MyMessage2() = default;
 
     public:
@@ -769,8 +769,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -953,8 +953,8 @@ class LIB_API MyMessage2 {
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) noexcept = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) noexcept = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default; // NOLINT
+        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
         ~MyMessage2() = default;
 
     public:
@@ -1173,8 +1173,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -1357,8 +1357,8 @@ class LIB_API MyMessage2 {
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) noexcept = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) noexcept = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default; // NOLINT
+        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
         ~MyMessage2() = default;
 
     public:
@@ -1577,8 +1577,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -1761,8 +1761,8 @@ class LIB_API MyMessage2 {
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) noexcept = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) noexcept = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default; // NOLINT
+        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
         ~MyMessage2() = default;
 
     public:
@@ -1977,8 +1977,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -2182,8 +2182,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -2387,8 +2387,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -2593,8 +2593,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -2803,8 +2803,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -3122,8 +3122,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -3552,8 +3552,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -3736,8 +3736,8 @@ class LIB_API MyMessage2 {
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) noexcept = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) noexcept = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default; // NOLINT
+        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
         ~MyMessage2() = default;
 
     public:
@@ -3972,8 +3972,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -4156,8 +4156,8 @@ class LIB_API MyMessage2 {
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) noexcept = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) noexcept = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default; // NOLINT
+        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
         ~MyMessage2() = default;
 
     public:
@@ -4393,8 +4393,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -4577,8 +4577,8 @@ class LIB_API MyMessage2 {
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) noexcept = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) noexcept = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default; // NOLINT
+        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
         ~MyMessage2() = default;
 
     public:
@@ -4815,8 +4815,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -4999,8 +4999,8 @@ class LIB_API MyMessage2 {
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) noexcept = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) noexcept = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default; // NOLINT
+        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
         ~MyMessage2() = default;
 
     public:
@@ -5237,8 +5237,8 @@ class LIB_API MyMessage1 {
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) noexcept = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) noexcept = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default; // NOLINT
+        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
         ~MyMessage1() = default;
 
     public:
@@ -5421,8 +5421,8 @@ class LIB_API MyMessage2 {
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) noexcept = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) noexcept = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default; // NOLINT
+        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
         ~MyMessage2() = default;
 
     public:
