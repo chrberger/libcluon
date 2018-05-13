@@ -48,7 +48,7 @@ set(CLANG40_CXX_WARNING_FLAGS " \
     -Wavailability \
     -Wbackend-plugin \
     -Wbad-function-cast \
-    -Wbind-to-temporary-copy \
+    -Wno-error=bind-to-temporary-copy \
     -Wbitfield-constant-conversion \
     -Wbitfield-width \
     -Wbitwise-op-parentheses \
