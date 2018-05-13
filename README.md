@@ -53,7 +53,7 @@ _Say you want to quickly realize a distributed software system where individual 
 
 
 ## Dependencies
-No dependencies! All you need is a C++14-compliant compiler (we are testing with Clang 5.0, GCC 5.4, GCC 6.0, GCC 7.2, Xcode 9.1, and Visual Studio 14 (MSVC 19.0)) as the project ships the following dependencies as part of the source distribution:
+No dependencies! All you need is a C++14-compliant compiler as the project ships the following dependencies as part of the source distribution:
 
 * [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.2.2) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/buildtools/xUnit)
 * [adishavit/argh v1.2.1](https://github.com/adishavit/argh/releases/tag/v1.2.1) - [![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/argh)
@@ -61,6 +61,24 @@ No dependencies! All you need is a C++14-compliant compiler (we are testing with
 * [kainjow/Mustache v3.2](https://github.com/kainjow/Mustache/releases/tag/v3.2) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/Mustache)
 * [thelink2012/any](https://github.com/thelink2012/any) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/cluon/any)
 * [yhirose/cpp-peglib](https://github.com/yhirose/cpp-peglib) - [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/cpp-peglib)
+
+As part of our CI strategy thanks to TravisCI and AppVeyor, we are continuously building with:
+
+* Darwin 16.7.0 (x86_64)/AppleClang 9.0.0.9000038
+* FreeBSD 11.1 (x86_64)/GCC 6.4.0
+* Ubuntu 14.04 LTS (armhf)/clang 3.8.1
+* Ubuntu 14.04 LTS (x86_64)/clang 3.8.0
+* Ubuntu 14.04 LTS (x86_64)/clang 3.9.1
+* Ubuntu 14.04 LTS (x86_64)/clang 4.0.1
+* Ubuntu 14.04 LTS (x86_64)/clang 5.0.0
+* Ubuntu 14.04 LTS (x86_64)/clang 5.0.2
+* Ubuntu 14.04 LTS (x86_64)/clang 6.0.1
+* Ubuntu 14.04 LTS (x86_64)/GCC 5.5.0
+* Ubuntu 14.04 LTS (x86_64)/GCC 6.4.0
+* Ubuntu 14.04 LTS (x86_64)/GCC 7.3.0
+* Ubuntu 14.04 LTS (x86_64)/GCC 8.0.1
+* Ubuntu 16.04 LTS (x86_64)/GCC 5.4.0
+* Windows (x86_64)/MSVC 19.13.26129.0
 
 
 ## Installation
