@@ -6,6 +6,4 @@ build_dir
 debian
 tmp*
 b
-c
-d
-e
+libcluon.js
