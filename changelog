@@ -1,3 +1,15 @@
+libcluon (0.0.97-1ppa1~bionic1) bionic; urgency=medium
+
+  * Fixing base64 encoder
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 14 May 2018 15:58:08 +0200
+
+libcluon (0.0.97-1ppa1~xenial1) xenial; urgency=medium
+
+  * Fixing base64 encoder
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 14 May 2018 15:58:08 +0200
+
 libcluon (0.0.96-1ppa1~bionic1) bionic; urgency=medium
 
   * Refactored deployment to JavaScript
