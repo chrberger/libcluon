@@ -97,6 +97,7 @@ class LIBCLUON_API ToJSONVisitor {
         }
     }
 
+   public:
     /**
      * This method returns the base64-encoded representation for the given input.
      *
