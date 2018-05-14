@@ -146,23 +146,23 @@ std::string ToJSONVisitor::encodeBase64(const std::string &input) const noexcept
         value = static_cast<uint32_t>(static_cast<unsigned char>(input.at(index++))) << 16;
         value |= static_cast<uint32_t>(static_cast<unsigned char>(input.at(index++))) << 8;
         value |= static_cast<uint32_t>(static_cast<unsigned char>(input.at(index++)));
-        retVal += ALPHABET.at((value & (63UL << 18)) >> 18);
-        retVal += ALPHABET.at((value & (63UL << 12)) >> 12);
-        retVal += ALPHABET.at((value & (63UL << 6)) >> 6);
-        retVal += ALPHABET.at(value & 63);
+        retVal += ALPHABET.at((value & 0xFC0000) >> 18);
+        retVal += ALPHABET.at((value & 0x3F000) >> 12);
+        retVal += ALPHABET.at((value & 0xFC0) >> 6);
+        retVal += ALPHABET.at(value & 0x3F);
         length -= 3;
     }
     if (length == 2) {
         value = static_cast<uint32_t>(static_cast<unsigned char>(input.at(index++))) << 16;
         value |= static_cast<uint32_t>(static_cast<unsigned char>(input.at(index++))) << 8;
-        retVal += ALPHABET.at((value & (63UL << 18)) >> 18);
-        retVal += ALPHABET.at((value & (63UL << 12)) >> 12);
-        retVal += ALPHABET.at((value & (63UL << 6)) >> 6);
+        retVal += ALPHABET.at((value & 0xFC0000) >> 18);
+        retVal += ALPHABET.at((value & 0x3F000) >> 12);
+        retVal += ALPHABET.at((value & 0xFC0) >> 6);
         retVal += "=";
     } else if (length == 1) {
         value = static_cast<uint32_t>(static_cast<unsigned char>(input.at(index++))) << 16;
-        retVal += ALPHABET.at((value & (63UL << 18)) >> 18);
-        retVal += ALPHABET.at((value & (63UL << 12)) >> 12);
+        retVal += ALPHABET.at((value & 0xFC0000) >> 18);
+        retVal += ALPHABET.at((value & 0x3F000) >> 12);
         retVal += "==";
     }
 
