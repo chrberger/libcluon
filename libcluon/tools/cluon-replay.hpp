@@ -82,8 +82,9 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
             }
 
             // Listen for data from stdin.
+            std::unique_ptr<std::thread> stdinMonitoringThread;
             if (monitorSTDIN) {
-                std::thread t([&playerCommandHandler](){ // LCOV_EXCL_LINE
+                stdinMonitoringThread = std::make_unique<std::thread>([&playerCommandHandler](){ // LCOV_EXCL_LINE
                     while (std::cin.good()) { // LCOV_EXCL_LINE
                         auto tmp{cluon::extractEnvelope(std::cin)}; // LCOV_EXCL_LINE
                         if (tmp.first && (tmp.second.dataType() == cluon::data::PlayerCommand::ID())) { // LCOV_EXCL_LINE
