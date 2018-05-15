@@ -1,3 +1,15 @@
+libcluon (0.0.98-1ppa1~bionic1) bionic; urgency=medium
+
+  * Fixing a termination issue when monitoring stdin in cluon-replay
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 15 May 2018 09:52:02 +0200
+
+libcluon (0.0.98-1ppa1~xenial1) xenial; urgency=medium
+
+  * Fixing a termination issue when monitoring stdin in cluon-replay
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 15 May 2018 09:52:02 +0200
+
 libcluon (0.0.97-1ppa1~bionic1) bionic; urgency=medium
 
   * Fixing base64 encoder
