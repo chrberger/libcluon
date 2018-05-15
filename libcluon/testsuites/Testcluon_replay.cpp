@@ -394,9 +394,9 @@ TEST_CASE("Test playback rec-file to OD4Session and stdout with external player 
     std::thread runcluon_replay([]() {
         constexpr int32_t argc = 4;
         const char *argv[]     = {static_cast<const char *>("cluon-replay"),
-                                  static_cast<const char *>("--cid=75"),
-                                  static_cast<const char *>("--stdout"),
-                                  static_cast<const char *>("abc5.rec")};
+                              static_cast<const char *>("--cid=75"),
+                              static_cast<const char *>("--stdout"),
+                              static_cast<const char *>("abc5.rec")};
         REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
     });
 
