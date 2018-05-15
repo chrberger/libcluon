@@ -212,7 +212,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                              unicastAddress                             = unicastAddress->Next) {
                             if (AF_INET == unicastAddress->Address.lpSockaddr->sa_family) {
                                 ::getnameinfo(unicastAddress->Address.lpSockaddr, unicastAddress->Address.iSockaddrLength, nullptr, 0, NULL, 0, NI_NUMERICHOST);
-                                std::memcpy(&tmpSocketAddress, unicastAddress->Address.lpSockaddr, sizeof(tmpSocketAddress));
+                                std::memcpy(&tmpSocketAddress, unicastAddress->Address.lpSockaddr, sizeof(tmpSocketAddress)); /* Flawfinder: ignore */ // NOLINT
                                 const unsigned long LOCAL_IP = tmpSocketAddress.sin_addr.s_addr;
                                 m_listOfLocalIPAddresses.insert(LOCAL_IP);
                             }
@@ -227,7 +227,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                 for (struct ifaddrs *it = interfaceAddress; nullptr != it; it = it->ifa_next) {
                     if ((nullptr != it->ifa_addr) && (it->ifa_addr->sa_family == AF_INET)) {
                         if (0 == ::getnameinfo(it->ifa_addr, sizeof(struct sockaddr_in), nullptr, 0, nullptr, 0, NI_NUMERICHOST)) {
-                            std::memcpy(&tmpSocketAddress, it->ifa_addr, sizeof(tmpSocketAddress));
+                            std::memcpy(&tmpSocketAddress, it->ifa_addr, sizeof(tmpSocketAddress)); /* Flawfinder: ignore */ // NOLINT
                             const unsigned long LOCAL_IP = tmpSocketAddress.sin_addr.s_addr;
                             m_listOfLocalIPAddresses.insert(LOCAL_IP);
                         }

@@ -76,7 +76,7 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
                 socklen_t length = sizeof(tmpAddr);
                 if (0 == ::getsockname(m_socket, &tmpAddr, &length)) {
                     struct sockaddr_in tmpAddrIn;
-                    std::memcpy(&tmpAddrIn, &tmpAddr, sizeof(tmpAddrIn)); // NOLINT
+                    std::memcpy(&tmpAddrIn, &tmpAddr, sizeof(tmpAddrIn)); /* Flawfinder: ignore */ // NOLINT
                     m_portToSentFrom = ntohs(tmpAddrIn.sin_port);
                 }
             }
