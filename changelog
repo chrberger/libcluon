@@ -1,3 +1,15 @@
+libcluon (0.0.99-1ppa1~bionic1) bionic; urgency=medium
+
+  * Adding support for messages with empty fields to convert to/from JSON
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 23 May 2018 21:59:42 +0200
+
+libcluon (0.0.99-1ppa1~xenial1) xenial; urgency=medium
+
+  * Adding support for messages with empty fields to convert to/from JSON
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 23 May 2018 21:59:42 +0200
+
 libcluon (0.0.98-1ppa1~bionic1) bionic; urgency=medium
 
   * Fixing a termination issue when monitoring stdin in cluon-replay
