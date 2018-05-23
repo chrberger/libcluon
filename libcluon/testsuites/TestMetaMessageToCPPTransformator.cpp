@@ -182,6 +182,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -390,6 +391,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -574,6 +576,7 @@ class LIB_API MyMessage2 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -793,6 +796,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -977,6 +981,7 @@ class LIB_API MyMessage2 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -1197,6 +1202,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -1381,6 +1387,7 @@ class LIB_API MyMessage2 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -1601,6 +1608,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -1785,6 +1793,7 @@ class LIB_API MyMessage2 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -2001,6 +2010,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -2206,6 +2216,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -2411,6 +2422,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -2617,6 +2629,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
@@ -2857,6 +2870,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
@@ -3211,6 +3225,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
@@ -3576,6 +3591,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
@@ -3765,6 +3781,7 @@ class LIB_API MyMessage2 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);
@@ -3996,6 +4013,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
@@ -4185,6 +4203,7 @@ class LIB_API MyMessage2 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);
@@ -4417,6 +4436,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
@@ -4606,6 +4626,7 @@ class LIB_API MyMessage2 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);
@@ -4839,6 +4860,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
@@ -5028,6 +5050,7 @@ class LIB_API MyMessage2 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);
@@ -5261,6 +5284,7 @@ class LIB_API MyMessage1 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
@@ -5450,6 +5474,7 @@ class LIB_API MyMessage2 {
 
         template<class PreVisitor, class Visitor, class PostVisitor>
         void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+            (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);

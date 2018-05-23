@@ -257,6 +257,194 @@ message example.Envelope [id = 1] {
     REQUIRE(std::string(JSON) == JSON_C);
 }
 
+TEST_CASE("Transform Envelope into JSON represention for payload without fields.") {
+    cluon::data::Envelope env;
+    REQUIRE(env.serializedData().empty());
+    REQUIRE(0 == env.senderStamp());
+    REQUIRE(0 == env.dataType());
+    REQUIRE(0 == env.sent().seconds());
+    REQUIRE(0 == env.sent().microseconds());
+    REQUIRE(0 == env.received().seconds());
+    REQUIRE(0 == env.received().microseconds());
+    REQUIRE(0 == env.sampleTimeStamp().seconds());
+    REQUIRE(0 == env.sampleTimeStamp().microseconds());
+
+    cluon::data::TimeStamp ts1;
+    ts1.seconds(1).microseconds(2);
+    cluon::data::TimeStamp ts2;
+    ts2.seconds(10).microseconds(20);
+    cluon::data::TimeStamp ts3;
+    ts3.seconds(100).microseconds(200);
+
+    env.senderStamp(2).sent(ts1).received(ts2).sampleTimeStamp(ts3).dataType(testdata::MyTestMessage11::ID());
+    {
+        testdata::MyTestMessage11 payload;
+
+        cluon::ToProtoVisitor proto;
+        payload.accept(proto);
+        env.serializedData(proto.encodedData());
+    }
+
+    REQUIRE(2 == env.senderStamp());
+    REQUIRE(30011 == env.dataType());
+    REQUIRE(1 == env.sent().seconds());
+    REQUIRE(2 == env.sent().microseconds());
+    REQUIRE(10 == env.received().seconds());
+    REQUIRE(20 == env.received().microseconds());
+    REQUIRE(100 == env.sampleTimeStamp().seconds());
+    REQUIRE(200 == env.sampleTimeStamp().microseconds());
+
+    REQUIRE(0 == env.serializedData().size());
+
+    // Next, turn Envelope into Proto-encoded byte stream.
+    std::string envelopeAsProto;
+    {
+        cluon::ToProtoVisitor proto;
+        env.accept(proto);
+        envelopeAsProto = proto.encodedData();
+    }
+    REQUIRE(28 == envelopeAsProto.size());
+
+//for(int i{0}; i < envelopeAsProto.size(); i++) {
+//std::cerr << "    REQUIRE(0x" << std::hex << static_cast<uint32_t>(static_cast<uint8_t>(envelopeAsProto.at(i))) << " == static_cast<uint8_t>(envelopeAsProto.at(" << std::dec << i << ")));" << std::endl;
+
+//}
+
+    REQUIRE(0x8 == static_cast<uint8_t>(envelopeAsProto.at(0)));
+    REQUIRE(0xf6 == static_cast<uint8_t>(envelopeAsProto.at(1)));
+    REQUIRE(0xd4 == static_cast<uint8_t>(envelopeAsProto.at(2)));
+    REQUIRE(0x3 == static_cast<uint8_t>(envelopeAsProto.at(3)));
+    REQUIRE(0x12 == static_cast<uint8_t>(envelopeAsProto.at(4)));
+    REQUIRE(0x0 == static_cast<uint8_t>(envelopeAsProto.at(5)));
+    REQUIRE(0x1a == static_cast<uint8_t>(envelopeAsProto.at(6)));
+    REQUIRE(0x4 == static_cast<uint8_t>(envelopeAsProto.at(7)));
+    REQUIRE(0x8 == static_cast<uint8_t>(envelopeAsProto.at(8)));
+    REQUIRE(0x2 == static_cast<uint8_t>(envelopeAsProto.at(9)));
+    REQUIRE(0x10 == static_cast<uint8_t>(envelopeAsProto.at(10)));
+    REQUIRE(0x4 == static_cast<uint8_t>(envelopeAsProto.at(11)));
+    REQUIRE(0x22 == static_cast<uint8_t>(envelopeAsProto.at(12)));
+    REQUIRE(0x4 == static_cast<uint8_t>(envelopeAsProto.at(13)));
+    REQUIRE(0x8 == static_cast<uint8_t>(envelopeAsProto.at(14)));
+    REQUIRE(0x14 == static_cast<uint8_t>(envelopeAsProto.at(15)));
+    REQUIRE(0x10 == static_cast<uint8_t>(envelopeAsProto.at(16)));
+    REQUIRE(0x28 == static_cast<uint8_t>(envelopeAsProto.at(17)));
+    REQUIRE(0x2a == static_cast<uint8_t>(envelopeAsProto.at(18)));
+    REQUIRE(0x6 == static_cast<uint8_t>(envelopeAsProto.at(19)));
+    REQUIRE(0x8 == static_cast<uint8_t>(envelopeAsProto.at(20)));
+    REQUIRE(0xc8 == static_cast<uint8_t>(envelopeAsProto.at(21)));
+    REQUIRE(0x1 == static_cast<uint8_t>(envelopeAsProto.at(22)));
+    REQUIRE(0x10 == static_cast<uint8_t>(envelopeAsProto.at(23)));
+    REQUIRE(0x90 == static_cast<uint8_t>(envelopeAsProto.at(24)));
+    REQUIRE(0x3 == static_cast<uint8_t>(envelopeAsProto.at(25)));
+    REQUIRE(0x30 == static_cast<uint8_t>(envelopeAsProto.at(26)));
+    REQUIRE(0x2 == static_cast<uint8_t>(envelopeAsProto.at(27)));
+
+
+
+    {
+        cluon::data::Envelope env2;
+        REQUIRE(env2.serializedData().empty());
+        REQUIRE(0 == env2.senderStamp());
+        REQUIRE(0 == env2.dataType());
+        REQUIRE(0 == env2.sent().seconds());
+        REQUIRE(0 == env2.sent().microseconds());
+        REQUIRE(0 == env2.received().seconds());
+        REQUIRE(0 == env2.received().microseconds());
+        REQUIRE(0 == env2.sampleTimeStamp().seconds());
+        REQUIRE(0 == env2.sampleTimeStamp().microseconds());
+
+        std::stringstream sstr{envelopeAsProto};
+        cluon::FromProtoVisitor protoDecoder;
+        protoDecoder.decodeFrom(sstr);
+
+        env2.accept(protoDecoder);
+        REQUIRE(env2.serializedData().empty());
+        REQUIRE(2 == env2.senderStamp());
+        REQUIRE(30011 == env2.dataType());
+        REQUIRE(1 == env2.sent().seconds());
+        REQUIRE(2 == env2.sent().microseconds());
+        REQUIRE(10 == env2.received().seconds());
+        REQUIRE(20 == env2.received().microseconds());
+        REQUIRE(100 == env2.sampleTimeStamp().seconds());
+        REQUIRE(200 == env2.sampleTimeStamp().microseconds());
+
+        REQUIRE(0 == env2.serializedData().size());
+    }
+
+    uint32_t length{static_cast<uint32_t>(envelopeAsProto.size())}; // NOLINT
+    length <<= 8;
+    length = htole32(length);
+
+    std::stringstream sstr;
+    // Add OD4 header.
+    constexpr unsigned char OD4_HEADER_BYTE0 = 0x0D;
+    constexpr unsigned char OD4_HEADER_BYTE1 = 0xA4;
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE0));
+    auto posByte1 = sstr.tellp();
+    sstr.write(reinterpret_cast<char *>(&length), static_cast<std::streamsize>(sizeof(uint32_t)));
+    auto posByte5 = sstr.tellp();
+    sstr.seekp(posByte1);
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE1));
+    sstr.seekp(posByte5);
+
+    // Write payload.
+    sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
+
+    const std::string output{sstr.str()};
+
+    REQUIRE(0x0d == static_cast<uint8_t>(output.at(0)));
+    REQUIRE(0xa4 == static_cast<uint8_t>(output.at(1)));
+    REQUIRE(0x1c == static_cast<uint8_t>(output.at(2)));
+    REQUIRE(0x0 == static_cast<uint8_t>(output.at(3)));
+    REQUIRE(0x0 == static_cast<uint8_t>(output.at(4)));
+
+    // output contains now an Envelope in a structure similar to how
+    // a Container would be encoded.
+
+    const char *messageSpecification = R"(
+message example.TimeStamp [id = 12] {
+    int32 seconds      [id = 1];
+    int32 microseconds [id = 2];
+}
+
+message example.Envelope [id = 1] {
+    int32 dataType                      [id = 1];
+    bytes serializedData                [id = 2];
+    example.TimeStamp sent              [id = 3];
+    example.TimeStamp received          [id = 4];
+    example.TimeStamp sampleTimeStamp   [id = 5];
+    uint32 senderStamp                  [id = 6];
+}
+
+message example.MyTestMessage11 [id = 30011] {}
+)";
+
+    const char *JSON = R"({"dataType":30011,
+"sent":{"seconds":1,
+"microseconds":2},
+"received":{"seconds":10,
+"microseconds":20},
+"sampleTimeStamp":{"seconds":100,
+"microseconds":200},
+"senderStamp":2,
+"example_MyTestMessage11":{}})";
+
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(3 == envConverter.setMessageSpecification(std::string(messageSpecification)));
+
+    // Test with Envelope:
+    const std::string JSON_A = envConverter.getJSONFromEnvelope(env);
+    REQUIRE(std::string(JSON) == JSON_A);
+
+    // Test without OD4 header:
+    const std::string JSON_B = envConverter.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
+    REQUIRE(std::string(JSON) == JSON_B);
+
+    // Test with OD4-header:
+    const std::string JSON_C = envConverter.getJSONFromProtoEncodedEnvelope(output);
+    REQUIRE(std::string(JSON) == JSON_C);
+}
+
 TEST_CASE("Transform Envelope into JSON represention for complex payload.") {
     cluon::data::Envelope env;
     REQUIRE(env.serializedData().empty());
@@ -1028,3 +1216,47 @@ message MyTestMessage5 [id = 30005] {
     REQUIRE(0 == Approx(tmp2.attribute10()));
     REQUIRE(tmp2.attribute11().empty());
 }
+
+TEST_CASE("Convert JSON representation of MyTestMessage11 into Proto-encoded data.") {
+    // First, prepare message to encode as JSON.
+    testdata::MyTestMessage11 tmp;
+
+    // Third, create JSON representation.
+    cluon::ToJSONVisitor jsonEncoder;
+    tmp.accept(jsonEncoder);
+
+    const char *JSON = R"({})";
+
+    REQUIRE(std::string(JSON) == jsonEncoder.json());
+
+    // Fourth, dynamically provide a message specification to create Envelope from JSON.
+    const char *messageSpecification = R"(
+message MyTestMessage11 [id = 30011] {}
+)";
+
+    // Fifth, parse message specification.
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(1 == envConverter.setMessageSpecification(std::string(messageSpecification)));
+
+    // Sixth, turn JSON into proper Envelope.
+    constexpr int32_t MESSAGE_IDENTIFIER{30011};
+    constexpr uint32_t SENDER_STAMP{0};
+    std::string protoEncodedData{envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(jsonEncoder.json(), MESSAGE_IDENTIFIER, SENDER_STAMP)};
+    REQUIRE(!protoEncodedData.empty());
+
+    // Seventh, read back Envelope from serialization.
+    std::stringstream sstr(protoEncodedData);
+    auto retVal = cluon::extractEnvelope(sstr);
+
+    REQUIRE(retVal.first);
+    cluon::data::Envelope env;
+    REQUIRE(0 == env.dataType());
+
+    // Verify values in transformed Envelope.
+    env = retVal.second;
+    REQUIRE(MESSAGE_IDENTIFIER == env.dataType());
+    REQUIRE(0 == (env.sent().seconds() + env.sent().microseconds()));
+    REQUIRE(0 == (env.received().seconds() + env.received().microseconds()));
+    REQUIRE(0 == (env.sampleTimeStamp().seconds() + env.sampleTimeStamp().microseconds()));
+}
+
