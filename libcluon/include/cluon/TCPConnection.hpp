@@ -97,7 +97,7 @@ class LIBCLUON_API TCPConnection {
 
    public:
     /**
-     * Constructor.
+     * Constructor to connect to a TCP server.
      *
      * @param address Numerical IPv4 address to receive UDP packets from.
      * @param port Port to receive UDP packets from.
@@ -108,8 +108,21 @@ class LIBCLUON_API TCPConnection {
                   uint16_t port,
                   std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate,
                   std::function<void()> connectionLostDelegate) noexcept;
+
+    /**
+     * Constructor (used by TCPServer).
+     *
+     * @param socket Socket to handle an existing TCP connection described by this socket.
+     */
+    TCPConnection(const int32_t &socket) noexcept;
+
     ~TCPConnection() noexcept;
 
+   public:
+    void setOnNewDataDelegate(std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate) noexcept;
+    void setOnConnectionLostDelegate(std::function<void()> connectionLostDelegate) noexcept;
+
+   public:
     /**
      * @return true if the TCPConnection could successfully be created and is able to receive data.
      */
@@ -140,7 +153,10 @@ class LIBCLUON_API TCPConnection {
     std::atomic<bool> m_readFromSocketThreadRunning{false};
     std::thread m_readFromSocketThread{};
 
+    std::mutex m_newDataDelegateMutex{};
     std::function<void(std::string &&, std::chrono::system_clock::time_point)> m_newDataDelegate{};
+
+    mutable std::mutex m_connectionLostDelegateMutex{};
     std::function<void()> m_connectionLostDelegate{};
 };
 } // namespace cluon

@@ -76,6 +76,7 @@ for i in \
     cluon/UDPSender.hpp \
     cluon/UDPReceiver.hpp \
     cluon/TCPConnection.hpp \
+    cluon/TCPServer.hpp \
     cluon/ProtoConstants.hpp \
     cluon/ToProtoVisitor.hpp \
     cluon/FromProtoVisitor.hpp \
@@ -112,6 +113,7 @@ for i in \
     UDPSender.cpp \
     UDPReceiver.cpp \
     TCPConnection.cpp \
+    TCPServer.cpp \
     ToProtoVisitor.cpp \
     FromProtoVisitor.cpp \
     FromLCMVisitor.cpp \

@@ -42,13 +42,27 @@
 
 namespace cluon {
 
+TCPConnection::TCPConnection(const int32_t &socket) noexcept
+    : m_socket(socket)
+    , m_newDataDelegate(nullptr)
+    , m_connectionLostDelegate(nullptr) {
+    if (!(m_socket < 0)) {
+        // Constructing a thread could fail.
+        try {
+            m_readFromSocketThread = std::thread(&TCPConnection::readFromSocket, this);
+
+            // Let the operating system spawn the thread.
+            using namespace std::literals::chrono_literals;
+            do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
+        } catch (...) { closeSocket(ECHILD); }
+    }
+}
+
 TCPConnection::TCPConnection(const std::string &address,
                              uint16_t port,
                              std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate,
                              std::function<void()> connectionLostDelegate) noexcept
-    : m_address()
-    , m_readFromSocketThread()
-    , m_newDataDelegate(std::move(newDataDelegate))
+    : m_newDataDelegate(std::move(newDataDelegate))
     , m_connectionLostDelegate(std::move(connectionLostDelegate)) {
     // Decompose given address string to check validity with numerical IPv4 address.
     std::string tmp{address};
@@ -143,6 +157,16 @@ void TCPConnection::closeSocket(int errorCode) noexcept {
     m_socket = -1;
 }
 
+void TCPConnection::setOnNewDataDelegate(std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate) noexcept {
+    std::lock_guard<std::mutex> lck(m_newDataDelegateMutex);
+    m_newDataDelegate = newDataDelegate;
+}
+
+void TCPConnection::setOnConnectionLostDelegate(std::function<void()> connectionLostDelegate) noexcept {
+    std::lock_guard<std::mutex> lck(m_connectionLostDelegateMutex);
+    m_connectionLostDelegate = connectionLostDelegate;
+}
+
 bool TCPConnection::isRunning() const noexcept {
     return (m_readFromSocketThreadRunning.load() && !TerminateHandler::instance().isTerminated.load());
 }
@@ -157,7 +181,10 @@ std::pair<ssize_t, int32_t> TCPConnection::send(std::string &&data) const noexce
     }
 
     if (!m_readFromSocketThreadRunning.load()) {
-        m_connectionLostDelegate();
+        std::lock_guard<std::mutex> lck(m_connectionLostDelegateMutex);
+        if (nullptr != m_connectionLostDelegate) {
+            m_connectionLostDelegate();
+        }
         return {-1, ENOTCONN};
     }
 
@@ -200,29 +227,37 @@ void TCPConnection::readFromSocket() noexcept {
             if (0 >= bytesRead) {
                 // 0 == bytesRead: peer shut down the connection; 0 > bytesRead: other error.
                 m_readFromSocketThreadRunning.store(false);
-                if (nullptr != m_connectionLostDelegate) {
-                    m_connectionLostDelegate();
+
+                {
+                    std::lock_guard<std::mutex> lck(m_connectionLostDelegateMutex);
+                    if (nullptr != m_connectionLostDelegate) {
+                        m_connectionLostDelegate();
+                    }
                 }
                 break;
             }
-            if ((0 < bytesRead) && (nullptr != m_newDataDelegate)) {
+
+            {
+                std::lock_guard<std::mutex> lck(m_newDataDelegateMutex);
+                if ((0 < bytesRead) && (nullptr != m_newDataDelegate)) {
 #ifdef __linux__
-                std::chrono::system_clock::time_point timestamp;
-                struct timeval receivedTimeStamp {};
-                if (0 == ::ioctl(m_socket, SIOCGSTAMP, &receivedTimeStamp)) {
-                    // Transform struct timeval to C++ chrono.
-                    std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> transformedTimePoint(
-                        std::chrono::microseconds(receivedTimeStamp.tv_sec * 1000000L + receivedTimeStamp.tv_usec));
-                    timestamp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(transformedTimePoint);
-                } else {
-                    // In case the ioctl failed, fall back to chrono.
-                    timestamp = std::chrono::system_clock::now();
-                }
+                    std::chrono::system_clock::time_point timestamp;
+                    struct timeval receivedTimeStamp {};
+                    if (0 == ::ioctl(m_socket, SIOCGSTAMP, &receivedTimeStamp)) {
+                        // Transform struct timeval to C++ chrono.
+                        std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> transformedTimePoint(
+                            std::chrono::microseconds(receivedTimeStamp.tv_sec * 1000000L + receivedTimeStamp.tv_usec));
+                        timestamp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(transformedTimePoint);
+                    } else {
+                        // In case the ioctl failed, fall back to chrono.
+                        timestamp = std::chrono::system_clock::now();
+                    }
 #else
-                std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now();
+                    std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now();
 #endif
-                // Call newDataDelegate.
-                m_newDataDelegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)), timestamp);
+                    // Call newDataDelegate.
+                    m_newDataDelegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)), timestamp);
+                }
             }
         }
     }
