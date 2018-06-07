@@ -38,7 +38,7 @@
 
 namespace cluon {
 
-TCPServer::TCPServer(uint16_t port, std::function<void(std::shared_ptr<cluon::TCPConnection> connection)> newConnectionDelegate) noexcept 
+TCPServer::TCPServer(uint16_t port, std::function<void(std::string &&from, std::shared_ptr<cluon::TCPConnection> connection)> newConnectionDelegate) noexcept 
     : m_newConnectionDelegate(newConnectionDelegate) {
     if (0 < port) {
 #ifdef WIN32
@@ -166,6 +166,9 @@ void TCPServer::readFromSocket() noexcept {
     // Indicate to main thread that we are ready.
     m_readFromSocketThreadRunning.store(true);
 
+    constexpr uint16_t MAX_ADDR_SIZE{1024};
+    std::array<char, MAX_ADDR_SIZE> remoteAddress{};
+
     while (m_readFromSocketThreadRunning.load()) {
         // Define timeout for select system call. The timeval struct must be
         // reinitialized for every select call as it might be modified containing
@@ -177,12 +180,16 @@ void TCPServer::readFromSocket() noexcept {
         FD_SET(m_socket, &setOfFiledescriptorsToReadFrom);
         ::select(m_socket + 1, &setOfFiledescriptorsToReadFrom, nullptr, nullptr, &timeout);
         if (FD_ISSET(m_socket, &setOfFiledescriptorsToReadFrom)) {
-            struct sockaddr clientSocket;
-            socklen_t sizeClientSocket = sizeof(clientSocket);
-
-            int32_t connectingClient = ::accept(m_socket, &clientSocket, &sizeClientSocket);
+            struct sockaddr_storage remote;
+            socklen_t addrLength = sizeof(remote);
+            int32_t connectingClient = ::accept(m_socket, reinterpret_cast<struct sockaddr *>(&remote), &addrLength);
             if ( (0 <= connectingClient) && (nullptr != m_newConnectionDelegate) ) {
-                m_newConnectionDelegate(std::shared_ptr<cluon::TCPConnection>(new cluon::TCPConnection(connectingClient)));
+                ::inet_ntop(remote.ss_family,
+                            &((reinterpret_cast<struct sockaddr_in *>(&remote))->sin_addr), // NOLINT
+                            remoteAddress.data(),
+                            remoteAddress.max_size());
+                const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
+                m_newConnectionDelegate(std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT), std::shared_ptr<cluon::TCPConnection>(new cluon::TCPConnection(connectingClient)));
             }
         }
     }

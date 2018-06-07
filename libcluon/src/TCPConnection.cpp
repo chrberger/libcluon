@@ -207,7 +207,6 @@ void TCPConnection::readFromSocket() noexcept {
 
     // Define file descriptor set to watch for read operations.
     fd_set setOfFiledescriptorsToReadFrom{};
-    ssize_t bytesRead{0};
 
     // Indicate to main thread that we are ready.
     m_readFromSocketThreadRunning.store(true);
@@ -232,7 +231,7 @@ void TCPConnection::readFromSocket() noexcept {
             hasNewDataDelegate = (nullptr != m_newDataDelegate);
         }
         if (FD_ISSET(m_socket, &setOfFiledescriptorsToReadFrom) && hasNewDataDelegate) {
-            bytesRead = ::recv(m_socket, buffer.data(), buffer.max_size(), 0);
+            ssize_t bytesRead = ::recv(m_socket, buffer.data(), buffer.max_size(), 0);
             if (0 >= bytesRead) {
                 // 0 == bytesRead: peer shut down the connection; 0 > bytesRead: other error.
                 m_readFromSocketThreadRunning.store(false);

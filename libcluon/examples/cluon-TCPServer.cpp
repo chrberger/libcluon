@@ -41,8 +41,8 @@ int main(int argc, char **argv) {
     } else {
         const std::string PORT(argv[1]); // NOLINT
         std::vector<std::shared_ptr<cluon::TCPConnection> > connections;
-        cluon::TCPServer srv(static_cast<uint16_t>(std::stoi(PORT)), [&connections](std::shared_ptr<cluon::TCPConnection> connection){
-            std::cout << "Got connection..." << std::endl;
+        cluon::TCPServer srv(static_cast<uint16_t>(std::stoi(PORT)), [&connections](std::string &&from, std::shared_ptr<cluon::TCPConnection> connection){
+            std::cout << "Got connection from " << from << std::endl;
             connection->setOnNewData([](std::string &&data, std::chrono::system_clock::time_point &&){
                 std::cout << "Data: '" << data << "'" << std::endl;
             });
