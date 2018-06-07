@@ -32,6 +32,7 @@
 // clang-format on
 
 #include <cstring>
+#include <array>
 #include <iostream>
 #include <memory>
 #include <sstream>
