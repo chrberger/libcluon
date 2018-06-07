@@ -28,6 +28,7 @@
 #include <string>
 #include <thread>
 #include <utility>
+#include <vector>
 
 TEST_CASE("Creating TCPServer and stop immediately.") {
     cluon::TCPServer srv1{1234, nullptr};
@@ -39,57 +40,67 @@ TEST_CASE("Trying to receive with wrong sendToPort.") {
     REQUIRE(!failingSrv2.isRunning());
 }
 
-//TEST_CASE("Creating TCPServer and receive data from one connection.") {
-//    auto before = std::chrono::system_clock::now();
+TEST_CASE("Creating TCPServer and receive data from one connection.") {
+    auto before = std::chrono::system_clock::now();
 
-//    // Setup data structures to receive data from UDPReceiver.
-//    std::atomic<bool> hasDataReceived{false};
-//    std::string data;
-//    std::string sender;
-//    std::chrono::system_clock::time_point timestamp;
+    // Setup data structures to receive data from UDPReceiver.
+    std::atomic<bool> hasDataReceived{false};
+    std::string data;
+    std::string sender;
+    std::chrono::system_clock::time_point timestamp;
+    std::vector<std::shared_ptr<cluon::TCPConnection> > connections;
 
-//    REQUIRE(data.empty());
-//    REQUIRE(sender.empty());
-//    REQUIRE(!hasDataReceived);
+    REQUIRE(data.empty());
+    REQUIRE(sender.empty());
+    REQUIRE(!hasDataReceived);
+    REQUIRE(connections.empty());
 
-//    cluon::TCPServer srv3(
-//        1235,
-//        [&hasDataReceived, &data, &sender, &timestamp ](std::string &&from, std::shared_ptr<cluon::TCPConnection> connection) noexcept {
-//            data      = std::move(d);
-//            sender    = std::move(s);
-//            timestamp = ts;
-//            hasDataReceived.store(true);
-//            std::time_t tp = std::chrono::system_clock::to_time_t(timestamp);
-//            std::cout << "Received '" << data << "' at '" << tp << ""
-//                      << "'" << std::endl;
-//        });
+    cluon::TCPServer srv3(
+        1235,
+        [&hasDataReceived, &data, &sender, &timestamp, &connections](std::string &&from, std::shared_ptr<cluon::TCPConnection> connection) noexcept {
+            sender = std::move(from);
+            std::cout << "Got connection from " << sender << std::endl;
+            connection->setOnNewData([&hasDataReceived, &data, &timestamp](std::string &&d, std::chrono::system_clock::time_point &&ts){
+                data = std::move(d);
+                timestamp = std::move(ts);
+                hasDataReceived.store(true);
+            });
+            connection->setOnConnectionLost([](){
+                std::cout << "Connection lost." << std::endl;
+            });
+            connections.push_back(connection);
+        });
 
-//    REQUIRE(srv3.isRunning());
+    REQUIRE(srv3.isRunning());
 
-//    cluon::UDPSender us2{"127.0.0.1", 1237};
-//    std::string TEST_DATA{"Hello World"};
-//    const auto TEST_DATA_SIZE{TEST_DATA.size()};
-//    auto retVal2 = us2.send(std::move(TEST_DATA));
-//    REQUIRE(TEST_DATA_SIZE == retVal2.first);
-//    REQUIRE(0 == retVal2.second);
+    cluon::TCPConnection conn3(
+        "127.0.0.1", 1235,
+        [](std::string &&, std::chrono::system_clock::time_point &&) noexcept {},
+        [](){});
 
-//    // Yield the UDP receiver so that the embedded thread has time to process the data.
-//    // Let the operating system spawn the thread.
-//    using namespace std::literals::chrono_literals; // NOLINT
-//    do { std::this_thread::sleep_for(1ms); } while (!hasDataReceived.load());
+    std::string TEST_DATA{"Hello World"};
+    const auto TEST_DATA_SIZE{TEST_DATA.size()};
+    auto retVal2 = conn3.send(std::move(TEST_DATA));
+    REQUIRE(TEST_DATA_SIZE == retVal2.first);
+    REQUIRE(0 == retVal2.second);
 
-//    REQUIRE(hasDataReceived);
-//    REQUIRE("Hello World" == data);
-//    REQUIRE(sender.substr(0, sender.find(':')) == "127.0.0.1");
+    // Yield the UDP receiver so that the embedded thread has time to process the data.
+    // Let the operating system spawn the thread.
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (!hasDataReceived.load());
 
-//    auto after = std::chrono::system_clock::now();
+    REQUIRE(hasDataReceived);
+    REQUIRE("Hello World" == data);
+    REQUIRE(sender.substr(0, sender.find(':')) == "127.0.0.1");
 
-//    // Test if the timestamping works correctly (only on 64bit systems).
-//    if (8 == sizeof(void *)) {
-//        REQUIRE(before < timestamp);
-//        REQUIRE(timestamp < after);
-//    }
-//}
+    auto after = std::chrono::system_clock::now();
+
+    // Test if the timestamping works correctly (only on 64bit systems).
+    if (8 == sizeof(void *)) {
+        REQUIRE(before < timestamp);
+        REQUIRE(timestamp < after);
+    }
+}
 
 //TEST_CASE("Testing multicast with 226.x.y.z address.") {
 //    // Setup data structures to receive data from UDPReceiver.
