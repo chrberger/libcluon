@@ -157,12 +157,12 @@ void TCPConnection::closeSocket(int errorCode) noexcept {
     m_socket = -1;
 }
 
-void TCPConnection::setOnNewDataDelegate(std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate) noexcept {
+void TCPConnection::setOnNewData(std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate) noexcept {
     std::lock_guard<std::mutex> lck(m_newDataDelegateMutex);
     m_newDataDelegate = newDataDelegate;
 }
 
-void TCPConnection::setOnConnectionLostDelegate(std::function<void()> connectionLostDelegate) noexcept {
+void TCPConnection::setOnConnectionLost(std::function<void()> connectionLostDelegate) noexcept {
     std::lock_guard<std::mutex> lck(m_connectionLostDelegateMutex);
     m_connectionLostDelegate = connectionLostDelegate;
 }

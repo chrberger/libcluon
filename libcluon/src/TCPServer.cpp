@@ -182,7 +182,7 @@ void TCPServer::readFromSocket() noexcept {
 
             int32_t connectingClient = ::accept(m_socket, &clientSocket, &sizeClientSocket);
             if ( (0 <= connectingClient) && (nullptr != m_newConnectionDelegate) ) {
-                m_newConnectionDelegate(std::make_shared<cluon::TCPConnection>(connectingClient));
+                m_newConnectionDelegate(std::shared_ptr<cluon::TCPConnection>(new cluon::TCPConnection(connectingClient)));
             }
         }
     }

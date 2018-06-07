@@ -43,8 +43,11 @@ int main(int argc, char **argv) {
         std::vector<std::shared_ptr<cluon::TCPConnection> > connections;
         cluon::TCPServer srv(static_cast<uint16_t>(std::stoi(PORT)), [&connections](std::shared_ptr<cluon::TCPConnection> connection){
             std::cout << "Got connection..." << std::endl;
-            connection->setOnNewDataDelegate([](std::string &&data, std::chrono::system_clock::time_point &&){
+            connection->setOnNewData([](std::string &&data, std::chrono::system_clock::time_point &&){
                 std::cout << "Data: '" << data << "'" << std::endl;
+            });
+            connection->setOnConnectionLost([](){
+                std::cout << "Connection lost." << std::endl;
             });
             connections.push_back(connection);
         });

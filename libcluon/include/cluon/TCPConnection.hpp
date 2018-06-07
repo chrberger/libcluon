@@ -90,6 +90,16 @@ whether the instance was created successfully and running, the method
 */
 class LIBCLUON_API TCPConnection {
    private:
+    friend class TCPServer;
+
+    /**
+     * Constructor that is only accessible to TCPServer to manage incoming TCP connections.
+     *
+     * @param socket Socket to handle an existing TCP connection described by this socket.
+     */
+    TCPConnection(const int32_t &socket) noexcept;
+
+   private:
     TCPConnection(const TCPConnection &) = delete;
     TCPConnection(TCPConnection &&)      = delete;
     TCPConnection &operator=(const TCPConnection &) = delete;
@@ -109,18 +119,11 @@ class LIBCLUON_API TCPConnection {
                   std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate,
                   std::function<void()> connectionLostDelegate) noexcept;
 
-    /**
-     * Constructor (used by TCPServer).
-     *
-     * @param socket Socket to handle an existing TCP connection described by this socket.
-     */
-    TCPConnection(const int32_t &socket) noexcept;
-
     ~TCPConnection() noexcept;
 
    public:
-    void setOnNewDataDelegate(std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate) noexcept;
-    void setOnConnectionLostDelegate(std::function<void()> connectionLostDelegate) noexcept;
+    void setOnNewData(std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate) noexcept;
+    void setOnConnectionLost(std::function<void()> connectionLostDelegate) noexcept;
 
    public:
     /**
