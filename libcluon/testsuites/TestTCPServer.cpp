@@ -20,11 +20,12 @@
 #include "cluon/TCPServer.hpp"
 #include "cluon/TCPConnection.hpp"
 
+#include <ctime>
 #include <atomic>
 #include <chrono>
-#include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <utility>
@@ -102,44 +103,56 @@ TEST_CASE("Creating TCPServer and receive data from one connection.") {
     }
 }
 
-//TEST_CASE("Testing multicast with 226.x.y.z address.") {
-//    // Setup data structures to receive data from UDPReceiver.
-//    std::atomic<bool> hasDataReceived{false};
-//    std::string data;
+TEST_CASE("Creating TCPServer and receive data from multiple connections.") {
+    // Setup data structures to receive data from UDPReceiver.
+    std::atomic<uint8_t> hasDataReceived{0};
+    std::mutex dataMutex;
+    std::vector<std::string> data;
+    std::vector<std::shared_ptr<cluon::TCPConnection> > connections;
 
-//    REQUIRE(data.empty());
-//    REQUIRE(!hasDataReceived);
+    REQUIRE(0 == hasDataReceived);
+    REQUIRE(connections.empty());
 
-//    cluon::UDPReceiver ur4(
-//        "226.0.0.226", 1238, [&hasDataReceived, &data ](std::string && d, std::string &&, std::chrono::system_clock::time_point &&) noexcept {
-//            data = std::move(d);
-//            hasDataReceived.store(true);
-//        });
-//    REQUIRE(ur4.isRunning());
+    cluon::TCPServer srv3(
+        1236,
+        [&hasDataReceived, &dataMutex, &data, &connections](std::string &&from, std::shared_ptr<cluon::TCPConnection> connection) noexcept {
+            std::cout << "Got connection from " << from << std::endl;
+            connection->setOnNewData([&hasDataReceived, &dataMutex, &data](std::string &&d, std::chrono::system_clock::time_point &&){
+                std::lock_guard<std::mutex> lck(dataMutex);
+                data.push_back(std::move(d));
+                hasDataReceived++;
+            });
+            connection->setOnConnectionLost([](){
+                std::cout << "Connection lost." << std::endl;
+            });
+            connections.push_back(connection);
+        });
 
-//    // Setup UDPSender.
-//    cluon::UDPSender us4{"226.0.0.226", 1238};
-//    std::string TEST_DATA{"Hello Multicast Group"};
-//    const auto TEST_DATA_SIZE{TEST_DATA.size()};
-//    auto retVal4 = us4.send(std::move(TEST_DATA));
-//    REQUIRE(TEST_DATA_SIZE == retVal4.first);
-//    REQUIRE(0 == retVal4.second);
+    REQUIRE(srv3.isRunning());
 
-//    // Yield the UDP receiver so that the embedded thread has time to process the data.
-//    do { std::this_thread::yield(); } while (!hasDataReceived.load());
+    constexpr uint8_t MAX_CONNECTIONS{10};
+    for(uint8_t i{0}; i < MAX_CONNECTIONS; i++) {
+        cluon::TCPConnection conn3(
+            "127.0.0.1", 1236,
+            [](std::string &&, std::chrono::system_clock::time_point &&) noexcept {},
+            [](){});
 
-//    REQUIRE(hasDataReceived);
-//    REQUIRE("Hello Multicast Group" == data);
-//}
+        std::string TEST_DATA{"Hello World " + std::to_string(i)};
+        const auto TEST_DATA_SIZE{TEST_DATA.size()};
+        auto retVal2 = conn3.send(std::move(TEST_DATA));
+        REQUIRE(TEST_DATA_SIZE == retVal2.first);
+        REQUIRE(0 == retVal2.second);
 
-//TEST_CASE("Testing multicast with faulty 224.0.0.1 address.") {
-//    // Setup data structures to receive data from UDPReceiver.
-//    std::atomic<bool> hasDataReceived{false};
+        using namespace std::literals::chrono_literals; // NOLINT
+        std::this_thread::sleep_for(1ms);
+    }
 
-//    REQUIRE(!hasDataReceived);
+    // Yield the UDP receiver so that the embedded thread has time to process the data.
+    // Let the operating system spawn the thread.
+    using namespace std::literals::chrono_literals; // NOLINT
+    do { std::this_thread::sleep_for(1ms); } while (hasDataReceived != MAX_CONNECTIONS);
 
-//    // Setup UDPReceiver.
-//    cluon::UDPReceiver ur5{"224.0.0.1", 1239, nullptr};
-//    REQUIRE(!ur5.isRunning());
-//    REQUIRE(!hasDataReceived);
-//}
+    REQUIRE(MAX_CONNECTIONS == hasDataReceived);
+    REQUIRE(MAX_CONNECTIONS == data.size());
+}
+
