@@ -33,11 +33,12 @@
 
 #include <cstring>
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 namespace cluon {
 
-TCPServer::TCPServer(uint16_t port, std::function<void(cluon::TCPConnection &&connection)> newConnectionDelegate) noexcept 
+TCPServer::TCPServer(uint16_t port, std::function<void(std::shared_ptr<cluon::TCPConnection> connection)> newConnectionDelegate) noexcept 
     : m_newConnectionDelegate(newConnectionDelegate) {
     if (0 < port) {
 #ifdef WIN32
@@ -181,7 +182,7 @@ void TCPServer::readFromSocket() noexcept {
 
             int32_t connectingClient = ::accept(m_socket, &clientSocket, &sizeClientSocket);
             if ( (0 <= connectingClient) && (nullptr != m_newConnectionDelegate) ) {
-                m_newConnectionDelegate(std::move(cluon::TCPConnection(connectingClient)));
+                m_newConnectionDelegate(std::make_shared<cluon::TCPConnection>(connectingClient));
             }
         }
     }

@@ -53,7 +53,7 @@ class LIBCLUON_API TCPServer {
      * @param port Port to receive UDP packets from.
      * @param newConnectionDelegate Functional to handle incoming TCP connections.
      */
-    TCPServer(uint16_t port, std::function<void(cluon::TCPConnection &&connection)> newConnectionDelegate) noexcept;
+    TCPServer(uint16_t port, std::function<void(std::shared_ptr<cluon::TCPConnection> connection)> newConnectionDelegate) noexcept;
 
     ~TCPServer() noexcept;
 
@@ -79,7 +79,7 @@ class LIBCLUON_API TCPServer {
     std::thread m_readFromSocketThread{};
 
     std::mutex m_newConnectionDelegateMutex{};
-    std::function<void(cluon::TCPConnection &&connection)> m_newConnectionDelegate{};
+    std::function<void(std::shared_ptr<cluon::TCPConnection> connection)> m_newConnectionDelegate{};
 };
 } // namespace cluon
 

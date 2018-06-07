@@ -212,6 +212,9 @@ void TCPConnection::readFromSocket() noexcept {
     // Indicate to main thread that we are ready.
     m_readFromSocketThreadRunning.store(true);
 
+    // This flag is used to not read data from the socket until this TCPConnection has a proper onNewDataHandler set.
+    bool hasNewDataDelegate{false};
+
     while (m_readFromSocketThreadRunning.load()) {
         // Define timeout for select system call. The timeval struct must be
         // reinitialized for every select call as it might be modified containing
@@ -222,7 +225,13 @@ void TCPConnection::readFromSocket() noexcept {
         FD_ZERO(&setOfFiledescriptorsToReadFrom);
         FD_SET(m_socket, &setOfFiledescriptorsToReadFrom);
         ::select(m_socket + 1, &setOfFiledescriptorsToReadFrom, nullptr, nullptr, &timeout);
-        if (FD_ISSET(m_socket, &setOfFiledescriptorsToReadFrom)) {
+
+        // Only read data when the newDataDelegate is set.
+        if (!hasNewDataDelegate) {
+            std::lock_guard<std::mutex> lck(m_newDataDelegateMutex);
+            hasNewDataDelegate = (nullptr != m_newDataDelegate);
+        }
+        if (FD_ISSET(m_socket, &setOfFiledescriptorsToReadFrom) && hasNewDataDelegate) {
             bytesRead = ::recv(m_socket, buffer.data(), buffer.max_size(), 0);
             if (0 >= bytesRead) {
                 // 0 == bytesRead: peer shut down the connection; 0 > bytesRead: other error.

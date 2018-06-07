@@ -28,6 +28,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <vector>
 
 int main(int argc, char **argv) {
     int retVal{1};
@@ -39,14 +40,13 @@ int main(int argc, char **argv) {
         std::cerr << "Example: " << PROGRAM << " 1234" << std::endl;
     } else {
         const std::string PORT(argv[1]); // NOLINT
-        cluon::TCPServer srv(static_cast<uint16_t>(std::stoi(PORT)), [](cluon::TCPConnection &&connection){
+        std::vector<std::shared_ptr<cluon::TCPConnection> > connections;
+        cluon::TCPServer srv(static_cast<uint16_t>(std::stoi(PORT)), [&connections](std::shared_ptr<cluon::TCPConnection> connection){
             std::cout << "Got connection..." << std::endl;
-            connection.setOnNewDataDelegate([](std::string &&data, std::chrono::system_clock::time_point &&){
+            connection->setOnNewDataDelegate([](std::string &&data, std::chrono::system_clock::time_point &&){
                 std::cout << "Data: '" << data << "'" << std::endl;
             });
-            using namespace std::literals::chrono_literals; // NOLINT
-            std::this_thread::sleep_for(10s);
-            std::cout << "Connection closed." << std::endl;
+            connections.push_back(connection);
         });
 
         int counter{0};
