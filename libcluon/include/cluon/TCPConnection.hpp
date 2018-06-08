@@ -116,8 +116,8 @@ class LIBCLUON_API TCPConnection {
      */
     TCPConnection(const std::string &address,
                   uint16_t port,
-                  std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate,
-                  std::function<void()> connectionLostDelegate) noexcept;
+                  std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate = nullptr,
+                  std::function<void()> connectionLostDelegate = nullptr) noexcept;
 
     ~TCPConnection() noexcept;
 

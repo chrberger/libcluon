@@ -74,10 +74,7 @@ TEST_CASE("Creating TCPServer and receive data from one connection.") {
 
     REQUIRE(srv3.isRunning());
 
-    cluon::TCPConnection conn3(
-        "127.0.0.1", 1235,
-        [](std::string &&, std::chrono::system_clock::time_point &&) noexcept {},
-        [](){});
+    cluon::TCPConnection conn3("127.0.0.1", 1235);
 
     std::string TEST_DATA{"Hello World"};
     const auto TEST_DATA_SIZE{TEST_DATA.size()};
@@ -132,10 +129,7 @@ TEST_CASE("Creating TCPServer and receive data from multiple connections.") {
 
     constexpr uint8_t MAX_CONNECTIONS{10};
     for(uint8_t i{0}; i < MAX_CONNECTIONS; i++) {
-        cluon::TCPConnection conn3(
-            "127.0.0.1", 1236,
-            [](std::string &&, std::chrono::system_clock::time_point &&) noexcept {},
-            [](){});
+        cluon::TCPConnection conn3("127.0.0.1", 1236);
 
         std::string TEST_DATA{"Hello World " + std::to_string(i)};
         const auto TEST_DATA_SIZE{TEST_DATA.size()};
