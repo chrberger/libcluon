@@ -95,24 +95,26 @@ TCPServer::TCPServer(uint16_t port, std::function<void(std::string &&from, std::
                         // Let the operating system spawn the thread.
                         using namespace std::literals::chrono_literals;
                         do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
-                    } catch (...) { closeSocket(ECHILD); }
+                    } catch (...) { // LCOV_EXCL_LINE
+                        closeSocket(ECHILD); // LCOV_EXCL_LINE
+                    }
                 }
-                else {
-#ifdef WIN32
+                else { // LCOV_EXCL_LINE
+#ifdef WIN32 // LCOV_EXCL_LINE
                     auto errorCode = WSAGetLastError();
 #else
-                    auto errorCode = errno;
-#endif
-                    closeSocket(errorCode);
+                    auto errorCode = errno; // LCOV_EXCL_LINE
+#endif // LCOV_EXCL_LINE
+                    closeSocket(errorCode); // LCOV_EXCL_LINE
                 }
             }
-            else {
-#ifdef WIN32
+            else { // LCOV_EXCL_LINE
+#ifdef WIN32 // LCOV_EXCL_LINE
                 auto errorCode = WSAGetLastError();
 #else
-                auto errorCode = errno;
-#endif
-                closeSocket(errorCode);
+                auto errorCode = errno; // LCOV_EXCL_LINE
+#endif // LCOV_EXCL_LINE
+                closeSocket(errorCode); // LCOV_EXCL_LINE
             }
         }
     }
@@ -126,19 +128,20 @@ TCPServer::~TCPServer() noexcept {
         if (m_readFromSocketThread.joinable()) {
             m_readFromSocketThread.join();
         }
-    } catch (...) {}
+    } catch (...) { // LCOV_EXCL_LINE
+    }
 
     closeSocket(0);
 }
 
 void TCPServer::closeSocket(int errorCode) noexcept {
     if (0 != errorCode) {
-        std::cerr << "[cluon::TCPServer] Failed to perform socket operation: ";
-#ifdef WIN32
+        std::cerr << "[cluon::TCPServer] Failed to perform socket operation: "; // LCOV_EXCL_LINE
+#ifdef WIN32 // LCOV_EXCL_LINE
         std::cerr << errorCode << std::endl;
 #else
-        std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl;
-#endif
+        std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl; // LCOV_EXCL_LINE
+#endif // LCOV_EXCL_LINE
     }
 
     if (!(m_socket < 0)) {

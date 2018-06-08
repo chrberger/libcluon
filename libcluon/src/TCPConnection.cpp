@@ -54,7 +54,9 @@ TCPConnection::TCPConnection(const int32_t &socket) noexcept
             // Let the operating system spawn the thread.
             using namespace std::literals::chrono_literals;
             do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
-        } catch (...) { closeSocket(ECHILD); }
+        } catch (...) { // LCOV_EXCL_LINE
+            closeSocket(ECHILD); // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -100,12 +102,12 @@ TCPConnection::TCPConnection(const std::string &address,
             if (!(m_socket < 0)) {
                 auto retVal = ::connect(m_socket, reinterpret_cast<struct sockaddr *>(&m_address), sizeof(m_address));
                 if (0 > retVal) {
-#ifdef WIN32
+#ifdef WIN32 // LCOV_EXCL_LINE
                     auto errorCode = WSAGetLastError();
 #else
-                    auto errorCode = errno;
-#endif
-                    closeSocket(errorCode);
+                    auto errorCode = errno; // LCOV_EXCL_LINE
+#endif // LCOV_EXCL_LINE
+                    closeSocket(errorCode); // LCOV_EXCL_LINE
                 } else {
                     // Constructing a thread could fail.
                     try {
@@ -114,7 +116,9 @@ TCPConnection::TCPConnection(const std::string &address,
                         // Let the operating system spawn the thread.
                         using namespace std::literals::chrono_literals;
                         do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
-                    } catch (...) { closeSocket(ECHILD); }
+                    } catch (...) { // LCOV_EXCL_LINE
+                        closeSocket(ECHILD); // LCOV_EXCL_LINE
+                    }
                 }
             }
         }
@@ -129,19 +133,20 @@ TCPConnection::~TCPConnection() noexcept {
         if (m_readFromSocketThread.joinable()) {
             m_readFromSocketThread.join();
         }
-    } catch (...) {}
+    } catch (...) { // LCOV_EXCL_LINE 
+    }
 
     closeSocket(0);
 }
 
 void TCPConnection::closeSocket(int errorCode) noexcept {
     if (0 != errorCode) {
-        std::cerr << "[cluon::TCPConnection] Failed to perform socket operation: ";
-#ifdef WIN32
+        std::cerr << "[cluon::TCPConnection] Failed to perform socket operation: "; // LCOV_EXCL_LINE
+#ifdef WIN32 // LCOV_EXCL_LINE
         std::cerr << errorCode << std::endl;
 #else
-        std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl;
-#endif
+        std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl; // LCOV_EXCL_LINE
+#endif // LCOV_EXCL_LINE
     }
 
     if (!(m_socket < 0)) {
@@ -181,11 +186,11 @@ std::pair<ssize_t, int32_t> TCPConnection::send(std::string &&data) const noexce
     }
 
     if (!m_readFromSocketThreadRunning.load()) {
-        std::lock_guard<std::mutex> lck(m_connectionLostDelegateMutex);
-        if (nullptr != m_connectionLostDelegate) {
-            m_connectionLostDelegate();
+        std::lock_guard<std::mutex> lck(m_connectionLostDelegateMutex); // LCOV_EXCL_LINE
+        if (nullptr != m_connectionLostDelegate) { // LCOV_EXCL_LINE
+            m_connectionLostDelegate(); // LCOV_EXCL_LINE
         }
-        return {-1, ENOTCONN};
+        return {-1, ENOTCONN}; // LCOV_EXCL_LINE
     }
 
     constexpr uint16_t MAX_LENGTH{65535};

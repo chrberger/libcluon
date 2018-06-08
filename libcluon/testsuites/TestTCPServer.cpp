@@ -20,6 +20,7 @@
 #include "cluon/TCPServer.hpp"
 #include "cluon/TCPConnection.hpp"
 
+#include <cerrno>
 #include <ctime>
 #include <atomic>
 #include <chrono>
@@ -39,6 +40,21 @@ TEST_CASE("Creating TCPServer and stop immediately.") {
 TEST_CASE("Trying to receive with wrong sendToPort.") {
     cluon::TCPServer failingSrv2{0, nullptr};
     REQUIRE(!failingSrv2.isRunning());
+}
+
+TEST_CASE("Trying to connect to wrong sendToPort.") {
+    cluon::TCPConnection conn1("256.0.0.1", 0);
+    REQUIRE(!conn1.isRunning());
+
+    std::string TEST_DATA{"Hello World"};
+    auto retVal2 = conn1.send(std::move(TEST_DATA));
+    REQUIRE(-1 == retVal2.first);
+#ifdef WIN32
+    constexpr int32_t EXPECTED_VALUE = 9;
+#else
+    constexpr int32_t EXPECTED_VALUE = EBADF;
+#endif
+    REQUIRE(EXPECTED_VALUE == retVal2.second);
 }
 
 TEST_CASE("Creating TCPServer and receive data from one connection.") {
@@ -71,16 +87,31 @@ TEST_CASE("Creating TCPServer and receive data from one connection.") {
             });
             connections.push_back(connection);
         });
-
     REQUIRE(srv3.isRunning());
 
     cluon::TCPConnection conn3("127.0.0.1", 1235);
+    REQUIRE(conn3.isRunning());
 
     std::string TEST_DATA{"Hello World"};
     const auto TEST_DATA_SIZE{TEST_DATA.size()};
     auto retVal2 = conn3.send(std::move(TEST_DATA));
     REQUIRE(TEST_DATA_SIZE == retVal2.first);
     REQUIRE(0 == retVal2.second);
+
+    {
+        // Try sending empty data.
+        auto retVal3 = conn3.send("");
+        REQUIRE(0 == retVal3.first);
+        REQUIRE(0 == retVal3.second);
+    }
+
+    {
+        // Try sending too large data.
+        std::string TEST_DATA2(0xFFFF + 1, 'A');
+        auto retVal4 = conn3.send(std::move(TEST_DATA2));
+        REQUIRE(-1 == retVal4.first);
+        REQUIRE(E2BIG == retVal4.second);
+    }
 
     // Yield the UDP receiver so that the embedded thread has time to process the data.
     // Let the operating system spawn the thread.
@@ -110,7 +141,7 @@ TEST_CASE("Creating TCPServer and receive data from multiple connections.") {
     REQUIRE(0 == hasDataReceived);
     REQUIRE(connections.empty());
 
-    cluon::TCPServer srv3(
+    cluon::TCPServer srv4(
         1236,
         [&hasDataReceived, &dataMutex, &data, &connections](std::string &&from, std::shared_ptr<cluon::TCPConnection> connection) noexcept {
             std::cout << "Got connection from " << from << std::endl;
@@ -125,15 +156,16 @@ TEST_CASE("Creating TCPServer and receive data from multiple connections.") {
             connections.push_back(connection);
         });
 
-    REQUIRE(srv3.isRunning());
+    REQUIRE(srv4.isRunning());
 
     constexpr uint8_t MAX_CONNECTIONS{10};
     for(uint8_t i{0}; i < MAX_CONNECTIONS; i++) {
-        cluon::TCPConnection conn3("127.0.0.1", 1236);
+        cluon::TCPConnection conn4("127.0.0.1", 1236);
+        REQUIRE(conn4.isRunning());
 
         std::string TEST_DATA{"Hello World " + std::to_string(i)};
         const auto TEST_DATA_SIZE{TEST_DATA.size()};
-        auto retVal2 = conn3.send(std::move(TEST_DATA));
+        auto retVal2 = conn4.send(std::move(TEST_DATA));
         REQUIRE(TEST_DATA_SIZE == retVal2.first);
         REQUIRE(0 == retVal2.second);
 
