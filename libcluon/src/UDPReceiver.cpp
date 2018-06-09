@@ -249,11 +249,14 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
 
             try {
-                m_pipelineThread = std::thread(&UDPReceiver::processPipeline, this);
-
-                // Let the operating system spawn the thread.
-                using namespace std::literals::chrono_literals; // NOLINT
-                do { std::this_thread::sleep_for(1ms); } while (!m_pipelineThreadRunning.load());
+                m_pipeline = std::make_shared<cluon::NotifyingPipeline<PipelineEntry> >([this](PipelineEntry &&entry){
+                    this->m_delegate(std::move(entry.m_data), std::move(entry.m_from), std::move(entry.m_sampleTime));
+                });
+                if (m_pipeline) {
+                    // Let the operating system spawn the thread.
+                    using namespace std::literals::chrono_literals; // NOLINT
+                    do { std::this_thread::sleep_for(1ms); } while (!m_pipeline->isRunning());
+                }
             } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
         }
     }
@@ -271,19 +274,7 @@ UDPReceiver::~UDPReceiver() noexcept {
         } catch (...) {} // LCOV_EXCL_LINE
     }
 
-    {
-        m_pipelineThreadRunning.store(false);
-
-        // Wake any waiting threads.
-        m_pipelineCondition.notify_all();
-
-        // Joining the thread could fail.
-        try {
-            if (m_pipelineThread.joinable()) {
-                m_pipelineThread.join();
-            }
-        } catch (...) {} // LCOV_EXCL_LINE
-    }
+    m_pipeline.reset();
 
     closeSocket(0);
 }
@@ -322,46 +313,6 @@ void UDPReceiver::closeSocket(int errorCode) noexcept {
 
 bool UDPReceiver::isRunning() const noexcept {
     return (m_readFromSocketThreadRunning.load() && !TerminateHandler::instance().isTerminated.load());
-}
-
-void UDPReceiver::processPipeline() noexcept {
-    // Indicate to main thread that we are ready.
-    m_pipelineThreadRunning.store(true);
-
-    while (m_pipelineThreadRunning.load()) {
-        std::unique_lock<std::mutex> lck(m_pipelineMutex);
-        // Wait until the thread should stop or data is available.
-        m_pipelineCondition.wait(lck, [this] { return (!this->m_pipelineThreadRunning.load() || !this->m_pipeline.empty()); });
-
-        // The condition will automatically lock the mutex after waking up.
-        // As we are locking per entry, we need to unlock the mutex first.
-        lck.unlock();
-
-        uint32_t entries{0};
-        {
-            lck.lock();
-            entries = static_cast<uint32_t>(m_pipeline.size());
-            lck.unlock();
-        }
-        for (uint32_t i{0}; i < entries; i++) {
-            PipelineEntry entry;
-            {
-                lck.lock();
-                entry = m_pipeline.front();
-                lck.unlock();
-            }
-
-            if (nullptr != m_delegate) {
-                m_delegate(std::move(entry.m_data), std::move(entry.m_from), std::move(entry.m_sampleTime));
-            }
-
-            {
-                lck.lock();
-                m_pipeline.pop_front();
-                lck.unlock();
-            }
-        }
-    }
 }
 
 void UDPReceiver::readFromSocket() noexcept {
@@ -449,9 +400,8 @@ void UDPReceiver::readFromSocket() noexcept {
                         pe.m_sampleTime = timestamp;
 
                         // Store entry in queue.
-                        {
-                            std::unique_lock<std::mutex> lck(m_pipelineMutex);
-                            m_pipeline.emplace_back(pe);
+                        if (m_pipeline) {
+                            m_pipeline->add(std::move(pe));
                         }
                     }
                     totalBytesRead += bytesRead;
@@ -460,7 +410,9 @@ void UDPReceiver::readFromSocket() noexcept {
         }
 
         if (static_cast<int32_t>(totalBytesRead) > 0) {
-            m_pipelineCondition.notify_all();
+            if (m_pipeline) {
+                m_pipeline->notifyAll();
+            }
         }
     }
 }

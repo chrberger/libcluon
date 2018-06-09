@@ -90,7 +90,6 @@ TEST_CASE("Creating UDPReceiver and receive data.") {
     REQUIRE(0 == retVal2.second);
 
     // Yield the UDP receiver so that the embedded thread has time to process the data.
-    // Let the operating system spawn the thread.
     using namespace std::literals::chrono_literals; // NOLINT
     do { std::this_thread::sleep_for(1ms); } while (!hasDataReceived.load());
 

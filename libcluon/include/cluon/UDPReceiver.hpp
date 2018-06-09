@@ -19,6 +19,7 @@
 #define CLUON_UDPRECEIVER_HPP
 
 #include "cluon/cluon.hpp"
+#include "cluon/NotifyingPipeline.hpp"
 
 // clang-format off
 #ifdef WIN32
@@ -35,6 +36,7 @@
 #include <deque>
 #include <chrono>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <set>
 #include <string>
@@ -115,8 +117,6 @@ class LIBCLUON_API UDPReceiver {
 
     void readFromSocket() noexcept;
 
-    void processPipeline() noexcept;
-
    private:
     int32_t m_socket{-1};
     bool m_isBlockingSocket{true};
@@ -133,18 +133,14 @@ class LIBCLUON_API UDPReceiver {
     std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point)> m_delegate{};
 
    private:
-    std::atomic<bool> m_pipelineThreadRunning{false};
-    std::thread m_pipelineThread{};
-    std::mutex m_pipelineMutex{};
-    std::condition_variable m_pipelineCondition{};
-
     class PipelineEntry {
        public:
         std::string m_data;
         std::string m_from;
         std::chrono::system_clock::time_point m_sampleTime;
     };
-    std::deque<PipelineEntry> m_pipeline{};
+
+    std::shared_ptr<cluon::NotifyingPipeline<PipelineEntry> > m_pipeline{};
 };
 } // namespace cluon
 
