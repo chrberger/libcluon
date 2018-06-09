@@ -72,6 +72,7 @@ for i in \
     cluon/MetaMessage.hpp \
     cluon/MessageParser.hpp \
     cluon/TerminateHandler.hpp \
+    cluon/NotifyingPipeline.hpp \
     cluon/UDPPacketSizeConstraints.hpp \
     cluon/UDPSender.hpp \
     cluon/UDPReceiver.hpp \

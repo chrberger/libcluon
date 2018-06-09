@@ -19,6 +19,7 @@
 #define CLUON_TCPCONNECTION_HPP
 
 #include "cluon/cluon.hpp"
+#include "cluon/NotifyingPipeline.hpp"
 
 // clang-format off
 #ifdef WIN32
@@ -33,6 +34,7 @@
 #include <atomic>
 #include <chrono>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -146,6 +148,7 @@ class LIBCLUON_API TCPConnection {
      * @param errorCode Error code that caused this closing.
      */
     void closeSocket(int errorCode) noexcept;
+    void startReadingFromSocket() noexcept;
     void readFromSocket() noexcept;
 
    private:
@@ -161,6 +164,15 @@ class LIBCLUON_API TCPConnection {
 
     mutable std::mutex m_connectionLostDelegateMutex{};
     std::function<void()> m_connectionLostDelegate{};
+
+   private:
+    class PipelineEntry {
+       public:
+        std::string m_data;
+        std::chrono::system_clock::time_point m_sampleTime;
+    };
+
+    std::shared_ptr<cluon::NotifyingPipeline<PipelineEntry> > m_pipeline{};
 };
 } // namespace cluon
 

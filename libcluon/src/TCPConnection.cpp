@@ -47,16 +47,7 @@ TCPConnection::TCPConnection(const int32_t &socket) noexcept
     , m_newDataDelegate(nullptr)
     , m_connectionLostDelegate(nullptr) {
     if (!(m_socket < 0)) {
-        // Constructing a thread could fail.
-        try {
-            m_readFromSocketThread = std::thread(&TCPConnection::readFromSocket, this);
-
-            // Let the operating system spawn the thread.
-            using namespace std::literals::chrono_literals;
-            do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
-        } catch (...) { // LCOV_EXCL_LINE
-            closeSocket(ECHILD); // LCOV_EXCL_LINE
-        }
+        startReadingFromSocket();
     }
 }
 
@@ -109,16 +100,7 @@ TCPConnection::TCPConnection(const std::string &address,
 #endif // LCOV_EXCL_LINE
                     closeSocket(errorCode); // LCOV_EXCL_LINE
                 } else {
-                    // Constructing a thread could fail.
-                    try {
-                        m_readFromSocketThread = std::thread(&TCPConnection::readFromSocket, this);
-
-                        // Let the operating system spawn the thread.
-                        using namespace std::literals::chrono_literals;
-                        do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
-                    } catch (...) { // LCOV_EXCL_LINE
-                        closeSocket(ECHILD); // LCOV_EXCL_LINE
-                    }
+                    startReadingFromSocket();
                 }
             }
         }
@@ -126,15 +108,18 @@ TCPConnection::TCPConnection(const std::string &address,
 }
 
 TCPConnection::~TCPConnection() noexcept {
-    m_readFromSocketThreadRunning.store(false);
+    {
+        m_readFromSocketThreadRunning.store(false);
 
-    // Joining the thread could fail.
-    try {
-        if (m_readFromSocketThread.joinable()) {
-            m_readFromSocketThread.join();
-        }
-    } catch (...) { // LCOV_EXCL_LINE 
+        // Joining the thread could fail.
+        try {
+            if (m_readFromSocketThread.joinable()) {
+                m_readFromSocketThread.join();
+            }
+        } catch (...) {} // LCOV_EXCL_LINE
     }
+
+    m_pipeline.reset();
 
     closeSocket(0);
 }
@@ -160,6 +145,30 @@ void TCPConnection::closeSocket(int errorCode) noexcept {
 #endif
     }
     m_socket = -1;
+}
+
+void TCPConnection::startReadingFromSocket() noexcept {
+    // Constructing a thread could fail.
+    try {
+        m_readFromSocketThread = std::thread(&TCPConnection::readFromSocket, this);
+
+        // Let the operating system spawn the thread.
+        using namespace std::literals::chrono_literals;
+        do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
+    } catch (...) { // LCOV_EXCL_LINE
+        closeSocket(ECHILD); // LCOV_EXCL_LINE
+    }
+
+    try {
+        m_pipeline = std::make_shared<cluon::NotifyingPipeline<PipelineEntry> >([this](PipelineEntry &&entry){
+            this->m_newDataDelegate(std::move(entry.m_data), std::move(entry.m_sampleTime));
+        });
+        if (m_pipeline) {
+            // Let the operating system spawn the thread.
+            using namespace std::literals::chrono_literals; // NOLINT
+            do { std::this_thread::sleep_for(1ms); } while (!m_pipeline->isRunning());
+        }
+    } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
 }
 
 void TCPConnection::setOnNewData(std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate) noexcept {
@@ -268,8 +277,20 @@ void TCPConnection::readFromSocket() noexcept {
 #else
                     std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now();
 #endif
-                    // Call newDataDelegate.
-                    m_newDataDelegate(std::string(buffer.data(), static_cast<size_t>(bytesRead)), timestamp);
+                    {
+                        PipelineEntry pe;
+                        pe.m_data       = std::string(buffer.data(), static_cast<size_t>(bytesRead));
+                        pe.m_sampleTime = timestamp;
+
+                        // Store entry in queue.
+                        if (m_pipeline) {
+                            m_pipeline->add(std::move(pe));
+                        }
+                    }
+
+                    if (m_pipeline) {
+                        m_pipeline->notifyAll();
+                    }
                 }
             }
         }
