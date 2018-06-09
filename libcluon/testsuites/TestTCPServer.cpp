@@ -17,13 +17,13 @@
 
 #include "catch.hpp"
 
-#include "cluon/TCPServer.hpp"
 #include "cluon/TCPConnection.hpp"
+#include "cluon/TCPServer.hpp"
 
-#include <cerrno>
-#include <ctime>
 #include <atomic>
+#include <cerrno>
 #include <chrono>
+#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <mutex>
@@ -65,7 +65,7 @@ TEST_CASE("Creating TCPServer and receive data from one connection.") {
     std::string data;
     std::string sender;
     std::chrono::system_clock::time_point timestamp;
-    std::vector<std::shared_ptr<cluon::TCPConnection> > connections;
+    std::vector<std::shared_ptr<cluon::TCPConnection>> connections;
 
     REQUIRE(data.empty());
     REQUIRE(sender.empty());
@@ -73,18 +73,15 @@ TEST_CASE("Creating TCPServer and receive data from one connection.") {
     REQUIRE(connections.empty());
 
     cluon::TCPServer srv3(
-        1235,
-        [&hasDataReceived, &data, &sender, &timestamp, &connections](std::string &&from, std::shared_ptr<cluon::TCPConnection> connection) noexcept {
+        1235, [&hasDataReceived, &data, &sender, &timestamp, &connections ](std::string && from, std::shared_ptr<cluon::TCPConnection> connection) noexcept {
             sender = std::move(from);
             std::cout << "Got connection from " << sender << std::endl;
-            connection->setOnNewData([&hasDataReceived, &data, &timestamp](std::string &&d, std::chrono::system_clock::time_point &&ts){
-                data = std::move(d);
+            connection->setOnNewData([&hasDataReceived, &data, &timestamp](std::string &&d, std::chrono::system_clock::time_point &&ts) {
+                data      = std::move(d);
                 timestamp = std::move(ts);
                 hasDataReceived.store(true);
             });
-            connection->setOnConnectionLost([](){
-                std::cout << "Connection lost." << std::endl;
-            });
+            connection->setOnConnectionLost([]() { std::cout << "Connection lost." << std::endl; });
             connections.push_back(connection);
         });
     REQUIRE(srv3.isRunning());
@@ -136,30 +133,27 @@ TEST_CASE("Creating TCPServer and receive data from multiple connections.") {
     std::atomic<uint8_t> hasDataReceived{0};
     std::mutex dataMutex;
     std::vector<std::string> data;
-    std::vector<std::shared_ptr<cluon::TCPConnection> > connections;
+    std::vector<std::shared_ptr<cluon::TCPConnection>> connections;
 
     REQUIRE(0 == hasDataReceived);
     REQUIRE(connections.empty());
 
-    cluon::TCPServer srv4(
-        1236,
-        [&hasDataReceived, &dataMutex, &data, &connections](std::string &&from, std::shared_ptr<cluon::TCPConnection> connection) noexcept {
-            std::cout << "Got connection from " << from << std::endl;
-            connection->setOnNewData([&hasDataReceived, &dataMutex, &data](std::string &&d, std::chrono::system_clock::time_point &&){
-                std::lock_guard<std::mutex> lck(dataMutex);
-                data.push_back(std::move(d));
-                hasDataReceived++;
-            });
-            connection->setOnConnectionLost([](){
-                std::cout << "Connection lost." << std::endl;
-            });
-            connections.push_back(connection);
-        });
+    cluon::TCPServer srv4(1236,
+                          [&hasDataReceived, &dataMutex, &data, &connections ](std::string && from, std::shared_ptr<cluon::TCPConnection> connection) noexcept {
+                              std::cout << "Got connection from " << from << std::endl;
+                              connection->setOnNewData([&hasDataReceived, &dataMutex, &data](std::string &&d, std::chrono::system_clock::time_point &&) {
+                                  std::lock_guard<std::mutex> lck(dataMutex);
+                                  data.push_back(std::move(d));
+                                  hasDataReceived++;
+                              });
+                              connection->setOnConnectionLost([]() { std::cout << "Connection lost." << std::endl; });
+                              connections.push_back(connection);
+                          });
 
     REQUIRE(srv4.isRunning());
 
     constexpr uint8_t MAX_CONNECTIONS{10};
-    for(uint8_t i{0}; i < MAX_CONNECTIONS; i++) {
+    for (uint8_t i{0}; i < MAX_CONNECTIONS; i++) {
         cluon::TCPConnection conn4("127.0.0.1", 1236);
         REQUIRE(conn4.isRunning());
 
@@ -181,4 +175,3 @@ TEST_CASE("Creating TCPServer and receive data from multiple connections.") {
     REQUIRE(MAX_CONNECTIONS == hasDataReceived);
     REQUIRE(MAX_CONNECTIONS == data.size());
 }
-

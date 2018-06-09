@@ -39,7 +39,7 @@
 
 namespace cluon {
 
-TCPServer::TCPServer(uint16_t port, std::function<void(std::string &&from, std::shared_ptr<cluon::TCPConnection> connection)> newConnectionDelegate) noexcept 
+TCPServer::TCPServer(uint16_t port, std::function<void(std::string &&from, std::shared_ptr<cluon::TCPConnection> connection)> newConnectionDelegate) noexcept
     : m_newConnectionDelegate(newConnectionDelegate) {
     if (0 < port) {
 #ifdef WIN32
@@ -68,22 +68,21 @@ TCPServer::TCPServer(uint16_t port, std::function<void(std::string &&from, std::
 #ifdef WIN32 // LCOV_EXCL_LINE
                 auto errorCode = WSAGetLastError();
 #else
-                auto errorCode = errno; // LCOV_EXCL_LINE
+                auto errorCode = errno;                                              // LCOV_EXCL_LINE
 #endif                                  // LCOV_EXCL_LINE
                 closeSocket(errorCode); // LCOV_EXCL_LINE
             }
         }
 
-
         if (!(m_socket < 0)) {
             // Setup address and port.
             struct sockaddr_in address;
             ::memset(&address, 0, sizeof(address));
-            address.sin_family = AF_INET;
+            address.sin_family      = AF_INET;
             address.sin_addr.s_addr = htonl(INADDR_ANY);
-            address.sin_port = htons(port);
+            address.sin_port        = htons(port);
 
-            auto retVal = ::bind(m_socket, reinterpret_cast<struct sockaddr*>(&address), sizeof(address));
+            auto retVal = ::bind(m_socket, reinterpret_cast<struct sockaddr *>(&address), sizeof(address));
             if (-1 != retVal) {
                 constexpr int32_t MAX_PENDING_CONNECTIONS{100};
                 retVal = ::listen(m_socket, MAX_PENDING_CONNECTIONS);
@@ -95,25 +94,23 @@ TCPServer::TCPServer(uint16_t port, std::function<void(std::string &&from, std::
                         // Let the operating system spawn the thread.
                         using namespace std::literals::chrono_literals;
                         do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
-                    } catch (...) { // LCOV_EXCL_LINE
+                    } catch (...) {          // LCOV_EXCL_LINE
                         closeSocket(ECHILD); // LCOV_EXCL_LINE
                     }
-                }
-                else { // LCOV_EXCL_LINE
-#ifdef WIN32 // LCOV_EXCL_LINE
+                } else { // LCOV_EXCL_LINE
+#ifdef WIN32             // LCOV_EXCL_LINE
                     auto errorCode = WSAGetLastError();
 #else
-                    auto errorCode = errno; // LCOV_EXCL_LINE
-#endif // LCOV_EXCL_LINE
+                    auto errorCode = errno;                                          // LCOV_EXCL_LINE
+#endif                                      // LCOV_EXCL_LINE
                     closeSocket(errorCode); // LCOV_EXCL_LINE
                 }
-            }
-            else { // LCOV_EXCL_LINE
-#ifdef WIN32 // LCOV_EXCL_LINE
+            } else { // LCOV_EXCL_LINE
+#ifdef WIN32         // LCOV_EXCL_LINE
                 auto errorCode = WSAGetLastError();
 #else
-                auto errorCode = errno; // LCOV_EXCL_LINE
-#endif // LCOV_EXCL_LINE
+                auto errorCode = errno;                                              // LCOV_EXCL_LINE
+#endif                                  // LCOV_EXCL_LINE
                 closeSocket(errorCode); // LCOV_EXCL_LINE
             }
         }
@@ -137,7 +134,7 @@ TCPServer::~TCPServer() noexcept {
 void TCPServer::closeSocket(int errorCode) noexcept {
     if (0 != errorCode) {
         std::cerr << "[cluon::TCPServer] Failed to perform socket operation: "; // LCOV_EXCL_LINE
-#ifdef WIN32 // LCOV_EXCL_LINE
+#ifdef WIN32                                                                    // LCOV_EXCL_LINE
         std::cerr << errorCode << std::endl;
 #else
         std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl; // LCOV_EXCL_LINE
@@ -150,7 +147,7 @@ void TCPServer::closeSocket(int errorCode) noexcept {
         ::closesocket(m_socket);
         WSACleanup();
 #else
-        ::shutdown(m_socket, SHUT_RDWR); // Disallow further read/write operations.
+        ::shutdown(m_socket, SHUT_RDWR);                                             // Disallow further read/write operations.
         ::close(m_socket);
 #endif
     }
@@ -185,15 +182,16 @@ void TCPServer::readFromSocket() noexcept {
         ::select(m_socket + 1, &setOfFiledescriptorsToReadFrom, nullptr, nullptr, &timeout);
         if (FD_ISSET(m_socket, &setOfFiledescriptorsToReadFrom)) {
             struct sockaddr_storage remote;
-            socklen_t addrLength = sizeof(remote);
+            socklen_t addrLength     = sizeof(remote);
             int32_t connectingClient = ::accept(m_socket, reinterpret_cast<struct sockaddr *>(&remote), &addrLength);
-            if ( (0 <= connectingClient) && (nullptr != m_newConnectionDelegate) ) {
+            if ((0 <= connectingClient) && (nullptr != m_newConnectionDelegate)) {
                 ::inet_ntop(remote.ss_family,
                             &((reinterpret_cast<struct sockaddr_in *>(&remote))->sin_addr), // NOLINT
                             remoteAddress.data(),
                             remoteAddress.max_size());
                 const uint16_t RECVFROM_PORT{ntohs(reinterpret_cast<struct sockaddr_in *>(&remote)->sin_port)}; // NOLINT
-                m_newConnectionDelegate(std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT), std::shared_ptr<cluon::TCPConnection>(new cluon::TCPConnection(connectingClient)));
+                m_newConnectionDelegate(std::string(remoteAddress.data()) + ':' + std::to_string(RECVFROM_PORT),
+                                        std::shared_ptr<cluon::TCPConnection>(new cluon::TCPConnection(connectingClient)));
             }
         }
     }

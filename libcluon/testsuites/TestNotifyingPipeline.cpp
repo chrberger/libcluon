@@ -35,7 +35,7 @@ TEST_CASE("Creating a NotifyingPipeline, add one entry, and get notified.") {
     std::string data;
 
     try {
-        cluon::NotifyingPipeline<std::string> pipeline([&hasDataReceived, &data](std::string &&entry){
+        cluon::NotifyingPipeline<std::string> pipeline([&hasDataReceived, &data](std::string &&entry) {
             hasDataReceived.store(true);
             data = entry;
         });
@@ -54,9 +54,5 @@ TEST_CASE("Creating a NotifyingPipeline, add one entry, and get notified.") {
         do { std::this_thread::sleep_for(1ms); } while (!hasDataReceived.load());
 
         REQUIRE("Hello World" == data);
-    }
-    catch(...) {
-        REQUIRE(false);
-    }
+    } catch (...) { REQUIRE(false); }
 }
-

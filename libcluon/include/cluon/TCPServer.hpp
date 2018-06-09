@@ -18,8 +18,8 @@
 #ifndef CLUON_TCPSERVER_HPP
 #define CLUON_TCPSERVER_HPP
 
-#include "cluon/cluon.hpp"
 #include "cluon/TCPConnection.hpp"
+#include "cluon/cluon.hpp"
 
 // clang-format off
 #ifdef WIN32

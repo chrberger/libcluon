@@ -96,8 +96,8 @@ TCPConnection::TCPConnection(const std::string &address,
 #ifdef WIN32 // LCOV_EXCL_LINE
                     auto errorCode = WSAGetLastError();
 #else
-                    auto errorCode = errno; // LCOV_EXCL_LINE
-#endif // LCOV_EXCL_LINE
+                    auto errorCode = errno;                                          // LCOV_EXCL_LINE
+#endif                                      // LCOV_EXCL_LINE
                     closeSocket(errorCode); // LCOV_EXCL_LINE
                 } else {
                     startReadingFromSocket();
@@ -127,7 +127,7 @@ TCPConnection::~TCPConnection() noexcept {
 void TCPConnection::closeSocket(int errorCode) noexcept {
     if (0 != errorCode) {
         std::cerr << "[cluon::TCPConnection] Failed to perform socket operation: "; // LCOV_EXCL_LINE
-#ifdef WIN32 // LCOV_EXCL_LINE
+#ifdef WIN32                                                                        // LCOV_EXCL_LINE
         std::cerr << errorCode << std::endl;
 #else
         std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl; // LCOV_EXCL_LINE
@@ -140,7 +140,7 @@ void TCPConnection::closeSocket(int errorCode) noexcept {
         ::closesocket(m_socket);
         WSACleanup();
 #else
-        ::shutdown(m_socket, SHUT_RDWR); // Disallow further read/write operations.
+        ::shutdown(m_socket, SHUT_RDWR);                                             // Disallow further read/write operations.
         ::close(m_socket);
 #endif
     }
@@ -155,14 +155,13 @@ void TCPConnection::startReadingFromSocket() noexcept {
         // Let the operating system spawn the thread.
         using namespace std::literals::chrono_literals;
         do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
-    } catch (...) { // LCOV_EXCL_LINE
+    } catch (...) {          // LCOV_EXCL_LINE
         closeSocket(ECHILD); // LCOV_EXCL_LINE
     }
 
     try {
-        m_pipeline = std::make_shared<cluon::NotifyingPipeline<PipelineEntry> >([this](PipelineEntry &&entry){
-            this->m_newDataDelegate(std::move(entry.m_data), std::move(entry.m_sampleTime));
-        });
+        m_pipeline = std::make_shared<cluon::NotifyingPipeline<PipelineEntry>>(
+            [this](PipelineEntry &&entry) { this->m_newDataDelegate(std::move(entry.m_data), std::move(entry.m_sampleTime)); });
         if (m_pipeline) {
             // Let the operating system spawn the thread.
             using namespace std::literals::chrono_literals; // NOLINT
@@ -196,8 +195,8 @@ std::pair<ssize_t, int32_t> TCPConnection::send(std::string &&data) const noexce
 
     if (!m_readFromSocketThreadRunning.load()) {
         std::lock_guard<std::mutex> lck(m_connectionLostDelegateMutex); // LCOV_EXCL_LINE
-        if (nullptr != m_connectionLostDelegate) { // LCOV_EXCL_LINE
-            m_connectionLostDelegate(); // LCOV_EXCL_LINE
+        if (nullptr != m_connectionLostDelegate) {                      // LCOV_EXCL_LINE
+            m_connectionLostDelegate();                                 // LCOV_EXCL_LINE
         }
         return {-1, ENOTCONN}; // LCOV_EXCL_LINE
     }

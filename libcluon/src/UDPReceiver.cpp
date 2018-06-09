@@ -249,9 +249,8 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
 
             try {
-                m_pipeline = std::make_shared<cluon::NotifyingPipeline<PipelineEntry> >([this](PipelineEntry &&entry){
-                    this->m_delegate(std::move(entry.m_data), std::move(entry.m_from), std::move(entry.m_sampleTime));
-                });
+                m_pipeline = std::make_shared<cluon::NotifyingPipeline<PipelineEntry>>(
+                    [this](PipelineEntry &&entry) { this->m_delegate(std::move(entry.m_data), std::move(entry.m_from), std::move(entry.m_sampleTime)); });
                 if (m_pipeline) {
                     // Let the operating system spawn the thread.
                     using namespace std::literals::chrono_literals; // NOLINT

@@ -18,8 +18,8 @@
 #ifndef CLUON_TCPCONNECTION_HPP
 #define CLUON_TCPCONNECTION_HPP
 
-#include "cluon/cluon.hpp"
 #include "cluon/NotifyingPipeline.hpp"
+#include "cluon/cluon.hpp"
 
 // clang-format off
 #ifdef WIN32
@@ -119,7 +119,7 @@ class LIBCLUON_API TCPConnection {
     TCPConnection(const std::string &address,
                   uint16_t port,
                   std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate = nullptr,
-                  std::function<void()> connectionLostDelegate = nullptr) noexcept;
+                  std::function<void()> connectionLostDelegate                                                  = nullptr) noexcept;
 
     ~TCPConnection() noexcept;
 
@@ -172,7 +172,7 @@ class LIBCLUON_API TCPConnection {
         std::chrono::system_clock::time_point m_sampleTime;
     };
 
-    std::shared_ptr<cluon::NotifyingPipeline<PipelineEntry> > m_pipeline{};
+    std::shared_ptr<cluon::NotifyingPipeline<PipelineEntry>> m_pipeline{};
 };
 } // namespace cluon
 

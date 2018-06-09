@@ -22,14 +22,14 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <functional>
 #include <deque>
+#include <functional>
 #include <mutex>
 #include <thread>
 
 namespace cluon {
 
-template<class T>
+template <class T>
 class LIBCLUON_API NotifyingPipeline {
    private:
     NotifyingPipeline(const NotifyingPipeline &) = delete;
@@ -67,13 +67,9 @@ class LIBCLUON_API NotifyingPipeline {
         m_pipeline.emplace_back(entry);
     }
 
-    inline void notifyAll() noexcept {
-        m_pipelineCondition.notify_all();
-    }
+    inline void notifyAll() noexcept { m_pipelineCondition.notify_all(); }
 
-    inline bool isRunning() noexcept {
-        return m_pipelineThreadRunning.load();
-    }
+    inline bool isRunning() noexcept { return m_pipelineThreadRunning.load(); }
 
    private:
     inline void processPipeline() noexcept {

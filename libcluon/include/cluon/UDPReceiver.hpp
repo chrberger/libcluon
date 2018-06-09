@@ -18,8 +18,8 @@
 #ifndef CLUON_UDPRECEIVER_HPP
 #define CLUON_UDPRECEIVER_HPP
 
-#include "cluon/cluon.hpp"
 #include "cluon/NotifyingPipeline.hpp"
+#include "cluon/cluon.hpp"
 
 // clang-format off
 #ifdef WIN32
@@ -140,7 +140,7 @@ class LIBCLUON_API UDPReceiver {
         std::chrono::system_clock::time_point m_sampleTime;
     };
 
-    std::shared_ptr<cluon::NotifyingPipeline<PipelineEntry> > m_pipeline{};
+    std::shared_ptr<cluon::NotifyingPipeline<PipelineEntry>> m_pipeline{};
 };
 } // namespace cluon
 

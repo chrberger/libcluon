@@ -305,10 +305,11 @@ TEST_CASE("Transform Envelope into JSON represention for payload without fields.
     }
     REQUIRE(28 == envelopeAsProto.size());
 
-//for(int i{0}; i < envelopeAsProto.size(); i++) {
-//std::cerr << "    REQUIRE(0x" << std::hex << static_cast<uint32_t>(static_cast<uint8_t>(envelopeAsProto.at(i))) << " == static_cast<uint8_t>(envelopeAsProto.at(" << std::dec << i << ")));" << std::endl;
+    // for(int i{0}; i < envelopeAsProto.size(); i++) {
+    // std::cerr << "    REQUIRE(0x" << std::hex << static_cast<uint32_t>(static_cast<uint8_t>(envelopeAsProto.at(i))) << " ==
+    // static_cast<uint8_t>(envelopeAsProto.at(" << std::dec << i << ")));" << std::endl;
 
-//}
+    //}
 
     REQUIRE(0x8 == static_cast<uint8_t>(envelopeAsProto.at(0)));
     REQUIRE(0xf6 == static_cast<uint8_t>(envelopeAsProto.at(1)));
@@ -338,8 +339,6 @@ TEST_CASE("Transform Envelope into JSON represention for payload without fields.
     REQUIRE(0x3 == static_cast<uint8_t>(envelopeAsProto.at(25)));
     REQUIRE(0x30 == static_cast<uint8_t>(envelopeAsProto.at(26)));
     REQUIRE(0x2 == static_cast<uint8_t>(envelopeAsProto.at(27)));
-
-
 
     {
         cluon::data::Envelope env2;
@@ -1259,4 +1258,3 @@ message MyTestMessage11 [id = 30011] {}
     REQUIRE(0 == (env.received().seconds() + env.received().microseconds()));
     REQUIRE(0 == (env.sampleTimeStamp().seconds() + env.sampleTimeStamp().microseconds()));
 }
-
