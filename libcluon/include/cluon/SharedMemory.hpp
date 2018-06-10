@@ -111,6 +111,14 @@ class LIBCLUON_API SharedMemory {
     void waitPOSIX() noexcept;
     void notifyAllPOSIX() noexcept;
     bool validPOSIX() noexcept;
+
+    void initSysV() noexcept;
+    void deinitSysV() noexcept;
+    void lockSysV() noexcept;
+    void unlockSysV() noexcept;
+    void waitSysV() noexcept;
+    void notifyAllSysV() noexcept;
+    bool validSysV() noexcept;
 #endif
 
    private:
@@ -125,6 +133,7 @@ class LIBCLUON_API SharedMemory {
     HANDLE __mutex{nullptr};
     HANDLE __sharedMemory{nullptr};
 #else
+    bool m_usePOSIX{true};
     int32_t m_fd{-1};
     struct SharedMemoryHeader {
         uint32_t __size;
