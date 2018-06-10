@@ -1,3 +1,15 @@
+libcluon (0.0.100-1ppa1~bionic1) bionic; urgency=medium
+
+  * TCPServer
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 10 Jun 2018 10:45:16 +0200
+
+libcluon (0.0.100-1ppa1~xenial1) xenial; urgency=medium
+
+  * TCPServer
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 10 Jun 2018 10:45:16 +0200
+
 libcluon (0.0.99-1ppa1~bionic1) bionic; urgency=medium
 
   * Adding support for messages with empty fields to convert to/from JSON
