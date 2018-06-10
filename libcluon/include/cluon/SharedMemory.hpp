@@ -73,6 +73,12 @@ class LIBCLUON_API SharedMemory {
      */
     void notifyAll() noexcept;
 
+   public:
+    /**
+     * @return True if the shared memory area is existing and usable.
+     */
+    bool valid() noexcept;
+
     /**
      * @return Pointer to the raw shared memory or nullptr in case of invalid shared memory.
      */
@@ -88,10 +94,24 @@ class LIBCLUON_API SharedMemory {
      */
     const std::string name() const noexcept;
 
-    /**
-     * @return True if the shared memory area is existing and usable.
-     */
-    bool valid() noexcept;
+#ifdef WIN32
+   private:
+    void initWIN32() noexcept;
+    void deinitWIN32() noexcept;
+    void lockWIN32() noexcept;
+    void unlockWIN32() noexcept;
+    void waitWIN32() noexcept;
+    void notifyAllWIN32() noexcept;
+#else
+   private:
+    void initPOSIX() noexcept;
+    void deinitPOSIX() noexcept;
+    void lockPOSIX() noexcept;
+    void unlockPOSIX() noexcept;
+    void waitPOSIX() noexcept;
+    void notifyAllPOSIX() noexcept;
+    bool validPOSIX() noexcept;
+#endif
 
    private:
     std::string m_name{""};
