@@ -54,5 +54,5 @@ TEST_CASE("Creating a NotifyingPipeline, add one entry, and get notified.") {
         do { std::this_thread::sleep_for(1ms); } while (!hasDataReceived.load());
 
         REQUIRE("Hello World" == data);
-    } catch (...) { REQUIRE(false); }
+    } catch (...) { REQUIRE(false); } // LCOV_EXCL_LINE
 }
