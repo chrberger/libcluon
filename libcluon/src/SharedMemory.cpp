@@ -23,7 +23,9 @@
 #else
     #include <cstdlib>
     #include <fcntl.h>
+    #include <sys/ipc.h>
     #include <sys/mman.h>
+    #include <sys/shm.h>
     #include <sys/stat.h>
     #include <unistd.h>
 #endif
@@ -31,6 +33,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <fstream>
 
 namespace cluon {
 
@@ -46,14 +49,8 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
         if ('/' != n[0]) {
             m_name = "/";
         }
-        m_name += n;
-        if (m_name.size() > MAX_LENGTH_NAME) {
-            m_name = m_name.substr(0, MAX_LENGTH_NAME);
-        }
 
-#ifdef WIN32
-        initWIN32();
-#else
+#ifndef WIN32
 #if defined(__NetBSD__) || defined(__OpenBSD__)
         std::clog << "[cluon::SharedMemory] Found NetBSD or OpenBSD; using SysV implementation." << std::endl;
         m_usePOSIX = false;
@@ -62,6 +59,20 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
         m_usePOSIX = ( (nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1') );
         std::clog << "[cluon::SharedMemory] Using " << (m_usePOSIX ? "POSIX" : "SysV") << " implementation." << std::endl;
 #endif
+        // For NetBSD and OpenBSD or for the SysV-based implementation, we put all token files to /tmp.
+        if (!m_usePOSIX && (0 != n.find("/tmp"))) {
+            m_name = "/tmp" + m_name;
+        }
+#endif
+
+        m_name += n;
+        if (m_name.size() > MAX_LENGTH_NAME) {
+            m_name = m_name.substr(0, MAX_LENGTH_NAME);
+        }
+
+#ifdef WIN32
+        initWIN32();
+#else
         if (m_usePOSIX) {
             initPOSIX();
         }
@@ -540,172 +551,199 @@ bool SharedMemory::validPOSIX() noexcept {
 void SharedMemory::initSysV() noexcept {
     // If size is greater than 0, the caller wants to create a new shared
     // memory area. Otherwise, the caller wants to open an existing shared memory.
-    int flags = O_RDWR;
+
+    // Create a key to identify the shared memory area.
+    constexpr int32_t ID_SHM = 1;
+    constexpr int32_t ID_SEM_AS_MUTEX = 2;
+    constexpr int32_t ID_SEM_AS_CONDITION = 3;
+    bool tokenFileExisting{false};
+
     if (0 < m_size) {
-        flags |= O_CREAT | O_EXCL;
+        // The file should not exist; otherwise, we need to clear an existing
+        // set of semaphores and shared memory areas.
+        std::fstream tokenFile(m_name.c_str(), std::ios::in);
+        if (tokenFile.good()) {
+            std::cerr << "[cluon::SharedMemory (SysV)] Token file '" << m_name << "' already exists; need to clean up existing SysV-based shared memory." << std::endl;
+            // Cleaning up will be tried in the code below.
+        }
+        tokenFile.close();
+
+        tokenFile.open(m_name.c_str(), std::ios::out);
+        tokenFileExisting = tokenFile.good();
+        if (!tokenFileExisting) {
+            std::cerr << "[cluon::SharedMemory (SysV)] Token file '" << m_name << "' could not be created; shared memory cannot be created." << std::endl;
+        }
+        tokenFile.close();
+    }
+    else {
+        // Open an existing shared memory area indicated by an existing token file.
+        m_hasOnlyAttachedToSharedMemory = true;
+
+        std::fstream tokenFile(m_name.c_str(), std::ios::in);
+        tokenFileExisting = tokenFile.good();
+        if (!tokenFileExisting) {
+            std::cerr << "[cluon::SharedMemory (SysV)] Token file '" << m_name << "' not found; shared memory cannot be created." << std::endl;
+        }
+        tokenFile.close();
     }
 
-    m_fd = ::shm_open(m_name.c_str(), flags, S_IRUSR | S_IWUSR);
-    if (-1 == m_fd) {
-        std::cerr << "[cluon::SharedMemory (SysV)] Failed to open shared memory '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" << std::endl;
-        // Try to remove existing shared memory segment and try again.
-        if ((flags & O_CREAT) == O_CREAT) {
-            std::clog << "[cluon::SharedMemory (SysV)] Trying to remove existing shared memory '" << m_name << "' and trying again... ";
-            if (0 == ::shm_unlink(m_name.c_str())) {
-                m_fd = ::shm_open(m_name.c_str(), flags, S_IRUSR | S_IWUSR);
-            }
-
-            if (-1 == m_fd) {
-                std::cerr << "failed: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-            } else {
-                std::cerr << "succeeded." << std::endl;
-            }
+    // We have a token file to be used for the keys.
+    if (tokenFileExisting) {
+        m_shmKeySysV = ::ftok(m_name.c_str(), ID_SHM);
+        if (-1 == m_shmKeySysV) {
+            std::cerr << "[cluon::SharedMemory (SysV)] Key for shared memory could not be created: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
         }
-    }
+        else {
+            if (!m_hasOnlyAttachedToSharedMemory) {
+                // The caller wants to create a shared memory segment.
 
-    if (-1 != m_fd) {
-        bool retVal{true};
-
-        // When creating a shared memory segment, truncate it.
-        if (0 < m_size) {
-            retVal = (0 == ::ftruncate(m_fd, static_cast<off_t>(sizeof(SharedMemoryHeader) + m_size)));
-            if (!retVal) {
-                std::cerr << "[cluon::SharedMemory (SysV)] Failed to truncate '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" // LCOV_EXCL_LINE
-                          << std::endl;                                                                                                   // LCOV_EXCL_LINE
-            }
-        }
-
-        // Accessing shared memory segment.
-        if (retVal) {
-            // On opening (i.e., NOT creating) a shared memory segment, m_size is still 0 and we need to figure out the size first.
-            m_sharedMemory = static_cast<char *>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0));
-            if (MAP_FAILED != m_sharedMemory) {
-                m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader *>(m_sharedMemory);
-
-                // On creating (i.e., NOT opening) a shared memory segment, setup the shared memory header.
-                if (0 < m_size) {
-                    // Store user accessible size in shared memory.
-                    m_sharedMemoryHeader->__size = m_size;
-
-                    // Create process-shared mutex (fastest approach, cf. Stevens & Rago: "Advanced Programming in the UNIX (R) Environment").
-                    pthread_mutexattr_t mutexAttribute;
-                    ::pthread_mutexattr_init(&mutexAttribute);
-                    ::pthread_mutexattr_setpshared(&mutexAttribute, PTHREAD_PROCESS_SHARED); // Share between unrelated processes.
-#ifndef __APPLE__
-                    ::pthread_mutexattr_setrobust(&mutexAttribute, PTHREAD_MUTEX_ROBUST); // Allow continuation of other processes waiting for this mutex
-                                                                                          // when the currently holding process unexpectedly terminates.
-#endif
-                    ::pthread_mutexattr_settype(&mutexAttribute, PTHREAD_MUTEX_NORMAL); // Using regular mutex with deadlock behavior.
-                    ::pthread_mutex_init(&(m_sharedMemoryHeader->__mutex), &mutexAttribute);
-                    ::pthread_mutexattr_destroy(&mutexAttribute);
-
-                    // Create shared condition.
-                    pthread_condattr_t conditionAttribute;
-                    ::pthread_condattr_init(&conditionAttribute);
-#ifndef __APPLE__
-                    ::pthread_condattr_setclock(&conditionAttribute, CLOCK_MONOTONIC); // Use realtime clock for timed waits with non-negative jumps.
-#endif
-                    ::pthread_condattr_setpshared(&conditionAttribute, PTHREAD_PROCESS_SHARED); // Share between unrelated processes.
-                    ::pthread_cond_init(&(m_sharedMemoryHeader->__condition), &conditionAttribute);
-                    ::pthread_condattr_destroy(&conditionAttribute);
-                } else {
-                    // Indicate that this instance is attaching to an existing shared memory segment.
-                    m_hasOnlyAttachedToSharedMemory = true;
-
-                    // Read size as we are attaching to an existing shared memory.
-                    m_size = m_sharedMemoryHeader->__size;
-
-                    // Now, as we know the real size, unmap the first mapping that did not know the size.
-                    if (::munmap(m_sharedMemory, sizeof(SharedMemoryHeader))) {
-                        std::cerr << "[cluon::SharedMemory (SysV)] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" // LCOV_EXCL_LINE
-                                  << std::endl;                                                                                           // LCOV_EXCL_LINE
-                    }
-
-                    // Invalidate all pointers.
-                    m_sharedMemory       = nullptr;
-                    m_sharedMemoryHeader = nullptr;
-
-                    // Re-map with the correct size parameter.
-                    m_sharedMemory = static_cast<char *>(::mmap(0, sizeof(SharedMemoryHeader) + m_size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0));
-                    if (MAP_FAILED != m_sharedMemory) {
-                        m_sharedMemoryHeader = reinterpret_cast<SharedMemoryHeader *>(m_sharedMemory);
+                // First, try to clean up an orphaned shared memory segment.
+                // Therefore, we try to open the shared memory area without the
+                // IPC_CREAT flag. On a clean environment, this call must fail
+                // as there should not be any shared memory segments left.
+                {
+                    int orphanedSharedMemoryIDSysV = ::shmget(m_shmKeySysV, 0, S_IRUSR|S_IWUSR);
+                    if (!(orphanedSharedMemoryIDSysV < 0)) {
+                        std::cerr << "[cluon::SharedMemory (SysV)] Existing shared memory (0x" << std::ios::hex << m_shmKeySysV << std::ios::dec << ") found; ";
+                        if (::shmctl(orphanedSharedMemoryIDSysV, IPC_RMID, 0)) {
+                            std::cerr << "removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                        }
+                        else {
+                            std::cerr << "successfully removed." << std::endl;
+                        }
                     }
                 }
-            } else {                                                                                                                 // LCOV_EXCL_LINE
-                std::cerr << "[cluon::SharedMemory (SysV)] Failed to map '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" // LCOV_EXCL_LINE
-                          << std::endl;                                                                                              // LCOV_EXCL_LINE
-            }
 
-            // If the shared memory segment is correctly available, store the pointer for the user data.
-            if (MAP_FAILED != m_sharedMemory) {
-                m_userAccessibleSharedMemory = m_sharedMemory + sizeof(SharedMemoryHeader);
-
-                // Lock the shared memory into RAM for performance reasons.
-                if (-1 == ::mlock(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size)) {
-                    std::cerr << "[cluon::SharedMemory (SysV)] Failed to mlock shared memory: " // LCOV_EXCL_LINE
-                              << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
+                // Now, create the shared memory segment.
+                m_sharedMemoryIDSysV = ::shmget(m_shmKeySysV, m_size, IPC_CREAT|S_IRUSR|S_IWUSR);
+                if (-1 != m_sharedMemoryIDSysV) {
+                    m_sharedMemory = reinterpret_cast<char*>(::shmat(m_sharedMemoryIDSysV, nullptr, 0));
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+                    if ((void *)-1 != m_sharedMemory) {
+                        m_userAccessibleSharedMemory = m_sharedMemory;
+                    }
+                    else {
+                        std::cerr << "[cluon::SharedMemory (SysV)] Failed to attach to shared memory (0x" << std::ios::hex << m_shmKeySysV << std::ios::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    }
+#pragma GCC diagnostic pop
+                }
+                else {
+                    std::cerr << "[cluon::SharedMemory (SysV)] Failed to get to shared memory (0x" << std::ios::hex << m_shmKeySysV << std::ios::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
                 }
             }
-        } else {                                                                                                                       // LCOV_EXCL_LINE
-            if (-1 != m_fd) {                                                                                                          // LCOV_EXCL_LINE
-                if (-1 == ::shm_unlink(m_name.c_str())) {                                                                              // LCOV_EXCL_LINE
-                    std::cerr << "[cluon::SharedMemory (SysV)] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" // LCOV_EXCL_LINE
-                              << std::endl;                                                                                            // LCOV_EXCL_LINE
+            else {
+                // The caller wants to attach to an existing shared memory segment.
+                m_sharedMemoryIDSysV = ::shmget(m_shmKeySysV, 0, S_IRUSR|S_IWUSR);
+                if (-1 != m_sharedMemoryIDSysV) {
+                    struct shmid_ds info;
+                    if (-1 != ::shmctl(m_sharedMemoryIDSysV, IPC_STAT, &info)) {
+                        m_size = static_cast<uint32_t>(info.shm_segsz);
+                        m_sharedMemory = reinterpret_cast<char*>(::shmat(m_sharedMemoryIDSysV, nullptr, 0));
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+                        if ((void *)-1 != m_sharedMemory) {
+                            m_userAccessibleSharedMemory = m_sharedMemory;
+                        }
+                        else {
+                            std::cerr << "[cluon::SharedMemory (SysV)] Failed to attach to shared memory (0x" << std::ios::hex << m_shmKeySysV << std::ios::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                        }
+#pragma GCC diagnostic pop
+                    }
+                    else {
+                        std::cerr << "[cluon::SharedMemory (SysV)] Could not read information about shared memory (0x" << std::ios::hex << m_shmKeySysV << std::ios::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    }
+                }
+                else {
+                    std::cerr << "[cluon::SharedMemory (SysV)] Failed to get shared memory (0x" << std::ios::hex << m_shmKeySysV << std::ios::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
                 }
             }
-            m_fd = -1; // LCOV_EXCL_LINE
+        }
+
+
+        // TODO: Add SysV semaphores for mutex and condition behavior.
+        m_mutexKeySysV = ::ftok(m_name.c_str(), ID_SEM_AS_MUTEX);
+        if (-1 == m_mutexKeySysV) {
+            std::cerr << "[cluon::SharedMemory (SysV)] Key for mutex could not be created: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        }
+
+        m_conditionKeySysV = ::ftok(m_name.c_str(), ID_SEM_AS_CONDITION);
+        if (-1 == m_conditionKeySysV) {
+            std::cerr << "[cluon::SharedMemory (SysV)] Key for condition could not be created: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
         }
     }
 }
 
 void SharedMemory::deinitSysV() noexcept {
-    if ((nullptr != m_sharedMemoryHeader) && (!m_hasOnlyAttachedToSharedMemory)) {
-        // Wake any waiting threads as we are going to end the shared memory session.
-        ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
-        ::pthread_cond_destroy(&(m_sharedMemoryHeader->__condition));
-        ::pthread_mutex_destroy(&(m_sharedMemoryHeader->__mutex));
+    // TODO: Wake any waiting threads as we are going to end the shared memory session.
+
+    if (nullptr != m_sharedMemory) {
+        if (-1 == ::shmdt(m_sharedMemory)) {
+            std::cerr << "[cluon::SharedMemory (SysV)] Could not detach shared memory (0x" << std::ios::hex << m_shmKeySysV << std::ios::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        }
     }
-    if ((nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size)) {
-        std::cerr << "[cluon::SharedMemory (SysV)] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
+
+    if (!m_hasOnlyAttachedToSharedMemory) {
+        // TODO: Release semaphores and shared memory.
+
+        if (-1 == ::unlink(m_name.c_str())) {
+            std::cerr << "[cluon::SharedMemory (SysV)] Token file '" << m_name << "' could not be removed: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        }
+
+        if (-1 != m_sharedMemoryIDSysV) {
+            if (::shmctl(m_sharedMemoryIDSysV, IPC_RMID, 0)) {
+                std::cerr << "[cluon::SharedMemory (SysV)] Shared memory (0x" << std::ios::hex << m_shmKeySysV << std::ios::dec << ") could not be removed: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+            }
+        }
     }
-    if (!m_hasOnlyAttachedToSharedMemory && (-1 != m_fd) && (-1 == ::shm_unlink(m_name.c_str()) && (ENOENT != errno))) {
-        std::cerr << "[cluon::SharedMemory (SysV)] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-    }
+
+
+//    if ((nullptr != m_sharedMemoryHeader) && (!m_hasOnlyAttachedToSharedMemory)) {
+//        // Wake any waiting threads as we are going to end the shared memory session.
+//        ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
+//        ::pthread_cond_destroy(&(m_sharedMemoryHeader->__condition));
+//        ::pthread_mutex_destroy(&(m_sharedMemoryHeader->__mutex));
+//    }
+//    if ((nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size)) {
+//        std::cerr << "[cluon::SharedMemory (SysV)] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
+//    }
+//    if (!m_hasOnlyAttachedToSharedMemory && (-1 != m_fd) && (-1 == ::shm_unlink(m_name.c_str()) && (ENOENT != errno))) {
+//        std::cerr << "[cluon::SharedMemory (SysV)] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
+//    }
 }
 
 void SharedMemory::lockSysV() noexcept {
-    if (nullptr != m_sharedMemoryHeader) {
-        if (EOWNERDEAD == ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex))) {
-            std::cerr << "[cluon::SharedMemory (SysV)] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name // LCOV_EXCL_LINE
-                      << "': " << ::strerror(errno)                                                                                // LCOV_EXCL_LINE
-                      << " (" << errno << ")" << std::endl;                                                                        // LCOV_EXCL_LINE
-        }
-    }
+//    if (nullptr != m_sharedMemoryHeader) {
+//        if (EOWNERDEAD == ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex))) {
+//            std::cerr << "[cluon::SharedMemory (SysV)] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name // LCOV_EXCL_LINE
+//                      << "': " << ::strerror(errno)                                                                                // LCOV_EXCL_LINE
+//                      << " (" << errno << ")" << std::endl;                                                                        // LCOV_EXCL_LINE
+//        }
+//    }
 }
 
 void SharedMemory::unlockSysV() noexcept {
-    if (nullptr != m_sharedMemoryHeader) {
-        ::pthread_mutex_unlock(&(m_sharedMemoryHeader->__mutex));
-    }
+//    if (nullptr != m_sharedMemoryHeader) {
+//        ::pthread_mutex_unlock(&(m_sharedMemoryHeader->__mutex));
+//    }
 }
 
 void SharedMemory::waitSysV() noexcept {
-    if (nullptr != m_sharedMemoryHeader) {
-        lock();
-        ::pthread_cond_wait(&(m_sharedMemoryHeader->__condition), &(m_sharedMemoryHeader->__mutex));
-        unlock();
-    }
+//    if (nullptr != m_sharedMemoryHeader) {
+//        lock();
+//        ::pthread_cond_wait(&(m_sharedMemoryHeader->__condition), &(m_sharedMemoryHeader->__mutex));
+//        unlock();
+//    }
 }
 
 void SharedMemory::notifyAllSysV() noexcept {
-    if (nullptr != m_sharedMemoryHeader) {
-        ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
-    }
+//    if (nullptr != m_sharedMemoryHeader) {
+//        ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
+//    }
 }
 
 bool SharedMemory::validSysV() noexcept {
-//    return false;
-    return (-1 != m_fd) && (MAP_FAILED != m_sharedMemory);
+    return (-1 != m_sharedMemoryIDSysV) && (nullptr != m_sharedMemory) && (0 < m_size);
 }
 #endif
 

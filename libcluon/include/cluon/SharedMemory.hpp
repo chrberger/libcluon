@@ -25,6 +25,7 @@
     #include <Windows.h>
 #else
     #include <pthread.h>
+    #include <sys/ipc.h>
 #endif
 // clang-format on
 
@@ -134,6 +135,8 @@ class LIBCLUON_API SharedMemory {
     HANDLE __sharedMemory{nullptr};
 #else
     bool m_usePOSIX{true};
+
+    // Member fields for POSIX-based shared memory.
     int32_t m_fd{-1};
 #if !defined(__NetBSD__) || !defined(__OpenBSD__)
     struct SharedMemoryHeader {
@@ -143,6 +146,13 @@ class LIBCLUON_API SharedMemory {
     };
     SharedMemoryHeader *m_sharedMemoryHeader{nullptr};
 #endif
+
+    // Member fields for SysV-based shared memory.
+    key_t m_shmKeySysV{0};
+    key_t m_mutexKeySysV{0};
+    key_t m_conditionKeySysV{0};
+
+    int m_sharedMemoryIDSysV{-1};
 #endif
 };
 } // namespace cluon
