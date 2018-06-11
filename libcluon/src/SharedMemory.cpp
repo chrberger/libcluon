@@ -704,7 +704,9 @@ void SharedMemory::initSysV() noexcept {
                         union semun tmp;
                         tmp.val = INITIAL_VALUE;
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wclass-varargs"
+# if defined(__clang__)
+#  pragma GCC diagnostic ignored "-Wclass-varargs"
+# endif
                         if (-1 == ::semctl(m_mutexIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
                             std::cerr << "[cluon::SharedMemory (SysV)] Failed to initialize semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
                         }
