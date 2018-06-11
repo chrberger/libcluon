@@ -153,6 +153,7 @@ class LIBCLUON_API SharedMemory {
     key_t m_conditionKeySysV{0};
 
     int m_sharedMemoryIDSysV{-1};
+    int m_mutexIDSysV{-1};
 #endif
 };
 } // namespace cluon

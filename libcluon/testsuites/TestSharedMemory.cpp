@@ -459,7 +459,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
         REQUIRE(sm1.valid());
         REQUIRE(4 == sm1.size());
         REQUIRE(nullptr != sm1.data());
-        REQUIRE("/GHI" == sm1.name());
+        REQUIRE("/tmp/GHI" == sm1.name());
         sm1.lock();
         uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
         REQUIRE(0 == *data);
@@ -470,7 +470,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
             cluon::SharedMemory inner_sm1{"/GHI"};
             REQUIRE(inner_sm1.valid());
             REQUIRE(nullptr != inner_sm1.data());
-            REQUIRE("/GHI" == inner_sm1.name());
+            REQUIRE("/tmp/GHI" == inner_sm1.name());
             inner_sm1.lock();
             uint32_t *inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
             REQUIRE(0 == *inner_data);
@@ -507,7 +507,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
         REQUIRE(sm1.valid());
         REQUIRE(4 == sm1.size());
         REQUIRE(nullptr != sm1.data());
-        REQUIRE("/JKL" == sm1.name());
+        REQUIRE("/tmp/JKL" == sm1.name());
         sm1.lock();
         uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
         REQUIRE(0 == *data);
@@ -518,7 +518,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
             cluon::SharedMemory inner_sm1{"/JKL"};
             REQUIRE(inner_sm1.valid());
             REQUIRE(nullptr != inner_sm1.data());
-            REQUIRE("/JKL" == inner_sm1.name());
+            REQUIRE("/tmp/JKL" == inner_sm1.name());
             inner_sm1.lock();
             uint32_t *inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
             REQUIRE(0 == *inner_data);
@@ -552,7 +552,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and two separate thre
         REQUIRE(sm1.valid());
         REQUIRE(4 == sm1.size());
         REQUIRE(nullptr != sm1.data());
-        REQUIRE("/MNO" == sm1.name());
+        REQUIRE("/tmp/MNO" == sm1.name());
         sm1.lock();
         uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
         REQUIRE(0 == *data);
@@ -563,7 +563,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and two separate thre
             cluon::SharedMemory inner_sm1{"/MNO"};
             REQUIRE(inner_sm1.valid());
             REQUIRE(nullptr != inner_sm1.data());
-            REQUIRE("/MNO" == inner_sm1.name());
+            REQUIRE("/tmp/MNO" == inner_sm1.name());
 
             inner_sm1.wait();
 
@@ -578,7 +578,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and two separate thre
             cluon::SharedMemory inner_sm2{"/MNO"};
             REQUIRE(inner_sm2.valid());
             REQUIRE(nullptr != inner_sm2.data());
-            REQUIRE("/MNO" == inner_sm2.name());
+            REQUIRE("/tmp/MNO" == inner_sm2.name());
 
             inner_sm2.wait();
 
