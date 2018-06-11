@@ -35,6 +35,14 @@
 #include <iostream>
 #include <fstream>
 
+#ifdef _SEM_SEMUN_UNDEFINED
+union semun {
+    int val;                /* for SETVAL */
+    struct semid_ds *buf;   /* for IPC_STAT and IPC_SET */
+    unsigned short *array;  /* for GETALL and SETALL*/
+};
+#endif
+
 namespace cluon {
 
 SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
@@ -615,7 +623,7 @@ void SharedMemory::initSysV() noexcept {
                 }
 
                 // Now, create the shared memory segment.
-                m_sharedMemoryIDSysV = ::shmget(m_shmKeySysV, m_size, IPC_CREAT|S_IRUSR|S_IWUSR);
+                m_sharedMemoryIDSysV = ::shmget(m_shmKeySysV, m_size, IPC_CREAT|IPC_EXCL|S_IRUSR|S_IWUSR);
                 if (-1 != m_sharedMemoryIDSysV) {
                     m_sharedMemory = reinterpret_cast<char*>(::shmat(m_sharedMemoryIDSysV, nullptr, 0));
 #pragma GCC diagnostic push
