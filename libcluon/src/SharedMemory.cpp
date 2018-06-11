@@ -684,7 +684,7 @@ void SharedMemory::initSysV() noexcept {
                 {
                     int orphanedMutexIDSysV = ::semget(m_mutexKeySysV, 0, S_IRUSR|S_IWUSR);
                     if (!(orphanedMutexIDSysV < 0)) {
-                        std::cerr << "[cluon::SharedMemory (SysV)] Existing semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ") found; ";
+                        std::cerr << "[cluon::SharedMemory (SysV)] Existing semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ", intended to use as mutex) found; ";
                         if (::semctl(orphanedMutexIDSysV, 0, IPC_RMID)) {
                             std::cerr << "removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl;
                         }
@@ -708,28 +708,76 @@ void SharedMemory::initSysV() noexcept {
 #  pragma GCC diagnostic ignored "-Wclass-varargs"
 # endif
                         if (-1 == ::semctl(m_mutexIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
-                            std::cerr << "[cluon::SharedMemory (SysV)] Failed to initialize semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                            std::cerr << "[cluon::SharedMemory (SysV)] Failed to initialize semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ", intended to use as mutex): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
                         }
 #pragma GCC diagnostic pop
                     }
                     else {
-                        std::cerr << "[cluon::SharedMemory (SysV)] Failed to create semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                        std::cerr << "[cluon::SharedMemory (SysV)] Failed to create semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ", intended to use as mutex): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
                     }
                 }
             }
             else {
                 m_mutexIDSysV = ::semget(m_mutexKeySysV, 0, S_IRUSR|S_IWUSR);
                 if (-1 == m_mutexIDSysV) {
-                    std::cerr << "[cluon::SharedMemory (SysV)] Failed to get semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    std::cerr << "[cluon::SharedMemory (SysV)] Failed to get semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ", intended to use as mutex): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
                 }
             }
         }
 
-
-        // TODO: Add SysV semaphores for mutex and condition behavior.
+        // Next, create the condition variable (but only if the shared memory was acquired correctly.
         m_conditionKeySysV = ::ftok(m_name.c_str(), ID_SEM_AS_CONDITION);
         if (-1 == m_conditionKeySysV) {
             std::cerr << "[cluon::SharedMemory (SysV)] Key for condition could not be created: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        }
+        if ((-1 != m_shmKeySysV) && (-1 != m_mutexKeySysV) && (-1 != m_conditionKeySysV) && (nullptr != m_userAccessibleSharedMemory)) {
+            if (!m_hasOnlyAttachedToSharedMemory) {
+                // The caller has created the shared memory segment and thus,
+                // we need the corresponding condition variable.
+
+                // First, try to remove the orphaned one.
+                {
+                    int orphanedConditionIDSysV = ::semget(m_conditionKeySysV, 0, S_IRUSR|S_IWUSR);
+                    if (!(orphanedConditionIDSysV < 0)) {
+                        std::cerr << "[cluon::SharedMemory (SysV)] Existing semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable) found; ";
+                        if (::semctl(orphanedConditionIDSysV, 0, IPC_RMID)) {
+                            std::cerr << "removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                        }
+                        else {
+                            std::cerr << "successfully removed." << std::endl;
+                        }
+                    }
+                }
+
+                // Next, create the correct semaphore used as condition variable.
+                {
+                    constexpr int NSEMS{1};
+                    m_conditionIDSysV = ::semget(m_conditionKeySysV, NSEMS, IPC_CREAT|IPC_EXCL|S_IRUSR|S_IWUSR);
+                    if (-1 != m_conditionIDSysV) {
+                        constexpr int NUMBER_OF_SEMAPHORE_TO_CONTROL{0};
+                        constexpr int INITIAL_VALUE{1};
+                        union semun tmp;
+                        tmp.val = INITIAL_VALUE;
+#pragma GCC diagnostic push
+# if defined(__clang__)
+#  pragma GCC diagnostic ignored "-Wclass-varargs"
+# endif
+                        if (-1 == ::semctl(m_conditionIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
+                            std::cerr << "[cluon::SharedMemory (SysV)] Failed to initialize semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                        }
+#pragma GCC diagnostic pop
+                    }
+                    else {
+                        std::cerr << "[cluon::SharedMemory (SysV)] Failed to create semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                    }
+                }
+            }
+            else {
+                m_conditionIDSysV = ::semget(m_conditionKeySysV, 0, S_IRUSR|S_IWUSR);
+                if (-1 == m_conditionIDSysV) {
+                    std::cerr << "[cluon::SharedMemory (SysV)] Failed to get semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+                }
+            }
         }
     }
 }
@@ -745,12 +793,17 @@ void SharedMemory::deinitSysV() noexcept {
         // TODO: Wake any waiting threads as we are going to end the shared memory session.
         notifyAllSysV();
 
-        if (-1 != m_mutexIDSysV) {
-            if (-1 == ::semctl(m_mutexIDSysV, 0, IPC_RMID)) {
-                std::cerr << "[cluon::SharedMemory (SysV)] Semaphore (0x" << std::hex << m_mutexIDSysV << std::dec << ") could not be removed: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        if (-1 != m_conditionIDSysV) {
+            if (-1 == ::semctl(m_conditionIDSysV, 0, IPC_RMID)) {
+                std::cerr << "[cluon::SharedMemory (SysV)] Semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ") could not be removed: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
             }
         }
 
+        if (-1 != m_mutexIDSysV) {
+            if (-1 == ::semctl(m_mutexIDSysV, 0, IPC_RMID)) {
+                std::cerr << "[cluon::SharedMemory (SysV)] Semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ") could not be removed: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+            }
+        }
         if (-1 != m_sharedMemoryIDSysV) {
             if (-1 == ::shmctl(m_sharedMemoryIDSysV, IPC_RMID, 0)) {
                 std::cerr << "[cluon::SharedMemory (SysV)] Shared memory (0x" << std::hex << m_shmKeySysV << std::dec << ") could not be removed: " << ::strerror(errno) << " (" << errno << ")" << std::endl;
@@ -810,7 +863,7 @@ void SharedMemory::notifyAllSysV() noexcept {
 }
 
 bool SharedMemory::validSysV() noexcept {
-    return (-1 != m_sharedMemoryIDSysV) && (nullptr != m_sharedMemory) && (0 < m_size) && (-1 != m_mutexIDSysV);
+    return (-1 != m_sharedMemoryIDSysV) && (nullptr != m_sharedMemory) && (0 < m_size) && (-1 != m_mutexIDSysV) && (-1 != m_conditionIDSysV);
 }
 #endif
 
