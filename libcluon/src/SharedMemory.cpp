@@ -790,7 +790,6 @@ void SharedMemory::deinitSysV() noexcept {
     }
 
     if (!m_hasOnlyAttachedToSharedMemory) {
-        // TODO: Wake any waiting threads as we are going to end the shared memory session.
         notifyAllSysV();
 
         if (-1 != m_conditionIDSysV) {
@@ -826,7 +825,7 @@ void SharedMemory::lockSysV() noexcept {
         tmp.sem_op = VALUE;
         tmp.sem_flg = SEM_UNDO; // When the caller terminates unexpectedly, let the kernel restore the original value.
         if (-1 == ::semop(m_mutexIDSysV, &tmp, 1)) {
-            std::cerr << "[cluon::SharedMemory (SysV)] semop failed for semaphore (0x" << std::hex << m_mutexIDSysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+            std::cerr << "[cluon::SharedMemory (SysV)] semop failed for semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
         }
 else std::clog << "locked" << std::endl;
     }
@@ -842,24 +841,62 @@ void SharedMemory::unlockSysV() noexcept {
         tmp.sem_op = VALUE;
         tmp.sem_flg = SEM_UNDO; // When the caller terminates unexpectedly, let the kernel restore the original value.
         if (-1 == ::semop(m_mutexIDSysV, &tmp, 1)) {
-            std::cerr << "[cluon::SharedMemory (SysV)] semop failed for semaphore (0x" << std::hex << m_mutexIDSysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+            std::cerr << "[cluon::SharedMemory (SysV)] semop failed for semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
         }
 else std::clog << "unlocked" << std::endl;
     }
 }
 
 void SharedMemory::waitSysV() noexcept {
-//    if (nullptr != m_sharedMemoryHeader) {
-//        lock();
-//        ::pthread_cond_wait(&(m_sharedMemoryHeader->__condition), &(m_sharedMemoryHeader->__mutex));
-//        unlock();
-//    }
+    if (-1 != m_conditionIDSysV) {
+        constexpr int NUMBER_OF_SEMAPHORE_TO_CONTROL{0};
+        constexpr int VALUE{0}; // Wait for this semaphore to become 0.
+
+        struct sembuf tmp;
+        tmp.sem_num = NUMBER_OF_SEMAPHORE_TO_CONTROL;
+        tmp.sem_op = VALUE;
+        tmp.sem_flg = 0;
+std::clog << "falling asleep" << std::endl;
+        if (-1 == ::semop(m_conditionIDSysV, &tmp, 1)) {
+            std::cerr << "[cluon::SharedMemory (SysV)] semop failed for semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+        }
+else std::clog << "awaken" << std::endl;
+    }
 }
 
 void SharedMemory::notifyAllSysV() noexcept {
-//    if (nullptr != m_sharedMemoryHeader) {
-//        ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
-//    }
+    if (-1 != m_conditionIDSysV) {
+        {
+            constexpr int NUMBER_OF_SEMAPHORE_TO_CONTROL{0};
+            constexpr int WAKEUP_VALUE{0};
+            union semun tmp;
+            tmp.val = WAKEUP_VALUE;
+#pragma GCC diagnostic push
+# if defined(__clang__)
+#  pragma GCC diagnostic ignored "-Wclass-varargs"
+# endif
+            if (-1 == ::semctl(m_conditionIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
+                std::cerr << "[cluon::SharedMemory (SysV)] Failed to wake up semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+            }
+else std::clog << "notified" << std::endl;
+#pragma GCC diagnostic pop
+        }
+        {
+            constexpr int NUMBER_OF_SEMAPHORE_TO_CONTROL{0};
+            constexpr int SLEEPING_VALUE{1};
+            union semun tmp;
+            tmp.val = SLEEPING_VALUE;
+#pragma GCC diagnostic push
+# if defined(__clang__)
+#  pragma GCC diagnostic ignored "-Wclass-varargs"
+# endif
+            if (-1 == ::semctl(m_conditionIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
+                std::cerr << "[cluon::SharedMemory (SysV)] Failed to set semaphore to sleep (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
+            }
+else std::clog << "restored" << std::endl;
+#pragma GCC diagnostic pop
+        }
+    }
 }
 
 bool SharedMemory::validSysV() noexcept {
