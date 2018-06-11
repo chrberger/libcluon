@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018  Christian Berger
+ * Copyright (C) 2018  Christian Berger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -827,7 +827,6 @@ void SharedMemory::lockSysV() noexcept {
         if (-1 == ::semop(m_mutexIDSysV, &tmp, 1)) {
             std::cerr << "[cluon::SharedMemory (SysV)] semop failed for semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
         }
-else std::clog << "locked" << std::endl;
     }
 }
 
@@ -843,7 +842,6 @@ void SharedMemory::unlockSysV() noexcept {
         if (-1 == ::semop(m_mutexIDSysV, &tmp, 1)) {
             std::cerr << "[cluon::SharedMemory (SysV)] semop failed for semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
         }
-else std::clog << "unlocked" << std::endl;
     }
 }
 
@@ -860,7 +858,6 @@ std::clog << "falling asleep" << std::endl;
         if (-1 == ::semop(m_conditionIDSysV, &tmp, 1)) {
             std::cerr << "[cluon::SharedMemory (SysV)] semop failed for semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
         }
-else std::clog << "awaken" << std::endl;
     }
 }
 
@@ -878,7 +875,6 @@ void SharedMemory::notifyAllSysV() noexcept {
             if (-1 == ::semctl(m_conditionIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
                 std::cerr << "[cluon::SharedMemory (SysV)] Failed to wake up semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
             }
-else std::clog << "notified" << std::endl;
 #pragma GCC diagnostic pop
         }
         {
@@ -893,7 +889,6 @@ else std::clog << "notified" << std::endl;
             if (-1 == ::semctl(m_conditionIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
                 std::cerr << "[cluon::SharedMemory (SysV)] Failed to set semaphore to sleep (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
             }
-else std::clog << "restored" << std::endl;
 #pragma GCC diagnostic pop
         }
     }
