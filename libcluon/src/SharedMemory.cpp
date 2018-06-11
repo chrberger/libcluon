@@ -54,9 +54,14 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
 #ifdef WIN32
         initWIN32();
 #else
+#if defined(__NetBSD__) || defined(__OpenBSD__)
+        std::clog << "[cluon::SharedMemory] Found NetBSD or OpenBSD; using SysV implementation." << std::endl;
+        m_usePOSIX = false;
+#else
         const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
         m_usePOSIX = ( (nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1') );
         std::clog << "[cluon::SharedMemory] Using " << (m_usePOSIX ? "POSIX" : "SysV") << " implementation." << std::endl;
+#endif
         if (m_usePOSIX) {
             initPOSIX();
         }
@@ -342,9 +347,10 @@ void SharedMemory::notifyAllWIN32() noexcept {
     }
 }
 
-#else /* POSIX */
+#else /* POSIX and SysV */
 
 void SharedMemory::initPOSIX() noexcept {
+#if !defined(__NetBSD__) || !defined(__OpenBSD__)
     // If size is greater than 0, the caller wants to create a new shared
     // memory area. Otherwise, the caller wants to open an existing shared memory.
     int flags = O_RDWR;
@@ -463,9 +469,11 @@ void SharedMemory::initPOSIX() noexcept {
             m_fd = -1; // LCOV_EXCL_LINE
         }
     }
+#endif
 }
 
 void SharedMemory::deinitPOSIX() noexcept {
+#if !defined(__NetBSD__) || !defined(__OpenBSD__)
     if ((nullptr != m_sharedMemoryHeader) && (!m_hasOnlyAttachedToSharedMemory)) {
         // Wake any waiting threads as we are going to end the shared memory session.
         ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
@@ -478,9 +486,11 @@ void SharedMemory::deinitPOSIX() noexcept {
     if (!m_hasOnlyAttachedToSharedMemory && (-1 != m_fd) && (-1 == ::shm_unlink(m_name.c_str()) && (ENOENT != errno))) {
         std::cerr << "[cluon::SharedMemory (POSIX)] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
     }
+#endif
 }
 
 void SharedMemory::lockPOSIX() noexcept {
+#if !defined(__NetBSD__) || !defined(__OpenBSD__)
     if (nullptr != m_sharedMemoryHeader) {
         if (EOWNERDEAD == ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex))) {
             std::cerr << "[cluon::SharedMemory (POSIX)] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name // LCOV_EXCL_LINE
@@ -488,31 +498,44 @@ void SharedMemory::lockPOSIX() noexcept {
                       << " (" << errno << ")" << std::endl;                                                                        // LCOV_EXCL_LINE
         }
     }
+#endif
 }
 
 void SharedMemory::unlockPOSIX() noexcept {
+#if !defined(__NetBSD__) || !defined(__OpenBSD__)
     if (nullptr != m_sharedMemoryHeader) {
         ::pthread_mutex_unlock(&(m_sharedMemoryHeader->__mutex));
     }
+#endif
 }
 
 void SharedMemory::waitPOSIX() noexcept {
+#if !defined(__NetBSD__) || !defined(__OpenBSD__)
     if (nullptr != m_sharedMemoryHeader) {
         lock();
         ::pthread_cond_wait(&(m_sharedMemoryHeader->__condition), &(m_sharedMemoryHeader->__mutex));
         unlock();
     }
+#endif
 }
 
 void SharedMemory::notifyAllPOSIX() noexcept {
+#if !defined(__NetBSD__) || !defined(__OpenBSD__)
     if (nullptr != m_sharedMemoryHeader) {
         ::pthread_cond_broadcast(&(m_sharedMemoryHeader->__condition));
     }
+#endif
 }
 
 bool SharedMemory::validPOSIX() noexcept {
+#if !defined(__NetBSD__) || !defined(__OpenBSD__)
     return (-1 != m_fd) && (MAP_FAILED != m_sharedMemory);
+#else
+    return false;
+#endif
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void SharedMemory::initSysV() noexcept {
     // If size is greater than 0, the caller wants to create a new shared
@@ -681,6 +704,7 @@ void SharedMemory::notifyAllSysV() noexcept {
 }
 
 bool SharedMemory::validSysV() noexcept {
+//    return false;
     return (-1 != m_fd) && (MAP_FAILED != m_sharedMemory);
 }
 #endif

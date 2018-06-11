@@ -135,12 +135,14 @@ class LIBCLUON_API SharedMemory {
 #else
     bool m_usePOSIX{true};
     int32_t m_fd{-1};
+#if !defined(__NetBSD__) || !defined(__OpenBSD__)
     struct SharedMemoryHeader {
         uint32_t __size;
         pthread_mutex_t __mutex;
         pthread_cond_t __condition;
     };
     SharedMemoryHeader *m_sharedMemoryHeader{nullptr};
+#endif
 #endif
 };
 } // namespace cluon
