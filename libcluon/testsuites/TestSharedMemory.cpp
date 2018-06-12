@@ -634,44 +634,87 @@ TEST_CASE("Trying to create SharedMemory with correct name and one separate thre
             REQUIRE(inner_sm1.valid());
             REQUIRE(nullptr != inner_sm1.data());
             REQUIRE("/tmp/PQR" == inner_sm1.name());
-std::cout << "(Inner) Notify...";
+            std::cout << "(Inner) Notify...";
             inner_sm1.notifyAll();
-std::cout << "done." << std::endl;
+            std::cout << "done." << std::endl;
 
             inner_sm1.lock();
             uint32_t *inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
             REQUIRE(0 == *inner_data);
-            *inner_data = 3456;
+            *inner_data = 3400;
+            REQUIRE(3400 == *inner_data);
+            inner_sm1.unlock();
+
+            {
+                // Give some time other thread to fall asleep again.
+                using namespace std::literals::chrono_literals; // NOLINT
+                std::this_thread::sleep_for(20ms);
+            }
+
+            std::cout << "(Inner) Notify...";
+            inner_sm1.notifyAll();
+            std::cout << "done." << std::endl;
+
+            {
+                // Give some time other thread to fall asleep again.
+                using namespace std::literals::chrono_literals; // NOLINT
+                std::this_thread::sleep_for(20ms);
+            }
+
+            inner_sm1.lock();
+            inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
+            REQUIRE(3400 == *inner_data);
+            *inner_data += 56;
             REQUIRE(3456 == *inner_data);
             inner_sm1.unlock();
 
-            // Give some time other thread to fall asleep again.
-            using namespace std::literals::chrono_literals; // NOLINT
-            std::this_thread::sleep_for(10ms);
+            {
+                // Give some time other thread to fall asleep again.
+                using namespace std::literals::chrono_literals; // NOLINT
+                std::this_thread::sleep_for(20ms);
+            }
 
-std::cout << "(Inner) Notify...";
+            std::cout << "(Inner) Notify...";
             inner_sm1.notifyAll();
-std::cout << "done." << std::endl;
+            std::cout << "done." << std::endl;
         });
 
-std::cout << "(Outer) Waiting...";
+        std::cout << "(Outer) Waiting...";
         sm1.wait();
-std::cout << "done." << std::endl;
+        std::cout << "done." << std::endl;
 
-        // Give some time other thread do work.
-        using namespace std::literals::chrono_literals; // NOLINT
-        std::this_thread::sleep_for(5ms);
+        {
+            // Give some time other thread do work.
+            using namespace std::literals::chrono_literals; // NOLINT
+            std::this_thread::sleep_for(5ms);
+        }
 
-std::cout << "(Outer) Waiting...";
+        std::cout << "(Outer) Waiting...";
         sm1.wait();
-std::cout << "done." << std::endl;
-        producer.join();
+        std::cout << "done." << std::endl;
 
         sm1.lock();
         uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
+        REQUIRE(3400 == tmp);
         sm1.unlock();
 
+        {
+            // Give some time other thread do work.
+            using namespace std::literals::chrono_literals; // NOLINT
+            std::this_thread::sleep_for(5ms);
+        }
+
+        std::cout << "(Outer) Waiting...";
+        sm1.wait();
+        std::cout << "done." << std::endl;
+
+        producer.join();
+
+        sm1.lock();
+        tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
         REQUIRE(3456 == tmp);
+        sm1.unlock();
+
     }
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
