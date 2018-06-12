@@ -22,6 +22,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <thread>
 
 TEST_CASE("Trying to open SharedMemory with empty name (on non-Win32: POSIX).") {
@@ -610,3 +611,69 @@ TEST_CASE("Trying to create SharedMemory with correct name and two separate thre
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
+
+TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization with several runs (SySV).") {
+#ifdef __linux__
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
+    {
+        cluon::SharedMemory sm1{"PQR", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/tmp/PQR" == sm1.name());
+        sm1.lock();
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        REQUIRE(0 == *data);
+        sm1.unlock();
+
+        // Spawning thread to attach and change data.
+        std::thread producer([]() {
+            cluon::SharedMemory inner_sm1{"PQR"};
+            REQUIRE(inner_sm1.valid());
+            REQUIRE(nullptr != inner_sm1.data());
+            REQUIRE("/tmp/PQR" == inner_sm1.name());
+std::cout << "(Inner) Notify...";
+            inner_sm1.notifyAll();
+std::cout << "done." << std::endl;
+
+            inner_sm1.lock();
+            uint32_t *inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
+            REQUIRE(0 == *inner_data);
+            *inner_data = 3456;
+            REQUIRE(3456 == *inner_data);
+            inner_sm1.unlock();
+
+            // Give some time other thread to fall asleep again.
+            using namespace std::literals::chrono_literals; // NOLINT
+            std::this_thread::sleep_for(10ms);
+
+std::cout << "(Inner) Notify...";
+            inner_sm1.notifyAll();
+std::cout << "done." << std::endl;
+        });
+
+std::cout << "(Outer) Waiting...";
+        sm1.wait();
+std::cout << "done." << std::endl;
+
+        // Give some time other thread do work.
+        using namespace std::literals::chrono_literals; // NOLINT
+        std::this_thread::sleep_for(5ms);
+
+std::cout << "(Outer) Waiting...";
+        sm1.wait();
+std::cout << "done." << std::endl;
+        producer.join();
+
+        sm1.lock();
+        uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
+        sm1.unlock();
+
+        REQUIRE(3456 == tmp);
+    }
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+}
+

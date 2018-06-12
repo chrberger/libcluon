@@ -858,7 +858,6 @@ void SharedMemory::waitSysV() noexcept {
         tmp.sem_num = NUMBER_OF_SEMAPHORE_TO_CONTROL;
         tmp.sem_op = VALUE;
         tmp.sem_flg = 0;
-        std::clog << "falling asleep" << std::endl;
         if (-1 == ::semop(m_conditionIDSysV, &tmp, 1)) {
             std::cerr << "[cluon::SharedMemory (SysV)] semop failed for semaphore (0x" << std::hex << m_conditionKeySysV << std::dec
                       << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
@@ -871,6 +870,7 @@ void SharedMemory::notifyAllSysV() noexcept {
         {
             constexpr int NUMBER_OF_SEMAPHORE_TO_CONTROL{0};
             constexpr int WAKEUP_VALUE{0};
+
             union semun tmp;
             tmp.val = WAKEUP_VALUE;
 #pragma GCC diagnostic push
@@ -878,7 +878,7 @@ void SharedMemory::notifyAllSysV() noexcept {
 #pragma GCC diagnostic ignored "-Wclass-varargs"
 #endif
             if (-1 == ::semctl(m_conditionIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
-                std::cerr << "[cluon::SharedMemory (SysV)] Failed to wake up semaphore (0x" << std::hex << m_conditionKeySysV << std::dec
+                std::cerr << "[cluon::SharedMemory (SysV)] Failed to notify semaphore (0x" << std::hex << m_conditionKeySysV << std::dec
                           << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
             }
 #pragma GCC diagnostic pop
@@ -886,6 +886,7 @@ void SharedMemory::notifyAllSysV() noexcept {
         {
             constexpr int NUMBER_OF_SEMAPHORE_TO_CONTROL{0};
             constexpr int SLEEPING_VALUE{1};
+
             union semun tmp;
             tmp.val = SLEEPING_VALUE;
 #pragma GCC diagnostic push
@@ -893,7 +894,7 @@ void SharedMemory::notifyAllSysV() noexcept {
 #pragma GCC diagnostic ignored "-Wclass-varargs"
 #endif
             if (-1 == ::semctl(m_conditionIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
-                std::cerr << "[cluon::SharedMemory (SysV)] Failed to set semaphore to sleep (0x" << std::hex << m_conditionKeySysV << std::dec
+                std::cerr << "[cluon::SharedMemory (SysV)] Failed to reset semaphore for notification (0x" << std::hex << m_conditionKeySysV << std::dec
                           << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl;
             }
 #pragma GCC diagnostic pop
