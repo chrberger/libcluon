@@ -57,8 +57,12 @@ else()
             -D__BSD_VISIBLE=1 ")
     endif()
 
+    if (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "NetBSD"))
+        set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
+            -D_XOPEN_SOURCE=700 ")
+    endif()
+
     set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
-        -D_XOPEN_SOURCE=700 \
         -fstack-protector \
         -pipe ")
 
