@@ -29,7 +29,7 @@ TEST_CASE("Trying to open SharedMemory with empty name (on non-Win32: POSIX).") 
 #if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
-    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1')); // LCOV_EXCL_LINE
     putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=1"));
 #endif
     {
