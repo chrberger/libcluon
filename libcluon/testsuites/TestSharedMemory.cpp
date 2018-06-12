@@ -26,6 +26,7 @@
 #include <thread>
 
 TEST_CASE("Trying to open SharedMemory with empty name (on non-Win32: POSIX).") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
@@ -41,9 +42,11 @@ TEST_CASE("Trying to open SharedMemory with empty name (on non-Win32: POSIX).") 
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
+#endif
 }
 
 TEST_CASE("Trying to open SharedMemory with name without leading / (on non-Win32: POSIX).") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
@@ -59,9 +62,11 @@ TEST_CASE("Trying to open SharedMemory with name without leading / (on non-Win32
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
+#endif
 }
 
 TEST_CASE("Trying to open SharedMemory with name without leading / and too long name > 255 (on non-Win32: POSIX).") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
@@ -84,9 +89,11 @@ TEST_CASE("Trying to open SharedMemory with name without leading / and too long 
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
+#endif
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name (on non-Win32: POSIX).") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
@@ -112,9 +119,11 @@ TEST_CASE("Trying to create SharedMemory with correct name (on non-Win32: POSIX)
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
+#endif
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name and one reader and one writer instance (on non-Win32: POSIX).") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
@@ -147,9 +156,11 @@ TEST_CASE("Trying to create SharedMemory with correct name and one reader and on
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
+#endif
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory (on non-Win32: POSIX).") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
@@ -197,10 +208,12 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
+#endif
 }
 
-TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory with condition variable for synchronization "
+TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization "
           "(on non-Win32: POSIX).") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
@@ -245,10 +258,124 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
+#endif
+}
+
+TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory with condition variable for synchronization multi-runs (on non-Win32: POSIX).") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
+#ifndef WIN32
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=1"));
+#endif
+    {
+        cluon::SharedMemory sm1{"PQR", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/PQR" == sm1.name());
+        sm1.lock();
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        REQUIRE(0 == *data);
+        sm1.unlock();
+
+        // Spawning thread to attach and change data.
+        std::thread producer([]() {
+            cluon::SharedMemory inner_sm1{"PQR"};
+            REQUIRE(inner_sm1.valid());
+            REQUIRE(nullptr != inner_sm1.data());
+            REQUIRE("/PQR" == inner_sm1.name());
+            std::cout << "(Inner) Notify...";
+            inner_sm1.notifyAll();
+            std::cout << "done." << std::endl;
+
+            inner_sm1.lock();
+            uint32_t *inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
+            REQUIRE(0 == *inner_data);
+            *inner_data = 3400;
+            REQUIRE(3400 == *inner_data);
+            inner_sm1.unlock();
+
+            {
+                // Give some time other thread to fall asleep again.
+                using namespace std::literals::chrono_literals; // NOLINT
+                std::this_thread::sleep_for(20ms);
+            }
+
+            std::cout << "(Inner) Notify...";
+            inner_sm1.notifyAll();
+            std::cout << "done." << std::endl;
+
+            {
+                // Give some time other thread to fall asleep again.
+                using namespace std::literals::chrono_literals; // NOLINT
+                std::this_thread::sleep_for(20ms);
+            }
+
+            inner_sm1.lock();
+            inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
+            REQUIRE(3400 == *inner_data);
+            *inner_data += 56;
+            REQUIRE(3456 == *inner_data);
+            inner_sm1.unlock();
+
+            {
+                // Give some time other thread to fall asleep again.
+                using namespace std::literals::chrono_literals; // NOLINT
+                std::this_thread::sleep_for(20ms);
+            }
+
+            std::cout << "(Inner) Notify...";
+            inner_sm1.notifyAll();
+            std::cout << "done." << std::endl;
+        });
+
+        std::cout << "(Outer) Waiting...";
+        sm1.wait();
+        std::cout << "done." << std::endl;
+
+        {
+            // Give some time other thread do work.
+            using namespace std::literals::chrono_literals; // NOLINT
+            std::this_thread::sleep_for(5ms);
+        }
+
+        std::cout << "(Outer) Waiting...";
+        sm1.wait();
+        std::cout << "done." << std::endl;
+
+        sm1.lock();
+        uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
+        REQUIRE(3400 == tmp);
+        sm1.unlock();
+
+        {
+            // Give some time other thread do work.
+            using namespace std::literals::chrono_literals; // NOLINT
+            std::this_thread::sleep_for(5ms);
+        }
+
+        std::cout << "(Outer) Waiting...";
+        sm1.wait();
+        std::cout << "done." << std::endl;
+
+        producer.join();
+
+        sm1.lock();
+        tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
+        REQUIRE(3456 == tmp);
+        sm1.unlock();
+
+    }
+#ifndef WIN32
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+#endif
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name and two separate threads to produce data for shared memory with condition variable for "
           "synchronization (on non-Win32: POSIX).") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
@@ -310,6 +437,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and two separate thre
     }
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
 #endif
 }
 
