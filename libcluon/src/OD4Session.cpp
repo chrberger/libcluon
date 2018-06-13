@@ -91,24 +91,34 @@ bool OD4Session::dataTrigger(int32_t messageIdentifier, std::function<void(cluon
 }
 
 void OD4Session::callback(std::string &&data, std::string && /*from*/, std::chrono::system_clock::time_point &&timepoint) noexcept {
-    std::stringstream sstr(data);
-    auto retVal = extractEnvelope(sstr);
+    size_t numberOfDataTriggeredDelegates{0};
+    {
+        try {
+            std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
+            numberOfDataTriggeredDelegates = m_mapOfDataTriggeredDelegates.size();
+        } catch (...) {} // LCOV_EXCL_LINE
+    }
+    // Only unpack the envelope when it needs to be post-processed.
+    if ((nullptr != m_delegate) || (0 < numberOfDataTriggeredDelegates)) {
+        std::stringstream sstr(data);
+        auto retVal = extractEnvelope(sstr);
 
-    if (retVal.first) {
-        cluon::data::Envelope env{retVal.second};
-        env.received(cluon::time::convert(timepoint));
+        if (retVal.first) {
+            cluon::data::Envelope env{retVal.second};
+            env.received(cluon::time::convert(timepoint));
 
-        // "Catch all"-delegate.
-        if (nullptr != m_delegate) {
-            m_delegate(std::move(env));
-        } else {
-            try {
-                // Data triggered-delegates.
-                std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
-                if (m_mapOfDataTriggeredDelegates.count(env.dataType()) > 0) {
-                    m_mapOfDataTriggeredDelegates[env.dataType()](std::move(env));
-                }
-            } catch (...) {} // LCOV_EXCL_LINE
+            // "Catch all"-delegate.
+            if (nullptr != m_delegate) {
+                m_delegate(std::move(env));
+            } else {
+                try {
+                    // Data triggered-delegates.
+                    std::lock_guard<std::mutex> lck{m_mapOfDataTriggeredDelegatesMutex};
+                    if (m_mapOfDataTriggeredDelegates.count(env.dataType()) > 0) {
+                        m_mapOfDataTriggeredDelegates[env.dataType()](std::move(env));
+                    }
+                } catch (...) {} // LCOV_EXCL_LINE
+            }
         }
     }
 }
