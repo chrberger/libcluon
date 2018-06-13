@@ -66,7 +66,7 @@ As part of our CI strategy thanks to TravisCI and AppVeyor, we are continuously 
 
 * Darwin 16.7.0 (x86_64)/AppleClang 9.0.0.9000038
 * FreeBSD 11.1 (x86_64)/GCC 6.4.0
-* NetBSD 7.0 (x86_64)/GCC 5.5.0
+* NetBSD 8.0 (x86_64)/GCC 5.5.0
 * Ubuntu 14.04 LTS (armhf)/clang 3.8.1
 * Ubuntu 14.04 LTS (x86_64)/clang 3.8.0
 * Ubuntu 14.04 LTS (x86_64)/clang 3.9.1
