@@ -37,7 +37,7 @@
 #include <iostream>
 #include <fstream>
 
-#if !defined(__APPLE__) && (defined(_SEM_SEMUN_UNDEFINED) || !defined(__FreeBSD__))
+#if !defined(__APPLE__) && !defined(__OpenBSD__) && (defined(_SEM_SEMUN_UNDEFINED) || !defined(__FreeBSD__))
 union semun {
     int val;               /* for SETVAL */
     struct semid_ds *buf;  /* for IPC_STAT and IPC_SET */

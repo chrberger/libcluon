@@ -57,9 +57,11 @@ else()
             -D__BSD_VISIBLE=1 ")
     endif()
 
-    if (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "NetBSD"))
+    if ( (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "NetBSD"))
+       AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "OpenBSD")) )
         set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
-            -D_XOPEN_SOURCE=700 ")
+            -D_XOPEN_SOURCE=700 \
+            -D_FORTIFY_SOURCE=2 ")
     endif()
 
     set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
@@ -68,13 +70,11 @@ else()
 
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} \
          ${GENERAL_BUILD_FLAGS} \
-        -D_FORTIFY_SOURCE=2 \
         -O2 \
         -fomit-frame-pointer ")
 
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} \
          ${GENERAL_BUILD_FLAGS} \
-        -D_FORTIFY_SOURCE=2 \
         -O2 \
         -fomit-frame-pointer ")
 
@@ -83,7 +83,8 @@ else()
         ${CXX_WARNING_FLAGS}")
 
     # Remove symbols from libraries.
-    if(NOT("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin"))
+    if ( (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin"))
+       AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "OpenBSD")) )
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ")
         set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} -s ")
         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s ")

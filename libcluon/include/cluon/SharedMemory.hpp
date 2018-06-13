@@ -137,8 +137,8 @@ class LIBCLUON_API SharedMemory {
     bool m_usePOSIX{true};
 
     // Member fields for POSIX-based shared memory.
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
     int32_t m_fd{-1};
-#if !defined(__NetBSD__) || !defined(__OpenBSD__)
     struct SharedMemoryHeader {
         uint32_t __size;
         pthread_mutex_t __mutex;
