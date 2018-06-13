@@ -1,8 +1,8 @@
 # libcluon
 
-| Linux & OSX Build (TravisCI) | FreeBSD (Jenkins) | NetBSD (Jenkins) | Win64 Build (AppVeyor) | Test Coverage | Coverity Analysis | CII Best Practices |
-| :--------------------------: | :---------------: | :--------------: | :--------------------: | :-----------: | :---------------: | :----------------: |
-| [![Build Status](https://travis-ci.org/chrberger/libcluon.svg?branch=master)](https://travis-ci.org/chrberger/libcluon) | [![Build Status](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-FreeBSD11/badge/icon)](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-FreeBSD11/) | [![Build Status](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-NetBSD7.0/badge/icon)](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-NetBSD7.0/) | [![Build status](https://ci.appveyor.com/api/projects/status/n33il43mb6ot5422/branch/master?svg=true)](https://ci.appveyor.com/project/chrberger/libcluon/branch/master) | [![codecov](https://codecov.io/gh/chrberger/libcluon/branch/master/graph/badge.svg)](https://codecov.io/gh/chrberger/libcluon) | [![Coverity Scan](https://scan.coverity.com/projects/14014/badge.svg)]() | [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1479/badge)](https://bestpractices.coreinfrastructure.org/projects/1479) |
+| Linux & OSX Build (TravisCI) | FreeBSD (Jenkins) | NetBSD (Jenkins) | OpenBSD (Jenkins) | Win64 Build (AppVeyor) | Test Coverage | Coverity Analysis | CII Best Practices |
+| :--------------------------: | :---------------: | :--------------: | :---------------: | :--------------------: | :-----------: | :---------------: | :----------------: |
+| [![Build Status](https://travis-ci.org/chrberger/libcluon.svg?branch=master)](https://travis-ci.org/chrberger/libcluon) | [![Build Status](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-FreeBSD11/badge/icon)](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-FreeBSD11/) | [![Build Status](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-NetBSD7.0/badge/icon)](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-NetBSD7.0/) | [![Build Status](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-OpenBSD59/badge/icon)](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-OpenBSD59/) | [![Build status](https://ci.appveyor.com/api/projects/status/n33il43mb6ot5422/branch/master?svg=true)](https://ci.appveyor.com/project/chrberger/libcluon/branch/master) | [![codecov](https://codecov.io/gh/chrberger/libcluon/branch/master/graph/badge.svg)](https://codecov.io/gh/chrberger/libcluon) | [![Coverity Scan](https://scan.coverity.com/projects/14014/badge.svg)]() | [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1479/badge)](https://bestpractices.coreinfrastructure.org/projects/1479) |
 
 [![License](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://raw.githubusercontent.com/chrberger/libcluon/master/LICENSE) [![API documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://chrberger.github.io/libcluon/) [![Win (x86_64)](https://img.shields.io/badge/Win-x86__64%20(installer)-blue.svg
 )](https://dl.bintray.com/chrberger/libcluon/) [![Ubuntu (x86_64)](https://img.shields.io/badge/deb-x86__64-blue.svg
@@ -67,6 +67,7 @@ As part of our CI strategy thanks to TravisCI and AppVeyor, we are continuously 
 * Darwin 16.7.0 (x86_64)/AppleClang 9.0.0.9000038
 * FreeBSD 11.1 (x86_64)/GCC 6.4.0
 * NetBSD 8.0 (x86_64)/GCC 5.5.0
+* OpenBSD 6.3 (x86_64)/clang 5.0.1
 * Ubuntu 14.04 LTS (armhf)/clang 3.8.1
 * Ubuntu 14.04 LTS (x86_64)/clang 3.8.0
 * Ubuntu 14.04 LTS (x86_64)/clang 3.9.1
