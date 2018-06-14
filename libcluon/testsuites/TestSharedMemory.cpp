@@ -19,6 +19,12 @@
 
 #include "cluon/SharedMemory.hpp"
 
+// clang-format off
+#ifndef WIN32
+  #include <unistd.h>
+#endif
+// clang-format on
+
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
@@ -85,6 +91,69 @@ TEST_CASE("Trying to open SharedMemory with name without leading / and too long 
         REQUIRE(!sm1.valid());
         REQUIRE(nullptr == sm1.data());
         REQUIRE(NAME_254 == sm1.name());
+    }
+#ifndef WIN32
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+#endif
+}
+
+TEST_CASE("Trying to create SharedMemory that was already created before: POSIX = new SharedMemory, Win32") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
+#ifndef WIN32
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=1"));
+#endif
+    {
+        cluon::SharedMemory sm1{"/DEFGHI", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/DEFGHI" == sm1.name());
+        sm1.lock();
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        *data          = 12345;
+        sm1.unlock();
+
+        sm1.lock();
+        uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
+        uint32_t tmp    = *data2;
+        sm1.unlock();
+        REQUIRE(12345 == tmp);
+
+        {
+            cluon::SharedMemory sm2{"/DEFGHI", 4};
+            REQUIRE(sm2.valid());
+            REQUIRE(4 == sm2.size());
+            REQUIRE(nullptr != sm2.data());
+            REQUIRE("/DEFGHI" == sm2.name());
+            sm2.lock();
+            uint32_t *data_ = reinterpret_cast<uint32_t *>(sm2.data());
+            *data_          = 23456;
+            sm2.unlock();
+
+            sm2.lock();
+            uint32_t *data2_ = reinterpret_cast<uint32_t *>(sm2.data());
+            uint32_t tmp_    = *data2_;
+            sm2.unlock();
+            REQUIRE(23456 == tmp_);
+        }
+        sm1.lock();
+        sm1.unlock();
+
+#ifndef WIN32
+        REQUIRE(sm1.valid());
+        sm1.lock();
+        data2 = reinterpret_cast<uint32_t *>(sm1.data());
+        tmp   = *data2;
+        sm1.unlock();
+        REQUIRE(12345 == tmp); // On POSIX, the new SharedMemory with the same name has a different file descriptor.
+#endif
+
+#ifdef WIN32
+        REQUIRE(!sm1.valid());
+#endif
     }
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
@@ -523,6 +592,42 @@ TEST_CASE("Trying to open SharedMemory with name without leading / and too long 
 #endif
 }
 
+TEST_CASE("Trying to create SharedMemory with invalid name (SySV).") {
+#ifdef __linux__
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
+    {
+        cluon::SharedMemory sm1{"/tmp/nested/folders/not/supported", 4};
+        REQUIRE(!sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr == sm1.data());
+        REQUIRE("/tmp/nested/folders/not/supported" == sm1.name());
+    }
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+}
+
+TEST_CASE("Trying to create SharedMemory with existing name (SySV).") {
+#ifdef __linux__
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
+    std::fstream fout("/tmp/libcluon-sysv-sharedmemory-c016cc2f-b98a-420f-a9c0-fac362c0d3f5", std::ios::out);
+    REQUIRE(fout.good());
+    {
+        cluon::SharedMemory sm1{"/tmp/libcluon-sysv-sharedmemory-c016cc2f-b98a-420f-a9c0-fac362c0d3f5", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/tmp/libcluon-sysv-sharedmemory-c016cc2f-b98a-420f-a9c0-fac362c0d3f5" == sm1.name());
+    }
+    fout.close();
+    unlink("/tmp/libcluon-sysv-sharedmemory-c016cc2f-b98a-420f-a9c0-fac362c0d3f5");
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+}
+
 TEST_CASE("Trying to create SharedMemory with correct name (SySV).") {
 #ifdef __linux__
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
@@ -544,6 +649,59 @@ TEST_CASE("Trying to create SharedMemory with correct name (SySV).") {
         uint32_t tmp    = *data2;
         sm1.unlock();
         REQUIRE(12345 == tmp);
+    }
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+}
+
+TEST_CASE("Trying to create SharedMemory with correct name for already existing SharedMemory (behavior of first one changes to broken) (SySV).") {
+#ifdef __linux__
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
+    {
+        cluon::SharedMemory sm1{"/DEFGHI", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/tmp/DEFGHI" == sm1.name());
+        sm1.lock();
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        *data          = 12345;
+        sm1.unlock();
+
+        sm1.lock();
+        uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
+        uint32_t tmp    = *data2;
+        sm1.unlock();
+        REQUIRE(12345 == tmp);
+
+        {
+            cluon::SharedMemory sm2{"/DEFGHI", 4};
+            REQUIRE(sm2.valid());
+            REQUIRE(4 == sm2.size());
+            REQUIRE(nullptr != sm2.data());
+            REQUIRE("/tmp/DEFGHI" == sm2.name());
+            sm2.lock();
+            uint32_t *data_ = reinterpret_cast<uint32_t *>(sm2.data());
+            *data_          = 23456;
+            sm2.unlock();
+
+            sm2.lock();
+            uint32_t *data2_ = reinterpret_cast<uint32_t *>(sm2.data());
+            uint32_t tmp_    = *data2_;
+            sm2.unlock();
+            REQUIRE(23456 == tmp_);
+        }
+        REQUIRE(sm1.valid());
+        sm1.lock();
+        REQUIRE(!sm1.valid());
+        sm1.unlock();
+        REQUIRE(!sm1.valid());
+        sm1.wait();
+        REQUIRE(!sm1.valid());
+        sm1.notifyAll();
+        REQUIRE(!sm1.valid());
     }
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif

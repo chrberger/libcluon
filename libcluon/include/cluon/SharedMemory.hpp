@@ -31,6 +31,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <atomic>
 #include <string>
 
 namespace cluon {
@@ -128,6 +129,8 @@ class LIBCLUON_API SharedMemory {
     char *m_sharedMemory{nullptr};
     char *m_userAccessibleSharedMemory{nullptr};
     bool m_hasOnlyAttachedToSharedMemory{false};
+
+    std::atomic<bool> m_broken{false};
 
 #ifdef WIN32
     HANDLE __conditionEvent{nullptr};
