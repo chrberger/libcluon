@@ -261,21 +261,9 @@ void TCPConnection::readFromSocket() noexcept {
             {
                 std::lock_guard<std::mutex> lck(m_newDataDelegateMutex);
                 if ((0 < bytesRead) && (nullptr != m_newDataDelegate)) {
-#ifdef __linux__
-                    std::chrono::system_clock::time_point timestamp;
-                    struct timeval receivedTimeStamp {};
-                    if (0 == ::ioctl(m_socket, SIOCGSTAMP, &receivedTimeStamp)) {
-                        // Transform struct timeval to C++ chrono.
-                        std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds> transformedTimePoint(
-                            std::chrono::microseconds(receivedTimeStamp.tv_sec * 1000000L + receivedTimeStamp.tv_usec));
-                        timestamp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(transformedTimePoint);
-                    } else {
-                        // In case the ioctl failed, fall back to chrono.
-                        timestamp = std::chrono::system_clock::now();
-                    }
-#else
+                    // SIOCGSTAMP is not available for a stream-based socket,
+                    // thus, falling back to regular chrono timestamping.
                     std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now();
-#endif
                     {
                         PipelineEntry pe;
                         pe.m_data       = std::string(buffer.data(), static_cast<size_t>(bytesRead));
