@@ -18,6 +18,8 @@
 #include "catch.hpp"
 
 #include "cluon/SharedMemory.hpp"
+#include "cluon/Time.hpp"
+#include "cluon/cluonDataStructures.hpp"
 
 // clang-format off
 #ifndef WIN32
@@ -1003,6 +1005,67 @@ TEST_CASE("Trying to create SharedMemory with correct name and one separate thre
 
     }
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+}
+
+TEST_CASE("Measure performance of using SharedMemory (SySV vs POSIX).") {
+#if defined(__amd64__) && defined(__linux__)
+    {
+        const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+        bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+        putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
+        {
+            cluon::SharedMemory sm1{"/DEF", 4};
+            REQUIRE(sm1.valid());
+            REQUIRE(4 == sm1.size());
+            REQUIRE(nullptr != sm1.data());
+            REQUIRE("/tmp/DEF" == sm1.name());
+            cluon::data::TimeStamp before = cluon::time::now();
+            for (uint32_t i{0}; i < static_cast<uint32_t>(1000 * 1000); i++) {
+                sm1.lock();
+                uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+                *data          = i;
+                sm1.unlock();
+
+                sm1.lock();
+                uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
+                uint32_t tmp    = *data2;
+                sm1.unlock();
+                REQUIRE(i == tmp);
+            }
+            cluon::data::TimeStamp after = cluon::time::now();
+            std::clog << "SysV took " << cluon::time::deltaInMicroseconds(after, before) << " microseconds." << std::endl;
+        }
+        putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    }
+    {
+        const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+        bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+        putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=1"));
+        {
+            cluon::SharedMemory sm1{"/DEF", 4};
+            REQUIRE(sm1.valid());
+            REQUIRE(4 == sm1.size());
+            REQUIRE(nullptr != sm1.data());
+            REQUIRE("/DEF" == sm1.name());
+            cluon::data::TimeStamp before = cluon::time::now();
+            for (uint32_t i{0}; i < static_cast<uint32_t>(1000 * 1000); i++) {
+                sm1.lock();
+                uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+                *data          = i;
+                sm1.unlock();
+
+                sm1.lock();
+                uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
+                uint32_t tmp    = *data2;
+                sm1.unlock();
+                REQUIRE(i == tmp);
+            }
+            cluon::data::TimeStamp after = cluon::time::now();
+            std::clog << "POSIX took " << cluon::time::deltaInMicroseconds(after, before) << " microseconds." << std::endl;
+        }
+        putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    }
 #endif
 }
 
