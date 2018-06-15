@@ -145,21 +145,23 @@ TEST_CASE("Trying to create SharedMemory that was already created before: POSIX 
         sm1.unlock();
 
 #ifndef WIN32
+        // On POSIX, the new SharedMemory with the same name has a distinct memory area.
         REQUIRE(sm1.valid());
         sm1.lock();
         data2 = reinterpret_cast<uint32_t *>(sm1.data());
         tmp   = *data2;
         sm1.unlock();
-        REQUIRE(12345 == tmp); // On POSIX, the new SharedMemory with the same name has a distinct memory area.
+        REQUIRE(12345 == tmp);
 #endif
 
 #ifdef WIN32
+        // On Win32, the new SharedMemory with the same name is also accessible from the old SharedMemory.
         REQUIRE(sm1.valid());
         sm1.lock();
         data2 = reinterpret_cast<uint32_t *>(sm1.data());
         tmp   = *data2;
         sm1.unlock();
-        REQUIRE(12345 == tmp); // On Win32, the new SharedMemory with the same name  has a distinct memory area.
+        REQUIRE(23456 == tmp); // On Win32, the new SharedMemory with the same name  has a distinct memory area.
 #endif
     }
 #ifndef WIN32
