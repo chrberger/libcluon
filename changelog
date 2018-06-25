@@ -1,3 +1,15 @@
+libcluon (0.0.102-1ppa1~bionic1) bionic; urgency=medium
+
+  * SysV IPC; segfault fix in cluon-replay; performance improvement in OD4Session; support for OpenBSD and NetBSD
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 25 Jun 2018 16:11:11 +0200
+
+libcluon (0.0.102-1ppa1~xenial1) xenial; urgency=medium
+
+  * SysV IPC; segfault fix in cluon-replay; performance improvement in OD4Session; support for OpenBSD and NetBSD
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 25 Jun 2018 16:11:11 +0200
+
 libcluon (0.0.101-1ppa1~bionic1) bionic; urgency=medium
 
   * Improving performance of OD4Session to skip unwanted Envelopes
