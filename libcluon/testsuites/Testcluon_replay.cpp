@@ -52,7 +52,7 @@ class RedirectCOUT {
 TEST_CASE("Test empty commandline parameters.") {
     int32_t argc       = 1;
     const char *argv[] = {static_cast<const char *>("cluon-replay")};
-    REQUIRE(1 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
+    REQUIRE(1 == cluon_replay(argc, const_cast<char **>(argv)));
 }
 
 TEST_CASE("Test non-existing rec-file.") {
@@ -68,7 +68,7 @@ TEST_CASE("Test non-existing rec-file.") {
 
     constexpr int32_t argc = 2;
     const char *argv[]     = {static_cast<const char *>("cluon-replay"), static_cast<const char *>("abc.rec")};
-    REQUIRE(1 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
+    REQUIRE(1 == cluon_replay(argc, const_cast<char **>(argv)));
 
     UNLINK("abc.rec");
 #endif
@@ -117,7 +117,7 @@ TEST_CASE("Test playback rec-file to stdout.") {
 
     constexpr int32_t argc = 2;
     const char *argv[]     = {static_cast<const char *>("cluon-replay"), static_cast<const char *>("abc1.rec")};
-    REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
+    REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv)));
 
     const std::string tmp = capturedCout.str();
     REQUIRE(!tmp.empty());
@@ -179,7 +179,7 @@ TEST_CASE("Test playback rec-file to OD4Session.") {
 
     constexpr int32_t argc = 3;
     const char *argv[]     = {static_cast<const char *>("cluon-replay"), static_cast<const char *>("--cid=73"), static_cast<const char *>("abc2.rec")};
-    REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
+    REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv)));
 
     const std::string tmp = capturedCout.str();
     REQUIRE(tmp.empty());
@@ -234,7 +234,7 @@ TEST_CASE("Test playback rec-file to OD4Session with wrong cid results in playba
 
     constexpr int32_t argc = 3;
     const char *argv[]     = {static_cast<const char *>("cluon-replay"), static_cast<const char *>("--cid=374"), static_cast<const char *>("abc3.rec")};
-    REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
+    REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv)));
 
     const std::string tmp = capturedCout.str();
     REQUIRE(!tmp.empty());
@@ -301,7 +301,7 @@ TEST_CASE("Test playback rec-file to OD4Session and to stdout.") {
                           static_cast<const char *>("--cid=74"),
                           static_cast<const char *>("--stdout"),
                           static_cast<const char *>("abc4.rec")};
-    REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
+    REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv)));
 
     const std::string tmp = capturedCout.str();
     REQUIRE(!tmp.empty());
@@ -397,7 +397,7 @@ TEST_CASE("Test playback rec-file to OD4Session and stdout with external player 
                               static_cast<const char *>("--cid=75"),
                               static_cast<const char *>("--stdout"),
                               static_cast<const char *>("abc5.rec")};
-        REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv), false /*do not monitor STDIN*/));
+        REQUIRE(0 == cluon_replay(argc, const_cast<char **>(argv)));
     });
 
     // Join parallel thread.

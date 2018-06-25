@@ -33,13 +33,13 @@
 #include <string>
 #include <thread>
 
-inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
+inline int32_t cluon_replay(int32_t argc, char **argv) {
     int32_t retCode{0};
     const std::string PROGRAM{argv[0]}; // NOLINT
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
     if (1 == argc) {
-        std::cerr << PROGRAM << " replays a .rec file into an OpenDaVINCI session or to stdout; if playing back to an OD4Session using parameter --cid, you can specify the optional parameter --stdout to also playback to stdout." << std::endl;
-        std::cerr << "Usage:   " << PROGRAM << " [--cid=<OpenDaVINCI session> [--stdout]] recording.rec" << std::endl;
+        std::cerr << PROGRAM << " replays a .rec file into an OpenDaVINCI session or to stdout; if playing back to an OD4Session using parameter --cid, you can specify the optional parameter --stdout to also playback to stdout; --keeprunning keeps " << PROGRAM << " open at the end of a recording file." << std::endl;
+        std::cerr << "Usage:   " << PROGRAM << " [--cid=<OpenDaVINCI session> [--stdout] [--keeprunning]] recording.rec" << std::endl;
         std::cerr << "Example: " << PROGRAM << " --cid=111 file.rec" << std::endl;
         std::cerr << "         " << PROGRAM << " --cid=111 --stdout file.rec" << std::endl;
         std::cerr << "         " << PROGRAM << " file.rec" << std::endl;
@@ -47,6 +47,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
     }
     else {
         const bool playBackToStdout = ( (0 != commandlineArguments.count("stdout")) || (0 == commandlineArguments.count("cid")) );
+        const bool keepRunning = (0 != commandlineArguments.count("keeprunning"));
 
         std::string recFile;
         for (auto e : commandlineArguments) {
@@ -62,54 +63,30 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
             std::mutex playerCommandMutex;
             cluon::data::PlayerCommand playerCommand;
 
-            auto playerCommandHandler = [&playCommandUpdate, &playerCommandMutex, &playerCommand](cluon::data::Envelope &&env){
-                cluon::data::PlayerCommand pc = cluon::extractMessage<cluon::data::PlayerCommand>(std::move(env));
-                {
-                    std::lock_guard<std::mutex> lck(playerCommandMutex);
-                    playerCommand = pc;
-                }
-                playCommandUpdate = true;
-            };
-
-            // OD4Session.
+            // Create an OD4Session to relay the.
             std::unique_ptr<cluon::OD4Session> od4;
             if (0 != commandlineArguments.count("cid")) {
-                // Interface to a running OpenDaVINCI session (ignoring any incoming Envelopes).
+                // Interface to a running OpenDaVINCI session and listening for PlayerCommands.
                 od4 = std::make_unique<cluon::OD4Session>(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"]))); // LCOV_EXCL_LINE
-                if (od4 && !monitorSTDIN) {
-                    od4->dataTrigger(cluon::data::PlayerCommand::ID(), playerCommandHandler);
-                }
-            }
-
-            // Listen for data from stdin.
-            std::unique_ptr<std::thread> stdinMonitoringThread;
-            if (monitorSTDIN) {
-                stdinMonitoringThread = std::make_unique<std::thread>([&playerCommandHandler](){ // LCOV_EXCL_LINE
-                    while (std::cin.good()) { // LCOV_EXCL_LINE
-                        auto tmp{cluon::extractEnvelope(std::cin)}; // LCOV_EXCL_LINE
-                        if (tmp.first && (tmp.second.dataType() == cluon::data::PlayerCommand::ID())) { // LCOV_EXCL_LINE
-                            cluon::data::Envelope env = tmp.second; // LCOV_EXCL_LINE
-                            playerCommandHandler(std::move(env)); // LCOV_EXCL_LINE
+                if (od4) {
+                    od4->dataTrigger(cluon::data::PlayerCommand::ID(), [&playCommandUpdate, &playerCommandMutex, &playerCommand](cluon::data::Envelope &&env){
+                        cluon::data::PlayerCommand pc = cluon::extractMessage<cluon::data::PlayerCommand>(std::move(env));
+                        {
+                            std::lock_guard<std::mutex> lck(playerCommandMutex);
+                            playerCommand = pc;
                         }
-                    }
-                }); // LCOV_EXCL_LINE
+                        playCommandUpdate = true;
+                    });
+                }
             }
 
             // Listen for PlayerStatus updates.
             std::atomic<bool> playerStatusUpdate{false};
             std::mutex playerStatusMutex;
             cluon::data::PlayerStatus playerStatus;
-            auto playerListener = [&playerStatusUpdate, &playerStatusMutex, &playerStatus](cluon::data::PlayerStatus &&ps){
-                {
-                    std::lock_guard<std::mutex> lck(playerStatusMutex);
-                    playerStatus = ps;
-                }
-                playerStatusUpdate = true;
-            };
-
             {
                 std::string s;
-                playerStatus.state(1); // loading file
+                playerStatus.state(1); // Report: "loading file"
                 {
                     std::lock_guard<std::mutex> lck(playerStatusMutex);
 
@@ -134,7 +111,13 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
             constexpr bool AUTOREWIND{false};
             constexpr bool THREADING{true};
             cluon::Player player(recFile, AUTOREWIND, THREADING);
-            player.setPlayerListener(playerListener);
+            player.setPlayerListener([&playerStatusUpdate, &playerStatusMutex, &playerStatus](cluon::data::PlayerStatus &&ps){
+                {
+                    std::lock_guard<std::mutex> lck(playerStatusMutex);
+                    playerStatus = ps;
+                }
+                playerStatusUpdate = true;
+            });
 
             {
                 std::string s;
@@ -163,7 +146,12 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
             }
 
             bool play = true;
-            while (player.hasMoreData()) {
+            while ( (player.hasMoreData() || keepRunning) ) {
+                // Stop execution in case of a running OD4Session.
+                if (od4 && !od4->isRunning()) {
+                    break;
+                }
+                // Check for broadcasting status updates.
                 if (playerStatusUpdate) {
                     std::string s;
                     {
@@ -190,6 +178,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                     }
                     playerStatusUpdate = false;
                 }
+                // Check for remotely controlling the player.
                 if (playCommandUpdate) {
                     std::lock_guard<std::mutex> lck(playerCommandMutex);
                     if ( (playerCommand.command() == 1) || (playerCommand.command() == 2) ) {
@@ -204,6 +193,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv, bool monitorSTDIN) {
                     }
                     playCommandUpdate = false;
                 }
+                // If playback is desired, relay the Envelope to the OD4Session.
                 if (play) {
                     auto next = player.getNextEnvelopeToBeReplayed();
                     if (next.first) {
