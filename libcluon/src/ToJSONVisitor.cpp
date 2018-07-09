@@ -130,11 +130,11 @@ void ToJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&nam
 void ToJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)typeName;
     if ((0 == m_mask.count(id)) || m_mask[id]) {
-        m_buffer << '\"' << name << '\"' << ':' << '\"' << encodeBase64(v) << '\"' << ',' << '\n';
+        m_buffer << '\"' << name << '\"' << ':' << '\"' << ToJSONVisitor::encodeBase64(v) << '\"' << ',' << '\n';
     }
 }
 
-std::string ToJSONVisitor::encodeBase64(const std::string &input) const noexcept {
+std::string ToJSONVisitor::encodeBase64(const std::string &input) noexcept {
     std::string retVal;
 
     const std::string ALPHABET{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};

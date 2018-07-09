@@ -122,7 +122,7 @@ void FromJSONVisitor::decodeFrom(std::istream &in) noexcept {
     m_keyValues = readKeyValues(s);
 }
 
-std::string FromJSONVisitor::decodeBase64(const std::string &input) const noexcept {
+std::string FromJSONVisitor::decodeBase64(const std::string &input) noexcept {
     const std::string ALPHABET{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
     uint8_t counter{0};
     std::array<char, 4> buffer;
@@ -320,7 +320,7 @@ void FromJSONVisitor::visit(uint32_t id, std::string &&typeName, std::string &&n
     if (0 < m_keyValues.count(name)) {
         try {
             std::string tmp{linb::any_cast<std::string>(m_keyValues[name].m_value)};
-            v = decodeBase64(tmp);
+            v = FromJSONVisitor::decodeBase64(tmp);
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
         }
     }

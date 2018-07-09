@@ -104,7 +104,7 @@ class LIBCLUON_API ToJSONVisitor {
      * @param input to encode as base64
      * @return base64 encoded input.
      */
-    std::string encodeBase64(const std::string &input) const noexcept;
+    static std::string encodeBase64(const std::string &input) noexcept;
 
    private:
     bool m_withOuterCurlyBraces{true};

@@ -121,7 +121,7 @@ class LIBCLUON_API FromJSONVisitor {
      * @param input to decode from base64
      * @return Decoded input.
      */
-    std::string decodeBase64(const std::string &input) const noexcept;
+    static std::string decodeBase64(const std::string &input) noexcept;
 
    private:
     std::map<std::string, FromJSONVisitor::JSONKeyValue> readKeyValues(std::string &input) noexcept;
