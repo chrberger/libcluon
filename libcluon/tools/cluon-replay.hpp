@@ -146,6 +146,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv) {
             }
 
             bool play = true;
+            bool step = false;
             while ( (player.hasMoreData() || keepRunning) ) {
                 // Stop execution in case of a running OD4Session.
                 if (od4 && !od4->isRunning()) {
@@ -183,18 +184,24 @@ inline int32_t cluon_replay(int32_t argc, char **argv) {
                     std::lock_guard<std::mutex> lck(playerCommandMutex);
                     if ( (playerCommand.command() == 1) || (playerCommand.command() == 2) ) {
                         play = !(2 == playerCommand.command()); // LCOV_EXCL_LINE
+                        std::clog << PROGRAM << ": Change state: " << +playerCommand.command() << ", play = " << play << std::endl;
                     }
-
-                    std::clog << PROGRAM << ": Change state: " << +playerCommand.command() << ", play = " << play << std::endl;
 
                     if (3 == playerCommand.command()) {
                         std::clog << PROGRAM << ": Change state: " << +playerCommand.command() << ", seekTo: " << playerCommand.seekTo() << std::endl;
                         player.seekTo(playerCommand.seekTo());
                     }
+
+                    if (4 == playerCommand.command()) {
+                        play = false;
+                        step = true;
+                        std::clog << PROGRAM << ": Change state: " << +playerCommand.command() << ", play = " << play << std::endl;
+                    }
+
                     playCommandUpdate = false;
                 }
                 // If playback is desired, relay the Envelope to the OD4Session.
-                if (play) {
+                if (play || step) {
                     auto next = player.getNextEnvelopeToBeReplayed();
                     if (next.first) {
                         if (od4 && od4->isRunning()) {
@@ -212,6 +219,9 @@ inline int32_t cluon_replay(int32_t argc, char **argv) {
                 else {
                     std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100)); // LCOV_EXCL_LINE
                 } // LCOV_EXCL_LINE
+
+                // Reset step.
+                step = false;
             }
             retCode = 0;
         }
