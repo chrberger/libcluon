@@ -346,11 +346,8 @@ TEST_CASE("Testing base64 encoding and decoding.") {
     const std::string DATA(reinterpret_cast<const char *>(IMAGE.data()), IMAGE.size());
     const std::string EXPECTED_DATA(reinterpret_cast<const char *>(IMAGE.data()), IMAGE.size());
 
-    cluon::ToJSONVisitor toJSON;
-    cluon::FromJSONVisitor fromJSON;
-
-    const std::string base64Encoded = toJSON.encodeBase64(DATA);
-    const std::string base64Decoded = fromJSON.decodeBase64(base64Encoded);
+    const std::string base64Encoded = cluon::ToJSONVisitor::encodeBase64(DATA);
+    const std::string base64Decoded = cluon::FromJSONVisitor::decodeBase64(base64Encoded);
 
     REQUIRE(base64Encoded.size() == EXPECTED_BASE64_ENCODED.size());
     REQUIRE(base64Encoded == EXPECTED_BASE64_ENCODED);

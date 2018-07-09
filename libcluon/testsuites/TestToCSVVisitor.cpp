@@ -50,7 +50,7 @@ TEST_CASE("Testing MyTestMessage1.") {
 
     const char *CSV
         = R"(attribute1;attribute2;attribute3;attribute4;attribute5;attribute6;attribute7;attribute8;attribute9;attribute10;attribute11;attribute12;attribute13;attribute14;
-1;c;-1;2;-3;4;-5;6;-7;8;-9.123456;10.123456789;"Hello World";"Hello Galaxy";
+1;c;-1;2;-3;4;-5;6;-7;8;-9.123456;10.123456789;"SGVsbG8gV29ybGQ=";"SGVsbG8gR2FsYXh5";
 )";
 
     REQUIRE(std::string(CSV) == csv.csv());
@@ -81,7 +81,7 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter.") {
 
     const char *CSV
         = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
-1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
+1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"SGVsbG8gV29ybGQ=","SGVsbG8gR2FsYXh5",
 )";
 
     REQUIRE(std::string(CSV) == csv.csv());
@@ -111,7 +111,7 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and appending data.") {
 
     const char *CSV1
         = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
-1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
+1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"SGVsbG8gV29ybGQ=","SGVsbG8gR2FsYXh5",
 )";
     tmp.accept(csv);
     REQUIRE(std::string(CSV1) == csv.csv());
@@ -119,8 +119,8 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and appending data.") {
     tmp.attribute4(77);
     const char *CSV2
         = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
-1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
-1,c,-1,77,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
+1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"SGVsbG8gV29ybGQ=","SGVsbG8gR2FsYXh5",
+1,c,-1,77,-3,4,-5,6,-7,8,-9.123456,10.123456789,"SGVsbG8gV29ybGQ=","SGVsbG8gR2FsYXh5",
 )";
     tmp.accept(csv);
     REQUIRE(std::string(CSV2) == csv.csv());
@@ -128,9 +128,9 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and appending data.") {
     tmp.attribute4(99);
     const char *CSV3
         = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
-1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
-1,c,-1,77,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
-1,c,-1,99,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
+1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"SGVsbG8gV29ybGQ=","SGVsbG8gR2FsYXh5",
+1,c,-1,77,-3,4,-5,6,-7,8,-9.123456,10.123456789,"SGVsbG8gV29ybGQ=","SGVsbG8gR2FsYXh5",
+1,c,-1,99,-3,4,-5,6,-7,8,-9.123456,10.123456789,"SGVsbG8gV29ybGQ=","SGVsbG8gR2FsYXh5",
 )";
     tmp.accept(csv);
     REQUIRE(std::string(CSV3) == csv.csv());
@@ -138,7 +138,7 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and appending data.") {
     tmp.attribute4(44);
     const char *CSV4
         = R"(attribute1,attribute2,attribute3,attribute4,attribute5,attribute6,attribute7,attribute8,attribute9,attribute10,attribute11,attribute12,attribute13,attribute14,
-1,c,-1,44,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
+1,c,-1,44,-3,4,-5,6,-7,8,-9.123456,10.123456789,"SGVsbG8gV29ybGQ=","SGVsbG8gR2FsYXh5",
 )";
     csv.clear();
     tmp.accept(csv);
@@ -168,7 +168,7 @@ TEST_CASE("Testing MyTestMessage1 with ',' delimiter and no header.") {
     cluon::ToCSVVisitor csv(',', false);
     tmp.accept(csv);
 
-    const char *CSV = R"(1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"Hello World","Hello Galaxy",
+    const char *CSV = R"(1,c,-1,2,-3,4,-5,6,-7,8,-9.123456,10.123456789,"SGVsbG8gV29ybGQ=","SGVsbG8gR2FsYXh5",
 )";
 
     REQUIRE(std::string(CSV) == csv.csv());

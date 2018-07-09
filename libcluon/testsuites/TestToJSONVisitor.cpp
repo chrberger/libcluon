@@ -27,14 +27,12 @@
 #include "cluon/cluonTestDataStructures.hpp"
 
 TEST_CASE("Testing base64") {
-    cluon::ToJSONVisitor j;
-
-    REQUIRE("SGVsbG8gV29ybGQh" == j.encodeBase64("Hello World!"));
-    REQUIRE("QUFBQQ==" == j.encodeBase64("AAAA"));
-    REQUIRE("QUFB" == j.encodeBase64("AAA"));
-    REQUIRE("QUE=" == j.encodeBase64("AA"));
-    REQUIRE("QQ==" == j.encodeBase64("A"));
-    REQUIRE(j.encodeBase64("").empty());
+    REQUIRE("SGVsbG8gV29ybGQh" == cluon::ToJSONVisitor::encodeBase64("Hello World!"));
+    REQUIRE("QUFBQQ==" == cluon::ToJSONVisitor::encodeBase64("AAAA"));
+    REQUIRE("QUFB" == cluon::ToJSONVisitor::encodeBase64("AAA"));
+    REQUIRE("QUE=" == cluon::ToJSONVisitor::encodeBase64("AA"));
+    REQUIRE("QQ==" == cluon::ToJSONVisitor::encodeBase64("A"));
+    REQUIRE(cluon::ToJSONVisitor::encodeBase64("").empty());
 }
 
 TEST_CASE("Testing MyTestMessage1.") {

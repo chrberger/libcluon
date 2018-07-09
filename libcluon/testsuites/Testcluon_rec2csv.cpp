@@ -163,8 +163,8 @@ message testdata.MyTestMessage5 [id = 30005] {
 
     const char *expectedOutput
         = R"(sent.seconds;sent.microseconds;received.seconds;received.microseconds;sampleTimeStamp.seconds;sampleTimeStamp.microseconds;attribute1;attribute2;attribute3;attribute4;attribute5;attribute6;attribute7;attribute8;attribute9;attribute10;attribute11;
-1000;0;5000;0;10000;0;1;-1;100;-100;10000;1;12345;-12345;-1.2345;-10.2345;"Hello World!";
-1000;1;5000;1;10000;1;1;-1;100;-100;10000;2;12345;-12345;-1.2345;-10.2345;"Hello World!";
+1000;0;5000;0;10000;0;1;-1;100;-100;10000;1;12345;-12345;-1.2345;-10.2345;"SGVsbG8gV29ybGQh";
+1000;1;5000;1;10000;1;1;-1;100;-100;10000;2;12345;-12345;-1.2345;-10.2345;"SGVsbG8gV29ybGQh";
 )";
 
     REQUIRE(output == std::string(expectedOutput));
