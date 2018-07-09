@@ -1,3 +1,15 @@
+libcluon (0.0.103-1ppa1~bionic1) bionic; urgency=medium
+
+  * CSV exporter writes strings in base64 encoding; cluon-replay can now step through a recording
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 09 Jul 2018 11:27:39 +0200
+
+libcluon (0.0.103-1ppa1~xenial1) xenial; urgency=medium
+
+  * CSV exporter writes strings in base64 encoding; cluon-replay can now step through a recording
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 09 Jul 2018 11:27:39 +0200
+
 libcluon (0.0.102-1ppa1~bionic1) bionic; urgency=medium
 
   * SysV IPC; segfault fix in cluon-replay; performance improvement in OD4Session; support for OpenBSD and NetBSD
