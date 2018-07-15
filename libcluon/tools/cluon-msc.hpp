@@ -38,25 +38,18 @@ inline int32_t cluon_msc(int32_t argc, char **argv) {
     if (std::string::npos != inputFilename.find(PROGRAM)) {
         std::cerr << PROGRAM
                   << " transforms a given message specification file in .odvd format into C++." << std::endl;
-        std::cerr << "Usage:   " << PROGRAM << " [--cpp-headers] [--cpp-sources] [--cpp-add-include-file=<string>] [--proto] [--out=<file>] <odvd file>" << std::endl;
-        std::cerr << "         " << PROGRAM << " --cpp-headers <odvd file>" << std::endl;
-        std::cerr << "         " << PROGRAM << " --cpp-sources <odvd file>" << std::endl;
-        std::cerr << "         " << PROGRAM << " --cpp-headers --out=<target file> <odvd file>" << std::endl;
-        std::cerr << "         " << PROGRAM << " --cpp-sources --cpp-add-include-file=dir/file.hpp --out=<target file> <odvd file>" << std::endl;
-        std::cerr << "         " << PROGRAM << " --proto <odvd file>" << std::endl;
+        std::cerr << "Usage:   " << PROGRAM << " [--cpp] [--proto] [--out=<file>] <odvd file>" << std::endl;
+        std::cerr << "         " << PROGRAM << " --cpp:   Generate C++14-compliant, self-contained header file." << std::endl;
+        std::cerr << "         " << PROGRAM << " --proto: Generate Proto version2-compliant file." << std::endl;
         std::cerr << std::endl;
-        std::cerr << "Example: " << PROGRAM << " --cpp-headers --out=/tmp/myOutput.hpp myFile.odvd" << std::endl;
+        std::cerr << "Example: " << PROGRAM << " --cpp --out=/tmp/myOutput.hpp myFile.odvd" << std::endl;
         return 1;
     }
 
     std::string outputFilename;
     commandline({"--out"}) >> outputFilename;
 
-    std::string CPPincludeFile;
-    commandline({"--cpp-add-include-file"}) >> CPPincludeFile;
-
-    const bool generateCPPHeaders = commandline[{"--cpp-headers"}];
-    const bool generateCPPSources = commandline[{"--cpp-sources"}];
+    const bool generateCPP = commandline[{"--cpp"}];
     const bool generateProto = commandline[{"--proto"}];
 
     int retVal = 1;
@@ -76,20 +69,10 @@ inline int32_t cluon_msc(int32_t argc, char **argv) {
         }
         for (auto e : result.first) {
             std::string content;
-            if (generateCPPHeaders || generateCPPSources) {
+            if (generateCPP) {
                 cluon::MetaMessageToCPPTransformator transformation;
                 e.accept([&trans = transformation](const cluon::MetaMessage &_mm){ trans.visit(_mm); });
-                std::stringstream sstr;
-                if (!CPPincludeFile.empty()) {
-                    sstr << "#include <" << CPPincludeFile << ">" << std::endl;
-                }
-                if (generateCPPHeaders) {
-                    sstr << transformation.contentHeader();
-                }
-                if (generateCPPSources) {
-                    sstr << transformation.contentSource();
-                }
-                content = sstr.str();
+                content = transformation.content();
             }
             if (generateProto) {
                 cluon::MetaMessageToProtoTransformator transformation;

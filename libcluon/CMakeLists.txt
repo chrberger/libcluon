@@ -88,7 +88,7 @@ FOREACH(entry ${CLUON-MSC-LIBCLUON-SOURCES})
     list(REMOVE_ITEM thisproject-sources ${entry})
 ENDFOREACH()
 
-add_library(${PROJECT_NAME}-objects OBJECT ${CMAKE_BINARY_DIR}/cluonDataStructures.cpp ${thisproject-sources})
+add_library(${PROJECT_NAME}-objects OBJECT ${thisproject-sources})
 set_target_properties(${PROJECT_NAME}-objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(${PROJECT_NAME} SHARED        $<TARGET_OBJECTS:${PROJECT_NAME}-objects> $<TARGET_OBJECTS:${CLUON-MSC}-objects>)
@@ -96,11 +96,6 @@ add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:${PROJECT_NAME}-objec
 
 # Define resulting libraries to link.
 set(LIBRARIES ${PROJECT_NAME}-static ${LIBRARIES})
-if("${WEB}" STREQUAL "")
-    add_library(${PROJECT_NAME}-test-objects OBJECT ${CMAKE_BINARY_DIR}/cluonTestDataStructures.cpp)
-    add_library(${PROJECT_NAME}-test-objects-static STATIC $<TARGET_OBJECTS:${PROJECT_NAME}-test-objects>)
-    set(ADDITIONAL_LIBRARIES_FOR_TESTING ${ADDITIONAL_LIBRARIES_FOR_TESTING} ${PROJECT_NAME}-test-objects-static)
-endif()
 
 # These binaries are only built for the non-Web version.
 if("${WEB}" STREQUAL "")
@@ -138,30 +133,35 @@ endif()
 
 # This command will generate an additional single source file that we can add to the build tree.
 if("${WEB}" STREQUAL "")
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluonDataStructures.cpp
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/include/cluon/cluonDataStructures.hpp
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/include/cluon
-                   COMMAND ${CLUON-MSC} --cpp-headers --cpp-sources --out=${CMAKE_BINARY_DIR}/cluonDataStructures.cpp ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd
-                   COMMAND ${CLUON-MSC} --cpp-headers --out=${CMAKE_BINARY_DIR}/include/cluon/cluonDataStructures.hpp ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd
+                   COMMAND ${CLUON-MSC} --cpp --out=${CMAKE_BINARY_DIR}/include/cluon/cluonDataStructures.hpp ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd
                    COMMAND ${CLUON-MSC} --proto --out=${CMAKE_BINARY_DIR}/cluonDataStructures.proto ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd
                    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd
                            ${CLUON-MSC})
 
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluonTestDataStructures.cpp
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/include/cluon/cluonTestDataStructures.hpp
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/include/cluon
-                   COMMAND ${CLUON-MSC} --cpp-headers --cpp-sources --out=${CMAKE_BINARY_DIR}/cluonTestDataStructures.cpp ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonTestDataStructures.odvd
-                   COMMAND ${CLUON-MSC} --cpp-headers --out=${CMAKE_BINARY_DIR}/include/cluon/cluonTestDataStructures.hpp ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonTestDataStructures.odvd
+                   COMMAND ${CLUON-MSC} --cpp --out=${CMAKE_BINARY_DIR}/include/cluon/cluonTestDataStructures.hpp ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonTestDataStructures.odvd
                    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonTestDataStructures.odvd
                            ${CLUON-MSC})
 else()
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluonDataStructures.cpp
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/include/cluon/cluonDataStructures.hpp
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/include/cluon
-                   COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd | docker run --rm -i chrberger/cluon:latest ${CLUON-MSC} --cpp-headers --cpp-sources --out=/dev/stdout /dev/stdin > ${CMAKE_BINARY_DIR}/cluonDataStructures.cpp
-                   COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd | docker run --rm -i chrberger/cluon:latest ${CLUON-MSC} --cpp-headers --out=/dev/stdout /dev/stdin > ${CMAKE_BINARY_DIR}/include/cluon/cluonDataStructures.hpp
+                   COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd | docker run --rm -i chrberger/cluon:latest ${CLUON-MSC} --cpp --out=/dev/stdout /dev/stdin > ${CMAKE_BINARY_DIR}/include/cluon/cluonDataStructures.hpp
                    COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd | docker run --rm -i chrberger/cluon:latest ${CLUON-MSC} --proto --out=/dev/stdout /dev/stdin > ${CMAKE_BINARY_DIR}/cluonDataStructures.proto
                    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/resources/cluonDataStructures.odvd)
+endif()
+
+# Add dependency the generate the header files.
+add_custom_target(generate_cluonDataStructures_hpp DEPENDS ${CMAKE_BINARY_DIR}/include/cluon/cluonDataStructures.hpp)
+add_dependencies(${PROJECT_NAME}-objects generate_cluonDataStructures_hpp)
+if("${WEB}" STREQUAL "")
+    add_custom_target(generate_cluonTestDataStructures_hpp DEPENDS ${CMAKE_BINARY_DIR}/include/cluon/cluonTestDataStructures.hpp)
+    add_dependencies(${PROJECT_NAME}-objects generate_cluonTestDataStructures_hpp)
 endif()
 
 include_directories(${CMAKE_BINARY_DIR}/include)

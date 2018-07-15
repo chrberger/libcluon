@@ -154,25 +154,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage1& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -181,7 +199,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -208,34 +226,6 @@ struct isTripletForwardVisitable<MyMessage1> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyMessage1";
-}
-
-MyMessage1& MyMessage1::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage1::s() const noexcept {
-    return m_s;
-}
-
-
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -243,10 +233,8 @@ std::string MyMessage1::s() const noexcept {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
 TEST_CASE("Transforming two messages without package and one field.") {
@@ -363,25 +351,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage1& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -390,7 +396,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -417,33 +423,6 @@ struct isTripletForwardVisitable<MyMessage1> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE1 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyMessage1";
-}
-
-MyMessage1& MyMessage1::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage1::s() const noexcept {
-    return m_s;
-}
-
-
-)";
 
     const char *EXPECTED_HEADER2 = R"(
 /*
@@ -548,25 +527,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage2 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage2";
+        static constexpr const char* TheLongName = "MyMessage2";
+
+    public:
+        inline static int32_t ID() {
+            return 2;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default;
+        MyMessage2& operator=(MyMessage2&&) = default;
         ~MyMessage2() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage2& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage2& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -575,7 +572,7 @@ class LIB_API MyMessage2 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -602,33 +599,6 @@ struct isTripletForwardVisitable<MyMessage2> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE2 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-
-
-int32_t MyMessage2::ID() {
-    return 2;
-}
-
-const std::string MyMessage2::ShortName() {
-    return "MyMessage2";
-}
-const std::string MyMessage2::LongName() {
-    return "MyMessage2";
-}
-
-MyMessage2& MyMessage2::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage2::s() const noexcept {
-    return m_s;
-}
-
-
-)";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
@@ -638,19 +608,15 @@ std::string MyMessage2::s() const noexcept {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.contentHeader() << std::endl;
-        //        std::cout << t.contentSource() << std::endl;
-        REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER1));
-        REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE1));
+//        std::cout << t.content() << std::endl;
+        REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.contentHeader() << std::endl;
-        //        std::cout << t.contentSource() << std::endl;
-        REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER2));
-        REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE2));
+//        std::cout << t.content() << std::endl;
+        REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
 
@@ -768,25 +734,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyPackage.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage1& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -795,7 +779,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -820,34 +804,6 @@ struct isTripletForwardVisitable<MyPackage::MyMessage1> {
     static const bool value = true;
 };
 #endif
-)";
-
-    const char *EXPECTED_SOURCE1 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyPackage.MyMessage1";
-}
-
-MyMessage1& MyMessage1::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage1::s() const noexcept {
-    return m_s;
-}
-
-}
 )";
 
     const char *EXPECTED_HEADER2 = R"(
@@ -953,25 +909,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage2 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage2";
+        static constexpr const char* TheLongName = "MyPackage.MyMessage2";
+
+    public:
+        inline static int32_t ID() {
+            return 2;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default;
+        MyMessage2& operator=(MyMessage2&&) = default;
         ~MyMessage2() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage2& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage2& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -980,7 +954,7 @@ class LIB_API MyMessage2 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -1007,34 +981,6 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE2 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage {
-
-int32_t MyMessage2::ID() {
-    return 2;
-}
-
-const std::string MyMessage2::ShortName() {
-    return "MyMessage2";
-}
-const std::string MyMessage2::LongName() {
-    return "MyPackage.MyMessage2";
-}
-
-MyMessage2& MyMessage2::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage2::s() const noexcept {
-    return m_s;
-}
-
-}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -1043,19 +989,15 @@ std::string MyMessage2::s() const noexcept {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.contentHeader() << std::endl;
-        //        std::cout << t.contentSource() << std::endl;
-        REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER1));
-        REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE1));
+//        std::cout << t.content() << std::endl;
+        REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.contentHeader() << std::endl;
-        //        std::cout << t.contentSource() << std::endl;
-        REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER2));
-        REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE2));
+//        std::cout << t.content() << std::endl;
+        REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
 
@@ -1174,25 +1116,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyPackage.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage1& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -1201,7 +1161,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -1226,34 +1186,6 @@ struct isTripletForwardVisitable<MyPackage::MyMessage1> {
     static const bool value = true;
 };
 #endif
-)";
-
-    const char *EXPECTED_SOURCE1 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyPackage.MyMessage1";
-}
-
-MyMessage1& MyMessage1::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage1::s() const noexcept {
-    return m_s;
-}
-
-}
 )";
 
     const char *EXPECTED_HEADER2 = R"(
@@ -1359,25 +1291,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage2 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage2";
+        static constexpr const char* TheLongName = "MyPackage.MyMessage2";
+
+    public:
+        inline static int32_t ID() {
+            return 2;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default;
+        MyMessage2& operator=(MyMessage2&&) = default;
         ~MyMessage2() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage2& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage2& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -1386,7 +1336,7 @@ class LIB_API MyMessage2 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -1413,34 +1363,6 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE2 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage {
-
-int32_t MyMessage2::ID() {
-    return 2;
-}
-
-const std::string MyMessage2::ShortName() {
-    return "MyMessage2";
-}
-const std::string MyMessage2::LongName() {
-    return "MyPackage.MyMessage2";
-}
-
-MyMessage2& MyMessage2::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage2::s() const noexcept {
-    return m_s;
-}
-
-}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -1449,19 +1371,15 @@ std::string MyMessage2::s() const noexcept {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.contentHeader() << std::endl;
-        //        std::cout << t.contentSource() << std::endl;
-        REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER1));
-        REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE1));
+//        std::cout << t.content() << std::endl;
+        REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.contentHeader() << std::endl;
-        //        std::cout << t.contentSource() << std::endl;
-        REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER2));
-        REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE2));
+//        std::cout << t.content() << std::endl;
+        REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
 
@@ -1580,25 +1498,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage { namespace SubPackage {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyPackage.SubPackage.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage1& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -1607,7 +1543,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -1632,34 +1568,6 @@ struct isTripletForwardVisitable<MyPackage::SubPackage::MyMessage1> {
     static const bool value = true;
 };
 #endif
-)";
-
-    const char *EXPECTED_SOURCE1 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage { namespace SubPackage {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyPackage.SubPackage.MyMessage1";
-}
-
-MyMessage1& MyMessage1::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage1::s() const noexcept {
-    return m_s;
-}
-
-}}
 )";
 
     const char *EXPECTED_HEADER2 = R"(
@@ -1765,25 +1673,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage { namespace SubPackage {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage2 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage2";
+        static constexpr const char* TheLongName = "MyPackage.SubPackage.MyMessage2";
+
+    public:
+        inline static int32_t ID() {
+            return 2;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default;
+        MyMessage2& operator=(MyMessage2&&) = default;
         ~MyMessage2() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage2& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage2& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -1792,7 +1718,7 @@ class LIB_API MyMessage2 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -1819,34 +1745,6 @@ struct isTripletForwardVisitable<MyPackage::SubPackage::MyMessage2> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE2 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage { namespace SubPackage {
-
-int32_t MyMessage2::ID() {
-    return 2;
-}
-
-const std::string MyMessage2::ShortName() {
-    return "MyMessage2";
-}
-const std::string MyMessage2::LongName() {
-    return "MyPackage.SubPackage.MyMessage2";
-}
-
-MyMessage2& MyMessage2::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage2::s() const noexcept {
-    return m_s;
-}
-
-}}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -1855,19 +1753,15 @@ std::string MyMessage2::s() const noexcept {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.contentHeader() << std::endl;
-        //        std::cout << t.contentSource() << std::endl;
-        REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER1));
-        REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE1));
+//        std::cout << t.content() << std::endl;
+        REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.contentHeader() << std::endl;
-        //        std::cout << t.contentSource() << std::endl;
-        REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER2));
-        REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE2));
+//        std::cout << t.content() << std::endl;
+        REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
 
@@ -1982,25 +1876,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage1 {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyPackage1.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage1& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -2009,7 +1921,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -2036,34 +1948,6 @@ struct isTripletForwardVisitable<MyPackage1::MyMessage1> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage1 {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyPackage1.MyMessage1";
-}
-
-MyMessage1& MyMessage1::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage1::s() const noexcept {
-    return m_s;
-}
-
-}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -2071,10 +1955,8 @@ std::string MyMessage1::s() const noexcept {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
 TEST_CASE("Transforming one message with multiple packages and one field.") {
@@ -2188,25 +2070,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage1 { namespace MySubPackage {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyPackage1.MySubPackage.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage1& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -2215,7 +2115,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -2242,34 +2142,6 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MyMessage1> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage1 { namespace MySubPackage {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyPackage1.MySubPackage.MyMessage1";
-}
-
-MyMessage1& MyMessage1::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage1::s() const noexcept {
-    return m_s;
-}
-
-}}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -2277,10 +2149,8 @@ std::string MyMessage1::s() const noexcept {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
 TEST_CASE("Transforming one message with sub-package with package and one field.") {
@@ -2394,25 +2264,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage1 { namespace MySubPackageMessage {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyPackage1.MySubPackageMessage.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage1& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -2421,7 +2309,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -2448,34 +2336,6 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackageMessage::MyMessage1> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage1 { namespace MySubPackageMessage {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyPackage1.MySubPackageMessage.MyMessage1";
-}
-
-MyMessage1& MyMessage1::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage1::s() const noexcept {
-    return m_s;
-}
-
-}}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -2483,10 +2343,8 @@ std::string MyMessage1::s() const noexcept {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
 TEST_CASE("Transforming one message with sub-package with multiple packages "
@@ -2601,25 +2459,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace MyPackage1 { namespace MySubPackage { namespace MySubPackageMessage {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyPackage1.MySubPackage.MySubPackageMessage.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& s(const std::string &v) noexcept;
-        std::string s() const noexcept;
+        inline MyMessage1& s(const std::string &v) noexcept {
+            m_s = v;
+            return *this;
+        }
+        inline std::string s() const noexcept {
+            return m_s;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
@@ -2628,7 +2504,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -2655,34 +2531,6 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MySubPackageMessage::
 #endif
 )";
 
-    const char *EXPECTED_SOURCE = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace MyPackage1 { namespace MySubPackage { namespace MySubPackageMessage {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyPackage1.MySubPackage.MySubPackageMessage.MyMessage1";
-}
-
-MyMessage1& MyMessage1::s(const std::string &v) noexcept {
-    m_s = v;
-    return *this;
-}
-std::string MyMessage1::s() const noexcept {
-    return m_s;
-}
-
-}}}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -2690,10 +2538,8 @@ std::string MyMessage1::s() const noexcept {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
 TEST_CASE("Transforming one message with and all fields.") {
@@ -2812,43 +2658,91 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& attribute1(const bool &v) noexcept;
-        bool attribute1() const noexcept;
+        inline MyMessage1& attribute1(const bool &v) noexcept {
+            m_attribute1 = v;
+            return *this;
+        }
+        inline bool attribute1() const noexcept {
+            return m_attribute1;
+        }
         
-        MyMessage1& attribute2(const char &v) noexcept;
-        char attribute2() const noexcept;
+        inline MyMessage1& attribute2(const char &v) noexcept {
+            m_attribute2 = v;
+            return *this;
+        }
+        inline char attribute2() const noexcept {
+            return m_attribute2;
+        }
         
-        MyMessage1& attribute3(const int32_t &v) noexcept;
-        int32_t attribute3() const noexcept;
+        inline MyMessage1& attribute3(const int32_t &v) noexcept {
+            m_attribute3 = v;
+            return *this;
+        }
+        inline int32_t attribute3() const noexcept {
+            return m_attribute3;
+        }
         
-        MyMessage1& attribute4(const uint32_t &v) noexcept;
-        uint32_t attribute4() const noexcept;
+        inline MyMessage1& attribute4(const uint32_t &v) noexcept {
+            m_attribute4 = v;
+            return *this;
+        }
+        inline uint32_t attribute4() const noexcept {
+            return m_attribute4;
+        }
         
-        MyMessage1& attribute5(const float &v) noexcept;
-        float attribute5() const noexcept;
+        inline MyMessage1& attribute5(const float &v) noexcept {
+            m_attribute5 = v;
+            return *this;
+        }
+        inline float attribute5() const noexcept {
+            return m_attribute5;
+        }
         
-        MyMessage1& attribute6(const double &v) noexcept;
-        double attribute6() const noexcept;
+        inline MyMessage1& attribute6(const double &v) noexcept {
+            m_attribute6 = v;
+            return *this;
+        }
+        inline double attribute6() const noexcept {
+            return m_attribute6;
+        }
         
-        MyMessage1& attribute7(const std::string &v) noexcept;
-        std::string attribute7() const noexcept;
+        inline MyMessage1& attribute7(const std::string &v) noexcept {
+            m_attribute7 = v;
+            return *this;
+        }
+        inline std::string attribute7() const noexcept {
+            return m_attribute7;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, visitor);
@@ -2869,7 +2763,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -2920,82 +2814,6 @@ struct isTripletForwardVisitable<MyMessage1> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyMessage1";
-}
-
-MyMessage1& MyMessage1::attribute1(const bool &v) noexcept {
-    m_attribute1 = v;
-    return *this;
-}
-bool MyMessage1::attribute1() const noexcept {
-    return m_attribute1;
-}
-
-MyMessage1& MyMessage1::attribute2(const char &v) noexcept {
-    m_attribute2 = v;
-    return *this;
-}
-char MyMessage1::attribute2() const noexcept {
-    return m_attribute2;
-}
-
-MyMessage1& MyMessage1::attribute3(const int32_t &v) noexcept {
-    m_attribute3 = v;
-    return *this;
-}
-int32_t MyMessage1::attribute3() const noexcept {
-    return m_attribute3;
-}
-
-MyMessage1& MyMessage1::attribute4(const uint32_t &v) noexcept {
-    m_attribute4 = v;
-    return *this;
-}
-uint32_t MyMessage1::attribute4() const noexcept {
-    return m_attribute4;
-}
-
-MyMessage1& MyMessage1::attribute5(const float &v) noexcept {
-    m_attribute5 = v;
-    return *this;
-}
-float MyMessage1::attribute5() const noexcept {
-    return m_attribute5;
-}
-
-MyMessage1& MyMessage1::attribute6(const double &v) noexcept {
-    m_attribute6 = v;
-    return *this;
-}
-double MyMessage1::attribute6() const noexcept {
-    return m_attribute6;
-}
-
-MyMessage1& MyMessage1::attribute7(const std::string &v) noexcept {
-    m_attribute7 = v;
-    return *this;
-}
-std::string MyMessage1::attribute7() const noexcept {
-    return m_attribute7;
-}
-
-
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -3003,10 +2821,8 @@ std::string MyMessage1::attribute7() const noexcept {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
 TEST_CASE("Transforming one message with all fields and individual initializers.") {
@@ -3132,64 +2948,147 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& attribute1(const bool &v) noexcept;
-        bool attribute1() const noexcept;
+        inline MyMessage1& attribute1(const bool &v) noexcept {
+            m_attribute1 = v;
+            return *this;
+        }
+        inline bool attribute1() const noexcept {
+            return m_attribute1;
+        }
         
-        MyMessage1& attribute2(const char &v) noexcept;
-        char attribute2() const noexcept;
+        inline MyMessage1& attribute2(const char &v) noexcept {
+            m_attribute2 = v;
+            return *this;
+        }
+        inline char attribute2() const noexcept {
+            return m_attribute2;
+        }
         
-        MyMessage1& attribute3(const int8_t &v) noexcept;
-        int8_t attribute3() const noexcept;
+        inline MyMessage1& attribute3(const int8_t &v) noexcept {
+            m_attribute3 = v;
+            return *this;
+        }
+        inline int8_t attribute3() const noexcept {
+            return m_attribute3;
+        }
         
-        MyMessage1& attribute4(const uint8_t &v) noexcept;
-        uint8_t attribute4() const noexcept;
+        inline MyMessage1& attribute4(const uint8_t &v) noexcept {
+            m_attribute4 = v;
+            return *this;
+        }
+        inline uint8_t attribute4() const noexcept {
+            return m_attribute4;
+        }
         
-        MyMessage1& attribute5(const int16_t &v) noexcept;
-        int16_t attribute5() const noexcept;
+        inline MyMessage1& attribute5(const int16_t &v) noexcept {
+            m_attribute5 = v;
+            return *this;
+        }
+        inline int16_t attribute5() const noexcept {
+            return m_attribute5;
+        }
         
-        MyMessage1& attribute6(const uint16_t &v) noexcept;
-        uint16_t attribute6() const noexcept;
+        inline MyMessage1& attribute6(const uint16_t &v) noexcept {
+            m_attribute6 = v;
+            return *this;
+        }
+        inline uint16_t attribute6() const noexcept {
+            return m_attribute6;
+        }
         
-        MyMessage1& attribute7(const int32_t &v) noexcept;
-        int32_t attribute7() const noexcept;
+        inline MyMessage1& attribute7(const int32_t &v) noexcept {
+            m_attribute7 = v;
+            return *this;
+        }
+        inline int32_t attribute7() const noexcept {
+            return m_attribute7;
+        }
         
-        MyMessage1& attribute8(const uint32_t &v) noexcept;
-        uint32_t attribute8() const noexcept;
+        inline MyMessage1& attribute8(const uint32_t &v) noexcept {
+            m_attribute8 = v;
+            return *this;
+        }
+        inline uint32_t attribute8() const noexcept {
+            return m_attribute8;
+        }
         
-        MyMessage1& attribute9(const int64_t &v) noexcept;
-        int64_t attribute9() const noexcept;
+        inline MyMessage1& attribute9(const int64_t &v) noexcept {
+            m_attribute9 = v;
+            return *this;
+        }
+        inline int64_t attribute9() const noexcept {
+            return m_attribute9;
+        }
         
-        MyMessage1& attribute10(const uint64_t &v) noexcept;
-        uint64_t attribute10() const noexcept;
+        inline MyMessage1& attribute10(const uint64_t &v) noexcept {
+            m_attribute10 = v;
+            return *this;
+        }
+        inline uint64_t attribute10() const noexcept {
+            return m_attribute10;
+        }
         
-        MyMessage1& attribute11(const float &v) noexcept;
-        float attribute11() const noexcept;
+        inline MyMessage1& attribute11(const float &v) noexcept {
+            m_attribute11 = v;
+            return *this;
+        }
+        inline float attribute11() const noexcept {
+            return m_attribute11;
+        }
         
-        MyMessage1& attribute12(const double &v) noexcept;
-        double attribute12() const noexcept;
+        inline MyMessage1& attribute12(const double &v) noexcept {
+            m_attribute12 = v;
+            return *this;
+        }
+        inline double attribute12() const noexcept {
+            return m_attribute12;
+        }
         
-        MyMessage1& attribute13(const std::string &v) noexcept;
-        std::string attribute13() const noexcept;
+        inline MyMessage1& attribute13(const std::string &v) noexcept {
+            m_attribute13 = v;
+            return *this;
+        }
+        inline std::string attribute13() const noexcept {
+            return m_attribute13;
+        }
         
-        MyMessage1& attribute14(const std::string &v) noexcept;
-        std::string attribute14() const noexcept;
+        inline MyMessage1& attribute14(const std::string &v) noexcept {
+            m_attribute14 = v;
+            return *this;
+        }
+        inline std::string attribute14() const noexcept {
+            return m_attribute14;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, visitor);
@@ -3224,7 +3123,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -3303,138 +3202,6 @@ struct isTripletForwardVisitable<MyMessage1> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyMessage1";
-}
-
-MyMessage1& MyMessage1::attribute1(const bool &v) noexcept {
-    m_attribute1 = v;
-    return *this;
-}
-bool MyMessage1::attribute1() const noexcept {
-    return m_attribute1;
-}
-
-MyMessage1& MyMessage1::attribute2(const char &v) noexcept {
-    m_attribute2 = v;
-    return *this;
-}
-char MyMessage1::attribute2() const noexcept {
-    return m_attribute2;
-}
-
-MyMessage1& MyMessage1::attribute3(const int8_t &v) noexcept {
-    m_attribute3 = v;
-    return *this;
-}
-int8_t MyMessage1::attribute3() const noexcept {
-    return m_attribute3;
-}
-
-MyMessage1& MyMessage1::attribute4(const uint8_t &v) noexcept {
-    m_attribute4 = v;
-    return *this;
-}
-uint8_t MyMessage1::attribute4() const noexcept {
-    return m_attribute4;
-}
-
-MyMessage1& MyMessage1::attribute5(const int16_t &v) noexcept {
-    m_attribute5 = v;
-    return *this;
-}
-int16_t MyMessage1::attribute5() const noexcept {
-    return m_attribute5;
-}
-
-MyMessage1& MyMessage1::attribute6(const uint16_t &v) noexcept {
-    m_attribute6 = v;
-    return *this;
-}
-uint16_t MyMessage1::attribute6() const noexcept {
-    return m_attribute6;
-}
-
-MyMessage1& MyMessage1::attribute7(const int32_t &v) noexcept {
-    m_attribute7 = v;
-    return *this;
-}
-int32_t MyMessage1::attribute7() const noexcept {
-    return m_attribute7;
-}
-
-MyMessage1& MyMessage1::attribute8(const uint32_t &v) noexcept {
-    m_attribute8 = v;
-    return *this;
-}
-uint32_t MyMessage1::attribute8() const noexcept {
-    return m_attribute8;
-}
-
-MyMessage1& MyMessage1::attribute9(const int64_t &v) noexcept {
-    m_attribute9 = v;
-    return *this;
-}
-int64_t MyMessage1::attribute9() const noexcept {
-    return m_attribute9;
-}
-
-MyMessage1& MyMessage1::attribute10(const uint64_t &v) noexcept {
-    m_attribute10 = v;
-    return *this;
-}
-uint64_t MyMessage1::attribute10() const noexcept {
-    return m_attribute10;
-}
-
-MyMessage1& MyMessage1::attribute11(const float &v) noexcept {
-    m_attribute11 = v;
-    return *this;
-}
-float MyMessage1::attribute11() const noexcept {
-    return m_attribute11;
-}
-
-MyMessage1& MyMessage1::attribute12(const double &v) noexcept {
-    m_attribute12 = v;
-    return *this;
-}
-double MyMessage1::attribute12() const noexcept {
-    return m_attribute12;
-}
-
-MyMessage1& MyMessage1::attribute13(const std::string &v) noexcept {
-    m_attribute13 = v;
-    return *this;
-}
-std::string MyMessage1::attribute13() const noexcept {
-    return m_attribute13;
-}
-
-MyMessage1& MyMessage1::attribute14(const std::string &v) noexcept {
-    m_attribute14 = v;
-    return *this;
-}
-std::string MyMessage1::attribute14() const noexcept {
-    return m_attribute14;
-}
-
-
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -3442,10 +3209,8 @@ std::string MyMessage1::attribute14() const noexcept {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
 TEST_CASE("Transforming two messages with one field each and cross-referenced message type.") {
@@ -3563,25 +3328,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& attribute1(const std::string &v) noexcept;
-        std::string attribute1() const noexcept;
+        inline MyMessage1& attribute1(const std::string &v) noexcept {
+            m_attribute1 = v;
+            return *this;
+        }
+        inline std::string attribute1() const noexcept {
+            return m_attribute1;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
@@ -3590,7 +3373,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -3615,34 +3398,6 @@ struct isTripletForwardVisitable<MyMessage1> {
     static const bool value = true;
 };
 #endif
-)";
-
-    const char *EXPECTED_SOURCE1 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "MyMessage1";
-}
-
-MyMessage1& MyMessage1::attribute1(const std::string &v) noexcept {
-    m_attribute1 = v;
-    return *this;
-}
-std::string MyMessage1::attribute1() const noexcept {
-    return m_attribute1;
-}
-
-
 )";
 
     const char *EXPECTED_HEADER2 = R"(
@@ -3748,28 +3503,51 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage2 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage2";
+        static constexpr const char* TheLongName = "MyMessage2";
+
+    public:
+        inline static int32_t ID() {
+            return 2;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default;
+        MyMessage2& operator=(MyMessage2&&) = default;
         ~MyMessage2() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage2& field1(const uint8_t &v) noexcept;
-        uint8_t field1() const noexcept;
+        inline MyMessage2& field1(const uint8_t &v) noexcept {
+            m_field1 = v;
+            return *this;
+        }
+        inline uint8_t field1() const noexcept {
+            return m_field1;
+        }
         
-        MyMessage2& field2(const MyMessage1 &v) noexcept;
-        MyMessage1 field2() const noexcept;
+        inline MyMessage2& field2(const MyMessage1 &v) noexcept {
+            m_field2 = v;
+            return *this;
+        }
+        inline MyMessage1 field2() const noexcept {
+            return m_field2;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
@@ -3780,7 +3558,7 @@ class LIB_API MyMessage2 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -3811,42 +3589,6 @@ struct isTripletForwardVisitable<MyMessage2> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE2 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-
-
-int32_t MyMessage2::ID() {
-    return 2;
-}
-
-const std::string MyMessage2::ShortName() {
-    return "MyMessage2";
-}
-const std::string MyMessage2::LongName() {
-    return "MyMessage2";
-}
-
-MyMessage2& MyMessage2::field1(const uint8_t &v) noexcept {
-    m_field1 = v;
-    return *this;
-}
-uint8_t MyMessage2::field1() const noexcept {
-    return m_field1;
-}
-
-MyMessage2& MyMessage2::field2(const MyMessage1 &v) noexcept {
-    m_field2 = v;
-    return *this;
-}
-MyMessage1 MyMessage2::field2() const noexcept {
-    return m_field2;
-}
-
-
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -3858,16 +3600,12 @@ MyMessage1 MyMessage2::field2() const noexcept {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER1));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE1));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER2));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE2));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
 TEST_CASE("Transforming two messages with one field each and cross-referenced message type with sub-message name.") {
@@ -3985,25 +3723,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace DEF {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "DEF.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& attribute1(const std::string &v) noexcept;
-        std::string attribute1() const noexcept;
+        inline MyMessage1& attribute1(const std::string &v) noexcept {
+            m_attribute1 = v;
+            return *this;
+        }
+        inline std::string attribute1() const noexcept {
+            return m_attribute1;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
@@ -4012,7 +3768,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -4037,34 +3793,6 @@ struct isTripletForwardVisitable<DEF::MyMessage1> {
     static const bool value = true;
 };
 #endif
-)";
-
-    const char *EXPECTED_SOURCE1 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace DEF {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "DEF.MyMessage1";
-}
-
-MyMessage1& MyMessage1::attribute1(const std::string &v) noexcept {
-    m_attribute1 = v;
-    return *this;
-}
-std::string MyMessage1::attribute1() const noexcept {
-    return m_attribute1;
-}
-
-}
 )";
 
     const char *EXPECTED_HEADER2 = R"(
@@ -4170,28 +3898,51 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace DEF {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage2 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage2";
+        static constexpr const char* TheLongName = "DEF.MyMessage2";
+
+    public:
+        inline static int32_t ID() {
+            return 2;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default;
+        MyMessage2& operator=(MyMessage2&&) = default;
         ~MyMessage2() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage2& field1(const uint8_t &v) noexcept;
-        uint8_t field1() const noexcept;
+        inline MyMessage2& field1(const uint8_t &v) noexcept {
+            m_field1 = v;
+            return *this;
+        }
+        inline uint8_t field1() const noexcept {
+            return m_field1;
+        }
         
-        MyMessage2& field2(const DEF::MyMessage1 &v) noexcept;
-        DEF::MyMessage1 field2() const noexcept;
+        inline MyMessage2& field2(const DEF::MyMessage1 &v) noexcept {
+            m_field2 = v;
+            return *this;
+        }
+        inline DEF::MyMessage1 field2() const noexcept {
+            return m_field2;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
@@ -4202,7 +3953,7 @@ class LIB_API MyMessage2 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -4233,42 +3984,6 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE2 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace DEF {
-
-int32_t MyMessage2::ID() {
-    return 2;
-}
-
-const std::string MyMessage2::ShortName() {
-    return "MyMessage2";
-}
-const std::string MyMessage2::LongName() {
-    return "DEF.MyMessage2";
-}
-
-MyMessage2& MyMessage2::field1(const uint8_t &v) noexcept {
-    m_field1 = v;
-    return *this;
-}
-uint8_t MyMessage2::field1() const noexcept {
-    return m_field1;
-}
-
-MyMessage2& MyMessage2::field2(const DEF::MyMessage1 &v) noexcept {
-    m_field2 = v;
-    return *this;
-}
-DEF::MyMessage1 MyMessage2::field2() const noexcept {
-    return m_field2;
-}
-
-}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -4280,16 +3995,12 @@ DEF::MyMessage1 MyMessage2::field2() const noexcept {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER1));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE1));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER2));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE2));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
 TEST_CASE("Transforming two messages with one field each and cross-referenced message type with package name.") {
@@ -4408,25 +4119,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace DEF {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "DEF.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& attribute1(const std::string &v) noexcept;
-        std::string attribute1() const noexcept;
+        inline MyMessage1& attribute1(const std::string &v) noexcept {
+            m_attribute1 = v;
+            return *this;
+        }
+        inline std::string attribute1() const noexcept {
+            return m_attribute1;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
@@ -4435,7 +4164,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -4460,34 +4189,6 @@ struct isTripletForwardVisitable<DEF::MyMessage1> {
     static const bool value = true;
 };
 #endif
-)";
-
-    const char *EXPECTED_SOURCE1 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace DEF {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "DEF.MyMessage1";
-}
-
-MyMessage1& MyMessage1::attribute1(const std::string &v) noexcept {
-    m_attribute1 = v;
-    return *this;
-}
-std::string MyMessage1::attribute1() const noexcept {
-    return m_attribute1;
-}
-
-}
 )";
 
     const char *EXPECTED_HEADER2 = R"(
@@ -4593,28 +4294,51 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace DEF {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage2 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage2";
+        static constexpr const char* TheLongName = "DEF.MyMessage2";
+
+    public:
+        inline static int32_t ID() {
+            return 2;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default;
+        MyMessage2& operator=(MyMessage2&&) = default;
         ~MyMessage2() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage2& field1(const uint8_t &v) noexcept;
-        uint8_t field1() const noexcept;
+        inline MyMessage2& field1(const uint8_t &v) noexcept {
+            m_field1 = v;
+            return *this;
+        }
+        inline uint8_t field1() const noexcept {
+            return m_field1;
+        }
         
-        MyMessage2& field2(const DEF::MyMessage1 &v) noexcept;
-        DEF::MyMessage1 field2() const noexcept;
+        inline MyMessage2& field2(const DEF::MyMessage1 &v) noexcept {
+            m_field2 = v;
+            return *this;
+        }
+        inline DEF::MyMessage1 field2() const noexcept {
+            return m_field2;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
@@ -4625,7 +4349,7 @@ class LIB_API MyMessage2 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -4656,42 +4380,6 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE2 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace DEF {
-
-int32_t MyMessage2::ID() {
-    return 2;
-}
-
-const std::string MyMessage2::ShortName() {
-    return "MyMessage2";
-}
-const std::string MyMessage2::LongName() {
-    return "DEF.MyMessage2";
-}
-
-MyMessage2& MyMessage2::field1(const uint8_t &v) noexcept {
-    m_field1 = v;
-    return *this;
-}
-uint8_t MyMessage2::field1() const noexcept {
-    return m_field1;
-}
-
-MyMessage2& MyMessage2::field2(const DEF::MyMessage1 &v) noexcept {
-    m_field2 = v;
-    return *this;
-}
-DEF::MyMessage1 MyMessage2::field2() const noexcept {
-    return m_field2;
-}
-
-}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -4703,16 +4391,12 @@ DEF::MyMessage1 MyMessage2::field2() const noexcept {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER1));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE1));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER2));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE2));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
 TEST_CASE("Transforming two messages with one field each and cross-referenced message type and sub-names with package "
@@ -4832,25 +4516,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace ABC { namespace DEF {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "ABC.DEF.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& attribute1(const std::string &v) noexcept;
-        std::string attribute1() const noexcept;
+        inline MyMessage1& attribute1(const std::string &v) noexcept {
+            m_attribute1 = v;
+            return *this;
+        }
+        inline std::string attribute1() const noexcept {
+            return m_attribute1;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
@@ -4859,7 +4561,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -4884,34 +4586,6 @@ struct isTripletForwardVisitable<ABC::DEF::MyMessage1> {
     static const bool value = true;
 };
 #endif
-)";
-
-    const char *EXPECTED_SOURCE1 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace ABC { namespace DEF {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "ABC.DEF.MyMessage1";
-}
-
-MyMessage1& MyMessage1::attribute1(const std::string &v) noexcept {
-    m_attribute1 = v;
-    return *this;
-}
-std::string MyMessage1::attribute1() const noexcept {
-    return m_attribute1;
-}
-
-}}
 )";
 
     const char *EXPECTED_HEADER2 = R"(
@@ -5017,28 +4691,51 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace ABC { namespace DEF {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage2 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage2";
+        static constexpr const char* TheLongName = "ABC.DEF.MyMessage2";
+
+    public:
+        inline static int32_t ID() {
+            return 2;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default;
+        MyMessage2& operator=(MyMessage2&&) = default;
         ~MyMessage2() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage2& field1(const uint8_t &v) noexcept;
-        uint8_t field1() const noexcept;
+        inline MyMessage2& field1(const uint8_t &v) noexcept {
+            m_field1 = v;
+            return *this;
+        }
+        inline uint8_t field1() const noexcept {
+            return m_field1;
+        }
         
-        MyMessage2& field2(const ABC::DEF::MyMessage1 &v) noexcept;
-        ABC::DEF::MyMessage1 field2() const noexcept;
+        inline MyMessage2& field2(const ABC::DEF::MyMessage1 &v) noexcept {
+            m_field2 = v;
+            return *this;
+        }
+        inline ABC::DEF::MyMessage1 field2() const noexcept {
+            return m_field2;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
@@ -5049,7 +4746,7 @@ class LIB_API MyMessage2 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -5080,42 +4777,6 @@ struct isTripletForwardVisitable<ABC::DEF::MyMessage2> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE2 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace ABC { namespace DEF {
-
-int32_t MyMessage2::ID() {
-    return 2;
-}
-
-const std::string MyMessage2::ShortName() {
-    return "MyMessage2";
-}
-const std::string MyMessage2::LongName() {
-    return "ABC.DEF.MyMessage2";
-}
-
-MyMessage2& MyMessage2::field1(const uint8_t &v) noexcept {
-    m_field1 = v;
-    return *this;
-}
-uint8_t MyMessage2::field1() const noexcept {
-    return m_field1;
-}
-
-MyMessage2& MyMessage2::field2(const ABC::DEF::MyMessage1 &v) noexcept {
-    m_field2 = v;
-    return *this;
-}
-ABC::DEF::MyMessage1 MyMessage2::field2() const noexcept {
-    return m_field2;
-}
-
-}}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -5127,16 +4788,12 @@ ABC::DEF::MyMessage1 MyMessage2::field2() const noexcept {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER1));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE1));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER2));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE2));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
 TEST_CASE("Transforming two messages with one field each and cross-referenced message type and sub-names with package "
@@ -5256,25 +4913,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace ABC { namespace GHI { namespace DEF {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage1 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage1";
+        static constexpr const char* TheLongName = "ABC.GHI.DEF.MyMessage1";
+
+    public:
+        inline static int32_t ID() {
+            return 1;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage1() = default;
         MyMessage1(const MyMessage1&) = default;
         MyMessage1& operator=(const MyMessage1&) = default;
-        MyMessage1(MyMessage1&&) = default; // NOLINT
-        MyMessage1& operator=(MyMessage1&&) = default; // NOLINT
+        MyMessage1(MyMessage1&&) = default;
+        MyMessage1& operator=(MyMessage1&&) = default;
         ~MyMessage1() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage1& attribute1(const std::string &v) noexcept;
-        std::string attribute1() const noexcept;
+        inline MyMessage1& attribute1(const std::string &v) noexcept {
+            m_attribute1 = v;
+            return *this;
+        }
+        inline std::string attribute1() const noexcept {
+            return m_attribute1;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
@@ -5283,7 +4958,7 @@ class LIB_API MyMessage1 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -5308,34 +4983,6 @@ struct isTripletForwardVisitable<ABC::GHI::DEF::MyMessage1> {
     static const bool value = true;
 };
 #endif
-)";
-
-    const char *EXPECTED_SOURCE1 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace ABC { namespace GHI { namespace DEF {
-
-int32_t MyMessage1::ID() {
-    return 1;
-}
-
-const std::string MyMessage1::ShortName() {
-    return "MyMessage1";
-}
-const std::string MyMessage1::LongName() {
-    return "ABC.GHI.DEF.MyMessage1";
-}
-
-MyMessage1& MyMessage1::attribute1(const std::string &v) noexcept {
-    m_attribute1 = v;
-    return *this;
-}
-std::string MyMessage1::attribute1() const noexcept {
-    return m_attribute1;
-}
-
-}}}
 )";
 
     const char *EXPECTED_HEADER2 = R"(
@@ -5441,28 +5088,51 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace ABC { namespace GHI { namespace DEF {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyMessage2 {
+    private:
+        static constexpr const char* TheShortName = "MyMessage2";
+        static constexpr const char* TheLongName = "ABC.GHI.DEF.MyMessage2";
+
+    public:
+        inline static int32_t ID() {
+            return 2;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyMessage2() = default;
         MyMessage2(const MyMessage2&) = default;
         MyMessage2& operator=(const MyMessage2&) = default;
-        MyMessage2(MyMessage2&&) = default; // NOLINT
-        MyMessage2& operator=(MyMessage2&&) = default; // NOLINT
+        MyMessage2(MyMessage2&&) = default;
+        MyMessage2& operator=(MyMessage2&&) = default;
         ~MyMessage2() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyMessage2& field1(const uint8_t &v) noexcept;
-        uint8_t field1() const noexcept;
+        inline MyMessage2& field1(const uint8_t &v) noexcept {
+            m_field1 = v;
+            return *this;
+        }
+        inline uint8_t field1() const noexcept {
+            return m_field1;
+        }
         
-        MyMessage2& field2(const ABC::GHI::DEF::MyMessage1 &v) noexcept;
-        ABC::GHI::DEF::MyMessage1 field2() const noexcept;
+        inline MyMessage2& field2(const ABC::GHI::DEF::MyMessage1 &v) noexcept {
+            m_field2 = v;
+            return *this;
+        }
+        inline ABC::GHI::DEF::MyMessage1 field2() const noexcept {
+            return m_field2;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
@@ -5473,7 +5143,7 @@ class LIB_API MyMessage2 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -5504,42 +5174,6 @@ struct isTripletForwardVisitable<ABC::GHI::DEF::MyMessage2> {
 #endif
 )";
 
-    const char *EXPECTED_SOURCE2 = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace ABC { namespace GHI { namespace DEF {
-
-int32_t MyMessage2::ID() {
-    return 2;
-}
-
-const std::string MyMessage2::ShortName() {
-    return "MyMessage2";
-}
-const std::string MyMessage2::LongName() {
-    return "ABC.GHI.DEF.MyMessage2";
-}
-
-MyMessage2& MyMessage2::field1(const uint8_t &v) noexcept {
-    m_field1 = v;
-    return *this;
-}
-uint8_t MyMessage2::field1() const noexcept {
-    return m_field1;
-}
-
-MyMessage2& MyMessage2::field2(const ABC::GHI::DEF::MyMessage1 &v) noexcept {
-    m_field2 = v;
-    return *this;
-}
-ABC::GHI::DEF::MyMessage1 MyMessage2::field2() const noexcept {
-    return m_field2;
-}
-
-}}}
-)";
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -5551,14 +5185,10 @@ ABC::GHI::DEF::MyMessage1 MyMessage2::field2() const noexcept {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER1));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE1));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.contentHeader() << std::endl;
-    //    std::cout << t.contentSource() << std::endl;
-    REQUIRE(t.contentHeader() == std::string(EXPECTED_HEADER2));
-    REQUIRE(t.contentSource() == std::string(EXPECTED_SOURCE2));
+//    std::cout << t.content() << std::endl;
+    REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }

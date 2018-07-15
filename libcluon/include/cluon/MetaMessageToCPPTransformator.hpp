@@ -50,11 +50,7 @@ class LIBCLUON_API MetaMessageToCPPTransformator {
     /**
      * @return Content of the C++ header.
      */
-    std::string contentHeader() noexcept;
-    /**
-     * @return Content of the C++ source.
-     */
-    std::string contentSource() noexcept;
+    std::string content() noexcept;
 
    private:
     kainjow::mustache::data m_dataToBeRendered{};

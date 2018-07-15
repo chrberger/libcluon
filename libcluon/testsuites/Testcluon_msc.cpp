@@ -207,13 +207,13 @@ message testdata_MyTestMessage5 {
     UNLINK("ABC2.proto");
 }
 
-TEST_CASE("Test .hpp conversion with valid ODVD.") {
+TEST_CASE("Test .cpp conversion with valid ODVD.") {
     UNLINK("ABC3.odvd");
     UNLINK("ABC3.hpp");
 
     constexpr int32_t argc = 4;
     const char *argv[]     = {static_cast<const char *>("cluon-msc"),
-                          static_cast<const char *>("--cpp-headers"),
+                          static_cast<const char *>("--cpp"),
                           static_cast<const char *>("--out=ABC3.hpp"),
                           static_cast<const char *>("ABC3.odvd")};
 
@@ -352,55 +352,123 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 namespace testdata {
 using namespace std::string_literals; // NOLINT
 class LIB_API MyTestMessage5 {
+    private:
+        static constexpr const char* TheShortName = "MyTestMessage5";
+        static constexpr const char* TheLongName = "testdata.MyTestMessage5";
+
+    public:
+        inline static int32_t ID() {
+            return 30005;
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         MyTestMessage5() = default;
         MyTestMessage5(const MyTestMessage5&) = default;
         MyTestMessage5& operator=(const MyTestMessage5&) = default;
-        MyTestMessage5(MyTestMessage5&&) = default; // NOLINT
-        MyTestMessage5& operator=(MyTestMessage5&&) = default; // NOLINT
+        MyTestMessage5(MyTestMessage5&&) = default;
+        MyTestMessage5& operator=(MyTestMessage5&&) = default;
         ~MyTestMessage5() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         
-        MyTestMessage5& attribute1(const uint8_t &v) noexcept;
-        uint8_t attribute1() const noexcept;
+        inline MyTestMessage5& attribute1(const uint8_t &v) noexcept {
+            m_attribute1 = v;
+            return *this;
+        }
+        inline uint8_t attribute1() const noexcept {
+            return m_attribute1;
+        }
         
-        MyTestMessage5& attribute2(const int8_t &v) noexcept;
-        int8_t attribute2() const noexcept;
+        inline MyTestMessage5& attribute2(const int8_t &v) noexcept {
+            m_attribute2 = v;
+            return *this;
+        }
+        inline int8_t attribute2() const noexcept {
+            return m_attribute2;
+        }
         
-        MyTestMessage5& attribute3(const uint16_t &v) noexcept;
-        uint16_t attribute3() const noexcept;
+        inline MyTestMessage5& attribute3(const uint16_t &v) noexcept {
+            m_attribute3 = v;
+            return *this;
+        }
+        inline uint16_t attribute3() const noexcept {
+            return m_attribute3;
+        }
         
-        MyTestMessage5& attribute4(const int16_t &v) noexcept;
-        int16_t attribute4() const noexcept;
+        inline MyTestMessage5& attribute4(const int16_t &v) noexcept {
+            m_attribute4 = v;
+            return *this;
+        }
+        inline int16_t attribute4() const noexcept {
+            return m_attribute4;
+        }
         
-        MyTestMessage5& attribute5(const uint32_t &v) noexcept;
-        uint32_t attribute5() const noexcept;
+        inline MyTestMessage5& attribute5(const uint32_t &v) noexcept {
+            m_attribute5 = v;
+            return *this;
+        }
+        inline uint32_t attribute5() const noexcept {
+            return m_attribute5;
+        }
         
-        MyTestMessage5& attribute6(const int32_t &v) noexcept;
-        int32_t attribute6() const noexcept;
+        inline MyTestMessage5& attribute6(const int32_t &v) noexcept {
+            m_attribute6 = v;
+            return *this;
+        }
+        inline int32_t attribute6() const noexcept {
+            return m_attribute6;
+        }
         
-        MyTestMessage5& attribute7(const uint64_t &v) noexcept;
-        uint64_t attribute7() const noexcept;
+        inline MyTestMessage5& attribute7(const uint64_t &v) noexcept {
+            m_attribute7 = v;
+            return *this;
+        }
+        inline uint64_t attribute7() const noexcept {
+            return m_attribute7;
+        }
         
-        MyTestMessage5& attribute8(const int64_t &v) noexcept;
-        int64_t attribute8() const noexcept;
+        inline MyTestMessage5& attribute8(const int64_t &v) noexcept {
+            m_attribute8 = v;
+            return *this;
+        }
+        inline int64_t attribute8() const noexcept {
+            return m_attribute8;
+        }
         
-        MyTestMessage5& attribute9(const float &v) noexcept;
-        float attribute9() const noexcept;
+        inline MyTestMessage5& attribute9(const float &v) noexcept {
+            m_attribute9 = v;
+            return *this;
+        }
+        inline float attribute9() const noexcept {
+            return m_attribute9;
+        }
         
-        MyTestMessage5& attribute10(const double &v) noexcept;
-        double attribute10() const noexcept;
+        inline MyTestMessage5& attribute10(const double &v) noexcept {
+            m_attribute10 = v;
+            return *this;
+        }
+        inline double attribute10() const noexcept {
+            return m_attribute10;
+        }
         
-        MyTestMessage5& attribute11(const std::string &v) noexcept;
-        std::string attribute11() const noexcept;
+        inline MyTestMessage5& attribute11(const std::string &v) noexcept {
+            m_attribute11 = v;
+            return *this;
+        }
+        inline std::string attribute11() const noexcept {
+            return m_attribute11;
+        }
         
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
             doVisit(1, std::move("uint8_t"s), std::move("attribute1"s), m_attribute1, visitor);
@@ -429,7 +497,7 @@ class LIB_API MyTestMessage5 {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             
@@ -501,320 +569,4 @@ struct isTripletForwardVisitable<testdata::MyTestMessage5> {
 
     UNLINK("ABC3.odvd");
     UNLINK("ABC3.proto");
-}
-
-TEST_CASE("Test .cpp conversion with valid ODVD and no additional include header.") {
-    UNLINK("ABC4.odvd");
-    UNLINK("ABC4.cpp");
-
-    constexpr int32_t argc = 4;
-    const char *argv[]     = {static_cast<const char *>("cluon-msc"),
-                          static_cast<const char *>("--cpp-sources"),
-                          static_cast<const char *>("--out=ABC4.cpp"),
-                          static_cast<const char *>("ABC4.odvd")};
-
-    const char *input = R"(
-message testdata.MyTestMessage5 [id = 30005] {
-    uint8 attribute1 [ default = 1, id = 1 ];
-    int8 attribute2 [ default = -1, id = 2 ];
-    uint16 attribute3 [ default = 100, id = 3 ];
-    int16 attribute4 [ default = -100, id = 4 ];
-    uint32 attribute5 [ default = 10000, id = 5 ];
-    int32 attribute6 [ default = -10000, id = 6 ];
-    uint64 attribute7 [ default = 12345, id = 7 ];
-    int64 attribute8 [ default = -12345, id = 8 ];
-    float attribute9 [ default = -1.2345, id = 9 ];
-    double attribute10 [ default = -10.2345, id = 10 ];
-    string attribute11 [ default = "Hello World!", id = 11 ];
-}
-)";
-    std::string messageSpecification(input);
-
-    std::fstream odvd("ABC4.odvd", std::ios::out);
-    odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
-    odvd.close();
-
-    REQUIRE(0 == cluon_msc(argc, const_cast<char **>(argv)));
-
-    std::fstream out("ABC4.cpp", std::ios::in);
-    REQUIRE(out.good());
-
-    std::stringstream sstrOutput;
-    std::string output;
-    while (getline(out, output)) { sstrOutput << output << std::endl; }
-    out.close();
-    output = sstrOutput.str();
-
-    const char *expectedOutput = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace testdata {
-
-int32_t MyTestMessage5::ID() {
-    return 30005;
-}
-
-const std::string MyTestMessage5::ShortName() {
-    return "MyTestMessage5";
-}
-const std::string MyTestMessage5::LongName() {
-    return "testdata.MyTestMessage5";
-}
-
-MyTestMessage5& MyTestMessage5::attribute1(const uint8_t &v) noexcept {
-    m_attribute1 = v;
-    return *this;
-}
-uint8_t MyTestMessage5::attribute1() const noexcept {
-    return m_attribute1;
-}
-
-MyTestMessage5& MyTestMessage5::attribute2(const int8_t &v) noexcept {
-    m_attribute2 = v;
-    return *this;
-}
-int8_t MyTestMessage5::attribute2() const noexcept {
-    return m_attribute2;
-}
-
-MyTestMessage5& MyTestMessage5::attribute3(const uint16_t &v) noexcept {
-    m_attribute3 = v;
-    return *this;
-}
-uint16_t MyTestMessage5::attribute3() const noexcept {
-    return m_attribute3;
-}
-
-MyTestMessage5& MyTestMessage5::attribute4(const int16_t &v) noexcept {
-    m_attribute4 = v;
-    return *this;
-}
-int16_t MyTestMessage5::attribute4() const noexcept {
-    return m_attribute4;
-}
-
-MyTestMessage5& MyTestMessage5::attribute5(const uint32_t &v) noexcept {
-    m_attribute5 = v;
-    return *this;
-}
-uint32_t MyTestMessage5::attribute5() const noexcept {
-    return m_attribute5;
-}
-
-MyTestMessage5& MyTestMessage5::attribute6(const int32_t &v) noexcept {
-    m_attribute6 = v;
-    return *this;
-}
-int32_t MyTestMessage5::attribute6() const noexcept {
-    return m_attribute6;
-}
-
-MyTestMessage5& MyTestMessage5::attribute7(const uint64_t &v) noexcept {
-    m_attribute7 = v;
-    return *this;
-}
-uint64_t MyTestMessage5::attribute7() const noexcept {
-    return m_attribute7;
-}
-
-MyTestMessage5& MyTestMessage5::attribute8(const int64_t &v) noexcept {
-    m_attribute8 = v;
-    return *this;
-}
-int64_t MyTestMessage5::attribute8() const noexcept {
-    return m_attribute8;
-}
-
-MyTestMessage5& MyTestMessage5::attribute9(const float &v) noexcept {
-    m_attribute9 = v;
-    return *this;
-}
-float MyTestMessage5::attribute9() const noexcept {
-    return m_attribute9;
-}
-
-MyTestMessage5& MyTestMessage5::attribute10(const double &v) noexcept {
-    m_attribute10 = v;
-    return *this;
-}
-double MyTestMessage5::attribute10() const noexcept {
-    return m_attribute10;
-}
-
-MyTestMessage5& MyTestMessage5::attribute11(const std::string &v) noexcept {
-    m_attribute11 = v;
-    return *this;
-}
-std::string MyTestMessage5::attribute11() const noexcept {
-    return m_attribute11;
-}
-
-}
-
-)";
-
-    REQUIRE(output == std::string(expectedOutput));
-
-    UNLINK("ABC4.odvd");
-    UNLINK("ABC4.cpp");
-}
-
-TEST_CASE("Test .cpp conversion with valid ODVD and additional include header.") {
-    UNLINK("ABC5.odvd");
-    UNLINK("ABC5.cpp");
-
-    constexpr int32_t argc = 5;
-    const char *argv[]     = {static_cast<const char *>("cluon-msc"),
-                          static_cast<const char *>("--cpp-sources"),
-                          static_cast<const char *>("--cpp-add-include-file=ABC5.hpp"),
-                          static_cast<const char *>("--out=ABC5.cpp"),
-                          static_cast<const char *>("ABC5.odvd")};
-
-    const char *input = R"(
-message testdata.MyTestMessage5 [id = 30005] {
-    uint8 attribute1 [ default = 1, id = 1 ];
-    int8 attribute2 [ default = -1, id = 2 ];
-    uint16 attribute3 [ default = 100, id = 3 ];
-    int16 attribute4 [ default = -100, id = 4 ];
-    uint32 attribute5 [ default = 10000, id = 5 ];
-    int32 attribute6 [ default = -10000, id = 6 ];
-    uint64 attribute7 [ default = 12345, id = 7 ];
-    int64 attribute8 [ default = -12345, id = 8 ];
-    float attribute9 [ default = -1.2345, id = 9 ];
-    double attribute10 [ default = -10.2345, id = 10 ];
-    string attribute11 [ default = "Hello World!", id = 11 ];
-}
-)";
-    std::string messageSpecification(input);
-
-    std::fstream odvd("ABC5.odvd", std::ios::out);
-    odvd.write(messageSpecification.c_str(), static_cast<std::streamsize>(messageSpecification.size()));
-    odvd.close();
-
-    REQUIRE(0 == cluon_msc(argc, const_cast<char **>(argv)));
-
-    std::fstream out("ABC5.cpp", std::ios::in);
-    REQUIRE(out.good());
-
-    std::stringstream sstrOutput;
-    std::string output;
-    while (getline(out, output)) { sstrOutput << output << std::endl; }
-    out.close();
-    output = sstrOutput.str();
-
-    const char *expectedOutput = R"(#include <ABC5.hpp>
-
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-namespace testdata {
-
-int32_t MyTestMessage5::ID() {
-    return 30005;
-}
-
-const std::string MyTestMessage5::ShortName() {
-    return "MyTestMessage5";
-}
-const std::string MyTestMessage5::LongName() {
-    return "testdata.MyTestMessage5";
-}
-
-MyTestMessage5& MyTestMessage5::attribute1(const uint8_t &v) noexcept {
-    m_attribute1 = v;
-    return *this;
-}
-uint8_t MyTestMessage5::attribute1() const noexcept {
-    return m_attribute1;
-}
-
-MyTestMessage5& MyTestMessage5::attribute2(const int8_t &v) noexcept {
-    m_attribute2 = v;
-    return *this;
-}
-int8_t MyTestMessage5::attribute2() const noexcept {
-    return m_attribute2;
-}
-
-MyTestMessage5& MyTestMessage5::attribute3(const uint16_t &v) noexcept {
-    m_attribute3 = v;
-    return *this;
-}
-uint16_t MyTestMessage5::attribute3() const noexcept {
-    return m_attribute3;
-}
-
-MyTestMessage5& MyTestMessage5::attribute4(const int16_t &v) noexcept {
-    m_attribute4 = v;
-    return *this;
-}
-int16_t MyTestMessage5::attribute4() const noexcept {
-    return m_attribute4;
-}
-
-MyTestMessage5& MyTestMessage5::attribute5(const uint32_t &v) noexcept {
-    m_attribute5 = v;
-    return *this;
-}
-uint32_t MyTestMessage5::attribute5() const noexcept {
-    return m_attribute5;
-}
-
-MyTestMessage5& MyTestMessage5::attribute6(const int32_t &v) noexcept {
-    m_attribute6 = v;
-    return *this;
-}
-int32_t MyTestMessage5::attribute6() const noexcept {
-    return m_attribute6;
-}
-
-MyTestMessage5& MyTestMessage5::attribute7(const uint64_t &v) noexcept {
-    m_attribute7 = v;
-    return *this;
-}
-uint64_t MyTestMessage5::attribute7() const noexcept {
-    return m_attribute7;
-}
-
-MyTestMessage5& MyTestMessage5::attribute8(const int64_t &v) noexcept {
-    m_attribute8 = v;
-    return *this;
-}
-int64_t MyTestMessage5::attribute8() const noexcept {
-    return m_attribute8;
-}
-
-MyTestMessage5& MyTestMessage5::attribute9(const float &v) noexcept {
-    m_attribute9 = v;
-    return *this;
-}
-float MyTestMessage5::attribute9() const noexcept {
-    return m_attribute9;
-}
-
-MyTestMessage5& MyTestMessage5::attribute10(const double &v) noexcept {
-    m_attribute10 = v;
-    return *this;
-}
-double MyTestMessage5::attribute10() const noexcept {
-    return m_attribute10;
-}
-
-MyTestMessage5& MyTestMessage5::attribute11(const std::string &v) noexcept {
-    m_attribute11 = v;
-    return *this;
-}
-std::string MyTestMessage5::attribute11() const noexcept {
-    return m_attribute11;
-}
-
-}
-
-)";
-
-    REQUIRE(output == std::string(expectedOutput));
-
-    UNLINK("ABC5.odvd");
-    UNLINK("ABC5.cpp");
 }

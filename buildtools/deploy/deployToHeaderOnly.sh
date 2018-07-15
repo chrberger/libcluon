@@ -53,15 +53,7 @@ cat <<EOF >> tmp.headeronly/cluon-complete.hpp
 EOF
 
 docker pull chrberger/cluon
-docker run --rm -v $PWD/libcluon/resources/cluonDataStructures.odvd:/opt/cluonDataStructures.odvd chrberger/cluon cluon-msc --cpp-headers /opt/cluonDataStructures.odvd >> tmp.headeronly/cluon-complete.hpp
-cat <<EOF >> tmp.headeronly/cluon-complete.hpp
-#ifndef IMPLEMENTATIONS_FOR_MESSAGES
-#define IMPLEMENTATIONS_FOR_MESSAGES
-EOF
-docker run --rm -v $PWD/libcluon/resources/cluonDataStructures.odvd:/opt/cluonDataStructures.odvd chrberger/cluon cluon-msc --cpp-sources /opt/cluonDataStructures.odvd >> tmp.headeronly/cluon-complete.cpp
-cat <<EOF >> tmp.headeronly/cluon-complete.cpp
-#endif
-EOF
+docker run --rm -v $PWD/libcluon/resources/cluonDataStructures.odvd:/opt/cluonDataStructures.odvd chrberger/cluon cluon-msc --cpp /opt/cluonDataStructures.odvd >> tmp.headeronly/cluon-complete.hpp
 
 cat libcluon/thirdparty/cluon/stringtoolbox.hpp >> tmp.headeronly/cluon-complete.hpp
 

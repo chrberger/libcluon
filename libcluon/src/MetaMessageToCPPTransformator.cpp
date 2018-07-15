@@ -132,25 +132,43 @@ void doTripletForwardVisit(uint32_t fieldIdentifier, std::string &&typeName, std
 {{%NAMESPACE_OPENING%}}
 using namespace std::string_literals; // NOLINT
 class LIB_API {{%MESSAGE%}} {
+    private:
+        static constexpr const char* TheShortName = "{{%MESSAGE%}}";
+        static constexpr const char* TheLongName = "{{%COMPLETEPACKAGENAME%}}{{%MESSAGE%}}";
+
+    public:
+        inline static int32_t ID() {
+            return {{%IDENTIFIER%}};
+        }
+        inline static const std::string ShortName() {
+            return TheShortName;
+        }
+        inline static const std::string LongName() {
+            return TheLongName;
+        }
+
     public:
         {{%MESSAGE%}}() = default;
         {{%MESSAGE%}}(const {{%MESSAGE%}}&) = default;
         {{%MESSAGE%}}& operator=(const {{%MESSAGE%}}&) = default;
-        {{%MESSAGE%}}({{%MESSAGE%}}&&) = default; // NOLINT
-        {{%MESSAGE%}}& operator=({{%MESSAGE%}}&&) = default; // NOLINT
+        {{%MESSAGE%}}({{%MESSAGE%}}&&) = default;
+        {{%MESSAGE%}}& operator=({{%MESSAGE%}}&&) = default;
         ~{{%MESSAGE%}}() = default;
 
     public:
-        static int32_t ID();
-        static const std::string ShortName();
-        static const std::string LongName();
         {{#%FIELDS%}}
-        {{%MESSAGE%}}& {{%NAME%}}(const {{%TYPE%}} &v) noexcept;
-        {{%TYPE%}} {{%NAME%}}() const noexcept;
+        inline {{%MESSAGE%}}& {{%NAME%}}(const {{%TYPE%}} &v) noexcept {
+            m_{{%NAME%}} = v;
+            return *this;
+        }
+        inline {{%TYPE%}} {{%NAME%}}() const noexcept {
+            return m_{{%NAME%}};
+        }
         {{/%FIELDS%}}
 
+    public:
         template<class Visitor>
-        void accept(Visitor &visitor) {
+        inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             {{#%FIELDS%}}
             doVisit({{%FIELDIDENTIFIER%}}, std::move("{{%TYPE%}}"s), std::move("{{%NAME%}}"s), m_{{%NAME%}}, visitor);
@@ -159,7 +177,7 @@ class LIB_API {{%MESSAGE%}} {
         }
 
         template<class PreVisitor, class Visitor, class PostVisitor>
-        void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
+        inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
             {{#%FIELDS%}}
@@ -186,50 +204,11 @@ struct isTripletForwardVisitable<{{%COMPLETEPACKAGENAME_WITH_COLON_SEPARATORS%}}
 #endif
 )";
 
-const char *sourceFileTemplate = R"(
-/*
- * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
- */
-{{%NAMESPACE_OPENING%}}
-
-int32_t {{%MESSAGE%}}::ID() {
-    return {{%IDENTIFIER%}};
-}
-
-const std::string {{%MESSAGE%}}::ShortName() {
-    return "{{%MESSAGE%}}";
-}
-const std::string {{%MESSAGE%}}::LongName() {
-    return "{{%COMPLETEPACKAGENAME%}}{{%MESSAGE%}}";
-}
-{{#%FIELDS%}}
-{{%MESSAGE%}}& {{%MESSAGE%}}::{{%NAME%}}(const {{%TYPE%}} &v) noexcept {
-    m_{{%NAME%}} = v;
-    return *this;
-}
-{{%TYPE%}} {{%MESSAGE%}}::{{%NAME%}}() const noexcept {
-    return m_{{%NAME%}};
-}
-{{/%FIELDS%}}
-{{%NAMESPACE_CLOSING%}}
-)";
-
-std::string MetaMessageToCPPTransformator::contentHeader() noexcept {
+std::string MetaMessageToCPPTransformator::content() noexcept {
     m_dataToBeRendered.set("%FIELDS%", m_fields);
 
     kainjow::mustache::mustache tmpl{headerFileTemplate};
     // Reset Mustache's default string-escaper.
-    tmpl.set_custom_escape([](const std::string &s) { return s; });
-    std::stringstream sstr;
-    sstr << tmpl.render(m_dataToBeRendered);
-    const std::string str(sstr.str());
-    return str;
-}
-
-std::string MetaMessageToCPPTransformator::contentSource() noexcept {
-    m_dataToBeRendered.set("%FIELDS%", m_fields);
-
-    kainjow::mustache::mustache tmpl{sourceFileTemplate};
     tmpl.set_custom_escape([](const std::string &s) { return s; });
     std::stringstream sstr;
     sstr << tmpl.render(m_dataToBeRendered);
