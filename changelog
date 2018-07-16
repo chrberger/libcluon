@@ -1,3 +1,15 @@
+libcluon (0.0.104-1ppa1~bionic1) bionic; urgency=medium
+
+  * Refactored cluon-msc to generate only a self-contained, C++14-compliant header file (commandline parameters for cluon-msc have changed!)
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 16 Jul 2018 14:53:59 +0200
+
+libcluon (0.0.104-1ppa1~xenial1) xenial; urgency=medium
+
+  * Refactored cluon-msc to generate only a self-contained, C++14-compliant header file (commandline parameters for cluon-msc have changed!)
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 16 Jul 2018 14:53:59 +0200
+
 libcluon (0.0.103-1ppa1~bionic1) bionic; urgency=medium
 
   * CSV exporter writes strings in base64 encoding; cluon-replay can now step through a recording
