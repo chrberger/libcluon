@@ -204,7 +204,7 @@ make install
 
 ## Tutorials & API Documentation
 * [API Documentation](https://chrberger.github.io/libcluon/)
-* [Tutorial: "Getting Started" explaining how to exchange messages between distributed applications (using an online C++ compiler)](https://wandbox.org/permlink/f7zBShUfoiun2VL2)
+* [Tutorial: "Getting Started" explaining how to exchange messages between distributed applications (using an online C++ compiler)](https://wandbox.org/permlink/3S1bSOaLakXfdWWZ)
 * [Tutorial: Sending & receiving data via UDP (using an online C++ compiler)](https://wandbox.org/permlink/3bWexUDo6OqxDCBE)
 * [Tutorial: Creating a TCP server to send & receive data (using an online C++ compiler)](https://wandbox.org/permlink/ZumnWxgXN9QUNHmD)
 * [Tutorial: Exchanging data via shared memory with wait & notify (using an online C++ compiler)](https://wandbox.org/permlink/m7bmtpOS0dynGJlP)
@@ -214,7 +214,7 @@ make install
 * [Tutorial: Encoding & decoding using libcluon's native MsgPack (using an online C++ compiler)](https://wandbox.org/permlink/qFNxlA8zwZj2if0P)
 * [Tutorial: Encoding using libcluon's native JSON (using an online C++ compiler)](https://wandbox.org/permlink/qyvkWIzGZFiBnTvm)
 * [Tutorial: Encoding using libcluon's native CSV (using an online C++ compiler)](https://wandbox.org/permlink/APD3G7An9Ebh4eio)
-* [Tutorial: Encoding & decoding with dynamic message specifications using libcluon's native Protobuf (using an online C++ compiler)](https://wandbox.org/permlink/7tQ7JJdUmOXpTB5G)
+* [Tutorial: Encoding & decoding with dynamic message specifications using libcluon's native Protobuf (using an online C++ compiler)](https://wandbox.org/permlink/uR2NZwnYZkTwmDac)
 * [Tutorial: Using libcluon to realize an application communicating between JavaScript and C++](https://github.com/chrberger/cluon-javascript)
 
 ## Contributing
