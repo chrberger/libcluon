@@ -118,7 +118,9 @@ EOF
 
 ################################################################################
 # Build Docker image for building Javascript.
-docker build -t chrberger/javascript-libcluon-builder:latest -f tmp.javascript/Dockerfile.javascript tmp.javascript
+if [[ "$(docker images -q chrberger/javascript-libcluon-builder:latest 2> /dev/null)" == "" ]]; then
+    docker build -t chrberger/javascript-libcluon-builder:latest -f tmp.javascript/Dockerfile.javascript tmp.javascript
+fi
 
 ################################################################################
 # Run JavaScript builder.
