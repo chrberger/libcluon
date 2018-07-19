@@ -1,3 +1,15 @@
+libcluon (0.0.105-1ppa1~bionic1) bionic; urgency=medium
+
+  * Added tool cluon-filter to keep or drop Envelopes from a stdin stream
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 19 Jul 2018 20:24:47 +0200
+
+libcluon (0.0.105-1ppa1~xenial1) xenial; urgency=medium
+
+  * Added tool cluon-filter to keep or drop Envelopes from a stdin stream
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 19 Jul 2018 20:24:47 +0200
+
 libcluon (0.0.104-1ppa1~bionic1) bionic; urgency=medium
 
   * Refactored cluon-msc to generate only a self-contained, C++14-compliant header file (commandline parameters for cluon-msc have changed!)
