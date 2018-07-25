@@ -152,6 +152,10 @@ inline int32_t cluon_replay(int32_t argc, char **argv) {
                 if (od4 && !od4->isRunning()) {
                     break;
                 }
+                // If we are at the end of the playback file, simply wait a little to avoid excessive system load.
+                if (!player.hasMoreData() && keepRunning) {
+                    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(200)); // LCOV_EXCL_LINE
+                }
                 // Check for broadcasting status updates.
                 if (playerStatusUpdate) {
                     std::string s;

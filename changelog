@@ -1,3 +1,15 @@
+libcluon (0.0.106-1ppa1~bionic1) bionic; urgency=medium
+
+  * Fix for busy waiting in cluon-replay at EOF
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 25 Jul 2018 22:56:28 +0200
+
+libcluon (0.0.106-1ppa1~xenial1) xenial; urgency=medium
+
+  * Fix for busy waiting in cluon-replay at EOF
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 25 Jul 2018 22:56:28 +0200
+
 libcluon (0.0.105-1ppa1~bionic1) bionic; urgency=medium
 
   * Added tool cluon-filter to keep or drop Envelopes from a stdin stream
