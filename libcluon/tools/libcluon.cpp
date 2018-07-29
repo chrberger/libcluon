@@ -51,6 +51,11 @@ std::string encodeEnvelopeFromJSONWithoutTimeStamps(const std::string &s, int32_
     return envConverter.getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(s, messageIdentifier, senderStamp);
 }
 
+std::string encodeEnvelopeFromJSONWithSampleTimeStamp(const std::string &s, int32_t messageIdentifier, uint32_t senderStamp) {
+    std::lock_guard<std::mutex> lck(envConverterMutex);
+    return envConverter.getProtoEncodedEnvelopeFromJSON(s, messageIdentifier, senderStamp);
+}
+
 int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
@@ -62,5 +67,6 @@ EMSCRIPTEN_BINDINGS(libcluon) {
     function("setMessageSpecification", &setMessageSpecification);
     function("decodeEnvelopeToJSON", &decodeEnvelopeToJSON);
     function("encodeEnvelopeFromJSONWithoutTimeStamps", &encodeEnvelopeFromJSONWithoutTimeStamps);
+    function("encodeEnvelopeFromJSONWithSampleTimeStamp", &encodeEnvelopeFromJSONWithSampleTimeStamp);
 }
 #endif

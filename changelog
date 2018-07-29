@@ -1,3 +1,15 @@
+libcluon (0.0.107-1ppa1~bionic1) bionic; urgency=medium
+
+  * Added encodeEnvelopeFromJSONWithSampleTimeStamp for Javascript to add sample timestamp
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 29 Jul 2018 21:27:33 +0200
+
+libcluon (0.0.107-1ppa1~xenial1) xenial; urgency=medium
+
+  * Added encodeEnvelopeFromJSONWithSampleTimeStamp for Javascript to add sample timestamp
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 29 Jul 2018 21:27:33 +0200
+
 libcluon (0.0.106-1ppa1~bionic1) bionic; urgency=medium
 
   * Fix for busy waiting in cluon-replay at EOF

@@ -23,6 +23,7 @@
 #include "cluon/MessageParser.hpp"
 #include "cluon/ToJSONVisitor.hpp"
 #include "cluon/ToProtoVisitor.hpp"
+#include "cluon/Time.hpp"
 #include "cluon/any/any.hpp"
 
 #include <algorithm>
@@ -127,6 +128,18 @@ std::string EnvelopeConverter::getJSONFromEnvelope(cluon::data::Envelope &envelo
 // clang-format off
 std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp) noexcept {
     // clang-format on
+    return getProtoEncodedEnvelopeFromJSON(json, messageIdentifier, senderStamp, cluon::data::TimeStamp());
+}
+
+// clang-format off
+std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSON(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp) noexcept {
+    // clang-format on
+    return getProtoEncodedEnvelopeFromJSON(json, messageIdentifier, senderStamp, cluon::time::now());
+}
+
+// clang-format off
+std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSON(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp, cluon::data::TimeStamp sampleTimeStamp) noexcept {
+    // clang-format on
     std::string retVal;
     if (0 < m_scopeOfMetaMessages.count(messageIdentifier)) {
         // Get specification for message to be created.
@@ -149,7 +162,10 @@ std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(
         gm.accept(protoEncoder);
 
         cluon::data::Envelope env;
-        env.dataType(messageIdentifier).serializedData(protoEncoder.encodedData()).senderStamp(senderStamp);
+        env.dataType(messageIdentifier)
+           .serializedData(protoEncoder.encodedData())
+           .senderStamp(senderStamp)
+           .sampleTimeStamp(sampleTimeStamp);
 
         retVal = cluon::serializeEnvelope(std::move(env));
     }

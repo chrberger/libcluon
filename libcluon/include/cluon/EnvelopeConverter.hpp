@@ -81,6 +81,21 @@ class LIBCLUON_API EnvelopeConverter {
      */
     std::string getProtoEncodedEnvelopeFromJSONWithoutTimeStamps(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp) noexcept;
 
+    /**
+     * This method transforms a given JSON representation into a Proto-encoded Envelope
+     * including the prepended OD4-header and setting cluon::time::now() as sampleTimeStamp.
+     *
+     * @param json representation according to the given message specification.
+     * @param messageIdentifier The given JSON representation shall be interpreted
+     *        as the specified message.
+     * @param senderStamp to be used in the Envelope.
+     * @return Proto-encoded Envelope including OD4-header or empty string.
+     */
+    std::string getProtoEncodedEnvelopeFromJSON(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp) noexcept;
+
+   private:
+    std::string getProtoEncodedEnvelopeFromJSON(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp, cluon::data::TimeStamp sampleTimeStamp) noexcept;
+
    private:
     std::vector<cluon::MetaMessage> m_listOfMetaMessages{};
     std::map<int32_t, cluon::MetaMessage> m_scopeOfMetaMessages{};
