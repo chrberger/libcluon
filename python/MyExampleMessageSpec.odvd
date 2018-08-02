@@ -1,0 +1,29 @@
+// Copyright (C) 2018 Christian Berger
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+message my.TestMessage [id = 30005] {
+    uint8 attribute1 [ default = 1, id = 1 ];
+    int8 attribute2 [ default = -1, id = 2 ];
+    uint16 attribute3 [ default = 100, id = 3 ];
+    int16 attribute4 [ default = -100, id = 4 ];
+    uint32 attribute5 [ default = 10000, id = 5 ];
+    int32 attribute6 [ default = -10000, id = 6 ];
+    uint64 attribute7 [ default = 12345, id = 7 ];
+    int64 attribute8 [ default = -12345, id = 8 ];
+    float attribute9 [ default = -1.2345, id = 9 ];
+    double attribute10 [ default = -10.2345, id = 10 ];
+    string attribute11 [ default = "Hello World!", id = 11 ];
+}

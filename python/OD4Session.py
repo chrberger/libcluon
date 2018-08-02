@@ -22,8 +22,7 @@ import thread
 
 import cluonDataStructures_pb2
 
-# This class provides an OD4Session listener to receive live messages from a
-# running OD4Session.
+# This class provides an OD4Session listener to receive live messages from a running OD4Session.
 class OD4Session:
     @staticmethod
     def run():
