@@ -15,6 +15,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import datetime
+import time
 import signal
 import socket
 import struct
@@ -51,6 +52,32 @@ class OD4Session:
         if not self.isRunning:
             thread.start_new_thread(self.__runner, ())
             self.isRunning = True
+
+
+    def send(self, messageID, rawStringFromMessageToSend):
+        now = time.time()
+
+        sentTimeStamp = cluonDataStructures_pb2.cluon_data_TimeStamp()
+        sentTimeStamp.seconds = int(now)
+        sentTimeStamp.microseconds = int((now - int(now))*1000*1000)
+
+        envelope = cluonDataStructures_pb2.cluon_data_Envelope()
+        envelope.dataType = messageID
+        envelope.sent.seconds = sentTimeStamp.seconds
+        envelope.sent.microseconds = sentTimeStamp.microseconds
+        envelope.sampleTimeStamp.seconds = sentTimeStamp.seconds
+        envelope.sampleTimeStamp.microseconds = sentTimeStamp.microseconds
+        envelope.serializedData = rawStringFromMessageToSend
+
+        serializedEnvelope = envelope.SerializeToString()
+        size = len(serializedEnvelope);
+
+        # Add Envelope header.
+        a = struct.pack("<B", *bytearray([0x0D, ]))
+        b = struct.pack("<L", ((size & 0xFFFFFF) << 8) | 0xA4)
+
+        data = a + b + serializedEnvelope
+        self.sock.sendto(data, (self.MULTICAST_GROUP, self.MULTICAST_PORT))
 
 
     def registerMessageCallback(self, msgID, func, msgType, params=()):

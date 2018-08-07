@@ -13,7 +13,8 @@ MyExampleMessageSpec_pb2.py: MyExampleMessageSpec.proto
 	protoc --python_out=. MyExampleMessageSpec.proto
 
 run: cluonDataStructures_pb2.py MyExampleMessageSpec_pb2.py
-	python receiveEnvelopes.py
+	python receiveEnvelopes.py &
+	sleep 2 && python sendEnvelopes.py
 
 clean:
 	rm -f *_pb2.py *pyc *.proto 
