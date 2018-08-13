@@ -591,9 +591,7 @@ void SharedMemory::initSysV() noexcept {
         // set of semaphores and shared memory areas.
         std::fstream tokenFile(m_name.c_str(), std::ios::in);
         if (tokenFile.good()) {
-            std::cerr << "[cluon::SharedMemory (SysV)] Token file '" << m_name << "' already exists; need to clean up existing SysV-based shared memory."
-                      << std::endl;
-            // Cleaning up will be tried in the code below.
+            // Existing tokenFile found. Cleaning up will be tried in the code below.
         }
         tokenFile.close();
 
@@ -629,19 +627,16 @@ void SharedMemory::initSysV() noexcept {
                 // IPC_CREAT flag. On a clean environment, this call must fail
                 // as there should not be any shared memory segments left.
                 {
-                    int orphanedSharedMemoryIDSysV = ::shmget(m_shmKeySysV, 0, S_IRUSR | S_IWUSR);
+                    int orphanedSharedMemoryIDSysV = ::shmget(m_shmKeySysV, 0, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
                     if (!(orphanedSharedMemoryIDSysV < 0)) {
-                        std::cerr << "[cluon::SharedMemory (SysV)] Existing shared memory (0x" << std::hex << m_shmKeySysV << std::dec << ") found; ";
                         if (::shmctl(orphanedSharedMemoryIDSysV, IPC_RMID, 0)) {
-                            std::cerr << "removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-                        } else {
-                            std::cerr << "successfully removed." << std::endl;
+                            std::cerr << "[cluon::SharedMemory (SysV)] Existing shared memory (0x" << std::hex << m_shmKeySysV << std::dec << ") found; removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
                         }
                     }
                 }
 
                 // Now, create the shared memory segment.
-                m_sharedMemoryIDSysV = ::shmget(m_shmKeySysV, m_size, IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
+                m_sharedMemoryIDSysV = ::shmget(m_shmKeySysV, m_size, IPC_CREAT | IPC_EXCL | S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
                 if (-1 != m_sharedMemoryIDSysV) {
                     m_sharedMemory = reinterpret_cast<char *>(::shmat(m_sharedMemoryIDSysV, nullptr, 0));
 #pragma GCC diagnostic push
@@ -659,7 +654,7 @@ void SharedMemory::initSysV() noexcept {
                 }
             } else {
                 // The caller wants to attach to an existing shared memory segment.
-                m_sharedMemoryIDSysV = ::shmget(m_shmKeySysV, 0, S_IRUSR | S_IWUSR);
+                m_sharedMemoryIDSysV = ::shmget(m_shmKeySysV, 0, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
                 if (-1 != m_sharedMemoryIDSysV) {
                     struct shmid_ds info;
                     if (-1 != ::shmctl(m_sharedMemoryIDSysV, IPC_STAT, &info)) {
@@ -697,14 +692,10 @@ void SharedMemory::initSysV() noexcept {
 
                 // First, try to remove the orphaned one.
                 {
-                    int orphanedMutexIDSysV = ::semget(m_mutexKeySysV, 0, S_IRUSR | S_IWUSR);
+                    int orphanedMutexIDSysV = ::semget(m_mutexKeySysV, 0, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
                     if (!(orphanedMutexIDSysV < 0)) {
-                        std::cerr << "[cluon::SharedMemory (SysV)] Existing semaphore (0x" << std::hex << m_mutexKeySysV << std::dec
-                                  << ", intended to use as mutex) found; ";
                         if (::semctl(orphanedMutexIDSysV, 0, IPC_RMID)) {
-                            std::cerr << "removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-                        } else {
-                            std::cerr << "successfully removed." << std::endl;
+                            std::cerr << "[cluon::SharedMemory (SysV)] Existing semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ", intended to use as mutex) found; removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
                         }
                     }
                 }
@@ -712,7 +703,7 @@ void SharedMemory::initSysV() noexcept {
                 // Next, create the correct semaphore used as mutex.
                 {
                     constexpr int NSEMS{1};
-                    m_mutexIDSysV = ::semget(m_mutexKeySysV, NSEMS, IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
+                    m_mutexIDSysV = ::semget(m_mutexKeySysV, NSEMS, IPC_CREAT | IPC_EXCL | S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
                     if (-1 != m_mutexIDSysV) {
                         constexpr int NUMBER_OF_SEMAPHORE_TO_CONTROL{0};
                         constexpr int INITIAL_VALUE{1};
@@ -733,7 +724,7 @@ void SharedMemory::initSysV() noexcept {
                     }
                 }
             } else {
-                m_mutexIDSysV = ::semget(m_mutexKeySysV, 0, S_IRUSR | S_IWUSR);
+                m_mutexIDSysV = ::semget(m_mutexKeySysV, 0, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
                 if (-1 == m_mutexIDSysV) {
                     std::cerr << "[cluon::SharedMemory (SysV)] Failed to get semaphore (0x" << std::hex << m_mutexKeySysV << std::dec // LCOV_EXCL_LINE
                               << ", intended to use as mutex): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
@@ -753,14 +744,10 @@ void SharedMemory::initSysV() noexcept {
 
                 // First, try to remove the orphaned one.
                 {
-                    int orphanedConditionIDSysV = ::semget(m_conditionKeySysV, 0, S_IRUSR | S_IWUSR);
+                    int orphanedConditionIDSysV = ::semget(m_conditionKeySysV, 0, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
                     if (!(orphanedConditionIDSysV < 0)) {
-                        std::cerr << "[cluon::SharedMemory (SysV)] Existing semaphore (0x" << std::hex << m_conditionKeySysV << std::dec
-                                  << ", intended to use as condition variable) found; ";
                         if (::semctl(orphanedConditionIDSysV, 0, IPC_RMID)) {
-                            std::cerr << "removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-                        } else {
-                            std::cerr << "successfully removed." << std::endl;
+                            std::cerr << "[cluon::SharedMemory (SysV)] Existing semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable) found; removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
                         }
                     }
                 }
@@ -768,7 +755,7 @@ void SharedMemory::initSysV() noexcept {
                 // Next, create the correct semaphore used as condition variable.
                 {
                     constexpr int NSEMS{1};
-                    m_conditionIDSysV = ::semget(m_conditionKeySysV, NSEMS, IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
+                    m_conditionIDSysV = ::semget(m_conditionKeySysV, NSEMS, IPC_CREAT | IPC_EXCL | S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
                     if (-1 != m_conditionIDSysV) {
                         constexpr int NUMBER_OF_SEMAPHORE_TO_CONTROL{0};
                         constexpr int INITIAL_VALUE{1};
@@ -789,7 +776,7 @@ void SharedMemory::initSysV() noexcept {
                     }
                 }
             } else {
-                m_conditionIDSysV = ::semget(m_conditionKeySysV, 0, S_IRUSR | S_IWUSR);
+                m_conditionIDSysV = ::semget(m_conditionKeySysV, 0, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
                 if (-1 == m_conditionIDSysV) {
                     std::cerr << "[cluon::SharedMemory (SysV)] Failed to get semaphore (0x" << std::hex << m_conditionKeySysV << std::dec // LCOV_EXCL_LINE
                               << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
