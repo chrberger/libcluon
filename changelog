@@ -1,3 +1,15 @@
+libcluon (0.0.108-1ppa1~bionic1) bionic; urgency=medium
+
+  * Reduced verbosity in SharedMemory in success case; elevated permission level to rw+ugo
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 13 Aug 2018 19:54:58 +0200
+
+libcluon (0.0.108-1ppa1~xenial1) xenial; urgency=medium
+
+  * Reduced verbosity in SharedMemory in success case; elevated permission level to rw+ugo
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 13 Aug 2018 19:54:58 +0200
+
 libcluon (0.0.107-1ppa1~bionic1) bionic; urgency=medium
 
   * Added encodeEnvelopeFromJSONWithSampleTimeStamp for Javascript to add sample timestamp
