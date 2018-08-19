@@ -224,7 +224,7 @@ struct isTripletForwardVisitable<MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -414,7 +414,6 @@ struct isTripletForwardVisitable<MyMessage1> {
 #endif
 )";
 
-
     const char *EXPECTED_HEADER2 = R"(
 /*
  * THIS IS AN AUTO-GENERATED FILE. DO NOT MODIFY AS CHANGES MIGHT BE OVERWRITTEN!
@@ -590,7 +589,6 @@ struct isTripletForwardVisitable<MyMessage2> {
 #endif
 )";
 
-
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
@@ -599,14 +597,14 @@ struct isTripletForwardVisitable<MyMessage2> {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//        std::cout << t.content() << std::endl;
+        //        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//        std::cout << t.content() << std::endl;
+        //        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
@@ -980,14 +978,14 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//        std::cout << t.content() << std::endl;
+        //        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//        std::cout << t.content() << std::endl;
+        //        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
@@ -1362,14 +1360,14 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//        std::cout << t.content() << std::endl;
+        //        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//        std::cout << t.content() << std::endl;
+        //        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
@@ -1744,14 +1742,14 @@ struct isTripletForwardVisitable<MyPackage::SubPackage::MyMessage2> {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//        std::cout << t.content() << std::endl;
+        //        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//        std::cout << t.content() << std::endl;
+        //        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
@@ -1946,7 +1944,7 @@ struct isTripletForwardVisitable<MyPackage1::MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -2140,7 +2138,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -2334,7 +2332,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackageMessage::MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -2529,7 +2527,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MySubPackageMessage::
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -2812,7 +2810,7 @@ struct isTripletForwardVisitable<MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -3200,7 +3198,7 @@ struct isTripletForwardVisitable<MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -3591,11 +3589,11 @@ struct isTripletForwardVisitable<MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
@@ -3986,11 +3984,11 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
@@ -4382,11 +4380,11 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
@@ -4779,11 +4777,11 @@ struct isTripletForwardVisitable<ABC::DEF::MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
@@ -5176,10 +5174,10 @@ struct isTripletForwardVisitable<ABC::GHI::DEF::MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-//    std::cout << t.content() << std::endl;
+    //    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }

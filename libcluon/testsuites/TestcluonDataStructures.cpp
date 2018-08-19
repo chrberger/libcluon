@@ -53,4 +53,3 @@ TEST_CASE("Test cluon::data::PlayerStatus.") {
     REQUIRE(0 == ps.numberOfEntries());
     REQUIRE(0 == ps.currentEntryForPlayback());
 }
-

@@ -12,9 +12,9 @@
 #include "cluon/FromProtoVisitor.hpp"
 #include "cluon/GenericMessage.hpp"
 #include "cluon/MessageParser.hpp"
+#include "cluon/Time.hpp"
 #include "cluon/ToJSONVisitor.hpp"
 #include "cluon/ToProtoVisitor.hpp"
-#include "cluon/Time.hpp"
 #include "cluon/any/any.hpp"
 
 #include <algorithm>
@@ -153,10 +153,7 @@ std::string EnvelopeConverter::getProtoEncodedEnvelopeFromJSON(const std::string
         gm.accept(protoEncoder);
 
         cluon::data::Envelope env;
-        env.dataType(messageIdentifier)
-           .serializedData(protoEncoder.encodedData())
-           .senderStamp(senderStamp)
-           .sampleTimeStamp(sampleTimeStamp);
+        env.dataType(messageIdentifier).serializedData(protoEncoder.encodedData()).senderStamp(senderStamp).sampleTimeStamp(sampleTimeStamp);
 
         retVal = cluon::serializeEnvelope(std::move(env));
     }

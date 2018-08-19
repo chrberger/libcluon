@@ -85,7 +85,9 @@ class LIBCLUON_API EnvelopeConverter {
     std::string getProtoEncodedEnvelopeFromJSON(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp) noexcept;
 
    private:
+// clang-format off
     std::string getProtoEncodedEnvelopeFromJSON(const std::string &json, int32_t messageIdentifier, uint32_t senderStamp, cluon::data::TimeStamp sampleTimeStamp) noexcept;
+// clang-format on
 
    private:
     std::vector<cluon::MetaMessage> m_listOfMetaMessages{};

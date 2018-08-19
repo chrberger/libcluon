@@ -280,8 +280,9 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
 #endif
 }
 
-TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization "
-          "(on non-Win32: POSIX).") {
+TEST_CASE(
+    "Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization "
+    "(on non-Win32: POSIX).") {
 #if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
@@ -330,7 +331,8 @@ TEST_CASE("Trying to create SharedMemory with correct name and one separate thre
 #endif
 }
 
-TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory with condition variable for synchronization multi-runs (on non-Win32: POSIX).") {
+TEST_CASE("Trying to create SharedMemory with correct name and separate thread to produce data for shared memory with condition variable for synchronization "
+          "multi-runs (on non-Win32: POSIX).") {
 #if !defined(__NetBSD__) && !defined(__OpenBSD__)
 #ifndef WIN32
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
@@ -434,7 +436,6 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
         tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
         REQUIRE(3456 == tmp);
         sm1.unlock();
-
     }
 #ifndef WIN32
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
@@ -898,7 +899,8 @@ TEST_CASE("Trying to create SharedMemory with correct name and two separate thre
 #endif
 }
 
-TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization with several runs (SySV).") {
+TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for "
+          "synchronization with several runs (SySV).") {
 #ifdef __linux__
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
@@ -1000,7 +1002,6 @@ TEST_CASE("Trying to create SharedMemory with correct name and one separate thre
         tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
         REQUIRE(3456 == tmp);
         sm1.unlock();
-
     }
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
@@ -1066,4 +1067,3 @@ TEST_CASE("Measure performance of using SharedMemory (SySV vs POSIX).") {
     }
 #endif
 }
-
