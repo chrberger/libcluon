@@ -224,7 +224,6 @@ We are happy to receive your PRs to accelerate libcluon's development; before co
 
 
 ## License
-* This project is released under the terms of the Mozilla Public License 2.0 - [![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2-blue.svg
-)](http://mozilla.org/MPL/2.0/)
-* Commercial support is available at libcluon@christianberger.net
+* This project is released under the terms of the Mozilla Public License 2.0 - [![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2-blue.svg)](http://mozilla.org/MPL/2.0/) - [FAQ](https://www.mozilla.org/en-US/MPL/2.0/FAQ/)
+* Commercial support is available at [libcluon@christianberger.net](mailto:libcluon@christianberger.net)
 

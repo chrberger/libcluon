@@ -400,9 +400,9 @@ void SharedMemory::initPOSIX() noexcept {
         if (0 < m_size) {
             retVal = (0 == ::ftruncate(m_fd, static_cast<off_t>(sizeof(SharedMemoryHeader) + m_size)));
             if (!retVal) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                 std::cerr << "[cluon::SharedMemory (POSIX)] Failed to truncate '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
             }
         }
 
@@ -448,9 +448,9 @@ void SharedMemory::initPOSIX() noexcept {
 
                     // Now, as we know the real size, unmap the first mapping that did not know the size.
                     if (::munmap(m_sharedMemory, sizeof(SharedMemoryHeader))) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                         std::cerr << "[cluon::SharedMemory (POSIX)] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                     }
 
                     // Invalidate all pointers.
@@ -464,9 +464,9 @@ void SharedMemory::initPOSIX() noexcept {
                     }
                 }
             } else { // LCOV_EXCL_LINE
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                 std::cerr << "[cluon::SharedMemory (POSIX)] Failed to map '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
             }
 
             // If the shared memory segment is correctly available, store the pointer for the user data.
@@ -482,9 +482,9 @@ void SharedMemory::initPOSIX() noexcept {
         } else { // LCOV_EXCL_LINE
             if (-1 != m_fd) { // LCOV_EXCL_LINE
                 if (-1 == ::shm_unlink(m_name.c_str())) { // LCOV_EXCL_LINE
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                     std::cerr << "[cluon::SharedMemory (POSIX)] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                 }
             }
             m_fd = -1; // LCOV_EXCL_LINE
@@ -502,14 +502,14 @@ void SharedMemory::deinitPOSIX() noexcept {
         ::pthread_mutex_destroy(&(m_sharedMemoryHeader->__mutex));
     }
     if ((nullptr != m_sharedMemory) && ::munmap(m_sharedMemory, sizeof(SharedMemoryHeader) + m_size)) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
         std::cerr << "[cluon::SharedMemory (POSIX)] Failed to unmap shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
     }
     if (!m_hasOnlyAttachedToSharedMemory && (-1 != m_fd) && (-1 == ::shm_unlink(m_name.c_str()) && (ENOENT != errno))) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
         std::cerr << "[cluon::SharedMemory (POSIX)] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
     }
 #endif
 }
@@ -519,9 +519,9 @@ void SharedMemory::lockPOSIX() noexcept {
     if (nullptr != m_sharedMemoryHeader) {
         auto retVal = ::pthread_mutex_lock(&(m_sharedMemoryHeader->__mutex));
         if (EOWNERDEAD == retVal) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
             std::cerr << "[cluon::SharedMemory (POSIX)] pthread_mutex_lock returned for EOWNERDEAD for mutex in shared memory '" << m_name << "': " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
         } else if (0 != retVal) {
             m_broken.store(true); // LCOV_EXCL_LINE
         }
@@ -612,9 +612,9 @@ void SharedMemory::initSysV() noexcept {
     if (tokenFileExisting) {
         m_shmKeySysV = ::ftok(m_name.c_str(), ID_SHM);
         if (-1 == m_shmKeySysV) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
             std::cerr << "[cluon::SharedMemory (SysV)] Key for shared memory could not be created: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
         } else {
             if (!m_hasOnlyAttachedToSharedMemory) {
                 // The caller wants to create a shared memory segment.
@@ -627,9 +627,9 @@ void SharedMemory::initSysV() noexcept {
                     int orphanedSharedMemoryIDSysV = ::shmget(m_shmKeySysV, 0, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
                     if (!(orphanedSharedMemoryIDSysV < 0)) {
                         if (::shmctl(orphanedSharedMemoryIDSysV, IPC_RMID, 0)) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                             std::cerr << "[cluon::SharedMemory (SysV)] Existing shared memory (0x" << std::hex << m_shmKeySysV << std::dec << ") found; removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                         }
                     }
                 }
@@ -643,15 +643,15 @@ void SharedMemory::initSysV() noexcept {
                     if ((void *)-1 != m_sharedMemory) {
                         m_userAccessibleSharedMemory = m_sharedMemory;
                     } else { // LCOV_EXCL_LINE
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                         std::cerr << "[cluon::SharedMemory (SysV)] Failed to attach to shared memory (0x" << std::hex << m_shmKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                     }
 #pragma GCC diagnostic pop
                 } else { // LCOV_EXCL_LINE
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                     std::cerr << "[cluon::SharedMemory (SysV)] Failed to get to shared memory (0x" << std::hex << m_shmKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                 }
             } else {
                 // The caller wants to attach to an existing shared memory segment.
@@ -666,20 +666,20 @@ void SharedMemory::initSysV() noexcept {
                         if ((void *)-1 != m_sharedMemory) {
                             m_userAccessibleSharedMemory = m_sharedMemory;
                         } else { // LCOV_EXCL_LINE
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                             std::cerr << "[cluon::SharedMemory (SysV)] Failed to attach to shared memory (0x" << std::hex << m_shmKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                         }
 #pragma GCC diagnostic pop
                     } else { // LCOV_EXCL_LINE
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                         std::cerr << "[cluon::SharedMemory (SysV)] Could not read information about shared memory (0x" << std::hex << m_shmKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                     }
                 } else { // LCOV_EXCL_LINE
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                     std::cerr << "[cluon::SharedMemory (SysV)] Failed to get shared memory (0x" << std::hex << m_shmKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                 }
             }
         }
@@ -687,9 +687,9 @@ void SharedMemory::initSysV() noexcept {
         // Next, create the mutex (but only if the shared memory was acquired correctly.
         m_mutexKeySysV = ::ftok(m_name.c_str(), ID_SEM_AS_MUTEX);
         if (-1 == m_mutexKeySysV) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
             std::cerr << "[cluon::SharedMemory (SysV)] Key for mutex could not be created: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
         }
         if ((-1 != m_shmKeySysV) && (-1 != m_mutexKeySysV) && (nullptr != m_userAccessibleSharedMemory)) {
             if (!m_hasOnlyAttachedToSharedMemory) {
@@ -701,9 +701,9 @@ void SharedMemory::initSysV() noexcept {
                     int orphanedMutexIDSysV = ::semget(m_mutexKeySysV, 0, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
                     if (!(orphanedMutexIDSysV < 0)) {
                         if (::semctl(orphanedMutexIDSysV, 0, IPC_RMID)) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                             std::cerr << "[cluon::SharedMemory (SysV)] Existing semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ", intended to use as mutex) found; removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                         }
                     }
                 }
@@ -722,23 +722,23 @@ void SharedMemory::initSysV() noexcept {
 #pragma GCC diagnostic ignored "-Wclass-varargs"
 #endif
                         if (-1 == ::semctl(m_mutexIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                             std::cerr << "[cluon::SharedMemory (SysV)] Failed to initialize semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ", intended to use as mutex): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                         }
 #pragma GCC diagnostic pop
                     } else { // LCOV_EXCL_LINE
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                         std::cerr << "[cluon::SharedMemory (SysV)] Failed to create semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ", intended to use as mutex): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                     }
                 }
             } else {
                 m_mutexIDSysV = ::semget(m_mutexKeySysV, 0, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
                 if (-1 == m_mutexIDSysV) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                     std::cerr << "[cluon::SharedMemory (SysV)] Failed to get semaphore (0x" << std::hex << m_mutexKeySysV << std::dec << ", intended to use as mutex): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                 }
             }
         }
@@ -746,9 +746,9 @@ void SharedMemory::initSysV() noexcept {
         // Next, create the condition variable (but only if the shared memory was acquired correctly.
         m_conditionKeySysV = ::ftok(m_name.c_str(), ID_SEM_AS_CONDITION);
         if (-1 == m_conditionKeySysV) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
             std::cerr << "[cluon::SharedMemory (SysV)] Key for condition could not be created: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
         }
         if ((-1 != m_shmKeySysV) && (-1 != m_mutexKeySysV) && (-1 != m_conditionKeySysV) && (nullptr != m_userAccessibleSharedMemory)) {
             if (!m_hasOnlyAttachedToSharedMemory) {
@@ -760,9 +760,9 @@ void SharedMemory::initSysV() noexcept {
                     int orphanedConditionIDSysV = ::semget(m_conditionKeySysV, 0, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
                     if (!(orphanedConditionIDSysV < 0)) {
                         if (::semctl(orphanedConditionIDSysV, 0, IPC_RMID)) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                             std::cerr << "[cluon::SharedMemory (SysV)] Existing semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable) found; removing failed." << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                         }
                     }
                 }
@@ -781,23 +781,23 @@ void SharedMemory::initSysV() noexcept {
 #pragma GCC diagnostic ignored "-Wclass-varargs"
 #endif
                         if (-1 == ::semctl(m_conditionIDSysV, NUMBER_OF_SEMAPHORE_TO_CONTROL, SETVAL, tmp)) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                             std::cerr << "[cluon::SharedMemory (SysV)] Failed to initialize semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                         }
 #pragma GCC diagnostic pop
                     } else { // LCOV_EXCL_LINE
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                         std::cerr << "[cluon::SharedMemory (SysV)] Failed to create semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                     }
                 }
             } else {
                 m_conditionIDSysV = ::semget(m_conditionKeySysV, 0, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
                 if (-1 == m_conditionIDSysV) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
                     std::cerr << "[cluon::SharedMemory (SysV)] Failed to get semaphore (0x" << std::hex << m_conditionKeySysV << std::dec << ", intended to use as condition variable): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
                 }
             }
         }
@@ -807,9 +807,9 @@ void SharedMemory::initSysV() noexcept {
 void SharedMemory::deinitSysV() noexcept {
     if (nullptr != m_sharedMemory) {
         if (-1 == ::shmdt(m_sharedMemory)) {
-// clang-format off
+// clang-format off // LCOV_EXCL_LINE
             std::cerr << "[cluon::SharedMemory (SysV)] Could not detach shared memory (0x" << std::hex << m_shmKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
-// clang-format on
+// clang-format on // LCOV_EXCL_LINE
         }
     }
 
