@@ -1,3 +1,15 @@
+libcluon (0.0.110-1ppa1~bionic1) bionic; urgency=medium
+
+  * Corrected SPDX for Alpine packages
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 19 Aug 2018 16:05:12 +0200
+
+libcluon (0.0.110-1ppa1~xenial1) xenial; urgency=medium
+
+  * Corrected SPDX for Alpine packages
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 19 Aug 2018 16:05:12 +0200
+
 libcluon (0.0.109-1ppa1~bionic1) bionic; urgency=medium
 
   * Re-licensed under MPL-2.0 to better meet single-file, header-only in practice
