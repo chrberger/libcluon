@@ -2,18 +2,9 @@
 
 # Copyright (C) 2017  Christian Berger
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 PROJECT=libcluon
 RELEASER_NAME="Christian Berger"
@@ -88,11 +79,11 @@ Source: https://github.com/chrberger/libcluon
 
 Files: *
 Copyright: Copyright (c) 2017-18 Christian Berger. All rights reserved.
-License: GPL-3.0+
+License: MPL-2.0
 
 Files: debian/*
 Copyright: Copyright (c) 2017-18 Christian Berger. All rights reserved.
-License: GPL-3.0+
+License: MPL-2.0
 
 Files: buildtools/xUnit/*
 Copyright: 2017-18 Two Blue Cubes Ltd. All rights reserved.
@@ -119,22 +110,10 @@ Copyright: Copyright (c) 2018 Christian Berger. All rights reserved.
 License: MIT
 
 
-License: GPL-3.0+
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
- .
- This package is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- .
- You should have received a copy of the GNU General Public License
- along with this program. If not, see <https://www.gnu.org/licenses/>.
- .
- On Debian systems, the complete text of the GNU General
- Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
+License: MPL-2.0
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
 License: Boost-1.0

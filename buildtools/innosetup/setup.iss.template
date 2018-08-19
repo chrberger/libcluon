@@ -7,7 +7,7 @@ AppVersion=RELEASE
 AppVerName=libcluon RELEASE
 AppPublisher=Christian Berger
 AppPublisherURL=https://github.com/chrberger/libcluon/
-AppCopyright=Copyright (C) 2017 Christian Berger
+AppCopyright=Copyright (C) 2017-2018 Christian Berger
 
 DefaultDirName={pf}\\libcluon
 DefaultGroupName=libcluon

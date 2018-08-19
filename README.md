@@ -4,7 +4,7 @@
 | :--------------------------: | :---------------: | :--------------: | :---------------: | :--------------------: | :-----------: | :---------------: | :----------------: |
 | [![Build Status](https://travis-ci.org/chrberger/libcluon.svg?branch=master)](https://travis-ci.org/chrberger/libcluon) | [![Build Status](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-FreeBSD11/badge/icon)](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-FreeBSD11/) | [![Build Status](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-NetBSD7.0/badge/icon)](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-NetBSD7.0/) | [![Build Status](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-OpenBSD59/badge/icon)](http://opendavinci.cse.chalmers.se:8888/job/OpenDaVINCI-OpenBSD59/) | [![Build status](https://ci.appveyor.com/api/projects/status/n33il43mb6ot5422/branch/master?svg=true)](https://ci.appveyor.com/project/chrberger/libcluon/branch/master) | [![codecov](https://codecov.io/gh/chrberger/libcluon/branch/master/graph/badge.svg)](https://codecov.io/gh/chrberger/libcluon) | [![Coverity Scan](https://scan.coverity.com/projects/14014/badge.svg)]() | [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1479/badge)](https://bestpractices.coreinfrastructure.org/projects/1479) |
 
-[![License](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://raw.githubusercontent.com/chrberger/libcluon/master/LICENSE) [![API documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://chrberger.github.io/libcluon/) [![Win (x86_64)](https://img.shields.io/badge/Win-x86__64%20(installer)-blue.svg
+[![License](https://img.shields.io/badge/license-MPL--2-blue.svg)](https://raw.githubusercontent.com/chrberger/libcluon/master/LICENSE) [![API documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://chrberger.github.io/libcluon/) [![Win (x86_64)](https://img.shields.io/badge/Win-x86__64%20(installer)-blue.svg
 )](https://dl.bintray.com/chrberger/libcluon/) [![Ubuntu (x86_64)](https://img.shields.io/badge/deb-x86__64-blue.svg
 )](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Ubuntu (armhf)](https://img.shields.io/badge/deb-armhf-blue.svg
 )](https://launchpad.net/~chrberger/+archive/ubuntu/libcluon/+packages) [![Ubuntu (aarch64)](https://img.shields.io/badge/deb-aarch64-blue.svg
@@ -15,11 +15,11 @@
 )](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/armhf/Dockerfile#L25) [![Alpine (aarch64)](https://img.shields.io/badge/Alpine-aarch64-blue.svg
 )](https://github.com/chrberger/libcluon/blob/gh-pages/alpine/v3.7/aarch64/Dockerfile#L25)
 
-libcluon is a small and efficient library written in modern C++ library to _glue_ distributed software components together - in a _clever_ way - simply: cluon. Its name is inspired by gluon, an [elementary particle acting as exchange particle](https://en.wikipedia.org/wiki/Gluon).
+libcluon is a small single-file, header-only library written in modern C++ library to _glue_ microservices - in a _clever_ way - simply: cluon. Its name is inspired by gluon, an [elementary particle acting as exchange particle](https://en.wikipedia.org/wiki/Gluon).
 
-libcluon is available as single-file, [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly) library - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"`, and compile your project with a modern C++ compiler (C++14 or newer)
+libcluon is distributed as single-file, [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly) library - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"`, and compile your project with a modern C++ compiler (C++14 or newer)
 
-_Say you want to quickly realize a distributed software system where individual software components exchange messages and you want to keep your project as *simple* and *clean* as possible - that's a typical use-case for libcluon._ [Getting Started Tutorial using an online C++ compiler](https://wandbox.org/permlink/PBUsOPs9nuPRncZd).
+_Say you want to quickly realize a distributed software system where individual software components exchange messages and you want to keep your project as *simple* and *clean* as possible - that's a typical use-case for libcluon._ [Getting Started Tutorial using an online C++ compiler](https://wandbox.org/permlink/3S1bSOaLakXfdWWZ).
 
 
 ## Table of Contents
@@ -85,7 +85,7 @@ As part of our CI strategy thanks to TravisCI and AppVeyor, we are continuously 
 
 ## Installation
 ### Installation as single-file, header-only library
-`libcluon` is provided as [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly), single-file library as well - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"` where you want to use libcluon, and compile your project with a modern C++ compiler (C++14 or newer)
+`libcluon` is provided as [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly), single-file library as well - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"` where you want to use libcluon, and compile your project with a modern C++ compiler (C++14 or newer).
 
 ### Installation on Ubuntu 18.04 LTS
 We are providing pre-compiled binaries for Ubuntu 18.04 LTS (Bionic Beaver) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
@@ -116,7 +116,7 @@ sudo apt-get install libcluon
 ```
 
 ### Installation on Ubuntu 14.04 LTS
-To use `libcluon` on Ubuntu 14.04 LTS, you need to compile it from sources after upgrading your C++ compiler to get C++14 support:
+To use `libcluon` on Ubuntu 14.04 LTS, you need to compile it from sources (only a C++ compiler and CMake are needed!) after upgrading your C++ compiler to get C++14 support:
 
 ```
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -154,6 +154,7 @@ Now, you can finally install `libcluon`:
 ```
 sudo apt update && sudo apt install libcluon
 ```
+
 ### Installation on Alpine 3.7
 We are providing pre-compiled binaries for Alpine 3.7 for `x86_64`, `armfh`, and `aarch64`; simply install the pre-compile `.apk` package as follows:
 
@@ -217,11 +218,13 @@ make install
 * [Tutorial: Encoding & decoding with dynamic message specifications using libcluon's native Protobuf (using an online C++ compiler)](https://wandbox.org/permlink/uR2NZwnYZkTwmDac)
 * [Tutorial: Using libcluon to realize an application communicating between JavaScript and C++](https://github.com/chrberger/cluon-javascript)
 
+
 ## Contributing
 We are happy to receive your PRs to accelerate libcluon's development; before contributing, please take a look at the [Contribution Documents](CONTRIBUTING.md).
 
 
 ## License
-* This project is released under the terms of the GNU GPLv3 License - [![License: GPLv3](https://img.shields.io/badge/license-GPL--3-blue.svg
-)](https://www.gnu.org/licenses/gpl-3.0.txt)
-* The auto-generated code for libcluon.js is released under the terms of the MIT License - [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+* This project is released under the terms of the Mozilla Public License 2.0 - [![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2-blue.svg
+)](http://mozilla.org/MPL/2.0/)
+* Commercial support is available at libcluon@christianberger.net
+
