@@ -1,3 +1,15 @@
+libcluon (0.0.109-1ppa1~bionic1) bionic; urgency=medium
+
+  * Re-licensed under MPL-2.0 to better meet single-file, header-only in practice
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 19 Aug 2018 15:11:04 +0200
+
+libcluon (0.0.109-1ppa1~xenial1) xenial; urgency=medium
+
+  * Re-licensed under MPL-2.0 to better meet single-file, header-only in practice
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 19 Aug 2018 15:11:04 +0200
+
 libcluon (0.0.108-1ppa1~bionic1) bionic; urgency=medium
 
   * Reduced verbosity in SharedMemory in success case; elevated permission level to rw+ugo
