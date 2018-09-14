@@ -28,12 +28,12 @@ class LIBCLUON_API FromProtoVisitor {
      */
     class ProtoKeyValue {
        private:
-        ProtoKeyValue(ProtoKeyValue &&) = delete;
         ProtoKeyValue &operator=(const ProtoKeyValue &) = delete;
 
        public:
         ProtoKeyValue() noexcept;
         ProtoKeyValue(const ProtoKeyValue &) = default; // LCOV_EXCL_LINE
+        ProtoKeyValue(ProtoKeyValue &&) = default;
         ProtoKeyValue &operator=(ProtoKeyValue &&) = default;
         ~ProtoKeyValue()                           = default;
 

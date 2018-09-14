@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <utility>
 
 namespace cluon {
 
@@ -50,28 +51,24 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
                 // Directly decode VarInt value.
                 uint64_t value{0};
                 fromVarInt(in, value);
-                ProtoKeyValue pkv{fieldId, value};
-                m_mapOfKeyValues[pkv.key()] = std::move(pkv);
+                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(fieldId, value));
             } else if (protoType == ProtoConstants::EIGHT_BYTES) {
                 constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(double)};
                 // Create map entry for Proto key/value here to avoid copying data later.
-                ProtoKeyValue pkv{fieldId, ProtoConstants::EIGHT_BYTES, BYTES_TO_READ_FROM_STREAM};
-                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, pkv.rawBuffer());
-                m_mapOfKeyValues[pkv.key()] = std::move(pkv);
+                auto it = m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(fieldId, ProtoConstants::EIGHT_BYTES, BYTES_TO_READ_FROM_STREAM));
+                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, it.first->second.rawBuffer());
             } else if (protoType == ProtoConstants::LENGTH_DELIMITED) {
                 uint64_t length{0};
                 fromVarInt(in, length);
                 const std::size_t BYTES_TO_READ_FROM_STREAM{static_cast<std::size_t>(length)};
                 // Create map entry for Proto key/value here to avoid copying data later.
-                ProtoKeyValue pkv{fieldId, ProtoConstants::LENGTH_DELIMITED, BYTES_TO_READ_FROM_STREAM};
-                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, pkv.rawBuffer());
-                m_mapOfKeyValues[pkv.key()] = std::move(pkv);
+                auto it = m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(fieldId, ProtoConstants::LENGTH_DELIMITED, BYTES_TO_READ_FROM_STREAM));
+                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, it.first->second.rawBuffer());
             } else if (protoType == ProtoConstants::FOUR_BYTES) {
                 constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(float)};
                 // Create map entry for Proto key/value here to avoid copying data later.
-                ProtoKeyValue pkv{fieldId, ProtoConstants::FOUR_BYTES, BYTES_TO_READ_FROM_STREAM};
-                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, pkv.rawBuffer());
-                m_mapOfKeyValues[pkv.key()] = std::move(pkv);
+                auto it = m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(fieldId, ProtoConstants::FOUR_BYTES, BYTES_TO_READ_FROM_STREAM));
+                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, it.first->second.rawBuffer());
             }
         }
     }
@@ -126,7 +123,7 @@ float FromProtoVisitor::ProtoKeyValue::valueAsFloat() const noexcept {
         float floatValue{0};
     } retVal;
     if (!m_value.empty() && (length() == sizeof(float)) && (m_value.size() == sizeof(float)) && (type() == ProtoConstants::FOUR_BYTES)) {
-        std::memmove(&retVal.uint32Value, &m_value[0], sizeof(float));
+        std::memcpy(&retVal.uint32Value, &m_value[0], sizeof(float));
         retVal.uint32Value = le32toh(retVal.uint32Value);
     }
     return retVal.floatValue;
@@ -138,7 +135,7 @@ double FromProtoVisitor::ProtoKeyValue::valueAsDouble() const noexcept {
         double doubleValue{0};
     } retVal;
     if (!m_value.empty() && (length() == sizeof(double)) && (m_value.size() == sizeof(double)) && (type() == ProtoConstants::EIGHT_BYTES)) {
-        std::memmove(&retVal.uint64Value, &m_value[0], sizeof(double));
+        std::memcpy(&retVal.uint64Value, &m_value[0], sizeof(double));
         retVal.uint64Value = le64toh(retVal.uint64Value);
     }
     return retVal.doubleValue;
