@@ -16,7 +16,6 @@
 #include <unordered_map>
 #include <sstream>
 #include <string>
-#include <vector>
 
 namespace cluon {
 /**
@@ -34,46 +33,47 @@ class LIBCLUON_API FromProtoVisitor {
         ProtoKeyValue() noexcept;
         ProtoKeyValue(const ProtoKeyValue &) = default; // LCOV_EXCL_LINE
         ProtoKeyValue(ProtoKeyValue &&) = default;
-        ProtoKeyValue &operator=(ProtoKeyValue &&) = default;
+        ProtoKeyValue &operator=(ProtoKeyValue &&) = default; // LCOV_EXCL_LINE
         ~ProtoKeyValue()                           = default;
 
         /**
-         * Constructor to pre-allocate the vector<char> for length-delimited types.
+         * Constructor for VARINT values.
          *
-         * @param key Proto key.
-         * @param type Proto type.
-         * @param length Length of the contained value.
+         * @param value VARINT value.
          */
-        ProtoKeyValue(uint32_t key, ProtoConstants type, uint64_t length) noexcept;
+        ProtoKeyValue(uint64_t value) noexcept;
 
         /**
-         * Constructor for cases when a VARINT value is encoded.
+         * Constructor for VARINT values.
          *
-         * @param key Proto key.
-         * @param value Actual VarInt value.
+         * @param value float value.
          */
-        ProtoKeyValue(uint32_t key, uint64_t value) noexcept;
+        ProtoKeyValue(float value) noexcept;
 
-        uint32_t key() const noexcept;
-        ProtoConstants type() const noexcept;
-        uint64_t length() const noexcept;
+        /**
+         * Constructor for VARINT values.
+         *
+         * @param value double value.
+         */
+        ProtoKeyValue(double value) noexcept;
+
+        /**
+         * Constructor for VARINT values.
+         *
+         * @param value string value.
+         */
+        ProtoKeyValue(std::string &&value) noexcept;
 
         uint64_t valueAsVarInt() const noexcept;
         float valueAsFloat() const noexcept;
         double valueAsDouble() const noexcept;
         std::string valueAsString() const noexcept;
 
-        /**
-         * @return Raw value as reference.
-         */
-        std::vector<char> &rawBuffer() noexcept;
-
        private:
-        uint32_t m_key{0};
-        ProtoConstants m_type{ProtoConstants::VARINT};
-        uint64_t m_length{0};
-        std::vector<char> m_value{};
         uint64_t m_varIntValue{0};
+        float m_floatValue{0};
+        double m_doubleValue{0};
+        std::string m_stringValue{};
     };
 
    private:
@@ -140,10 +140,9 @@ class LIBCLUON_API FromProtoVisitor {
 
     std::size_t fromVarInt(std::istream &in, uint64_t &value) noexcept;
 
-    void readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, std::vector<char> &buffer) noexcept;
+    void readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, char *buffer) noexcept;
 
    private:
-    std::stringstream m_buffer{""};
     std::unordered_map<uint32_t, ProtoKeyValue> m_mapOfKeyValues{};
 };
 } // namespace cluon

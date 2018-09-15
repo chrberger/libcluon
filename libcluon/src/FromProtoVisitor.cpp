@@ -10,34 +10,51 @@
 
 #include <cstddef>
 #include <cstring>
+#include <array>
 #include <utility>
+#include <vector>
 
 namespace cluon {
 
-void FromProtoVisitor::readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, std::vector<char> &buffer) noexcept {
-    constexpr std::size_t CHUNK_SIZE{1024};
-    std::streamsize bufferPosition{0};
+void FromProtoVisitor::readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, char *buffer) noexcept {
+    if (nullptr != buffer) {
+        constexpr std::size_t CHUNK_SIZE{1024};
+        std::streamsize bufferPosition{0};
 
-    // Ensure buffer has enough space to hold the bytes.
-    if (buffer.capacity() < bytesToReadFromStream) {
-        buffer.reserve(bytesToReadFromStream);
-    }
-
-    while ((0 < bytesToReadFromStream) && in.good()) {
-        // clang-format off
-        in.read(&buffer[static_cast<std::size_t>(bufferPosition)], /* Flawfinder: ignore */ /* Cf. buffer.reserve(...) above.  */
-                (bytesToReadFromStream > CHUNK_SIZE) ? CHUNK_SIZE : static_cast<std::streamsize>(bytesToReadFromStream));
-        // clang-format on
-        const std::streamsize EXTRACTED_BYTES{in.gcount()};
-        bufferPosition += EXTRACTED_BYTES;
-        bytesToReadFromStream -= static_cast<std::size_t>(EXTRACTED_BYTES);
+        while ((0 < bytesToReadFromStream) && in.good()) {
+            // clang-format off
+            in.read(&buffer[static_cast<std::size_t>(bufferPosition)], /* Flawfinder: ignore */ /* Cf. buffer.reserve(...) above.  */
+                    (bytesToReadFromStream > CHUNK_SIZE) ? CHUNK_SIZE : static_cast<std::streamsize>(bytesToReadFromStream));
+            // clang-format on
+            const std::streamsize EXTRACTED_BYTES{in.gcount()};
+            bufferPosition += EXTRACTED_BYTES;
+            bytesToReadFromStream -= static_cast<std::size_t>(EXTRACTED_BYTES);
+        }
     }
 }
 
 void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
     // Reset internal states as this deserializer could be reused.
-    m_buffer.str("");
     m_mapOfKeyValues.clear();
+
+    // Buffer for double values.
+    union DoubleValue {
+        std::array<char, sizeof(double)> buffer;
+        uint64_t uint64Value;
+        double doubleValue{0};
+    } doubleValue;
+
+    // Buffer for float values.
+    union FloatValue {
+        std::array<char, sizeof(float)> buffer;
+        uint32_t uint32Value;
+        float floatValue{0};
+    } floatValue;
+
+    // Buffer for strings.
+    constexpr const uint32_t INITIAL_BUFFER_SIZE{8192};
+    std::vector<char> buffer;
+    buffer.reserve(INITIAL_BUFFER_SIZE);
 
     while (in.good()) {
         // First stage: Read keyFieldType (encoded as VarInt).
@@ -53,24 +70,26 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
                 // Directly decode VarInt value.
                 uint64_t value{0};
                 fromVarInt(in, value);
-                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(fieldId, value));
+                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(value));
             } else if (protoType == ProtoConstants::EIGHT_BYTES) {
-                constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(double)};
-                // Create map entry for Proto key/value here to avoid copying data later.
-                auto it = m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(fieldId, ProtoConstants::EIGHT_BYTES, BYTES_TO_READ_FROM_STREAM));
-                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, it.first->second.rawBuffer());
+                const constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(double)};
+                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, doubleValue.buffer.data());
+                doubleValue.uint64Value = le64toh(doubleValue.uint64Value);
+                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(doubleValue.doubleValue));
+            } else if (protoType == ProtoConstants::FOUR_BYTES) {
+                const constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(float)};
+                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, floatValue.buffer.data());
+                floatValue.uint32Value = le32toh(floatValue.uint32Value);
+                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(floatValue.floatValue));
             } else if (protoType == ProtoConstants::LENGTH_DELIMITED) {
                 uint64_t length{0};
                 fromVarInt(in, length);
                 const std::size_t BYTES_TO_READ_FROM_STREAM{static_cast<std::size_t>(length)};
-                // Create map entry for Proto key/value here to avoid copying data later.
-                auto it = m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(fieldId, ProtoConstants::LENGTH_DELIMITED, BYTES_TO_READ_FROM_STREAM));
-                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, it.first->second.rawBuffer());
-            } else if (protoType == ProtoConstants::FOUR_BYTES) {
-                constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(float)};
-                // Create map entry for Proto key/value here to avoid copying data later.
-                auto it = m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(fieldId, ProtoConstants::FOUR_BYTES, BYTES_TO_READ_FROM_STREAM));
-                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, it.first->second.rawBuffer());
+                if (buffer.capacity() < BYTES_TO_READ_FROM_STREAM) {
+                    buffer.reserve(BYTES_TO_READ_FROM_STREAM);
+                }
+                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, buffer.data());
+                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(std::string(&buffer[0], BYTES_TO_READ_FROM_STREAM)));
             }
         }
     }
@@ -79,89 +98,55 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
 ////////////////////////////////////////////////////////////////////////////////
 
 FromProtoVisitor::ProtoKeyValue::ProtoKeyValue() noexcept
-    : m_key{0}
-    , m_type{ProtoConstants::VARINT}
-    , m_length{0}
-    , m_value{0}
-    , m_varIntValue{0} {}
+    : m_varIntValue{0}
+    , m_floatValue{0}
+    , m_doubleValue{0}
+    , m_stringValue{} {}
 
-FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint32_t key, ProtoConstants type, uint64_t length) noexcept
-    : m_key{key}
-    , m_type{type}
-    , m_length{length}
-    , m_value(static_cast<std::size_t>(length))
-    , m_varIntValue{0} {}
+FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint64_t value) noexcept
+    : m_varIntValue{value}
+    , m_floatValue{0}
+    , m_doubleValue{0}
+    , m_stringValue{} {}
 
-FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint32_t key, uint64_t value) noexcept
-    : m_key{key}
-    , m_type{ProtoConstants::VARINT}
-    , m_length{0}
-    , m_value{0}
-    , m_varIntValue{value} {}
+FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(float value) noexcept
+    : m_varIntValue{0}
+    , m_floatValue{value}
+    , m_doubleValue{0}
+    , m_stringValue{} {}
 
-uint32_t FromProtoVisitor::ProtoKeyValue::key() const noexcept {
-    return m_key;
-}
+FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(double value) noexcept
+    : m_varIntValue{0}
+    , m_floatValue{0}
+    , m_doubleValue{value}
+    , m_stringValue{} {}
 
-ProtoConstants FromProtoVisitor::ProtoKeyValue::type() const noexcept {
-    return m_type;
-}
-
-uint64_t FromProtoVisitor::ProtoKeyValue::length() const noexcept {
-    return m_length;
-}
+FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(std::string &&value) noexcept
+    : m_varIntValue{0}
+    , m_floatValue{0}
+    , m_doubleValue{0}
+    , m_stringValue{std::move(value)} {}
 
 uint64_t FromProtoVisitor::ProtoKeyValue::valueAsVarInt() const noexcept {
-    uint64_t retVal{0};
-    if (type() == ProtoConstants::VARINT) {
-        retVal = m_varIntValue;
-    }
-    return retVal;
+    return m_varIntValue;
 }
 
 float FromProtoVisitor::ProtoKeyValue::valueAsFloat() const noexcept {
-    union FloatValue {
-        uint32_t uint32Value;
-        float floatValue{0};
-    } retVal;
-    if (!m_value.empty() && (length() == sizeof(float)) && (m_value.size() == sizeof(float)) && (type() == ProtoConstants::FOUR_BYTES)) {
-        std::memcpy(&retVal.uint32Value, &m_value[0], sizeof(float));
-        retVal.uint32Value = le32toh(retVal.uint32Value);
-    }
-    return retVal.floatValue;
+    return m_floatValue;
 }
 
 double FromProtoVisitor::ProtoKeyValue::valueAsDouble() const noexcept {
-    union DoubleValue {
-        uint64_t uint64Value;
-        double doubleValue{0};
-    } retVal;
-    if (!m_value.empty() && (length() == sizeof(double)) && (m_value.size() == sizeof(double)) && (type() == ProtoConstants::EIGHT_BYTES)) {
-        std::memcpy(&retVal.uint64Value, &m_value[0], sizeof(double));
-        retVal.uint64Value = le64toh(retVal.uint64Value);
-    }
-    return retVal.doubleValue;
+    return m_doubleValue;
 }
 
 std::string FromProtoVisitor::ProtoKeyValue::valueAsString() const noexcept {
-    std::string retVal;
-    if (!m_value.empty() && (length() > 0) && (type() == ProtoConstants::LENGTH_DELIMITED)) {
-        // Create string from buffer.
-        retVal = std::string(m_value.data(), static_cast<std::size_t>(m_length));
-    }
-    return retVal;
-}
-
-std::vector<char> &FromProtoVisitor::ProtoKeyValue::rawBuffer() noexcept {
-    return m_value;
+    return m_stringValue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 FromProtoVisitor &FromProtoVisitor::operator=(const FromProtoVisitor &other) noexcept {
-    m_buffer.str(other.m_buffer.str());
     m_mapOfKeyValues = other.m_mapOfKeyValues;
-
     return *this;
 }
 
@@ -308,16 +293,19 @@ int64_t FromProtoVisitor::fromZigZag64(uint64_t v) noexcept {
 std::size_t FromProtoVisitor::fromVarInt(std::istream &in, uint64_t &value) noexcept {
     value = 0;
 
-    constexpr uint64_t MASK  = 0x7f;
-    constexpr uint64_t SHIFT = 0x7;
-    constexpr uint64_t MSB   = 0x80;
+    const constexpr uint64_t MASK  = 0x7f;
+    const constexpr uint64_t SHIFT = 0x7;
+    const constexpr uint64_t MSB   = 0x80;
 
     std::size_t size = 0;
+    uint64_t C{0};
+    uint64_t B{0};
     while (in.good()) {
-        const auto C     = in.get();
-        const uint64_t B = static_cast<uint64_t>(C) & MASK;
+        auto x = in.get();
+        C = static_cast<uint64_t>(x);
+        B = C & MASK;
         value |= B << (SHIFT * size++);
-        if (!(static_cast<uint64_t>(C) & MSB)) { // NOLINT
+        if (!(C & MSB)) { // NOLINT
             break;
         }
     }
