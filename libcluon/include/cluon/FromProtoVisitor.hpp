@@ -13,7 +13,7 @@
 #include "cluon/cluon.hpp"
 
 #include <cstdint>
-#include <map>
+#include <unordered_map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -144,7 +144,7 @@ class LIBCLUON_API FromProtoVisitor {
 
    private:
     std::stringstream m_buffer{""};
-    std::map<uint32_t, ProtoKeyValue> m_mapOfKeyValues{};
+    std::unordered_map<uint32_t, ProtoKeyValue> m_mapOfKeyValues{};
 };
 } // namespace cluon
 

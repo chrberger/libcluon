@@ -19,7 +19,9 @@ void FromProtoVisitor::readBytesFromStream(std::istream &in, std::size_t bytesTo
     std::streamsize bufferPosition{0};
 
     // Ensure buffer has enough space to hold the bytes.
-    buffer.reserve(bytesToReadFromStream);
+    if (buffer.capacity() < bytesToReadFromStream) {
+        buffer.reserve(bytesToReadFromStream);
+    }
 
     while ((0 < bytesToReadFromStream) && in.good()) {
         // clang-format off
@@ -80,7 +82,7 @@ FromProtoVisitor::ProtoKeyValue::ProtoKeyValue() noexcept
     : m_key{0}
     , m_type{ProtoConstants::VARINT}
     , m_length{0}
-    , m_value{}
+    , m_value{0}
     , m_varIntValue{0} {}
 
 FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint32_t key, ProtoConstants type, uint64_t length) noexcept
@@ -94,7 +96,7 @@ FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint32_t key, uint64_t value) noe
     : m_key{key}
     , m_type{ProtoConstants::VARINT}
     , m_length{0}
-    , m_value{}
+    , m_value{0}
     , m_varIntValue{value} {}
 
 uint32_t FromProtoVisitor::ProtoKeyValue::key() const noexcept {
