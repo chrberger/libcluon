@@ -71,21 +71,21 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
                 {
                     // Directly decode VarInt value.
                     fromVarInt(in, value);
-                    m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(value));
+                    m_mapOfKeyValues.emplace(fieldId, linb::any(value));
                 }
                 break;
                 case ProtoConstants::EIGHT_BYTES:
                 {
                     readBytesFromStream(in, sizeof(double), doubleValue.buffer.data());
                     doubleValue.uint64Value = le64toh(doubleValue.uint64Value);
-                    m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(doubleValue.doubleValue));
+                    m_mapOfKeyValues.emplace(fieldId, linb::any(doubleValue.doubleValue));
                 }
                 break;
                 case ProtoConstants::FOUR_BYTES:
                 {
                     readBytesFromStream(in, sizeof(float), floatValue.buffer.data());
                     floatValue.uint32Value = le32toh(floatValue.uint32Value);
-                    m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(floatValue.floatValue));
+                    m_mapOfKeyValues.emplace(fieldId, linb::any(floatValue.floatValue));
                 }
                 break;
                 case ProtoConstants::LENGTH_DELIMITED:
@@ -96,60 +96,12 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
                         buffer.reserve(BYTES_TO_READ_FROM_STREAM);
                     }
                     readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, buffer.data());
-                    m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(std::string(buffer.data(), value)));
+                    m_mapOfKeyValues.emplace(fieldId, linb::any(std::string(buffer.data(), value)));
                 }
                 break;
             }
         }
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-FromProtoVisitor::ProtoKeyValue::ProtoKeyValue() noexcept
-    : m_varIntValue{0}
-    , m_floatValue{0}
-    , m_doubleValue{0}
-    , m_stringValue{} {}
-
-FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(uint64_t value) noexcept
-    : m_varIntValue{value}
-    , m_floatValue{0}
-    , m_doubleValue{0}
-    , m_stringValue{} {}
-
-FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(float value) noexcept
-    : m_varIntValue{0}
-    , m_floatValue{value}
-    , m_doubleValue{0}
-    , m_stringValue{} {}
-
-FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(double value) noexcept
-    : m_varIntValue{0}
-    , m_floatValue{0}
-    , m_doubleValue{value}
-    , m_stringValue{} {}
-
-FromProtoVisitor::ProtoKeyValue::ProtoKeyValue(std::string &&value) noexcept
-    : m_varIntValue{0}
-    , m_floatValue{0}
-    , m_doubleValue{0}
-    , m_stringValue{std::move(value)} {}
-
-uint64_t FromProtoVisitor::ProtoKeyValue::valueAsVarInt() const noexcept {
-    return m_varIntValue;
-}
-
-float FromProtoVisitor::ProtoKeyValue::valueAsFloat() const noexcept {
-    return m_floatValue;
-}
-
-double FromProtoVisitor::ProtoKeyValue::valueAsDouble() const noexcept {
-    return m_doubleValue;
-}
-
-std::string FromProtoVisitor::ProtoKeyValue::valueAsString() const noexcept {
-    return m_stringValue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +125,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        v = (0 != m_mapOfKeyValues[id].valueAsVarInt());
+        try {
+            v = (0 != linb::any_cast<uint64_t>(m_mapOfKeyValues[id]));
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -181,8 +136,11 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<char>(_v);
+        try {
+            uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
+            v           = static_cast<char>(_v);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -190,8 +148,11 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<int8_t>(fromZigZag8(static_cast<uint8_t>(_v)));
+        try {
+            uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
+            v           = static_cast<int8_t>(fromZigZag8(static_cast<uint8_t>(_v)));
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -199,8 +160,11 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<uint8_t>(_v);
+        try {
+            uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
+            v           = static_cast<uint8_t>(_v);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -208,8 +172,11 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<int16_t>(fromZigZag16(static_cast<uint16_t>(_v)));
+        try {
+            uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
+            v           = static_cast<int16_t>(fromZigZag16(static_cast<uint16_t>(_v)));
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -217,8 +184,11 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<uint16_t>(_v);
+        try {
+            uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
+            v           = static_cast<uint16_t>(_v);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -226,8 +196,11 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<int32_t>(fromZigZag32(static_cast<uint32_t>(_v)));
+        try {
+            uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
+            v           = static_cast<int32_t>(fromZigZag32(static_cast<uint32_t>(_v)));
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -235,8 +208,11 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<uint32_t>(_v);
+        try {
+            uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
+            v           = static_cast<uint32_t>(_v);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -244,8 +220,11 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        uint64_t _v = m_mapOfKeyValues[id].valueAsVarInt();
-        v           = static_cast<int64_t>(fromZigZag64(_v));
+        try {
+            uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
+            v           = static_cast<int64_t>(fromZigZag64(_v));
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -253,7 +232,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        v = m_mapOfKeyValues[id].valueAsVarInt();
+        try {
+            v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -261,7 +243,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        v = m_mapOfKeyValues[id].valueAsFloat();
+        try {
+            v = linb::any_cast<float>(m_mapOfKeyValues[id]);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -269,7 +254,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        v = m_mapOfKeyValues[id].valueAsDouble();
+        try {
+            v = linb::any_cast<double>(m_mapOfKeyValues[id]);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 
@@ -277,7 +265,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_mapOfKeyValues.count(id) > 0) {
-        v = m_mapOfKeyValues[id].valueAsString();
+        try {
+            v = linb::any_cast<std::string>(m_mapOfKeyValues[id]);
+        } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+        }
     }
 }
 

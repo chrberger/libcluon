@@ -19,64 +19,17 @@
 #include <string>
 
 namespace cluon {
+    class ValueAsHash {
+       public:
+        inline std::size_t operator()(const uint32_t v) const noexcept {
+            return static_cast<std::size_t>(v);
+        }
+    };
+
 /**
 This class decodes a given message from Proto format.
 */
 class LIBCLUON_API FromProtoVisitor {
-    /**
-     * This class represents an entry in a Proto payload stream.
-     */
-    class ProtoKeyValue {
-       private:
-        ProtoKeyValue &operator=(const ProtoKeyValue &) = delete;
-
-       public:
-        ProtoKeyValue() noexcept;
-        ProtoKeyValue(const ProtoKeyValue &) = default; // LCOV_EXCL_LINE
-        ProtoKeyValue(ProtoKeyValue &&) = default;
-        ProtoKeyValue &operator=(ProtoKeyValue &&) = default; // LCOV_EXCL_LINE
-        ~ProtoKeyValue()                           = default;
-
-        /**
-         * Constructor for VARINT values.
-         *
-         * @param value VARINT value.
-         */
-        ProtoKeyValue(uint64_t value) noexcept;
-
-        /**
-         * Constructor for VARINT values.
-         *
-         * @param value float value.
-         */
-        ProtoKeyValue(float value) noexcept;
-
-        /**
-         * Constructor for VARINT values.
-         *
-         * @param value double value.
-         */
-        ProtoKeyValue(double value) noexcept;
-
-        /**
-         * Constructor for VARINT values.
-         *
-         * @param value string value.
-         */
-        ProtoKeyValue(std::string &&value) noexcept;
-
-        uint64_t valueAsVarInt() const noexcept;
-        float valueAsFloat() const noexcept;
-        double valueAsDouble() const noexcept;
-        std::string valueAsString() const noexcept;
-
-       private:
-        uint64_t m_varIntValue{0};
-        float m_floatValue{0};
-        double m_doubleValue{0};
-        std::string m_stringValue{};
-    };
-
    private:
     FromProtoVisitor(const FromProtoVisitor &) = delete;
     FromProtoVisitor(FromProtoVisitor &&)      = delete;
@@ -123,13 +76,14 @@ class LIBCLUON_API FromProtoVisitor {
         (void)name;
 
         if (0 < m_mapOfKeyValues.count(id)) {
-            const std::string s{m_mapOfKeyValues[id].valueAsString()};
+            try {
+                std::stringstream sstr{linb::any_cast<std::string>(m_mapOfKeyValues[id])};
+                cluon::FromProtoVisitor nestedProtoDecoder;
+                nestedProtoDecoder.decodeFrom(sstr);
 
-            std::stringstream sstr{s};
-            cluon::FromProtoVisitor nestedProtoDecoder;
-            nestedProtoDecoder.decodeFrom(sstr);
-
-            value.accept(nestedProtoDecoder);
+                value.accept(nestedProtoDecoder);
+            } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+            }
         }
     }
 
@@ -144,7 +98,7 @@ class LIBCLUON_API FromProtoVisitor {
     void readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, char *buffer) noexcept;
 
    private:
-    std::unordered_map<uint32_t, ProtoKeyValue> m_mapOfKeyValues{};
+    std::unordered_map<uint32_t, linb::any, ValueAsHash> m_mapOfKeyValues{};
 };
 } // namespace cluon
 

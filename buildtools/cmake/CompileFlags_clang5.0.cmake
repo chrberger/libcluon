@@ -435,7 +435,7 @@ set(CLANG50_CXX_WARNING_FLAGS " \
     -Wsuper-class-method-mismatch \
     -Wswitch \
     -Wswitch-bool \
-    -Wswitch-default \
+    -Wno-error=switch-default \
     -Wswitch-enum \
     -Wsynth \
     -Wtautological-compare \

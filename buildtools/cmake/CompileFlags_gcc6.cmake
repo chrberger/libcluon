@@ -132,7 +132,7 @@ set(GCC6_CXX_WARNING_FLAGS " \
     -Wno-error=suggest-override \
     -Wswitch \
     -Wswitch-bool \
-    -Wswitch-default \
+    -Wno-error=switch-default \
     -Wswitch-enum \
     -Wsync-nand \
     -Wsynth \
