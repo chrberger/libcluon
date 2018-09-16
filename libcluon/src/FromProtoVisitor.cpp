@@ -85,11 +85,12 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
                 uint64_t length{0};
                 fromVarInt(in, length);
                 const std::size_t BYTES_TO_READ_FROM_STREAM{static_cast<std::size_t>(length)};
+                const std::size_t L{BYTES_TO_READ_FROM_STREAM};
                 if (buffer.capacity() < BYTES_TO_READ_FROM_STREAM) {
                     buffer.reserve(BYTES_TO_READ_FROM_STREAM);
                 }
                 readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, buffer.data());
-                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(std::string(&buffer[0], BYTES_TO_READ_FROM_STREAM)));
+                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(std::string(buffer.data(), L)));
             }
         }
     }
