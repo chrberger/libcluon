@@ -41,17 +41,15 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
     uint64_t value{0};
 
     // Buffer for double values.
-    const constexpr std::size_t SIZEOF_DOUBLE{sizeof(double)};
     union DoubleValue {
-        std::array<char, SIZEOF_DOUBLE> buffer;
+        std::array<char, sizeof(double)> buffer;
         uint64_t uint64Value;
         double doubleValue{0};
     } doubleValue;
 
     // Buffer for float values.
-    const constexpr std::size_t SIZEOF_FLOAT{sizeof(float)};
     union FloatValue {
-        std::array<char, SIZEOF_FLOAT> buffer;
+        std::array<char, sizeof(float)> buffer;
         uint32_t uint32Value;
         float floatValue{0};
     } floatValue;
@@ -78,14 +76,14 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
                 break;
                 case ProtoConstants::EIGHT_BYTES:
                 {
-                    readBytesFromStream(in, SIZEOF_DOUBLE, doubleValue.buffer.data());
+                    readBytesFromStream(in, sizeof(double), doubleValue.buffer.data());
                     doubleValue.uint64Value = le64toh(doubleValue.uint64Value);
                     m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(doubleValue.doubleValue));
                 }
                 break;
                 case ProtoConstants::FOUR_BYTES:
                 {
-                    readBytesFromStream(in, SIZEOF_FLOAT, floatValue.buffer.data());
+                    readBytesFromStream(in, sizeof(float), floatValue.buffer.data());
                     floatValue.uint32Value = le32toh(floatValue.uint32Value);
                     m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(floatValue.floatValue));
                 }
