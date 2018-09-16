@@ -18,7 +18,7 @@ namespace cluon {
 
 void FromProtoVisitor::readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, char *buffer) noexcept {
     if (nullptr != buffer) {
-        constexpr std::size_t CHUNK_SIZE{1024};
+        const constexpr std::size_t CHUNK_SIZE{1024};
         std::streamsize bufferPosition{0};
 
         while ((0 < bytesToReadFromStream) && in.good()) {
@@ -37,60 +37,70 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
     // Reset internal states as this deserializer could be reused.
     m_mapOfKeyValues.clear();
 
+    // VARINT values.
+    uint64_t value{0};
+
     // Buffer for double values.
+    const constexpr std::size_t SIZEOF_DOUBLE{sizeof(double)};
     union DoubleValue {
-        std::array<char, sizeof(double)> buffer;
+        std::array<char, SIZEOF_DOUBLE> buffer;
         uint64_t uint64Value;
         double doubleValue{0};
     } doubleValue;
 
     // Buffer for float values.
+    const constexpr std::size_t SIZEOF_FLOAT{sizeof(float)};
     union FloatValue {
-        std::array<char, sizeof(float)> buffer;
+        std::array<char, SIZEOF_FLOAT> buffer;
         uint32_t uint32Value;
         float floatValue{0};
     } floatValue;
 
     // Buffer for strings.
-    constexpr const uint32_t INITIAL_BUFFER_SIZE{8192};
     std::vector<char> buffer;
-    buffer.reserve(INITIAL_BUFFER_SIZE);
 
+    uint64_t keyFieldType{0};
+    ProtoConstants protoType{ProtoConstants::VARINT};
+    uint32_t fieldId{0};
     while (in.good()) {
         // First stage: Read keyFieldType (encoded as VarInt).
-        uint64_t keyFieldType{0};
-        std::size_t bytesRead{fromVarInt(in, keyFieldType)};
-
-        if (bytesRead > 0) {
+        if (0 < fromVarInt(in, keyFieldType)) {
             // Succeeded to read keyFieldType entry; extract information.
-            const uint32_t fieldId{static_cast<uint32_t>(keyFieldType >> 3)};
-            const ProtoConstants protoType{static_cast<ProtoConstants>(keyFieldType & 0x7)};
-
-            if (protoType == ProtoConstants::VARINT) {
-                // Directly decode VarInt value.
-                uint64_t value{0};
-                fromVarInt(in, value);
-                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(value));
-            } else if (protoType == ProtoConstants::EIGHT_BYTES) {
-                const constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(double)};
-                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, doubleValue.buffer.data());
-                doubleValue.uint64Value = le64toh(doubleValue.uint64Value);
-                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(doubleValue.doubleValue));
-            } else if (protoType == ProtoConstants::FOUR_BYTES) {
-                const constexpr std::size_t BYTES_TO_READ_FROM_STREAM{sizeof(float)};
-                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, floatValue.buffer.data());
-                floatValue.uint32Value = le32toh(floatValue.uint32Value);
-                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(floatValue.floatValue));
-            } else if (protoType == ProtoConstants::LENGTH_DELIMITED) {
-                uint64_t length{0};
-                fromVarInt(in, length);
-                const std::size_t BYTES_TO_READ_FROM_STREAM{static_cast<std::size_t>(length)};
-                const std::size_t L{BYTES_TO_READ_FROM_STREAM};
-                if (buffer.capacity() < BYTES_TO_READ_FROM_STREAM) {
-                    buffer.reserve(BYTES_TO_READ_FROM_STREAM);
+            protoType = static_cast<ProtoConstants>(keyFieldType & 0x7);
+            fieldId = static_cast<uint32_t>(keyFieldType >> 3);
+            switch (protoType) {
+                case ProtoConstants::VARINT:
+                {
+                    // Directly decode VarInt value.
+                    fromVarInt(in, value);
+                    m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(value));
                 }
-                readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, buffer.data());
-                m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(std::string(buffer.data(), L)));
+                break;
+                case ProtoConstants::EIGHT_BYTES:
+                {
+                    readBytesFromStream(in, SIZEOF_DOUBLE, doubleValue.buffer.data());
+                    doubleValue.uint64Value = le64toh(doubleValue.uint64Value);
+                    m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(doubleValue.doubleValue));
+                }
+                break;
+                case ProtoConstants::FOUR_BYTES:
+                {
+                    readBytesFromStream(in, SIZEOF_FLOAT, floatValue.buffer.data());
+                    floatValue.uint32Value = le32toh(floatValue.uint32Value);
+                    m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(floatValue.floatValue));
+                }
+                break;
+                case ProtoConstants::LENGTH_DELIMITED:
+                {
+                    fromVarInt(in, value);
+                    const std::size_t BYTES_TO_READ_FROM_STREAM{static_cast<std::size_t>(value)};
+                    if (buffer.capacity() < BYTES_TO_READ_FROM_STREAM) {
+                        buffer.reserve(BYTES_TO_READ_FROM_STREAM);
+                    }
+                    readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, buffer.data());
+                    m_mapOfKeyValues.emplace(fieldId, ProtoKeyValue(std::string(buffer.data(), value)));
+                }
+                break;
             }
         }
     }
@@ -294,18 +304,16 @@ int64_t FromProtoVisitor::fromZigZag64(uint64_t v) noexcept {
 std::size_t FromProtoVisitor::fromVarInt(std::istream &in, uint64_t &value) noexcept {
     value = 0;
 
-    const constexpr uint64_t MASK  = 0x7f;
-    const constexpr uint64_t SHIFT = 0x7;
-    const constexpr uint64_t MSB   = 0x80;
+    constexpr uint64_t MASK  = 0x7f;
+    constexpr uint64_t SHIFT = 0x7;
+    constexpr uint64_t MSB   = 0x80;
 
     std::size_t size = 0;
     uint64_t C{0};
-    uint64_t B{0};
     while (in.good()) {
         auto x = in.get();
         C = static_cast<uint64_t>(x);
-        B = C & MASK;
-        value |= B << (SHIFT * size++);
+        value |= (C & MASK) << (SHIFT * size++);
         if (!(C & MSB)) { // NOLINT
             break;
         }

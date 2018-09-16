@@ -11,6 +11,7 @@
 
 #include "cluon/ProtoConstants.hpp"
 #include "cluon/cluon.hpp"
+#include "cluon/any/any.hpp"
 
 #include <cstdint>
 #include <unordered_map>
