@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace cluon {
     class ValueAsHash {
@@ -99,6 +100,31 @@ class LIBCLUON_API FromProtoVisitor {
 
    private:
     std::unordered_map<uint32_t, linb::any, ValueAsHash> m_mapOfKeyValues{};
+
+   private:
+    // VARINT values.
+    uint64_t m_value{0};
+
+    // Buffer for double values.
+    union DoubleValue {
+        std::array<char, sizeof(double)> buffer;
+        uint64_t uint64Value;
+        double doubleValue{0};
+    } m_doubleValue;
+
+    // Buffer for float values.
+    union FloatValue {
+        std::array<char, sizeof(float)> buffer;
+        uint32_t uint32Value;
+        float floatValue{0};
+    } m_floatValue;
+
+    // Buffer for strings.
+    std::vector<char> m_stringValue;
+
+    uint64_t m_keyFieldType{0};
+    ProtoConstants m_protoType{ProtoConstants::VARINT};
+    uint32_t m_fieldId{0};
 };
 } // namespace cluon
 

@@ -10,9 +10,7 @@
 
 #include <cstddef>
 #include <cstring>
-#include <array>
 #include <utility>
-#include <vector>
 
 namespace cluon {
 
@@ -37,66 +35,43 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
     // Reset internal states as this deserializer could be reused.
     m_mapOfKeyValues.clear();
 
-    // VARINT values.
-    uint64_t value{0};
-
-    // Buffer for double values.
-    union DoubleValue {
-        std::array<char, sizeof(double)> buffer;
-        uint64_t uint64Value;
-        double doubleValue{0};
-    } doubleValue;
-
-    // Buffer for float values.
-    union FloatValue {
-        std::array<char, sizeof(float)> buffer;
-        uint32_t uint32Value;
-        float floatValue{0};
-    } floatValue;
-
-    // Buffer for strings.
-    std::vector<char> buffer;
-
-    uint64_t keyFieldType{0};
-    ProtoConstants protoType{ProtoConstants::VARINT};
-    uint32_t fieldId{0};
     while (in.good()) {
         // First stage: Read keyFieldType (encoded as VarInt).
-        if (0 < fromVarInt(in, keyFieldType)) {
+        if (0 < fromVarInt(in, m_keyFieldType)) {
             // Succeeded to read keyFieldType entry; extract information.
-            protoType = static_cast<ProtoConstants>(keyFieldType & 0x7);
-            fieldId = static_cast<uint32_t>(keyFieldType >> 3);
-            switch (protoType) {
+            m_protoType = static_cast<ProtoConstants>(m_keyFieldType & 0x7);
+            m_fieldId = static_cast<uint32_t>(m_keyFieldType >> 3);
+            switch (m_protoType) {
                 case ProtoConstants::VARINT:
                 {
                     // Directly decode VarInt value.
-                    fromVarInt(in, value);
-                    m_mapOfKeyValues.emplace(fieldId, linb::any(value));
+                    fromVarInt(in, m_value);
+                    m_mapOfKeyValues.emplace(m_fieldId, linb::any(m_value));
                 }
                 break;
                 case ProtoConstants::EIGHT_BYTES:
                 {
-                    readBytesFromStream(in, sizeof(double), doubleValue.buffer.data());
-                    doubleValue.uint64Value = le64toh(doubleValue.uint64Value);
-                    m_mapOfKeyValues.emplace(fieldId, linb::any(doubleValue.doubleValue));
+                    readBytesFromStream(in, sizeof(double), m_doubleValue.buffer.data());
+                    m_doubleValue.uint64Value = le64toh(m_doubleValue.uint64Value);
+                    m_mapOfKeyValues.emplace(m_fieldId, linb::any(m_doubleValue.doubleValue));
                 }
                 break;
                 case ProtoConstants::FOUR_BYTES:
                 {
-                    readBytesFromStream(in, sizeof(float), floatValue.buffer.data());
-                    floatValue.uint32Value = le32toh(floatValue.uint32Value);
-                    m_mapOfKeyValues.emplace(fieldId, linb::any(floatValue.floatValue));
+                    readBytesFromStream(in, sizeof(float), m_floatValue.buffer.data());
+                    m_floatValue.uint32Value = le32toh(m_floatValue.uint32Value);
+                    m_mapOfKeyValues.emplace(m_fieldId, linb::any(m_floatValue.floatValue));
                 }
                 break;
                 case ProtoConstants::LENGTH_DELIMITED:
                 {
-                    fromVarInt(in, value);
-                    const std::size_t BYTES_TO_READ_FROM_STREAM{static_cast<std::size_t>(value)};
-                    if (buffer.capacity() < BYTES_TO_READ_FROM_STREAM) {
-                        buffer.reserve(BYTES_TO_READ_FROM_STREAM);
+                    fromVarInt(in, m_value);
+                    const std::size_t BYTES_TO_READ_FROM_STREAM{static_cast<std::size_t>(m_value)};
+                    if (m_stringValue.capacity() < BYTES_TO_READ_FROM_STREAM) {
+                        m_stringValue.reserve(BYTES_TO_READ_FROM_STREAM);
                     }
-                    readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, buffer.data());
-                    m_mapOfKeyValues.emplace(fieldId, linb::any(std::string(buffer.data(), value)));
+                    readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, m_stringValue.data());
+                    m_mapOfKeyValues.emplace(m_fieldId, linb::any(std::string(m_stringValue.data(), m_value)));
                 }
                 break;
             }
