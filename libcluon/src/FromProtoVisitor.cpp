@@ -34,6 +34,21 @@ void FromProtoVisitor::readBytesFromStream(std::istream &in, std::size_t bytesTo
 void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
     // Reset internal states as this deserializer could be reused.
     m_mapOfKeyValues.clear();
+    if (m_needToResetPreallocatedEntries) {
+        for(auto it = preallocatedMapOfKeyVarInts.begin(); it != preallocatedMapOfKeyVarInts.end(); it++) {
+            it->second = 0;
+        }
+        for(auto it = preallocatedMapOfKeyFloats.begin(); it != preallocatedMapOfKeyFloats.end(); it++) {
+            it->second = 0.f;
+        }
+        for(auto it = preallocatedMapOfKeyDoubles.begin(); it != preallocatedMapOfKeyDoubles.end(); it++) {
+            it->second = 0.0;
+        }
+        for(auto it = preallocatedMapOfKeyStrings.begin(); it != preallocatedMapOfKeyStrings.end(); it++) {
+            it->second = "";
+        }
+    }
+    m_needToResetPreallocatedEntries = true;
 
     while (in.good()) {
         // First stage: Read keyFieldType (encoded as VarInt).

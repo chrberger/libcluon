@@ -14,9 +14,10 @@
 #include "cluon/any/any.hpp"
 
 #include <cstdint>
-#include <unordered_map>
+#include <array>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace cluon {
@@ -100,6 +101,100 @@ class LIBCLUON_API FromProtoVisitor {
 
    private:
     std::unordered_map<uint32_t, linb::any, ValueAsHash> m_mapOfKeyValues{};
+
+    bool m_needToResetPreallocatedEntries{false};
+    const constexpr static uint8_t MAX_PREALLOCATED_ENTRIES{20};
+    std::unordered_map<uint32_t, uint64_t, ValueAsHash> preallocatedMapOfKeyVarInts = {
+        {0, 0},
+        {1, 0},
+        {2, 0},
+        {3, 0},
+        {4, 0},
+        {5, 0},
+        {6, 0},
+        {7, 0},
+        {8, 0},
+        {9, 0},
+        {10, 0},
+        {11, 0},
+        {12, 0},
+        {13, 0},
+        {14, 0},
+        {15, 0},
+        {16, 0},
+        {17, 0},
+        {18, 0},
+        {19, 0}
+    };
+
+    std::unordered_map<uint32_t, float, ValueAsHash> preallocatedMapOfKeyFloats = {
+        {0, 0.f},
+        {1, 0.f},
+        {2, 0.f},
+        {3, 0.f},
+        {4, 0.f},
+        {5, 0.f},
+        {6, 0.f},
+        {7, 0.f},
+        {8, 0.f},
+        {9, 0.f},
+        {10, 0.f},
+        {11, 0.f},
+        {12, 0.f},
+        {13, 0.f},
+        {14, 0.f},
+        {15, 0.f},
+        {16, 0.f},
+        {17, 0.f},
+        {18, 0.f},
+        {19, 0.f}
+    };
+
+    std::unordered_map<uint32_t, double, ValueAsHash> preallocatedMapOfKeyDoubles = {
+        {0, 0.0},
+        {1, 0.0},
+        {2, 0.0},
+        {3, 0.0},
+        {4, 0.0},
+        {5, 0.0},
+        {6, 0.0},
+        {7, 0.0},
+        {8, 0.0},
+        {9, 0.0},
+        {10, 0.0},
+        {11, 0.0},
+        {12, 0.0},
+        {13, 0.0},
+        {14, 0.0},
+        {15, 0.0},
+        {16, 0.0},
+        {17, 0.0},
+        {18, 0.0},
+        {19, 0.0}
+    };
+
+    std::unordered_map<uint32_t, std::string, ValueAsHash> preallocatedMapOfKeyStrings = {
+        {0, ""},
+        {1, ""},
+        {2, ""},
+        {3, ""},
+        {4, ""},
+        {5, ""},
+        {6, ""},
+        {7, ""},
+        {8, ""},
+        {9, ""},
+        {10, ""},
+        {11, ""},
+        {12, ""},
+        {13, ""},
+        {14, ""},
+        {15, ""},
+        {16, ""},
+        {17, ""},
+        {18, ""},
+        {19, ""}
+    };
 
    private:
     // VARINT values.
