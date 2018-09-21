@@ -159,6 +159,20 @@ class LIB_API {{%MESSAGE%}} {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            {{#%FIELDS%}}
+            if ({{%FIELDIDENTIFIER%}} == fieldId) {
+                doVisit({{%FIELDIDENTIFIER%}}, std::move("{{%TYPE%}}"s), std::move("{{%NAME%}}"s), m_{{%NAME%}}, visitor);
+                return;
+            }
+            {{/%FIELDS%}}
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             {{#%FIELDS%}}

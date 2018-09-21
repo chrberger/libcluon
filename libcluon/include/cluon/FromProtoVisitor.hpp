@@ -73,20 +73,80 @@ class LIBCLUON_API FromProtoVisitor {
     void visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept;
 
     template <typename T>
-    void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
+    void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &v) noexcept {
         (void)typeName;
         (void)name;
 
-        if (0 < m_mapOfKeyValues.count(id)) {
+        if (m_callToDecodeFromWithDirectVisit) {
+            std::stringstream sstr{std::move(std::string(m_stringValue.data(), m_value))};
+            cluon::FromProtoVisitor nestedProtoDecoder;
+            nestedProtoDecoder.decodeFrom(sstr);
+            v.accept(nestedProtoDecoder);
+        }
+        else if (0 < m_mapOfKeyValues.count(id)) {
             try {
                 std::stringstream sstr{linb::any_cast<std::string>(m_mapOfKeyValues[id])};
                 cluon::FromProtoVisitor nestedProtoDecoder;
                 nestedProtoDecoder.decodeFrom(sstr);
-
-                value.accept(nestedProtoDecoder);
+                v.accept(nestedProtoDecoder);
             } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
             }
         }
+    }
+
+   public:
+    /**
+     * This method decodes a given istream into corresponding fields of v.
+     *
+     * @param in istream to decode.
+     * @param v Data structure to receive the decoded values.
+     */
+    template<typename T>
+    void decodeFrom(std::istream &in, T &v) noexcept {
+        m_callToDecodeFromWithDirectVisit = true;
+        while (in.good()) {
+            // First stage: Read keyFieldType (encoded as VarInt).
+            if (0 < fromVarInt(in, m_keyFieldType)) {
+                // Succeeded to read keyFieldType entry; extract information.
+                m_protoType = static_cast<ProtoConstants>(m_keyFieldType & 0x7);
+                m_fieldId = static_cast<uint32_t>(m_keyFieldType >> 3);
+                switch (m_protoType) {
+                    case ProtoConstants::VARINT:
+                    {
+                        // Directly decode VarInt value.
+                        fromVarInt(in, m_value);
+                        v.accept(m_fieldId, *this);
+                    }
+                    break;
+                    case ProtoConstants::EIGHT_BYTES:
+                    {
+                        readBytesFromStream(in, sizeof(double), m_doubleValue.buffer.data());
+                        m_doubleValue.uint64Value = le64toh(m_doubleValue.uint64Value);
+                        v.accept(m_fieldId, *this);
+                    }
+                    break;
+                    case ProtoConstants::FOUR_BYTES:
+                    {
+                        readBytesFromStream(in, sizeof(float), m_floatValue.buffer.data());
+                        m_floatValue.uint32Value = le32toh(m_floatValue.uint32Value);
+                        v.accept(m_fieldId, *this);
+                    }
+                    break;
+                    case ProtoConstants::LENGTH_DELIMITED:
+                    {
+                        fromVarInt(in, m_value);
+                        const std::size_t BYTES_TO_READ_FROM_STREAM{static_cast<std::size_t>(m_value)};
+                        if (m_stringValue.capacity() < BYTES_TO_READ_FROM_STREAM) {
+                            m_stringValue.reserve(BYTES_TO_READ_FROM_STREAM);
+                        }
+                        readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, m_stringValue.data());
+                        v.accept(m_fieldId, *this);
+                    }
+                    break;
+                }
+            }
+        }
+        m_callToDecodeFromWithDirectVisit = false;
     }
 
    private:
@@ -100,6 +160,9 @@ class LIBCLUON_API FromProtoVisitor {
     void readBytesFromStream(std::istream &in, std::size_t bytesToReadFromStream, char *buffer) noexcept;
 
    private:
+    // This Boolean flag indicates whether we consecutively decode from istream
+    // and inject the decoded values directly into the receiving data structure.
+    bool m_callToDecodeFromWithDirectVisit{false};
     std::unordered_map<uint32_t, linb::any, ValueAsHash> m_mapOfKeyValues{};
 
    private:

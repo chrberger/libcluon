@@ -99,7 +99,10 @@ void FromProtoVisitor::postVisit() noexcept {}
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, bool &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = (0 != m_value);
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             v = (0 != linb::any_cast<uint64_t>(m_mapOfKeyValues[id]));
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
@@ -110,7 +113,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, char &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = static_cast<char>(m_value);
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
             v           = static_cast<char>(_v);
@@ -122,7 +128,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int8_t &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = static_cast<int8_t>(fromZigZag8(static_cast<uint8_t>(m_value)));
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
             v           = static_cast<int8_t>(fromZigZag8(static_cast<uint8_t>(_v)));
@@ -134,7 +143,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint8_t &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = static_cast<uint8_t>(m_value);
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
             v           = static_cast<uint8_t>(_v);
@@ -146,7 +158,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int16_t &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = static_cast<int16_t>(fromZigZag16(static_cast<uint16_t>(m_value)));
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
             v           = static_cast<int16_t>(fromZigZag16(static_cast<uint16_t>(_v)));
@@ -158,7 +173,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint16_t &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = static_cast<uint16_t>(m_value);
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
             v           = static_cast<uint16_t>(_v);
@@ -170,7 +188,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int32_t &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = static_cast<int32_t>(fromZigZag32(static_cast<uint32_t>(m_value)));
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
             v           = static_cast<int32_t>(fromZigZag32(static_cast<uint32_t>(_v)));
@@ -182,7 +203,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint32_t &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = static_cast<uint32_t>(m_value);
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
             v           = static_cast<uint32_t>(_v);
@@ -194,7 +218,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, int64_t &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = static_cast<int64_t>(fromZigZag64(static_cast<uint64_t>(m_value)));
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             uint64_t _v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
             v           = static_cast<int64_t>(fromZigZag64(_v));
@@ -206,7 +233,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, uint64_t &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = m_value;
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             v = linb::any_cast<uint64_t>(m_mapOfKeyValues[id]);
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
@@ -217,7 +247,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, float &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = m_floatValue.floatValue;
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             v = linb::any_cast<float>(m_mapOfKeyValues[id]);
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
@@ -228,7 +261,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, double &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = m_doubleValue.doubleValue;
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             v = linb::any_cast<double>(m_mapOfKeyValues[id]);
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
@@ -239,7 +275,10 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
 void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&name, std::string &v) noexcept {
     (void)typeName;
     (void)name;
-    if (m_mapOfKeyValues.count(id) > 0) {
+    if (m_callToDecodeFromWithDirectVisit) {
+        v = std::move(std::string(m_stringValue.data(), m_value));
+    }
+    else if (m_mapOfKeyValues.count(id) > 0) {
         try {
             v = linb::any_cast<std::string>(m_mapOfKeyValues[id]);
         } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
