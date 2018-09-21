@@ -181,6 +181,20 @@ class LIB_API MyMessage1 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -224,7 +238,7 @@ struct isTripletForwardVisitable<MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -377,6 +391,20 @@ class LIB_API MyMessage1 {
         
 
     public:
+        template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
@@ -553,6 +581,20 @@ class LIB_API MyMessage2 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -597,14 +639,14 @@ struct isTripletForwardVisitable<MyMessage2> {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.content() << std::endl;
+//        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.content() << std::endl;
+//        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
@@ -758,6 +800,20 @@ class LIB_API MyMessage1 {
         
 
     public:
+        template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
@@ -934,6 +990,20 @@ class LIB_API MyMessage2 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -978,14 +1048,14 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.content() << std::endl;
+//        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.content() << std::endl;
+//        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
@@ -1141,6 +1211,20 @@ class LIB_API MyMessage1 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -1316,6 +1400,20 @@ class LIB_API MyMessage2 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -1360,14 +1458,14 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.content() << std::endl;
+//        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.content() << std::endl;
+//        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
@@ -1522,6 +1620,20 @@ class LIB_API MyMessage1 {
         
 
     public:
+        template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
@@ -1698,6 +1810,20 @@ class LIB_API MyMessage2 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -1742,14 +1868,14 @@ struct isTripletForwardVisitable<MyPackage::SubPackage::MyMessage2> {
         auto firstMetaMessage = retVal.first.front();
         cluon::MetaMessageToCPPTransformator t;
         firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.content() << std::endl;
+//        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
     }
     {
         auto secondMetaMessage = retVal.first.back();
         cluon::MetaMessageToCPPTransformator t;
         secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-        //        std::cout << t.content() << std::endl;
+//        std::cout << t.content() << std::endl;
         REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
     }
 }
@@ -1901,6 +2027,20 @@ class LIB_API MyMessage1 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -1944,7 +2084,7 @@ struct isTripletForwardVisitable<MyPackage1::MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -2095,6 +2235,20 @@ class LIB_API MyMessage1 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -2138,7 +2292,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -2289,6 +2443,20 @@ class LIB_API MyMessage1 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -2332,7 +2500,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackageMessage::MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -2484,6 +2652,20 @@ class LIB_API MyMessage1 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -2527,7 +2709,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MySubPackageMessage::
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -2731,6 +2913,50 @@ class LIB_API MyMessage1 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, visitor);
+                return;
+            }
+            
+            if (2 == fieldId) {
+                doVisit(2, std::move("char"s), std::move("attribute2"s), m_attribute2, visitor);
+                return;
+            }
+            
+            if (3 == fieldId) {
+                doVisit(3, std::move("int32_t"s), std::move("attribute3"s), m_attribute3, visitor);
+                return;
+            }
+            
+            if (4 == fieldId) {
+                doVisit(4, std::move("uint32_t"s), std::move("attribute4"s), m_attribute4, visitor);
+                return;
+            }
+            
+            if (5 == fieldId) {
+                doVisit(5, std::move("float"s), std::move("attribute5"s), m_attribute5, visitor);
+                return;
+            }
+            
+            if (6 == fieldId) {
+                doVisit(6, std::move("double"s), std::move("attribute6"s), m_attribute6, visitor);
+                return;
+            }
+            
+            if (7 == fieldId) {
+                doVisit(7, std::move("std::string"s), std::move("attribute7"s), m_attribute7, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -2810,7 +3036,7 @@ struct isTripletForwardVisitable<MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -3077,6 +3303,85 @@ class LIB_API MyMessage1 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, visitor);
+                return;
+            }
+            
+            if (2 == fieldId) {
+                doVisit(2, std::move("char"s), std::move("attribute2"s), m_attribute2, visitor);
+                return;
+            }
+            
+            if (3 == fieldId) {
+                doVisit(3, std::move("int8_t"s), std::move("attribute3"s), m_attribute3, visitor);
+                return;
+            }
+            
+            if (4 == fieldId) {
+                doVisit(4, std::move("uint8_t"s), std::move("attribute4"s), m_attribute4, visitor);
+                return;
+            }
+            
+            if (5 == fieldId) {
+                doVisit(5, std::move("int16_t"s), std::move("attribute5"s), m_attribute5, visitor);
+                return;
+            }
+            
+            if (6 == fieldId) {
+                doVisit(6, std::move("uint16_t"s), std::move("attribute6"s), m_attribute6, visitor);
+                return;
+            }
+            
+            if (7 == fieldId) {
+                doVisit(7, std::move("int32_t"s), std::move("attribute7"s), m_attribute7, visitor);
+                return;
+            }
+            
+            if (8 == fieldId) {
+                doVisit(8, std::move("uint32_t"s), std::move("attribute8"s), m_attribute8, visitor);
+                return;
+            }
+            
+            if (9 == fieldId) {
+                doVisit(9, std::move("int64_t"s), std::move("attribute9"s), m_attribute9, visitor);
+                return;
+            }
+            
+            if (10 == fieldId) {
+                doVisit(10, std::move("uint64_t"s), std::move("attribute10"s), m_attribute10, visitor);
+                return;
+            }
+            
+            if (11 == fieldId) {
+                doVisit(11, std::move("float"s), std::move("attribute11"s), m_attribute11, visitor);
+                return;
+            }
+            
+            if (12 == fieldId) {
+                doVisit(12, std::move("double"s), std::move("attribute12"s), m_attribute12, visitor);
+                return;
+            }
+            
+            if (13 == fieldId) {
+                doVisit(13, std::move("std::string"s), std::move("attribute13"s), m_attribute13, visitor);
+                return;
+            }
+            
+            if (14 == fieldId) {
+                doVisit(14, std::move("std::string"s), std::move("attribute14"s), m_attribute14, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -3198,7 +3503,7 @@ struct isTripletForwardVisitable<MyMessage1> {
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER));
 }
 
@@ -3352,6 +3657,20 @@ class LIB_API MyMessage1 {
         
 
     public:
+        template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
@@ -3536,6 +3855,25 @@ class LIB_API MyMessage2 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
+                return;
+            }
+            
+            if (2 == fieldId) {
+                doVisit(2, std::move("MyMessage1"s), std::move("field2"s), m_field2, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -3589,11 +3927,11 @@ struct isTripletForwardVisitable<MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
@@ -3747,6 +4085,20 @@ class LIB_API MyMessage1 {
         
 
     public:
+        template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
@@ -3931,6 +4283,25 @@ class LIB_API MyMessage2 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
+                return;
+            }
+            
+            if (2 == fieldId) {
+                doVisit(2, std::move("DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -3984,11 +4355,11 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
@@ -4144,6 +4515,20 @@ class LIB_API MyMessage1 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -4327,6 +4712,25 @@ class LIB_API MyMessage2 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
+                return;
+            }
+            
+            if (2 == fieldId) {
+                doVisit(2, std::move("DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -4380,11 +4784,11 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
@@ -4540,6 +4944,20 @@ class LIB_API MyMessage1 {
         
 
     public:
+        template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
@@ -4724,6 +5142,25 @@ class LIB_API MyMessage2 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
+                return;
+            }
+            
+            if (2 == fieldId) {
+                doVisit(2, std::move("ABC::DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -4777,11 +5214,11 @@ struct isTripletForwardVisitable<ABC::DEF::MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }
 
@@ -4937,6 +5374,20 @@ class LIB_API MyMessage1 {
         
 
     public:
+        template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
@@ -5121,6 +5572,25 @@ class LIB_API MyMessage2 {
 
     public:
         template<class Visitor>
+        inline void accept(uint32_t fieldId, Visitor &visitor) {
+            (void)fieldId;
+            (void)visitor;
+//            visitor.preVisit(ID(), ShortName(), LongName());
+            
+            if (1 == fieldId) {
+                doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
+                return;
+            }
+            
+            if (2 == fieldId) {
+                doVisit(2, std::move("ABC::GHI::DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
+                return;
+            }
+            
+//            visitor.postVisit();
+        }
+
+        template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
             
@@ -5174,10 +5644,10 @@ struct isTripletForwardVisitable<ABC::GHI::DEF::MyMessage2> {
     auto firstMetaMessage  = listOfMessages[0];
     auto secondMetaMessage = listOfMessages[1];
     firstMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER1));
 
     secondMetaMessage.accept([&trans = t](const cluon::MetaMessage &_mm) { trans.visit(_mm); });
-    //    std::cout << t.content() << std::endl;
+//    std::cout << t.content() << std::endl;
     REQUIRE(t.content() == std::string(EXPECTED_HEADER2));
 }

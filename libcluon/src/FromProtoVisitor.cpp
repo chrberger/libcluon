@@ -276,7 +276,7 @@ void FromProtoVisitor::visit(uint32_t id, std::string &&typeName, std::string &&
     (void)typeName;
     (void)name;
     if (m_callToDecodeFromWithDirectVisit) {
-        v = std::move(std::string(m_stringValue.data(), m_value));
+        v = std::string(m_stringValue.data(), m_value);
     }
     else if (m_mapOfKeyValues.count(id) > 0) {
         try {

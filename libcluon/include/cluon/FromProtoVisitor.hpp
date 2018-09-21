@@ -82,6 +82,8 @@ class LIBCLUON_API FromProtoVisitor {
             cluon::FromProtoVisitor nestedProtoDecoder;
             nestedProtoDecoder.decodeFrom(sstr);
             v.accept(nestedProtoDecoder);
+            // TODO: Extend GenericMessage to enable the following call and remove the previous two lines.
+//            nestedProtoDecoder.decodeFrom(sstr, v);
         }
         else if (0 < m_mapOfKeyValues.count(id)) {
             try {
