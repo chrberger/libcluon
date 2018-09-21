@@ -302,6 +302,113 @@ class LIBCLUON_API GenericMessage {
    public:
     /**
      * This method allows other instances to visit this GenericMessage for
+     * post-processing the contained data on an individual field basis.
+     *
+     * @param visitor Instance of the visitor visiting this GenericMessage.
+     */
+    template<class Visitor>
+    inline void accept(uint32_t fieldId, Visitor &visitor) {
+        visitor.preVisit(ID(), ShortName(), LongName());
+
+        for (const auto &f : m_metaMessage.listOfMetaFields()) {
+            if (fieldId == f.fieldIdentifier()) {
+                if (f.fieldDataType() == MetaMessage::MetaField::BOOL_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<bool &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::CHAR_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<char &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::UINT8_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<uint8_t &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::INT8_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<int8_t &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::UINT16_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<uint16_t &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::INT16_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<int16_t &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::UINT32_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<uint32_t &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::INT32_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<int32_t &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::UINT64_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<uint64_t &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::INT64_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<int64_t &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::FLOAT_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<float &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::DOUBLE_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<double &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (((f.fieldDataType() == MetaMessage::MetaField::STRING_T) || (f.fieldDataType() == MetaMessage::MetaField::BYTES_T))
+                           && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<std::string &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                } else if (f.fieldDataType() == MetaMessage::MetaField::MESSAGE_T && (0 < m_intermediateDataRepresentation.count(f.fieldIdentifier()))) {
+                    try {
+                        auto &v = linb::any_cast<cluon::GenericMessage &>(m_intermediateDataRepresentation[f.fieldIdentifier()]);
+                        doVisit(f.fieldIdentifier(), std::move(f.fieldDataTypeName()), std::move(f.fieldName()), v, visitor);
+                    } catch (const linb::bad_any_cast &) { // LCOV_EXCL_LINE
+                    }
+                }
+                // End processing.
+                break;
+            }
+        }
+
+        visitor.postVisit();
+    }
+
+
+    /**
+     * This method allows other instances to visit this GenericMessage for
      * post-processing the contained data.
      *
      * @param visitor Instance of the visitor visiting this GenericMessage.

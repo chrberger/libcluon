@@ -73,10 +73,7 @@ class LIBCLUON_API FromProtoVisitor {
         if (m_callToDecodeFromWithDirectVisit) {
             std::stringstream sstr{std::move(std::string(m_stringValue.data(), m_value))};
             cluon::FromProtoVisitor nestedProtoDecoder;
-            nestedProtoDecoder.decodeFrom(sstr);
-            v.accept(nestedProtoDecoder);
-            // TODO: Extend GenericMessage to enable the following call and remove the previous two lines.
-//            nestedProtoDecoder.decodeFrom(sstr, v);
+            nestedProtoDecoder.decodeFrom(sstr, v);
         }
         else if (0 < m_mapOfKeyValues.count(id)) {
             try {
