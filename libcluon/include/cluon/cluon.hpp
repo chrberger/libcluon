@@ -67,7 +67,7 @@ namespace cluon {
 /**
 This class can be used to define hash keys.
 */
-class UseValueAsHashKey {
+class UseUInt32ValueAsHashKey {
    public:
     inline std::size_t operator()(const uint32_t v) const noexcept {
         return static_cast<std::size_t>(v);

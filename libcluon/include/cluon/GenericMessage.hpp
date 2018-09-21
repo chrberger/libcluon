@@ -220,11 +220,11 @@ class LIBCLUON_API GenericMessage {
         /**
          * @return Intermediate data representation for this GenericMessage.
          */
-        std::unordered_map<uint32_t, linb::any, UseValueAsHashKey> intermediateDataRepresentation() const noexcept;
+        std::unordered_map<uint32_t, linb::any, UseUInt32ValueAsHashKey> intermediateDataRepresentation() const noexcept;
 
        private:
         MetaMessage m_metaMessage{};
-        std::unordered_map<uint32_t, linb::any, UseValueAsHashKey> m_intermediateDataRepresentation;
+        std::unordered_map<uint32_t, linb::any, UseUInt32ValueAsHashKey> m_intermediateDataRepresentation;
     };
 
    private:
@@ -511,7 +511,7 @@ class LIBCLUON_API GenericMessage {
     std::vector<MetaMessage> m_scopeOfMetaMessages{};
     std::unordered_map<std::string, MetaMessage> m_mapForScopeOfMetaMessages{};
     std::string m_longName{""};
-    std::unordered_map<uint32_t, linb::any, UseValueAsHashKey> m_intermediateDataRepresentation;
+    std::unordered_map<uint32_t, linb::any, UseUInt32ValueAsHashKey> m_intermediateDataRepresentation;
 };
 } // namespace cluon
 
