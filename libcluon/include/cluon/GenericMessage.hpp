@@ -16,8 +16,8 @@
 #include "cluon/cluonDataStructures.hpp"
 
 #include <cstdint>
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace cluon {
@@ -220,11 +220,11 @@ class LIBCLUON_API GenericMessage {
         /**
          * @return Intermediate data representation for this GenericMessage.
          */
-        std::map<uint32_t, linb::any> intermediateDataRepresentation() const noexcept;
+        std::unordered_map<uint32_t, linb::any, UseValueAsHashKey> intermediateDataRepresentation() const noexcept;
 
        private:
         MetaMessage m_metaMessage{};
-        std::map<uint32_t, linb::any> m_intermediateDataRepresentation;
+        std::unordered_map<uint32_t, linb::any, UseValueAsHashKey> m_intermediateDataRepresentation;
     };
 
    private:
@@ -509,9 +509,9 @@ class LIBCLUON_API GenericMessage {
    private:
     MetaMessage m_metaMessage{};
     std::vector<MetaMessage> m_scopeOfMetaMessages{};
-    std::map<std::string, MetaMessage> m_mapForScopeOfMetaMessages{};
+    std::unordered_map<std::string, MetaMessage> m_mapForScopeOfMetaMessages{};
     std::string m_longName{""};
-    std::map<uint32_t, linb::any> m_intermediateDataRepresentation;
+    std::unordered_map<uint32_t, linb::any, UseValueAsHashKey> m_intermediateDataRepresentation;
 };
 } // namespace cluon
 

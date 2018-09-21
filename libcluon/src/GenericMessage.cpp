@@ -122,7 +122,7 @@ MetaMessage GenericMessage::GenericMessageVisitor::metaMessage() const noexcept 
     return m_metaMessage;
 }
 
-std::map<uint32_t, linb::any> GenericMessage::GenericMessageVisitor::intermediateDataRepresentation() const noexcept {
+std::unordered_map<uint32_t, linb::any, UseValueAsHashKey> GenericMessage::GenericMessageVisitor::intermediateDataRepresentation() const noexcept {
     return m_intermediateDataRepresentation;
 }
 

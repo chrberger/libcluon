@@ -21,13 +21,6 @@
 #include <vector>
 
 namespace cluon {
-    class ValueAsHash {
-       public:
-        inline std::size_t operator()(const uint32_t v) const noexcept {
-            return static_cast<std::size_t>(v);
-        }
-    };
-
 /**
 This class decodes a given message from Proto format.
 */
@@ -165,7 +158,7 @@ class LIBCLUON_API FromProtoVisitor {
     // This Boolean flag indicates whether we consecutively decode from istream
     // and inject the decoded values directly into the receiving data structure.
     bool m_callToDecodeFromWithDirectVisit{false};
-    std::unordered_map<uint32_t, linb::any, ValueAsHash> m_mapOfKeyValues{};
+    std::unordered_map<uint32_t, linb::any, UseValueAsHashKey> m_mapOfKeyValues{};
 
    private:
     // Fields necessary to decode from an istream.
