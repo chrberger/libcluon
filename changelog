@@ -1,3 +1,15 @@
+libcluon (0.0.111-1ppa1~bionic1) bionic; urgency=medium
+
+  * Improving performance of Proto implementation
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 22 Sep 2018 19:48:27 +0200
+
+libcluon (0.0.111-1ppa1~xenial1) xenial; urgency=medium
+
+  * Improving performance of Proto implementation
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 22 Sep 2018 19:48:27 +0200
+
 libcluon (0.0.110-1ppa1~bionic1) bionic; urgency=medium
 
   * Corrected SPDX for Alpine packages
