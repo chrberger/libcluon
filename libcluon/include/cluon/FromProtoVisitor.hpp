@@ -14,6 +14,7 @@
 #include "cluon/any/any.hpp"
 
 #include <cstdint>
+#include <cstddef>
 #include <array>
 #include <sstream>
 #include <string>
@@ -71,7 +72,7 @@ class LIBCLUON_API FromProtoVisitor {
         (void)name;
 
         if (m_callToDecodeFromWithDirectVisit) {
-            std::stringstream sstr{std::move(std::string(m_stringValue.data(), m_value))};
+            std::stringstream sstr{std::move(std::string(m_stringValue.data(), static_cast<std::size_t>(m_value)))};
             cluon::FromProtoVisitor nestedProtoDecoder;
             nestedProtoDecoder.decodeFrom(sstr, v);
         }

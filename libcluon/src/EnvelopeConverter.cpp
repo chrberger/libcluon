@@ -62,11 +62,9 @@ std::string EnvelopeConverter::getJSONFromProtoEncodedEnvelope(const std::string
         }
 
         if (0 == envelope.dataType()) {
-            // Directly decoding complete OD4 container failed, try decoding
-            // without header.
+            // Directly decoding complete OD4 container failed, try decoding without header.
             cluon::FromProtoVisitor protoDecoder;
-            protoDecoder.decodeFrom(sstr);
-            envelope.accept(protoDecoder);
+            protoDecoder.decodeFrom(sstr, envelope);
         }
 
         retVal = getJSONFromEnvelope(envelope);
