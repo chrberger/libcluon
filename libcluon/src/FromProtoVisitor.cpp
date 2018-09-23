@@ -71,7 +71,7 @@ void FromProtoVisitor::decodeFrom(std::istream &in) noexcept {
                         m_stringValue.reserve(BYTES_TO_READ_FROM_STREAM);
                     }
                     readBytesFromStream(in, BYTES_TO_READ_FROM_STREAM, m_stringValue.data());
-                    m_mapOfKeyValues.emplace(m_fieldId, linb::any(std::string(m_stringValue.data(), m_value)));
+                    m_mapOfKeyValues.emplace(m_fieldId, linb::any(std::string(m_stringValue.data(), static_cast<std::size_t>(m_value))));
                 }
                 break;
             }
