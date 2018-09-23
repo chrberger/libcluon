@@ -1,3 +1,15 @@
+libcluon (0.0.113-1ppa1~bionic1) bionic; urgency=medium
+
+  * Compile fixes for i386 and armhf
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 23 Sep 2018 10:09:01 +0200
+
+libcluon (0.0.113-1ppa1~xenial1) xenial; urgency=medium
+
+  * Compile fixes for i386 and armhf
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 23 Sep 2018 10:09:01 +0200
+
 libcluon (0.0.112-1ppa1~bionic1) bionic; urgency=medium
 
   * Compile fixes
