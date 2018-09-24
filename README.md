@@ -80,6 +80,7 @@ As part of our CI strategy thanks to TravisCI and AppVeyor, we are continuously 
 * Ubuntu 14.04 LTS (x86_64)/GCC 7.3.0
 * Ubuntu 14.04 LTS (x86_64)/GCC 8.0.1
 * Ubuntu 16.04 LTS (x86_64)/GCC 5.4.0
+* Ubuntu 16.04 LTS (x86_64)/GCC 7.3.0
 * Windows (x86_64)/MSVC 19.13.26129.0
 
 
