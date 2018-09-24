@@ -1,7 +1,8 @@
 version: v{build}
 image:
   - Visual Studio 2017
-  - ubuntu
+  - ubuntu1604
+  - ubuntu1804
 skip_tags: true
 build:
   verbosity: quiet
