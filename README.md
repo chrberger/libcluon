@@ -55,7 +55,7 @@ _Say you want to quickly realize a distributed software system where individual 
 ## Dependencies
 No dependencies! All you need is a C++14-compliant compiler as the project ships the following dependencies as part of the source distribution:
 
-* [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.3.0) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/buildtools/xUnit)
+* [Unit Test Framework Catch2](https://github.com/catchorg/Catch2/releases/tag/v2.4.1) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/buildtools/xUnit)
 * [adishavit/argh v1.2.1](https://github.com/adishavit/argh/releases/tag/v1.2.1) - [![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/argh)
 * [chrberger/stringtoolbox](https://github.com/chrberger/stringtoolbox) - [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/cluon/stringtoolbox.hpp)
 * [kainjow/Mustache v3.2.1](https://github.com/kainjow/Mustache/releases/tag/v3.2.1) - [![License: Boost Software License v1.0](https://img.shields.io/badge/License-Boost%20v1-blue.svg)](http://www.boost.org/LICENSE_1_0.txt) - [Source](https://github.com/chrberger/libcluon/tree/master/libcluon/thirdparty/Mustache)
