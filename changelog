@@ -1,3 +1,15 @@
+libcluon (0.0.114-1ppa1~bionic1) bionic; urgency=medium
+
+  * Updating catch2 and cpp-peglib
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 04 Oct 2018 20:57:25 +0200
+
+libcluon (0.0.114-1ppa1~xenial1) xenial; urgency=medium
+
+  * Updating catch2 and cpp-peglib
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 04 Oct 2018 20:57:25 +0200
+
 libcluon (0.0.113-1ppa1~bionic1) bionic; urgency=medium
 
   * Compile fixes for i386 and armhf
