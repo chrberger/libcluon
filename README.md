@@ -217,6 +217,7 @@ make install
 * [Tutorial: Encoding using libcluon's native JSON (using an online C++ compiler)](https://wandbox.org/permlink/qyvkWIzGZFiBnTvm)
 * [Tutorial: Encoding using libcluon's native CSV (using an online C++ compiler)](https://wandbox.org/permlink/APD3G7An9Ebh4eio)
 * [Tutorial: Encoding & decoding with dynamic message specifications using libcluon's native Protobuf (using an online C++ compiler)](https://wandbox.org/permlink/uR2NZwnYZkTwmDac)
+* [Tutorial: Turn a JSON string into Protobuf with dynamic message specifications (using an online C++ compiler)](https://wandbox.org/permlink/2SKYkHnVrNwoSJfK)
 * [Tutorial: Using libcluon to realize an application communicating between JavaScript and C++](https://github.com/chrberger/cluon-javascript)
 
 
