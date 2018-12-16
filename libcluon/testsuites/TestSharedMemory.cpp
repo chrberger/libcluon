@@ -14,15 +14,83 @@
 
 // clang-format off
 #ifndef WIN32
+  #include <fcntl.h>
+  #include <sys/stat.h>
   #include <unistd.h>
 #endif
 // clang-format on
 
+#include <cstring>
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <thread>
+
+TEST_CASE("Testing time-stamps on files for POSIX.") {
+#ifndef WIN32
+    std::string filename{"./TestSharedMemory.timestamp"};
+    unlink(filename.c_str());
+    {
+        std::fstream fout(filename.c_str(), std::ios::out);
+        REQUIRE(fout.good());
+        fout << "Test" << std::endl;
+        fout.close();
+    }
+
+    auto getModifiedTimeStamp = [](const std::string &_filename){
+        struct stat fileStatus;
+        {
+            std::memset(&fileStatus, 0, sizeof(fileStatus));
+            REQUIRE(0 == (fileStatus.st_atim.tv_sec + fileStatus.st_atim.tv_nsec));
+            REQUIRE(0 == (fileStatus.st_mtim.tv_sec + fileStatus.st_mtim.tv_nsec));
+        }
+        fstatat(AT_FDCWD, _filename.c_str(), &fileStatus, 0 /*flags*/);
+        {
+            REQUIRE(0 < fileStatus.st_atim.tv_sec);
+        }
+        cluon::data::TimeStamp ts;
+        ts.seconds(static_cast<int32_t>(fileStatus.st_mtim.tv_sec))
+          .microseconds(static_cast<int32_t>(fileStatus.st_mtim.tv_nsec/1000));
+        return ts;
+    };
+
+    {
+        cluon::data::TimeStamp ts{getModifiedTimeStamp(filename)};
+        REQUIRE(0 < ts.seconds());
+    }
+
+    auto setModifiedTimeStamp = [](const std::string &_filename, const cluon::data::TimeStamp &ts){
+        struct timespec accessedTime;
+        accessedTime.tv_sec = 0;
+        accessedTime.tv_nsec = UTIME_OMIT;
+
+        struct timespec modifiedTime;
+        modifiedTime.tv_sec = ts.seconds();
+        modifiedTime.tv_nsec = ts.microseconds()*1000;
+
+        struct timespec times[2]{accessedTime, modifiedTime};
+        utimensat(AT_FDCWD, _filename.c_str(), times, 0 /*flags*/);
+    };
+
+    cluon::data::TimeStamp modifiedTimeStamp;
+    setModifiedTimeStamp(filename, modifiedTimeStamp);
+    {
+        cluon::data::TimeStamp ts{getModifiedTimeStamp(filename)};
+        REQUIRE(0 == (ts.seconds() + ts.microseconds()));
+    }
+
+    modifiedTimeStamp.seconds(1234).microseconds(5678);
+    setModifiedTimeStamp(filename, modifiedTimeStamp);
+    {
+        cluon::data::TimeStamp ts{getModifiedTimeStamp(filename)};
+        REQUIRE(6912 == (ts.seconds() + ts.microseconds()));
+    }
+
+    REQUIRE(0 == unlink(filename.c_str()));
+#endif
+}
 
 TEST_CASE("Trying to open SharedMemory with empty name (on non-Win32: POSIX).") {
 #if !defined(__NetBSD__) && !defined(__OpenBSD__)
