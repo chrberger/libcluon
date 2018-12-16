@@ -430,23 +430,22 @@ class MySelectiveVisitor {
     }
     void postVisit() noexcept {}
 
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, bool &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, char &/*v*/) noexcept {}
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, bool &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, char &/*v*/) noexcept {} // LCOV_EXCL_LINE
     void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int8_t &/*v*/) noexcept { calledForint8_t = true; }
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint8_t &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int16_t &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint16_t &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int32_t &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint32_t &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int64_t &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint64_t &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, float &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, double &/*v*/) noexcept {}
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, std::string &/*v*/) noexcept {}
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint8_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int16_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint16_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int32_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint32_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int64_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint64_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, float &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, double &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, std::string &/*v*/) noexcept {} // LCOV_EXCL_LINE
 
     template <typename T>
-    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, T &/*v*/) noexcept {
-    }
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, T &/*v*/) noexcept {}  // LCOV_EXCL_LINE
 };
 
 TEST_CASE("Dynamically creating messages for simple message and selective visiting.") {
