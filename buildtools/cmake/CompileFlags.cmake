@@ -30,6 +30,10 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         include(CompileFlags_gcc7)
         set(CXX_WARNING_FLAGS ${GCC7_CXX_WARNING_FLAGS})
     endif ()
+    if (NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 8.2))
+        include(CompileFlags_gcc8.2)
+        set(CXX_WARNING_FLAGS ${GCC82_CXX_WARNING_FLAGS})
+    endif ()
 endif()
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
@@ -48,7 +52,7 @@ else()
             -D__BSD_VISIBLE=1 ")
     endif()
 
-    if ( (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "NetBSD"))
+    if (   (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "NetBSD"))
        AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "OpenBSD")) )
         set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
             -D_XOPEN_SOURCE=700 \
@@ -56,7 +60,7 @@ else()
     endif()
 
     set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
-        -fstack-protector \
+        -fstack-protector-strong \
         -pipe ")
 
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} \
@@ -74,7 +78,7 @@ else()
         ${CXX_WARNING_FLAGS}")
 
     # Remove symbols from libraries.
-    if ( (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin"))
+    if (   (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin"))
        AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "OpenBSD")) )
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ")
         set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} -s ")
