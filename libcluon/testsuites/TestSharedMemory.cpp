@@ -172,10 +172,13 @@ TEST_CASE("Trying to create SharedMemory that was already created before: POSIX 
         REQUIRE(4 == sm1.size());
         REQUIRE(nullptr != sm1.data());
         REQUIRE("/DEFGHI" == sm1.name());
+        REQUIRE(!sm1.isLocked());
         sm1.lock();
+        REQUIRE(sm1.isLocked());
         uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
         *data          = 12345;
         sm1.unlock();
+        REQUIRE(!sm1.isLocked());
 
         sm1.lock();
         uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());

@@ -47,6 +47,11 @@ class LIBCLUON_API SharedMemory {
     ~SharedMemory() noexcept;
 
     /**
+     * @return true when this shared memory area is locked.
+     */
+    bool isLocked() const noexcept;
+
+    /**
      * This method locks the shared memory area.
      */
     void lock() noexcept;
@@ -122,17 +127,18 @@ class LIBCLUON_API SharedMemory {
     bool m_hasOnlyAttachedToSharedMemory{false};
 
     std::atomic<bool> m_broken{false};
+    std::atomic<bool> m_isLocked{false};
 
 #ifdef WIN32
     HANDLE __conditionEvent{nullptr};
     HANDLE __mutex{nullptr};
     HANDLE __sharedMemory{nullptr};
 #else
+    int32_t m_fd{-1};
     bool m_usePOSIX{true};
 
     // Member fields for POSIX-based shared memory.
 #if !defined(__NetBSD__) && !defined(__OpenBSD__)
-    int32_t m_fd{-1};
     struct SharedMemoryHeader {
         uint32_t __size;
         pthread_mutex_t __mutex;

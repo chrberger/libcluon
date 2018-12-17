@@ -95,6 +95,10 @@ SharedMemory::~SharedMemory() noexcept {
 #endif
 }
 
+bool SharedMemory::isLocked() const noexcept {
+    return m_isLocked.load();
+}
+
 void SharedMemory::lock() noexcept {
 #ifdef WIN32
     lockWIN32();
@@ -105,6 +109,7 @@ void SharedMemory::lock() noexcept {
         lockSysV();
     }
 #endif
+    m_isLocked.store(true);
 }
 
 void SharedMemory::unlock() noexcept {
@@ -117,6 +122,7 @@ void SharedMemory::unlock() noexcept {
         unlockSysV();
     }
 #endif
+    m_isLocked.store(false);
 }
 
 void SharedMemory::wait() noexcept {
