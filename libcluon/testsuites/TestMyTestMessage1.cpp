@@ -421,6 +421,101 @@ message MyMessageA [id = 30003] {
     }
 }
 
+class MySelectiveVisitor {
+   public:
+    bool calledForint8_t{false};
+   public:
+    void preVisit(int32_t id, const std::string &shortName, const std::string &longName) noexcept {
+        std::cout << "id = " << id << ", short name = " << shortName << ", long name = " << longName << std::endl;
+    }
+    void postVisit() noexcept {}
+
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, bool &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, char &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int8_t &/*v*/) noexcept { calledForint8_t = true; }
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint8_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int16_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint16_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int32_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint32_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, int64_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, uint64_t &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, float &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, double &/*v*/) noexcept {} // LCOV_EXCL_LINE
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, std::string &/*v*/) noexcept {} // LCOV_EXCL_LINE
+
+    template <typename T>
+    void visit(uint32_t /*id*/, std::string &&/*typeName*/, std::string &&/*name*/, T &/*v*/) noexcept {}  // LCOV_EXCL_LINE
+};
+
+TEST_CASE("Dynamically creating messages for simple message and selective visiting.") {
+    const char *msg = R"(
+// Original message:
+// message testdata.MyTestMessage3 [id = 30003] {
+//    uint8 attribute1 [ default = 124, id = 1 ];
+//    int8 attribute2 [ default = -124, id = 2 ];
+// }
+
+message MyMessageA [id = 30003] {
+    uint8 field1 [id = 1];
+    int8 field2 [id = 2];
+}
+)";
+
+    testdata::MyTestMessage3 msg3;
+    REQUIRE(124 == msg3.attribute1());
+    REQUIRE(-124 == msg3.attribute2());
+
+    msg3.attribute1(11).attribute2(21);
+    REQUIRE(11 == msg3.attribute1());
+    REQUIRE(21 == msg3.attribute2());
+
+    cluon::ToProtoVisitor proto;
+    msg3.accept(proto);
+    std::string s{proto.encodedData()};
+
+    std::stringstream sstr{s};
+    cluon::FromProtoVisitor protoDecoder;
+    protoDecoder.decodeFrom(sstr);
+
+    testdata::MyTestMessage3 msg3_2;
+    REQUIRE(124 == msg3_2.attribute1());
+    REQUIRE(-124 == msg3_2.attribute2());
+    msg3_2.accept(protoDecoder);
+    REQUIRE(11 == msg3_2.attribute1());
+    REQUIRE(21 == msg3_2.attribute2());
+
+    cluon::MessageParser mp;
+    auto retVal = mp.parse(std::string(msg));
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+
+    auto listOfMessages = retVal.first;
+    REQUIRE(1 == listOfMessages.size());
+
+    cluon::MetaMessage m = listOfMessages.front();
+
+    cluon::GenericMessage gm;
+    gm.createFrom(m, listOfMessages);
+
+    REQUIRE(30003 == gm.ID());
+    REQUIRE("MyMessageA" == gm.ShortName());
+    REQUIRE("MyMessageA" == gm.LongName());
+
+    // Set values in GenericMessage from ProtoDecoder.
+    gm.accept(protoDecoder);
+
+    MySelectiveVisitor msv;
+    REQUIRE(!msv.calledForint8_t);
+
+    const uint32_t WRONG_FIELD_ID{5};
+    gm.accept<MySelectiveVisitor>(WRONG_FIELD_ID, msv);
+    REQUIRE(!msv.calledForint8_t);
+
+    const uint32_t FIELD_ID{2};
+    gm.accept<MySelectiveVisitor>(FIELD_ID, msv);
+    REQUIRE(msv.calledForint8_t);
+}
+
 TEST_CASE("Dynamically creating messages for complex message.") {
     const char *msg = R"(
 // Original message:
