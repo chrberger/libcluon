@@ -10,6 +10,7 @@
 #define CLUON_SHAREDMEMORY_HPP
 
 #include "cluon/cluon.hpp"
+#include "cluon/cluonDataStructures.hpp"
 
 // clang-format off
 #ifdef WIN32
@@ -24,6 +25,7 @@
 #include <cstdint>
 #include <atomic>
 #include <string>
+#include <utility>
 
 namespace cluon {
 
@@ -70,6 +72,27 @@ class LIBCLUON_API SharedMemory {
      * This method notifies all threads waiting on the shared condition.
      */
     void notifyAll() noexcept;
+
+    /**
+     * This method sets the time stamp that can be used to
+     * express the sample time stamp of the data in residing
+     * in the shared memory.
+     *
+     * This method is only allowed when the shared memory is locked.
+     *
+     * @param ts TimeStamp.
+     * @return true if the timestamp could set; false if the shared memory was not locked.
+     */
+    bool setTimeStamp(const cluon::data::TimeStamp &ts) noexcept;
+
+    /**
+     * This method returns the sample time stamp.
+     *
+     * This method is only allowed when the shared memory is locked.
+     *
+     * @return (true, sample time stamp) or (false, 0) in case if the shared memory was not locked.
+     */
+    std::pair<bool, cluon::data::TimeStamp> getTimeStamp() noexcept;
 
    public:
     /**

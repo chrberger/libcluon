@@ -149,6 +149,45 @@ void SharedMemory::notifyAll() noexcept {
 #endif
 }
 
+bool SharedMemory::setTimeStamp(const cluon::data::TimeStamp &ts) noexcept {
+    bool retVal{false};
+
+#ifdef WIN32
+    (void)ts;
+#else
+    if ((retVal = isLocked())) {
+      struct timespec accessedTime;
+      accessedTime.tv_sec = 0;
+      accessedTime.tv_nsec = UTIME_OMIT;
+
+      struct timespec modifiedTime;
+      modifiedTime.tv_sec = ts.seconds();
+      modifiedTime.tv_nsec = ts.microseconds()*1000;
+
+      struct timespec times[2]{accessedTime, modifiedTime};
+      futimens(m_fd, times);
+    }
+#endif
+
+    return retVal;
+}
+
+std::pair<bool, cluon::data::TimeStamp> SharedMemory::getTimeStamp() noexcept {
+    bool retVal{false};
+    cluon::data::TimeStamp sampleTimeStamp;
+
+#ifndef WIN32
+    if ((retVal = isLocked())) {
+        struct stat fileStatus;
+        fstat(m_fd, &fileStatus);
+        sampleTimeStamp.seconds(static_cast<int32_t>(fileStatus.st_mtim.tv_sec))
+                       .microseconds(static_cast<int32_t>(fileStatus.st_mtim.tv_nsec/1000));
+    }
+#endif
+
+    return std::make_pair(retVal, sampleTimeStamp);
+}
+
 bool SharedMemory::valid() noexcept {
     bool valid{!m_broken.load()};
     valid &= (nullptr != m_sharedMemory);
@@ -808,10 +847,19 @@ void SharedMemory::initSysV() noexcept {
             }
         }
     }
+
+    // If the shared memory is present, open the token file for the time stamping.
+    if (nullptr != m_sharedMemory) {
+        m_fd = ::open(m_name.c_str(), O_RDONLY);
+    }
 }
 
 void SharedMemory::deinitSysV() noexcept {
     if (nullptr != m_sharedMemory) {
+        // Close token file.
+        ::close(m_fd);
+        m_fd = -1;
+
         if (-1 == ::shmdt(m_sharedMemory)) {
 // clang-format off // LCOV_EXCL_LINE
             std::cerr << "[cluon::SharedMemory (SysV)] Could not detach shared memory (0x" << std::hex << m_shmKeySysV << std::dec << "): " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
