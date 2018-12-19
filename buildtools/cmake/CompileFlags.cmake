@@ -55,7 +55,10 @@ else()
     if (   (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "NetBSD"))
        AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL "OpenBSD")) )
         set(GENERAL_BUILD_FLAGS "${GENERAL_BUILD_FLAGS} \
-            -D_XOPEN_SOURCE=700 \
+            -D_XOPEN_SOURCE=700 ")
+        set(GENERAL_BUILD_FLAGS_RELEASE "${GENERAL_BUILD_FLAGS} \
+            -O2 \
+            -fomit-frame-pointer \
             -D_FORTIFY_SOURCE=2 ")
     endif()
 
@@ -64,14 +67,10 @@ else()
         -pipe ")
 
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} \
-         ${GENERAL_BUILD_FLAGS} \
-        -O2 \
-        -fomit-frame-pointer ")
+         ${GENERAL_BUILD_FLAGS_RELEASE} ")
 
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} \
-         ${GENERAL_BUILD_FLAGS} \
-        -O2 \
-        -fomit-frame-pointer ")
+         ${GENERAL_BUILD_FLAGS_RELEASE} ")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
         ${GENERAL_BUILD_FLAGS} \
