@@ -1230,9 +1230,9 @@ TEST_CASE("Trying to create SharedMemory with correct name (on non-Win32: POSIX)
 
         sm1.lock();
         {
-          auto r = sm1.getTimeStamp();
-          REQUIRE(r.first);
-          REQUIRE(r.second.seconds() != sampleTime.seconds());
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() != sampleTime.seconds());
         }
         uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
         *data          = 12345;
@@ -1245,18 +1245,75 @@ TEST_CASE("Trying to create SharedMemory with correct name (on non-Win32: POSIX)
         uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
         uint32_t tmp    = *data2;
         {
-          auto r = sm1.getTimeStamp();
-          REQUIRE(r.first);
-          REQUIRE(r.second.seconds() == sampleTime.seconds());
-          REQUIRE(r.second.microseconds() == sampleTime.microseconds());
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() == sampleTime.seconds());
+            REQUIRE(r.second.microseconds() == sampleTime.microseconds());
         }
         sm1.unlock();
 
         {
-          auto r = sm1.getTimeStamp();
-          REQUIRE(!r.first);
+            auto r = sm1.getTimeStamp();
+            REQUIRE(!r.first);
         }
         REQUIRE(12345 == tmp);
+    }
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+#endif
+}
+
+TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization (POSIX) and set time.") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
+#ifndef WIN32
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=1"));
+    {
+        cluon::data::TimeStamp sampleTime;
+        sampleTime.seconds(642).microseconds(531);
+
+        cluon::SharedMemory sm1{"/JKL", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/JKL" == sm1.name());
+        sm1.lock();
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        REQUIRE(0 == *data);
+        sm1.unlock();
+
+        // Spawning thread to attach and change data.
+        std::thread producer([&sampleTime]() {
+            cluon::SharedMemory inner_sm1{"/JKL"};
+            REQUIRE(inner_sm1.valid());
+            REQUIRE(nullptr != inner_sm1.data());
+            REQUIRE("/JKL" == inner_sm1.name());
+            inner_sm1.lock();
+            uint32_t *inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
+            REQUIRE(0 == *inner_data);
+            *inner_data = 23456;
+            REQUIRE(23456 == *inner_data);
+            REQUIRE(inner_sm1.setTimeStamp(sampleTime));
+            inner_sm1.unlock();
+
+            inner_sm1.notifyAll();
+        });
+
+        sm1.wait();
+        producer.join();
+
+        sm1.lock();
+        uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() == sampleTime.seconds());
+            REQUIRE(r.second.microseconds() == sampleTime.microseconds());
+        }
+        sm1.unlock();
+
+        REQUIRE(23456 == tmp);
     }
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
@@ -1283,9 +1340,9 @@ TEST_CASE("Trying to create SharedMemory with correct name (SySV) and set time s
 
         sm1.lock();
         {
-          auto r = sm1.getTimeStamp();
-          REQUIRE(r.first);
-          REQUIRE(r.second.seconds() != sampleTime.seconds());
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() != sampleTime.seconds());
         }
         uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
         *data          = 12345;
@@ -1298,18 +1355,73 @@ TEST_CASE("Trying to create SharedMemory with correct name (SySV) and set time s
         uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
         uint32_t tmp    = *data2;
         {
-          auto r = sm1.getTimeStamp();
-          REQUIRE(r.first);
-          REQUIRE(r.second.seconds() == sampleTime.seconds());
-          REQUIRE(r.second.microseconds() == sampleTime.microseconds());
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() == sampleTime.seconds());
+            REQUIRE(r.second.microseconds() == sampleTime.microseconds());
         }
         sm1.unlock();
 
         {
-          auto r = sm1.getTimeStamp();
-          REQUIRE(!r.first);
+            auto r = sm1.getTimeStamp();
+            REQUIRE(!r.first);
         }
         REQUIRE(12345 == tmp);
+    }
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+}
+
+TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization (SysV) and set time.") {
+#ifdef __linux__
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
+    {
+        cluon::data::TimeStamp sampleTime;
+        sampleTime.seconds(642).microseconds(531);
+
+        cluon::SharedMemory sm1{"/JKL", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/tmp/JKL" == sm1.name());
+        sm1.lock();
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        REQUIRE(0 == *data);
+        sm1.unlock();
+
+        // Spawning thread to attach and change data.
+        std::thread producer([&sampleTime]() {
+            cluon::SharedMemory inner_sm1{"/JKL"};
+            REQUIRE(inner_sm1.valid());
+            REQUIRE(nullptr != inner_sm1.data());
+            REQUIRE("/tmp/JKL" == inner_sm1.name());
+            inner_sm1.lock();
+            uint32_t *inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
+            REQUIRE(0 == *inner_data);
+            *inner_data = 23456;
+            REQUIRE(23456 == *inner_data);
+            REQUIRE(inner_sm1.setTimeStamp(sampleTime));
+            inner_sm1.unlock();
+
+            inner_sm1.notifyAll();
+        });
+
+        sm1.wait();
+        producer.join();
+
+        sm1.lock();
+        uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() == sampleTime.seconds());
+            REQUIRE(r.second.microseconds() == sampleTime.microseconds());
+        }
+        sm1.unlock();
+
+        REQUIRE(23456 == tmp);
     }
     putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
