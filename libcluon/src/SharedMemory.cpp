@@ -19,6 +19,7 @@
     #include <sys/sem.h>
     #include <sys/shm.h>
     #include <sys/stat.h>
+    #include <sys/time.h>
     #include <sys/types.h>
     #include <unistd.h>
 #endif
@@ -156,6 +157,18 @@ bool SharedMemory::setTimeStamp(const cluon::data::TimeStamp &ts) noexcept {
     (void)ts;
 #else
     if ((retVal = isLocked())) {
+#ifdef __APPLE__
+      struct timeval accessedTime;
+      accessedTime.tv_sec = 0;
+      accessedTime.tv_usec = 0;
+
+      struct timeval modifiedTime;
+      modifiedTime.tv_sec = ts.seconds();
+      modifiedTime.tv_usec = ts.microseconds();
+
+      struct timeval times[2]{accessedTime, modifiedTime};
+      futimes(m_fd, times);
+#else
       struct timespec accessedTime;
       accessedTime.tv_sec = 0;
       accessedTime.tv_nsec = UTIME_OMIT;
@@ -166,6 +179,7 @@ bool SharedMemory::setTimeStamp(const cluon::data::TimeStamp &ts) noexcept {
 
       struct timespec times[2]{accessedTime, modifiedTime};
       futimens(m_fd, times);
+#endif
     }
 #endif
 
@@ -180,8 +194,13 @@ std::pair<bool, cluon::data::TimeStamp> SharedMemory::getTimeStamp() noexcept {
     if ((retVal = isLocked())) {
         struct stat fileStatus;
         fstat(m_fd, &fileStatus);
+#ifdef __APPLE__
+        sampleTimeStamp.seconds(static_cast<int32_t>(fileStatus.st_mtimespec.tv_sec))
+                       .microseconds(static_cast<int32_t>(fileStatus.st_mtimespec.tv_nsec/1000));
+#else
         sampleTimeStamp.seconds(static_cast<int32_t>(fileStatus.st_mtim.tv_sec))
                        .microseconds(static_cast<int32_t>(fileStatus.st_mtim.tv_nsec/1000));
+#endif
     }
 #endif
 

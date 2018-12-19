@@ -29,7 +29,7 @@
 #include <thread>
 
 TEST_CASE("Testing time-stamps on files for POSIX using file descriptors.") {
-#ifndef WIN32
+#if !defined(__APPLE__) && !defined(WIN32)
     std::string filename{"./TestSharedMemory.timestamp"};
     unlink(filename.c_str());
     {
@@ -97,7 +97,7 @@ TEST_CASE("Testing time-stamps on files for POSIX using file descriptors.") {
 }
 
 TEST_CASE("Testing time-stamps on files for POSIX using filename.") {
-#ifndef WIN32
+#if !defined(__APPLE__) && !defined(WIN32)
     std::string filename{"./TestSharedMemory.timestamp"};
     unlink(filename.c_str());
     {
