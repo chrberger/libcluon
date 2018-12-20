@@ -144,6 +144,7 @@ class LIBCLUON_API SharedMemory {
 
    private:
     std::string m_name{""};
+    std::string m_nameForTimeStamping{""};
     uint32_t m_size{0};
     char *m_sharedMemory{nullptr};
     char *m_userAccessibleSharedMemory{nullptr};
@@ -157,7 +158,6 @@ class LIBCLUON_API SharedMemory {
     HANDLE __mutex{nullptr};
     HANDLE __sharedMemory{nullptr};
 #else
-    std::string m_nameForTimeStamping{""};
     int32_t m_fdForTimeStamping{-1};
 
     bool m_usePOSIX{true};
