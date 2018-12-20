@@ -175,33 +175,33 @@ bool SharedMemory::setTimeStamp(const cluon::data::TimeStamp &ts) noexcept {
 #else
     if ((retVal = isLocked())) {
 #ifdef __APPLE__
-      struct timeval accessedTime;
-      accessedTime.tv_sec = 0;
-      accessedTime.tv_usec = 0;
+        struct timeval accessedTime;
+        accessedTime.tv_sec = 0;
+        accessedTime.tv_usec = 0;
 
-      struct timeval modifiedTime;
-      modifiedTime.tv_sec = ts.seconds();
-      modifiedTime.tv_usec = ts.microseconds();
+        struct timeval modifiedTime;
+        modifiedTime.tv_sec = ts.seconds();
+        modifiedTime.tv_usec = ts.microseconds();
 
-      struct timeval times[2]{accessedTime, modifiedTime};
-      if (0 != futimes(m_fdForTimeStamping, times)) {
-          std::cerr << "[cluon::SharedMemory] Failed to set time stamp: '" << strerror(errno) << "' (" << errno << "): " << std::endl;
-          retVal = false;
-      }
+        struct timeval times[2]{accessedTime, modifiedTime};
+        if (0 != futimes(m_fdForTimeStamping, times)) {
+            std::cerr << "[cluon::SharedMemory] Failed to set time stamp: '" << strerror(errno) << "' (" << errno << "): " << std::endl;
+            retVal = false;
+        }
 #else
-      struct timespec accessedTime;
-      accessedTime.tv_sec = 0;
-      accessedTime.tv_nsec = UTIME_OMIT;
+        struct timespec accessedTime;
+        accessedTime.tv_sec = 0;
+        accessedTime.tv_nsec = UTIME_OMIT;
 
-      struct timespec modifiedTime;
-      modifiedTime.tv_sec = ts.seconds();
-      modifiedTime.tv_nsec = ts.microseconds()*1000;
+        struct timespec modifiedTime;
+        modifiedTime.tv_sec = ts.seconds();
+        modifiedTime.tv_nsec = ts.microseconds()*1000;
 
-      struct timespec times[2]{accessedTime, modifiedTime};
-      if (0 != futimens(m_fdForTimeStamping, times)) {
-          std::cerr << "[cluon::SharedMemory] Failed to set time stamp: '" << strerror(errno) << "' (" << errno << "): " << std::endl;
-          retVal = false;
-      }
+        struct timespec times[2]{accessedTime, modifiedTime};
+        if (0 != futimens(m_fdForTimeStamping, times)) {
+            std::cerr << "[cluon::SharedMemory] Failed to set time stamp: '" << strerror(errno) << "' (" << errno << "): " << std::endl; // LCOV_EXCL_LINE
+            retVal = false; // LCOV_EXCL_LINE
+        }
 #endif
     }
 #endif

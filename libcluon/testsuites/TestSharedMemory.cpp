@@ -1252,7 +1252,7 @@ TEST_CASE("Trying to create SharedMemory with correct name (on non-Win32: POSIX)
             REQUIRE(r.first);
             REQUIRE(r.second.seconds() == sampleTime.seconds());
             if (!runsOnTravis) {
-                REQUIRE(r.second.microseconds() == sampleTime.microseconds());
+                REQUIRE(r.second.microseconds() == sampleTime.microseconds()); // LCOV_EXCL_LINE
             }
         }
         sm1.unlock();
@@ -1318,7 +1318,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and one separate thre
             REQUIRE(r.first);
             REQUIRE(r.second.seconds() == sampleTime.seconds());
             if (!runsOnTravis) {
-                REQUIRE(r.second.microseconds() == sampleTime.microseconds());
+                REQUIRE(r.second.microseconds() == sampleTime.microseconds()); // LCOV_EXCL_LINE
             }
         }
         sm1.unlock();
