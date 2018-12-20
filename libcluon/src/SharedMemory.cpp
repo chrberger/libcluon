@@ -25,6 +25,7 @@
 #endif
 // clang-format on
 
+#include <cerrno>
 #include <cstring>
 #include <iostream>
 #include <fstream>
@@ -61,15 +62,31 @@ SharedMemory::SharedMemory(const std::string &name, uint32_t size) noexcept
         m_usePOSIX                           = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
         std::clog << "[cluon::SharedMemory] Using " << (m_usePOSIX ? "POSIX" : "SysV") << " implementation." << std::endl;
 #endif
-        // For NetBSD and OpenBSD or for the SysV-based implementation, we put all token files to /tmp.
-        if (!m_usePOSIX && (0 != n.find("/tmp"))) {
-            m_name = "/tmp" + m_name;
+        // Define filename for timestamping.
+        if (0 != n.find("/tmp")) {
+            m_nameForTimeStamping = "/tmp" + m_name;
+
+            // For NetBSD and OpenBSD or for the SysV-based implementation, we put all token files to /tmp.
+            if (!m_usePOSIX) {
+                m_name = m_nameForTimeStamping;
+            }
         }
 #endif
 
-        m_name += n;
-        if (m_name.size() > MAX_LENGTH_NAME) {
-            m_name = m_name.substr(0, MAX_LENGTH_NAME);
+        // Name of the shared memory.
+        {
+            m_name += n;
+            if (m_name.size() > MAX_LENGTH_NAME) {
+                m_name = m_name.substr(0, MAX_LENGTH_NAME);
+            }
+        }
+
+        // Name of the file for timestamping.
+        {
+            m_nameForTimeStamping += n;
+            if (m_nameForTimeStamping.size() > MAX_LENGTH_NAME) {
+                m_nameForTimeStamping = m_nameForTimeStamping.substr(0, MAX_LENGTH_NAME);
+            }
         }
 
 #ifdef WIN32
@@ -167,7 +184,9 @@ bool SharedMemory::setTimeStamp(const cluon::data::TimeStamp &ts) noexcept {
       modifiedTime.tv_usec = ts.microseconds();
 
       struct timeval times[2]{accessedTime, modifiedTime};
-      futimes(m_fd, times);
+      if ((retVal = (0 == futimes(m_fdForTimeStamping, times)))) {
+          std::cerr << "[cluon::SharedMemory] Failed to set time stamp: '" << strerror(errno) << "' (" << errno << "): " << std::endl;
+      }
 #else
       struct timespec accessedTime;
       accessedTime.tv_sec = 0;
@@ -178,7 +197,9 @@ bool SharedMemory::setTimeStamp(const cluon::data::TimeStamp &ts) noexcept {
       modifiedTime.tv_nsec = ts.microseconds()*1000;
 
       struct timespec times[2]{accessedTime, modifiedTime};
-      futimens(m_fd, times);
+      if ((retVal = (0 == futimens(m_fdForTimeStamping, times)))) {
+          std::cerr << "[cluon::SharedMemory] Failed to set time stamp: '" << strerror(errno) << "' (" << errno << "): " << std::endl;
+      }
 #endif
     }
 #endif
@@ -193,7 +214,7 @@ std::pair<bool, cluon::data::TimeStamp> SharedMemory::getTimeStamp() noexcept {
 #ifndef WIN32
     if ((retVal = isLocked())) {
         struct stat fileStatus;
-        fstat(m_fd, &fileStatus);
+        fstat(m_fdForTimeStamping, &fileStatus);
 #ifdef __APPLE__
         sampleTimeStamp.seconds(static_cast<int32_t>(fileStatus.st_mtimespec.tv_sec))
                        .microseconds(static_cast<int32_t>(fileStatus.st_mtimespec.tv_nsec/1000));
@@ -555,6 +576,20 @@ void SharedMemory::initPOSIX() noexcept {
         }
     }
 #endif
+
+#ifdef __linux__
+    // On Linux, the POSIX shared memory lives in /dev/shm and we have a valid
+    // file descriptor to use for timestamping.
+    if (-1 != m_fd) {
+        m_fdForTimeStamping = m_fd;
+    }
+#else
+    // On *BSDs, the POSIX shared memory lives not in /dev/shm and we have
+    // need to use a separate file for timestamping.
+    if (-1 != m_fd) {
+        m_fdForTimeStamping = ::open(m_nameForTimeStamping.c_str(), O_RDONLY);
+    }
+#endif
 }
 
 void SharedMemory::deinitPOSIX() noexcept {
@@ -574,6 +609,14 @@ void SharedMemory::deinitPOSIX() noexcept {
 // clang-format off // LCOV_EXCL_LINE
         std::cerr << "[cluon::SharedMemory (POSIX)] Failed to unlink shared memory: " << ::strerror(errno) << " (" << errno << ")" << std::endl; // LCOV_EXCL_LINE
 // clang-format on // LCOV_EXCL_LINE
+    }
+#endif
+
+#ifndef __linux__
+    // On *BSDs, the POSIX shared memory lives not in /dev/shm and we have
+    // used a separate file for timestamping.
+    if (-1 != m_fdForTimeStamping) {
+        ::close(m_fdForTimeStamping);
     }
 #endif
 }
@@ -869,15 +912,15 @@ void SharedMemory::initSysV() noexcept {
 
     // If the shared memory is present, open the token file for the time stamping.
     if (nullptr != m_sharedMemory) {
-        m_fd = ::open(m_name.c_str(), O_RDONLY);
+        m_fdForTimeStamping = ::open(m_name.c_str(), O_RDONLY);
     }
 }
 
 void SharedMemory::deinitSysV() noexcept {
     if (nullptr != m_sharedMemory) {
         // Close token file.
-        ::close(m_fd);
-        m_fd = -1;
+        ::close(m_fdForTimeStamping);
+        m_fdForTimeStamping = -1;
 
         if (-1 == ::shmdt(m_sharedMemory)) {
 // clang-format off // LCOV_EXCL_LINE

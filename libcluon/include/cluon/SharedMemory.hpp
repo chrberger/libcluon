@@ -157,11 +157,14 @@ class LIBCLUON_API SharedMemory {
     HANDLE __mutex{nullptr};
     HANDLE __sharedMemory{nullptr};
 #else
-    int32_t m_fd{-1};
+    std::string m_nameForTimeStamping{""};
+    int32_t m_fdForTimeStamping{-1};
+
     bool m_usePOSIX{true};
 
     // Member fields for POSIX-based shared memory.
 #if !defined(__NetBSD__) && !defined(__OpenBSD__)
+    int32_t m_fd{-1};
     struct SharedMemoryHeader {
         uint32_t __size;
         pthread_mutex_t __mutex;
