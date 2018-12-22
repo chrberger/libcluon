@@ -586,11 +586,13 @@ void SharedMemory::initPOSIX() noexcept {
         m_fdForTimeStamping = m_fd;
     }
 #else
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
     // On *BSDs, the POSIX shared memory lives not in /dev/shm and we have
     // need to use a separate file for timestamping.
     if (-1 != m_fd) {
         m_fdForTimeStamping = ::open(m_nameForTimeStamping.c_str(), O_CREAT|O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     }
+#endif
 #endif
 }
 
