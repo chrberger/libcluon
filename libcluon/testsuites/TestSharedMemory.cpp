@@ -14,15 +14,151 @@
 
 // clang-format off
 #ifndef WIN32
+  #include <fcntl.h>
+  #include <sys/stat.h>
   #include <unistd.h>
 #endif
 // clang-format on
 
+#include <cstring>
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <thread>
+
+TEST_CASE("Testing time-stamps on files for POSIX using file descriptors.") {
+#if !defined(__APPLE__) && !defined(WIN32)
+    std::string filename{"./TestSharedMemory.timestamp"};
+    unlink(filename.c_str());
+    {
+        std::fstream fout(filename.c_str(), std::ios::out);
+        REQUIRE(fout.good());
+        fout << "Test" << std::endl;
+        fout.close();
+    }
+
+    int fd = open(filename.c_str(), O_RDONLY);
+
+    auto getModifiedTimeStamp = [](int _fd){
+        struct stat fileStatus;
+        {
+            std::memset(&fileStatus, 0, sizeof(fileStatus));
+            REQUIRE(0 == (fileStatus.st_atim.tv_sec + fileStatus.st_atim.tv_nsec));
+            REQUIRE(0 == (fileStatus.st_mtim.tv_sec + fileStatus.st_mtim.tv_nsec));
+        }
+        fstat(_fd, &fileStatus);
+        {
+            REQUIRE(0 < fileStatus.st_atim.tv_sec);
+        }
+        cluon::data::TimeStamp ts;
+        ts.seconds(static_cast<int32_t>(fileStatus.st_mtim.tv_sec))
+          .microseconds(static_cast<int32_t>(fileStatus.st_mtim.tv_nsec/1000));
+        return ts;
+    };
+
+    {
+        cluon::data::TimeStamp ts{getModifiedTimeStamp(fd)};
+        REQUIRE(0 < ts.seconds());
+    }
+
+    auto setModifiedTimeStamp = [](int _fd, const cluon::data::TimeStamp &ts){
+        struct timespec accessedTime;
+        accessedTime.tv_sec = 0;
+        accessedTime.tv_nsec = UTIME_OMIT;
+
+        struct timespec modifiedTime;
+        modifiedTime.tv_sec = ts.seconds();
+        modifiedTime.tv_nsec = ts.microseconds()*1000;
+
+        struct timespec times[2]{accessedTime, modifiedTime};
+        futimens(_fd, times);
+    };
+
+    cluon::data::TimeStamp modifiedTimeStamp;
+    setModifiedTimeStamp(fd, modifiedTimeStamp);
+    {
+        cluon::data::TimeStamp ts{getModifiedTimeStamp(fd)};
+        REQUIRE(0 == (ts.seconds() + ts.microseconds()));
+    }
+
+    modifiedTimeStamp.seconds(1234).microseconds(5678);
+    setModifiedTimeStamp(fd, modifiedTimeStamp);
+    {
+        cluon::data::TimeStamp ts{getModifiedTimeStamp(fd)};
+        REQUIRE(6912 == (ts.seconds() + ts.microseconds()));
+    }
+
+    close(fd);
+
+    REQUIRE(0 == unlink(filename.c_str()));
+#endif
+}
+
+TEST_CASE("Testing time-stamps on files for POSIX using filename.") {
+#if !defined(__APPLE__) && !defined(WIN32)
+    std::string filename{"./TestSharedMemory.timestamp"};
+    unlink(filename.c_str());
+    {
+        std::fstream fout(filename.c_str(), std::ios::out);
+        REQUIRE(fout.good());
+        fout << "Test" << std::endl;
+        fout.close();
+    }
+
+    auto getModifiedTimeStamp = [](const std::string &_filename){
+        struct stat fileStatus;
+        {
+            std::memset(&fileStatus, 0, sizeof(fileStatus));
+            REQUIRE(0 == (fileStatus.st_atim.tv_sec + fileStatus.st_atim.tv_nsec));
+            REQUIRE(0 == (fileStatus.st_mtim.tv_sec + fileStatus.st_mtim.tv_nsec));
+        }
+        fstatat(AT_FDCWD, _filename.c_str(), &fileStatus, 0 /*flags*/);
+        {
+            REQUIRE(0 < fileStatus.st_atim.tv_sec);
+        }
+        cluon::data::TimeStamp ts;
+        ts.seconds(static_cast<int32_t>(fileStatus.st_mtim.tv_sec))
+          .microseconds(static_cast<int32_t>(fileStatus.st_mtim.tv_nsec/1000));
+        return ts;
+    };
+
+    {
+        cluon::data::TimeStamp ts{getModifiedTimeStamp(filename)};
+        REQUIRE(0 < ts.seconds());
+    }
+
+    auto setModifiedTimeStamp = [](const std::string &_filename, const cluon::data::TimeStamp &ts){
+        struct timespec accessedTime;
+        accessedTime.tv_sec = 0;
+        accessedTime.tv_nsec = UTIME_OMIT;
+
+        struct timespec modifiedTime;
+        modifiedTime.tv_sec = ts.seconds();
+        modifiedTime.tv_nsec = ts.microseconds()*1000;
+
+        struct timespec times[2]{accessedTime, modifiedTime};
+        utimensat(AT_FDCWD, _filename.c_str(), times, 0 /*flags*/);
+    };
+
+    cluon::data::TimeStamp modifiedTimeStamp;
+    setModifiedTimeStamp(filename, modifiedTimeStamp);
+    {
+        cluon::data::TimeStamp ts{getModifiedTimeStamp(filename)};
+        REQUIRE(0 == (ts.seconds() + ts.microseconds()));
+    }
+
+    modifiedTimeStamp.seconds(1234).microseconds(5678);
+    setModifiedTimeStamp(filename, modifiedTimeStamp);
+    {
+        cluon::data::TimeStamp ts{getModifiedTimeStamp(filename)};
+        REQUIRE(6912 == (ts.seconds() + ts.microseconds()));
+    }
+
+    REQUIRE(0 == unlink(filename.c_str()));
+#endif
+}
 
 TEST_CASE("Trying to open SharedMemory with empty name (on non-Win32: POSIX).") {
 #if !defined(__NetBSD__) && !defined(__OpenBSD__)
@@ -104,15 +240,20 @@ TEST_CASE("Trying to create SharedMemory that was already created before: POSIX 
         REQUIRE(4 == sm1.size());
         REQUIRE(nullptr != sm1.data());
         REQUIRE("/DEFGHI" == sm1.name());
+        REQUIRE(!sm1.isLocked());
         sm1.lock();
+        REQUIRE(sm1.isLocked());
         uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
         *data          = 12345;
         sm1.unlock();
+        REQUIRE(!sm1.isLocked());
 
         sm1.lock();
+        REQUIRE(sm1.isLocked());
         uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
         uint32_t tmp    = *data2;
         sm1.unlock();
+        REQUIRE(!sm1.isLocked());
         REQUIRE(12345 == tmp);
 
         {
@@ -1067,3 +1208,232 @@ TEST_CASE("Measure performance of using SharedMemory (SySV vs POSIX).") {
     }
 #endif
 }
+
+TEST_CASE("Trying to create SharedMemory with correct name (on non-Win32: POSIX) and set time stamp.") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
+#ifndef WIN32
+    const char *ON_TRAVIS = getenv("TRAVIS_COMPILER");
+    bool runsOnTravis = ((nullptr != ON_TRAVIS) && (ON_TRAVIS[0] == 'c') && (ON_TRAVIS[1] == 'l') && (ON_TRAVIS[2] == 'a') && (ON_TRAVIS[3] == 'n') && (ON_TRAVIS[4] == 'g'));
+
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=1"));
+    {
+        cluon::SharedMemory sm1{"/DEF", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/DEF" == sm1.name());
+
+        cluon::data::TimeStamp sampleTime;
+        sampleTime.seconds(123).microseconds(456);
+
+        // Setting time stamp should fail.
+        REQUIRE(!sm1.setTimeStamp(sampleTime));
+
+        sm1.lock();
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() != sampleTime.seconds());
+        }
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        *data          = 12345;
+
+        // Set time stamp.
+        REQUIRE(sm1.setTimeStamp(sampleTime));
+        sm1.unlock();
+
+        sm1.lock();
+        uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
+        uint32_t tmp    = *data2;
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() == sampleTime.seconds());
+            if (!runsOnTravis) {
+                REQUIRE(r.second.microseconds() == sampleTime.microseconds()); // LCOV_EXCL_LINE
+            }
+        }
+        sm1.unlock();
+
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(!r.first);
+        }
+        REQUIRE(12345 == tmp);
+    }
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+#endif
+}
+
+TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization (POSIX) and set time.") {
+#if !defined(__NetBSD__) && !defined(__OpenBSD__)
+#ifndef WIN32
+    const char *ON_TRAVIS = getenv("TRAVIS_COMPILER");
+    bool runsOnTravis = ((nullptr != ON_TRAVIS) && (ON_TRAVIS[0] == 'c') && (ON_TRAVIS[1] == 'l') && (ON_TRAVIS[2] == 'a') && (ON_TRAVIS[3] == 'n') && (ON_TRAVIS[4] == 'g'));
+
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=1"));
+    {
+        cluon::data::TimeStamp sampleTime;
+        sampleTime.seconds(642).microseconds(531);
+
+        cluon::SharedMemory sm1{"/JKL", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/JKL" == sm1.name());
+        sm1.lock();
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        REQUIRE(0 == *data);
+        sm1.unlock();
+
+        // Spawning thread to attach and change data.
+        std::thread producer([&sampleTime]() {
+            cluon::SharedMemory inner_sm1{"/JKL"};
+            REQUIRE(inner_sm1.valid());
+            REQUIRE(nullptr != inner_sm1.data());
+            REQUIRE("/JKL" == inner_sm1.name());
+            inner_sm1.lock();
+            uint32_t *inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
+            REQUIRE(0 == *inner_data);
+            *inner_data = 23456;
+            REQUIRE(23456 == *inner_data);
+            REQUIRE(inner_sm1.setTimeStamp(sampleTime));
+            inner_sm1.unlock();
+
+            inner_sm1.notifyAll();
+        });
+
+        sm1.wait();
+        producer.join();
+
+        sm1.lock();
+        uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() == sampleTime.seconds());
+            if (!runsOnTravis) {
+                REQUIRE(r.second.microseconds() == sampleTime.microseconds()); // LCOV_EXCL_LINE
+            }
+        }
+        sm1.unlock();
+
+        REQUIRE(23456 == tmp);
+    }
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+#endif
+}
+
+TEST_CASE("Trying to create SharedMemory with correct name (SySV) and set time stamp.") {
+#ifdef __linux__
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
+    {
+        cluon::SharedMemory sm1{"/DEF", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/tmp/DEF" == sm1.name());
+
+        cluon::data::TimeStamp sampleTime;
+        sampleTime.seconds(123).microseconds(456);
+
+        // Setting time stamp should fail.
+        REQUIRE(!sm1.setTimeStamp(sampleTime));
+
+        sm1.lock();
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() != sampleTime.seconds());
+        }
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        *data          = 12345;
+
+        // Set time stamp.
+        REQUIRE(sm1.setTimeStamp(sampleTime));
+        sm1.unlock();
+
+        sm1.lock();
+        uint32_t *data2 = reinterpret_cast<uint32_t *>(sm1.data());
+        uint32_t tmp    = *data2;
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() == sampleTime.seconds());
+            REQUIRE(r.second.microseconds() == sampleTime.microseconds());
+        }
+        sm1.unlock();
+
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(!r.first);
+        }
+        REQUIRE(12345 == tmp);
+    }
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+}
+
+TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization (SysV) and set time.") {
+#ifdef __linux__
+    const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
+    bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
+    putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
+    {
+        cluon::data::TimeStamp sampleTime;
+        sampleTime.seconds(642).microseconds(531);
+
+        cluon::SharedMemory sm1{"/JKL", 4};
+        REQUIRE(sm1.valid());
+        REQUIRE(4 == sm1.size());
+        REQUIRE(nullptr != sm1.data());
+        REQUIRE("/tmp/JKL" == sm1.name());
+        sm1.lock();
+        uint32_t *data = reinterpret_cast<uint32_t *>(sm1.data());
+        REQUIRE(0 == *data);
+        sm1.unlock();
+
+        // Spawning thread to attach and change data.
+        std::thread producer([&sampleTime]() {
+            cluon::SharedMemory inner_sm1{"/JKL"};
+            REQUIRE(inner_sm1.valid());
+            REQUIRE(nullptr != inner_sm1.data());
+            REQUIRE("/tmp/JKL" == inner_sm1.name());
+            inner_sm1.lock();
+            uint32_t *inner_data = reinterpret_cast<uint32_t *>(inner_sm1.data());
+            REQUIRE(0 == *inner_data);
+            *inner_data = 23456;
+            REQUIRE(23456 == *inner_data);
+            REQUIRE(inner_sm1.setTimeStamp(sampleTime));
+            inner_sm1.unlock();
+
+            inner_sm1.notifyAll();
+        });
+
+        sm1.wait();
+        producer.join();
+
+        sm1.lock();
+        uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
+        {
+            auto r = sm1.getTimeStamp();
+            REQUIRE(r.first);
+            REQUIRE(r.second.seconds() == sampleTime.seconds());
+            REQUIRE(r.second.microseconds() == sampleTime.microseconds());
+        }
+        sm1.unlock();
+
+        REQUIRE(23456 == tmp);
+    }
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+#endif
+}
+

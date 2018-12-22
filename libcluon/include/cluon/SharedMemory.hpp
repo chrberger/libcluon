@@ -10,6 +10,7 @@
 #define CLUON_SHAREDMEMORY_HPP
 
 #include "cluon/cluon.hpp"
+#include "cluon/cluonDataStructures.hpp"
 
 // clang-format off
 #ifdef WIN32
@@ -24,6 +25,7 @@
 #include <cstdint>
 #include <atomic>
 #include <string>
+#include <utility>
 
 namespace cluon {
 
@@ -47,6 +49,11 @@ class LIBCLUON_API SharedMemory {
     ~SharedMemory() noexcept;
 
     /**
+     * @return true when this shared memory area is locked.
+     */
+    bool isLocked() const noexcept;
+
+    /**
      * This method locks the shared memory area.
      */
     void lock() noexcept;
@@ -65,6 +72,27 @@ class LIBCLUON_API SharedMemory {
      * This method notifies all threads waiting on the shared condition.
      */
     void notifyAll() noexcept;
+
+    /**
+     * This method sets the time stamp that can be used to
+     * express the sample time stamp of the data in residing
+     * in the shared memory.
+     *
+     * This method is only allowed when the shared memory is locked.
+     *
+     * @param ts TimeStamp.
+     * @return true if the timestamp could set; false if the shared memory was not locked.
+     */
+    bool setTimeStamp(const cluon::data::TimeStamp &ts) noexcept;
+
+    /**
+     * This method returns the sample time stamp.
+     *
+     * This method is only allowed when the shared memory is locked.
+     *
+     * @return (true, sample time stamp) or (false, 0) in case if the shared memory was not locked.
+     */
+    std::pair<bool, cluon::data::TimeStamp> getTimeStamp() noexcept;
 
    public:
     /**
@@ -116,18 +144,22 @@ class LIBCLUON_API SharedMemory {
 
    private:
     std::string m_name{""};
+    std::string m_nameForTimeStamping{""};
     uint32_t m_size{0};
     char *m_sharedMemory{nullptr};
     char *m_userAccessibleSharedMemory{nullptr};
     bool m_hasOnlyAttachedToSharedMemory{false};
 
     std::atomic<bool> m_broken{false};
+    std::atomic<bool> m_isLocked{false};
 
 #ifdef WIN32
     HANDLE __conditionEvent{nullptr};
     HANDLE __mutex{nullptr};
     HANDLE __sharedMemory{nullptr};
 #else
+    int32_t m_fdForTimeStamping{-1};
+
     bool m_usePOSIX{true};
 
     // Member fields for POSIX-based shared memory.
