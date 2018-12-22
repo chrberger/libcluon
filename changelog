@@ -1,3 +1,15 @@
+libcluon (0.0.117-1ppa1~bionic1) bionic; urgency=medium
+
+  * SharedMemory provides time stamping feature
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 22 Dec 2018 22:53:35 +0100
+
+libcluon (0.0.117-1ppa1~xenial1) xenial; urgency=medium
+
+  * SharedMemory provides time stamping feature
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 22 Dec 2018 22:53:35 +0100
+
 libcluon (0.0.116-1ppa1~bionic1) bionic; urgency=medium
 
   * Adjusted compile flags for release builds
