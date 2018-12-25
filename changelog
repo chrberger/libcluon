@@ -1,3 +1,15 @@
+libcluon (0.0.119-1ppa1~bionic1) bionic; urgency=medium
+
+  * Updating catch to v2.5.0, argh to v1.3.0, cpp-peglib to latest
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 25 Dec 2018 19:24:44 +0100
+
+libcluon (0.0.119-1ppa1~xenial1) xenial; urgency=medium
+
+  * Updating catch to v2.5.0, argh to v1.3.0, cpp-peglib to latest
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 25 Dec 2018 19:24:44 +0100
+
 libcluon (0.0.118-1ppa1~bionic1) bionic; urgency=medium
 
   * Compile fixes for musl-libc emulation for aarch64 and armhf
