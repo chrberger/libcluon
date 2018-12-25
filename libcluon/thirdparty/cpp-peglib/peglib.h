@@ -1,4 +1,4 @@
-//
+﻿//
 //  peglib.h
 //
 //  Copyright (c) 2015-18 Yuji Hirose. All rights reserved.
@@ -459,6 +459,9 @@ struct SemanticValues : protected std::vector<any>
         return peg::line_info(ss, s_);
     }
 
+    // Choice count
+    size_t      choice_count() const { return choice_count_; }
+
     // Choice number (0 based index)
     size_t      choice() const { return choice_; }
 
@@ -480,7 +483,7 @@ struct SemanticValues : protected std::vector<any>
         return this->transform(beg, end, [](const any& v) { return v.get<T>(); });
     }
 
-    SemanticValues() : s_(nullptr), n_(0), choice_(0) {}
+    SemanticValues() : s_(nullptr), n_(0), choice_count_(0), choice_(0) {}
 
     using std::vector<any>::iterator;
     using std::vector<any>::const_iterator;
@@ -507,11 +510,13 @@ struct SemanticValues : protected std::vector<any>
 
 private:
     friend class Context;
+    friend class Sequence;
     friend class PrioritizedChoice;
     friend class Holder;
 
     const char* s_;
     size_t      n_;
+    size_t      choice_count_;
     size_t      choice_;
 
     template <typename F>
@@ -531,6 +536,17 @@ private:
             r.emplace_back(f((*this)[i]));
         }
         return r;
+    }
+
+    void reset() {
+        path = nullptr;
+        ss = nullptr;
+        tokens.clear();
+
+        s_ = nullptr;
+        n_ = 0;
+        choice_count_ = 0;
+        choice_ = 0;
     }
 };
 
@@ -599,61 +615,111 @@ public:
         return bool(fn_);
     }
 
-    any operator()(const SemanticValues& sv, any& dt) const {
+    any operator()(SemanticValues& sv, any& dt) const {
         return fn_(sv, dt);
     }
 
 private:
     template <typename R>
-    struct TypeAdaptor {
-        TypeAdaptor(std::function<R (const SemanticValues& sv)> fn)
+    struct TypeAdaptor_sv {
+        TypeAdaptor_sv(std::function<R (SemanticValues& sv)> fn)
             : fn_(fn) {}
-        any operator()(const SemanticValues& sv, any& /*dt*/) {
+        any operator()(SemanticValues& sv, any& /*dt*/) {
+            return call<R>(fn_, sv);
+        }
+        std::function<R (SemanticValues& sv)> fn_;
+    };
+
+    template <typename R>
+    struct TypeAdaptor_csv {
+        TypeAdaptor_csv(std::function<R (const SemanticValues& sv)> fn)
+            : fn_(fn) {}
+        any operator()(SemanticValues& sv, any& /*dt*/) {
             return call<R>(fn_, sv);
         }
         std::function<R (const SemanticValues& sv)> fn_;
     };
 
     template <typename R>
-    struct TypeAdaptor_c {
-        TypeAdaptor_c(std::function<R (const SemanticValues& sv, any& dt)> fn)
+    struct TypeAdaptor_sv_dt {
+        TypeAdaptor_sv_dt(std::function<R (SemanticValues& sv, any& dt)> fn)
             : fn_(fn) {}
-        any operator()(const SemanticValues& sv, any& dt) {
+        any operator()(SemanticValues& sv, any& dt) {
+            return call<R>(fn_, sv, dt);
+        }
+        std::function<R (SemanticValues& sv, any& dt)> fn_;
+    };
+
+    template <typename R>
+    struct TypeAdaptor_csv_dt {
+        TypeAdaptor_csv_dt(std::function<R (const SemanticValues& sv, any& dt)> fn)
+            : fn_(fn) {}
+        any operator()(SemanticValues& sv, any& dt) {
             return call<R>(fn_, sv, dt);
         }
         std::function<R (const SemanticValues& sv, any& dt)> fn_;
     };
 
-    typedef std::function<any (const SemanticValues& sv, any& dt)> Fty;
+    typedef std::function<any (SemanticValues& sv, any& dt)> Fty;
+
+    template<typename F, typename R>
+    Fty make_adaptor(F fn, R (F::* /*mf*/)(SemanticValues& sv) const) {
+        return TypeAdaptor_sv<R>(fn);
+    }
 
     template<typename F, typename R>
     Fty make_adaptor(F fn, R (F::* /*mf*/)(const SemanticValues& sv) const) {
-        return TypeAdaptor<R>(fn);
+        return TypeAdaptor_csv<R>(fn);
+    }
+
+    template<typename F, typename R>
+    Fty make_adaptor(F fn, R (F::* /*mf*/)(SemanticValues& sv)) {
+        return TypeAdaptor_sv<R>(fn);
     }
 
     template<typename F, typename R>
     Fty make_adaptor(F fn, R (F::* /*mf*/)(const SemanticValues& sv)) {
-        return TypeAdaptor<R>(fn);
+        return TypeAdaptor_csv<R>(fn);
+    }
+
+    template<typename F, typename R>
+    Fty make_adaptor(F fn, R (* /*mf*/)(SemanticValues& sv)) {
+        return TypeAdaptor_sv<R>(fn);
     }
 
     template<typename F, typename R>
     Fty make_adaptor(F fn, R (* /*mf*/)(const SemanticValues& sv)) {
-        return TypeAdaptor<R>(fn);
+        return TypeAdaptor_csv<R>(fn);
+    }
+
+    template<typename F, typename R>
+    Fty make_adaptor(F fn, R (F::* /*mf*/)(SemanticValues& sv, any& dt) const) {
+        return TypeAdaptor_sv_dt<R>(fn);
     }
 
     template<typename F, typename R>
     Fty make_adaptor(F fn, R (F::* /*mf*/)(const SemanticValues& sv, any& dt) const) {
-        return TypeAdaptor_c<R>(fn);
+        return TypeAdaptor_csv_dt<R>(fn);
+    }
+
+    template<typename F, typename R>
+    Fty make_adaptor(F fn, R (F::* /*mf*/)(SemanticValues& sv, any& dt)) {
+        return TypeAdaptor_sv_dt<R>(fn);
     }
 
     template<typename F, typename R>
     Fty make_adaptor(F fn, R (F::* /*mf*/)(const SemanticValues& sv, any& dt)) {
-        return TypeAdaptor_c<R>(fn);
+        return TypeAdaptor_csv_dt<R>(fn);
+    }
+
+    template<typename F, typename R>
+    Fty make_adaptor(F fn, R(* /*mf*/)(SemanticValues& sv, any& dt)) {
+        return TypeAdaptor_sv_dt<R>(fn);
     }
 
     template<typename F, typename R>
     Fty make_adaptor(F fn, R(* /*mf*/)(const SemanticValues& sv, any& dt)) {
-        return TypeAdaptor_c<R>(fn);
+        return TypeAdaptor_csv_dt<R>(fn);
     }
 
     Fty fn_;
@@ -796,11 +862,9 @@ public:
         if (!sv.empty()) {
             sv.clear();
         }
+        sv.reset();
         sv.path = path;
         sv.ss = s;
-        sv.s_ = nullptr;
-        sv.n_ = 0;
-        sv.tokens.clear();
         return sv;
     }
 
@@ -885,17 +949,22 @@ public:
 
     size_t parse(const char* s, size_t n, SemanticValues& sv, Context& c, any& dt) const override {
         c.trace("Sequence", s, n, sv, dt);
+        auto& chldsv = c.push();
         size_t i = 0;
         for (const auto& ope : opes_) {
             c.nest_level++;
             auto se = make_scope_exit([&]() { c.nest_level--; });
             const auto& rule = *ope;
-            auto len = rule.parse(s + i, n - i, sv, c, dt);
+            auto len = rule.parse(s + i, n - i, chldsv, c, dt);
             if (fail(len)) {
                 return static_cast<size_t>(-1);
             }
             i += len;
         }
+        sv.insert(sv.end(), chldsv.begin(), chldsv.end());
+        sv.s_ = chldsv.c_str();
+        sv.n_ = chldsv.length();
+        sv.tokens.insert(sv.tokens.end(), chldsv.tokens.begin(), chldsv.tokens.end());
         return i;
     }
 
@@ -941,11 +1010,10 @@ public:
             const auto& rule = *ope;
             auto len = rule.parse(s, n, chldsv, c, dt);
             if (success(len)) {
-                if (!chldsv.empty()) {
-                    sv.insert(sv.end(), chldsv.begin(), chldsv.end());
-                }
+                sv.insert(sv.end(), chldsv.begin(), chldsv.end());
                 sv.s_ = chldsv.c_str();
                 sv.n_ = chldsv.length();
+                sv.choice_count_ = opes_.size();
                 sv.choice_ = id;
                 sv.tokens.insert(sv.tokens.end(), chldsv.tokens.begin(), chldsv.tokens.end());
 
@@ -1178,8 +1246,8 @@ public:
     void accept(Visitor& v) override;
 
     std::string lit_;
-	mutable bool init_is_word_;
-	mutable bool is_word_;
+    mutable bool init_is_word_;
+    mutable bool is_word_;
 };
 
 class CharacterClass : public Ope
@@ -1387,7 +1455,7 @@ public:
 
     void accept(Visitor& v) override;
 
-    any reduce(const SemanticValues& sv, any& dt) const;
+    any reduce(SemanticValues& sv, any& dt) const;
 
     std::shared_ptr<Ope> ope_;
     Definition*          outer_;
@@ -2043,27 +2111,27 @@ inline size_t parse_literal(const char* s, size_t n, SemanticValues& sv, Context
         }
     }
 
-	// Word check
+    // Word check
     static Context dummy_c(nullptr, lit.data(), lit.size(), 0, nullptr, nullptr, false, nullptr);
     static SemanticValues dummy_sv;
     static any dummy_dt;
 
     if (!init_is_word) { // TODO: Protect with mutex
-		if (c.wordOpe) {
-			auto len = c.wordOpe->parse(lit.data(), lit.size(), dummy_sv, dummy_c, dummy_dt);
-			is_word = success(len);
-		}
+        if (c.wordOpe) {
+            auto len = c.wordOpe->parse(lit.data(), lit.size(), dummy_sv, dummy_c, dummy_dt);
+            is_word = success(len);
+        }
         init_is_word = true;
     }
 
-	if (is_word) {
+    if (is_word) {
         auto ope = std::make_shared<NotPredicate>(c.wordOpe);
-		auto len = ope->parse(s + i, n - i, dummy_sv, dummy_c, dummy_dt);
-		if (fail(len)) {
+        auto len = ope->parse(s + i, n - i, dummy_sv, dummy_c, dummy_dt);
+        if (fail(len)) {
             return static_cast<size_t>(-1);
-		}
+        }
         i += len;
-	}
+    }
 
     // Skip whiltespace
     if (!c.in_token) {
@@ -2085,7 +2153,7 @@ inline size_t LiteralString::parse(const char* s, size_t n, SemanticValues& sv, 
 }
 
 inline size_t TokenBoundary::parse(const char* s, size_t n, SemanticValues& sv, Context& c, any& dt) const {
-	c.in_token = true;
+    c.in_token = true;
     auto se = make_scope_exit([&]() { c.in_token = false; });
     const auto& rule = *ope_;
     auto len = rule.parse(s, n, sv, c, dt);
@@ -2177,45 +2245,45 @@ inline size_t Holder::parse(const char* s, size_t n, SemanticValues& sv, Context
     return len;
 }
 
-inline any Holder::reduce(const SemanticValues& sv, any& dt) const {
+inline any Holder::reduce(SemanticValues& sv, any& dt) const {
     if (outer_->action) {
         return outer_->action(sv, dt);
     } else if (sv.empty()) {
         return any();
     } else {
-        return sv.front();
+        return std::move(sv.front());
     }
 }
 
 inline size_t Reference::parse(
     const char* s, size_t n, SemanticValues& sv, Context& c, any& dt) const {
-	if (rule_) {
-		// Reference rule
-		if (rule_->is_macro) {
+    if (rule_) {
+        // Reference rule
+        if (rule_->is_macro) {
             // Macro
             FindReference vis(c.top_args(), rule_->params);
 
-			// Collect arguments
+            // Collect arguments
             std::vector<std::shared_ptr<Ope>> args;
             for (auto arg: args_) {
-				arg->accept(vis);
-				args.push_back(vis.found_ope);
-			}
+                arg->accept(vis);
+                args.push_back(vis.found_ope);
+            }
 
-			c.push_args(args);
+            c.push_args(args);
             auto se = make_scope_exit([&]() { c.pop_args(); });
             auto ope = get_core_operator();
-			return ope->parse(s, n, sv, c, dt);
-		} else {
-			// Definition
+            return ope->parse(s, n, sv, c, dt);
+        } else {
+            // Definition
             auto ope = get_core_operator();
             return ope->parse(s, n, sv, c, dt);
-		}
-	} else {
-		// Reference parameter in macro
-		const auto& args = c.top_args();
-		return args[iarg_]->parse(s, n, sv, c, dt);
-	}
+        }
+    } else {
+        // Reference parameter in macro
+        const auto& args = c.top_args();
+        return args[iarg_]->parse(s, n, sv, c, dt);
+    }
 }
 
 inline std::shared_ptr<Ope> Reference::get_core_operator() const {
@@ -2843,12 +2911,18 @@ inline constexpr unsigned int operator "" _(const char* s, size_t) {
 template <typename Annotation>
 struct AstBase : public Annotation
 {
-    AstBase(const char* a_path, size_t a_line, size_t a_column, const char* a_name, const std::vector<std::shared_ptr<AstBase>>& a_nodes)
+    AstBase(const char* a_path, size_t a_line, size_t a_column,
+            const char* a_name, size_t a_choice_count, size_t a_choice,
+            const std::vector<std::shared_ptr<AstBase>>& a_nodes)
         : path(a_path ? a_path : "")
         , line(a_line)
         , column(a_column)
         , name(a_name)
+        , choice_count(a_choice_count)
+        , choice(a_choice)
         , original_name(a_name)
+        , original_choice_count(a_choice_count)
+        , original_choice(a_choice)
 #ifndef PEGLIB_NO_CONSTEXPR_SUPPORT
         , tag(str2tag(a_name))
         , original_tag(tag)
@@ -2857,12 +2931,18 @@ struct AstBase : public Annotation
         , nodes(a_nodes)
     {}
 
-    AstBase(const char* a_path, size_t a_line, size_t a_column, const char* a_name, const std::string& a_token)
+    AstBase(const char* a_path, size_t a_line, size_t a_column,
+            const char* a_name, size_t a_choice_count, size_t a_choice,
+            const std::string& a_token)
         : path(a_path ? a_path : "")
         , line(a_line)
         , column(a_column)
         , name(a_name)
+        , choice_count(a_choice_count)
+        , choice(a_choice)
         , original_name(a_name)
+        , original_choice_count(a_choice_count)
+        , original_choice(a_choice)
 #ifndef PEGLIB_NO_CONSTEXPR_SUPPORT
         , tag(str2tag(a_name))
         , original_tag(tag)
@@ -2871,12 +2951,17 @@ struct AstBase : public Annotation
         , token(a_token)
     {}
 
-    AstBase(const AstBase& ast, const char* a_original_name)
+    AstBase(const AstBase& ast, const char* a_original_name,
+            size_t a_original_choice_count, size_t a_original_choise)
         : path(ast.path)
         , line(ast.line)
         , column(ast.column)
         , name(ast.name)
+        , choice_count(ast.choice_count)
+        , choice(ast.choice)
         , original_name(a_original_name)
+        , original_choice_count(a_original_choice_count)
+        , original_choice(a_original_choise)
 #ifndef PEGLIB_NO_CONSTEXPR_SUPPORT
         , tag(ast.tag)
         , original_tag(str2tag(a_original_name))
@@ -2892,7 +2977,11 @@ struct AstBase : public Annotation
     const size_t                      column;
 
     const std::string                 name;
+    const size_t                      choice_count;
+    const size_t                      choice;
     const std::string                 original_name;
+    const size_t                      original_choice_count;
+    const size_t                      original_choice;
 #ifndef PEGLIB_NO_CONSTEXPR_SUPPORT
     const unsigned int                tag;
     const unsigned int                original_tag;
@@ -2916,11 +3005,12 @@ void ast_to_s_core(
     for (auto i = 0; i < level; i++) {
         s += "  ";
     }
-    std::string name;
-    if (ast.name == ast.original_name) {
-        name = ast.name;
-    } else {
-        name = ast.original_name + "[" + ast.name + "]";
+    auto name = ast.original_name;
+    if (ast.original_choice_count > 0) {
+        name += "/" + std::to_string(ast.original_choice);
+    }
+    if (ast.name != ast.original_name) {
+        name += "[" + ast.name + "]";
     }
     if (ast.is_token) {
         s += "- " + name + " (" + ast.token + ")\n";
@@ -2959,7 +3049,8 @@ struct AstOptimizer
 
         if (opt && original->nodes.size() == 1) {
             auto child = optimize(original->nodes[0], parent);
-            return std::make_shared<T>(*child, original->name.c_str());
+            return std::make_shared<T>(
+                *child, original->name.c_str(), original->choice_count, original->choice);
         }
 
         auto ast = std::make_shared<T>(*original);
@@ -3118,6 +3209,10 @@ public:
         return (*grammar_)[s];
     }
 
+    const Definition& operator[](const char* s) const {
+        return (*grammar_)[s];
+    }
+
     std::vector<std::string> get_rule_names(){
         std::vector<std::string> rules;
         rules.reserve(grammar_->size());
@@ -3145,10 +3240,16 @@ public:
                     auto line = line_info(sv.ss, sv.c_str());
 
                     if (rule.is_token()) {
-                        return std::make_shared<T>(sv.path, line.first, line.second, name.c_str(), sv.token());
+                        return std::make_shared<T>(
+                            sv.path, line.first, line.second,
+                            name.c_str(), sv.choice_count(), sv.choice(),
+                            sv.token());
                     }
 
-                    auto ast = std::make_shared<T>(sv.path, line.first, line.second, name.c_str(), sv.transform<std::shared_ptr<T>>());
+                    auto ast = std::make_shared<T>(
+                        sv.path, line.first, line.second,
+                        name.c_str(), sv.choice_count(), sv.choice(),
+                        sv.transform<std::shared_ptr<T>>());
 
                     for (auto node: ast->nodes) {
                         node->parent = ast;
