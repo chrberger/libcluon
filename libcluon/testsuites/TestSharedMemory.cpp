@@ -29,7 +29,7 @@
 #include <thread>
 
 TEST_CASE("Testing time-stamps on files for POSIX using file descriptors.") {
-#if !defined(__APPLE__) && !defined(WIN32)
+#if !defined(__APPLE__) && !defined(WIN32) && defined(__amd64__) && defined(__linux__)
     std::string filename{"./TestSharedMemory.timestamp"};
     unlink(filename.c_str());
     {
@@ -97,7 +97,7 @@ TEST_CASE("Testing time-stamps on files for POSIX using file descriptors.") {
 }
 
 TEST_CASE("Testing time-stamps on files for POSIX using filename.") {
-#if !defined(__APPLE__) && !defined(WIN32)
+#if !defined(__APPLE__) && !defined(WIN32) && defined(__amd64__) && defined(__linux__)
     std::string filename{"./TestSharedMemory.timestamp"};
     unlink(filename.c_str());
     {
@@ -1210,7 +1210,7 @@ TEST_CASE("Measure performance of using SharedMemory (SySV vs POSIX).") {
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name (on non-Win32: POSIX) and set time stamp.") {
-#if !defined(__NetBSD__) && !defined(__OpenBSD__)
+#if !defined(__NetBSD__) && !defined(__OpenBSD__) && defined(__GLIBC__)
 #ifndef WIN32
     const char *ON_TRAVIS = getenv("TRAVIS_COMPILER");
     bool runsOnTravis = ((nullptr != ON_TRAVIS) && (ON_TRAVIS[0] == 'c') && (ON_TRAVIS[1] == 'l') && (ON_TRAVIS[2] == 'a') && (ON_TRAVIS[3] == 'n') && (ON_TRAVIS[4] == 'g'));
@@ -1269,7 +1269,7 @@ TEST_CASE("Trying to create SharedMemory with correct name (on non-Win32: POSIX)
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization (POSIX) and set time.") {
-#if !defined(__NetBSD__) && !defined(__OpenBSD__)
+#if !defined(__NetBSD__) && !defined(__OpenBSD__) && defined(__GLIBC__)
 #ifndef WIN32
     const char *ON_TRAVIS = getenv("TRAVIS_COMPILER");
     bool runsOnTravis = ((nullptr != ON_TRAVIS) && (ON_TRAVIS[0] == 'c') && (ON_TRAVIS[1] == 'l') && (ON_TRAVIS[2] == 'a') && (ON_TRAVIS[3] == 'n') && (ON_TRAVIS[4] == 'g'));
@@ -1331,7 +1331,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and one separate thre
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name (SySV) and set time stamp.") {
-#ifdef __linux__
+#if defined(__linux__) && defined(__GLIBC__)
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
     putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
@@ -1383,7 +1383,7 @@ TEST_CASE("Trying to create SharedMemory with correct name (SySV) and set time s
 }
 
 TEST_CASE("Trying to create SharedMemory with correct name and one separate thread to produce data for shared memory with condition variable for synchronization (SysV) and set time.") {
-#ifdef __linux__
+#if defined(__linux__) && defined(__GLIBC__)
     const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
     bool usePOSIX                        = ((nullptr != CLUON_SHAREDMEMORY_POSIX) && (CLUON_SHAREDMEMORY_POSIX[0] == '1'));
     putenv(const_cast<char *>("CLUON_SHAREDMEMORY_POSIX=0"));
