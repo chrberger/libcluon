@@ -20,7 +20,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -82,14 +82,14 @@ inline int32_t cluon_livefeed(int32_t argc, char **argv) {
         }
 
         std::mutex mapOfLastEnvelopesMutex;
-        std::map<int32_t, std::map<uint32_t, cluon::data::Envelope> > mapOfLastEnvelopes;
+        std::unordered_map<int32_t, std::unordered_map<uint32_t, cluon::data::Envelope, cluon::UseUInt32ValueAsHashKey>, cluon::UseUInt32ValueAsHashKey> mapOfLastEnvelopes;
 
         cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])),
             [&mapOfLastEnvelopesMutex, &mapOfLastEnvelopes](cluon::data::Envelope &&envelope) noexcept {
             std::lock_guard<std::mutex> lck(mapOfLastEnvelopesMutex);
 
             // Update mapping for tupel (dataType, senderStamp) --> Envelope.
-            std::map<uint32_t, cluon::data::Envelope> entry = mapOfLastEnvelopes[envelope.dataType()];
+            auto entry = mapOfLastEnvelopes[envelope.dataType()];
             entry[envelope.senderStamp()] = envelope;
             mapOfLastEnvelopes[envelope.dataType()] = entry;
         });
