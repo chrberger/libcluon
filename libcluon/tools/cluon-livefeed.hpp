@@ -83,19 +83,41 @@ inline int32_t cluon_livefeed(int32_t argc, char **argv) {
 
         std::mutex mapOfLastEnvelopesMutex;
         std::unordered_map<int32_t, std::unordered_map<uint32_t, cluon::data::Envelope, cluon::UseUInt32ValueAsHashKey>, cluon::UseUInt32ValueAsHashKey> mapOfLastEnvelopes;
+        std::unordered_map<int32_t, std::unordered_map<uint32_t, float>, cluon::UseUInt32ValueAsHashKey> mapOfUpdateRates;
 
         cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])),
-            [&mapOfLastEnvelopesMutex, &mapOfLastEnvelopes](cluon::data::Envelope &&envelope) noexcept {
+            [&mapOfLastEnvelopesMutex, &mapOfLastEnvelopes, &mapOfUpdateRates](cluon::data::Envelope &&envelope) noexcept {
             std::lock_guard<std::mutex> lck(mapOfLastEnvelopesMutex);
 
-            // Update mapping for tupel (dataType, senderStamp) --> Envelope.
-            auto entry = mapOfLastEnvelopes[envelope.dataType()];
-            entry[envelope.senderStamp()] = envelope;
-            mapOfLastEnvelopes[envelope.dataType()] = entry;
+            int64_t lastTimeStamp{0};
+            int64_t currentTimeStamp{0};
+            {
+                // Update mapping for tupel (dataType, senderStamp) --> Envelope.
+                auto entry = mapOfLastEnvelopes[envelope.dataType()];
+                if (0 != entry.count(envelope.senderStamp())) {
+                    lastTimeStamp = cluon::time::toMicroseconds(entry[envelope.senderStamp()].sampleTimeStamp());
+                }
+                currentTimeStamp = cluon::time::toMicroseconds(envelope.sampleTimeStamp());
+                entry[envelope.senderStamp()] = envelope;
+                mapOfLastEnvelopes[envelope.dataType()] = entry;
+            }
+            {
+                // Update mapping for tupel (dataType, senderStamp) --> deltaToLastEnvelope.
+                auto entry = mapOfUpdateRates[envelope.dataType()];
+
+                float average{0};
+                if (0 != entry.count(envelope.senderStamp())) {
+                    average = entry[envelope.senderStamp()];
+                    float freq = (static_cast<float>(currentTimeStamp - lastTimeStamp))/(1000.0f*1000.0f);
+                    average = (1.0f/freq)*0.1f + 0.9f*average;
+                }
+                entry[envelope.senderStamp()] = average;
+                mapOfUpdateRates[envelope.dataType()] = entry;
+            }
         });
 
         if (od4Session.isRunning()) {
-            od4Session.timeTrigger(5, [&mapOfLastEnvelopesMutex, &mapOfLastEnvelopes, &scopeOfMetaMessages](){
+            od4Session.timeTrigger(5, [&mapOfLastEnvelopesMutex, &mapOfLastEnvelopes, &mapOfUpdateRates, &scopeOfMetaMessages, &od4Session](){
                 std::lock_guard<std::mutex> lck(mapOfLastEnvelopesMutex);
 
                 if (!mapOfLastEnvelopes.empty()) {
@@ -108,7 +130,12 @@ inline int32_t cluon_livefeed(int32_t argc, char **argv) {
                             auto env = ee.second;
                             std::stringstream sstr;
 
-                            sstr << "Envelope: " << std::setfill(' ') << std::setw(5) << env.dataType() << std::setw(0) << "/" << env.senderStamp() << "; " << "sent: " << formatTimeStamp(env.sent()) << "; sample: " << formatTimeStamp(env.sampleTimeStamp());
+                            float freq{0};
+                            if ( (0 < mapOfUpdateRates.count(ee.second.dataType())) && (0 < mapOfUpdateRates[ee.second.dataType()].count(ee.second.senderStamp())) ) {
+                                freq = mapOfUpdateRates[ee.second.dataType()][ee.second.senderStamp()];
+                            }
+
+                            sstr << "Envelope: " << std::setfill(' ') << std::setw(5) << env.dataType() << std::setw(0) << "/" << env.senderStamp() << "; " << (static_cast<float>(static_cast<uint32_t>(freq*100.0f))/100.f) << " Hz; " << "sent: " << formatTimeStamp(env.sent()) << "; sample: " << formatTimeStamp(env.sampleTimeStamp());
                             if (scopeOfMetaMessages.count(env.dataType()) > 0) {
                                 sstr << "; " << scopeOfMetaMessages[env.dataType()].messageName();
                             }
@@ -128,7 +155,7 @@ inline int32_t cluon_livefeed(int32_t argc, char **argv) {
                         }
                     }
                 }
-                return !cluon::TerminateHandler::instance().isTerminated.load();
+                return od4Session.isRunning();
             });
 
             retVal = 0;
