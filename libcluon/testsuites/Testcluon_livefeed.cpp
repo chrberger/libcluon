@@ -127,7 +127,7 @@ TEST_CASE("Test starting cluon-livefeed in thread and send one message results i
 
     // Wait before stopping.
     using namespace std::literals::chrono_literals;
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(1000ms);
 
     const std::string tmp = capturedCout.str();
     REQUIRE(std::string::npos != tmp.find("Envelope:"));
@@ -199,7 +199,7 @@ message testdata.MyTestMessage5 [id = 30005] {
 
     // Wait before stopping.
     using namespace std::literals::chrono_literals;
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(1000ms);
 
     const std::string tmp = capturedCout.str();
     REQUIRE(std::string::npos != tmp.find("Envelope:"));
@@ -280,7 +280,7 @@ message testdata.MyTestMessage5 [id = 30005] {
 
     // Wait before stopping.
     using namespace std::literals::chrono_literals;
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(1000ms);
 
     const std::string tmp = capturedCout.str();
     REQUIRE(std::string::npos != tmp.find("Envelope:"));

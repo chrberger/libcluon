@@ -13,6 +13,7 @@
 #include "cluon/MetaMessage.hpp"
 #include "cluon/MessageParser.hpp"
 #include "cluon/OD4Session.hpp"
+#include "cluon/TerminateHandler.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -84,51 +85,51 @@ inline int32_t cluon_livefeed(int32_t argc, char **argv) {
         std::map<int32_t, std::map<uint32_t, cluon::data::Envelope> > mapOfLastEnvelopes;
 
         cluon::OD4Session od4Session(static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])),
-            [&](cluon::data::Envelope &&envelope) noexcept {
+            [&mapOfLastEnvelopesMutex, &mapOfLastEnvelopes](cluon::data::Envelope &&envelope) noexcept {
             std::lock_guard<std::mutex> lck(mapOfLastEnvelopesMutex);
 
             // Update mapping for tupel (dataType, senderStamp) --> Envelope.
             std::map<uint32_t, cluon::data::Envelope> entry = mapOfLastEnvelopes[envelope.dataType()];
             entry[envelope.senderStamp()] = envelope;
             mapOfLastEnvelopes[envelope.dataType()] = entry;
-
-            clearScreen();
-
-            const auto LAST_TIME_POINT{envelope.received().seconds() * 1000 * 1000 + envelope.received().microseconds()};
-
-            uint8_t y = 1;
-            const uint8_t x = 1;
-            for (auto e : mapOfLastEnvelopes) {
-                for (auto ee : e.second) {
-                    auto env = ee.second;
-                    std::stringstream sstr;
-
-                    sstr << "Envelope: " << std::setfill(' ') << std::setw(5) << env.dataType() << std::setw(0) << "/" << env.senderStamp() << "; " << "sent: " << formatTimeStamp(env.sent()) << "; sample: " << formatTimeStamp(env.sampleTimeStamp());
-                    if (scopeOfMetaMessages.count(env.dataType()) > 0) {
-                        sstr << "; " << scopeOfMetaMessages[env.dataType()].messageName();
-                    }
-                    else {
-                        sstr << "; unknown data type";
-                    }
-                    sstr << std::endl;
-
-                    const auto AGE{LAST_TIME_POINT - (env.received().seconds() * 1000 * 1000 + env.received().microseconds())};
-
-                    Color c = Color::DEFAULT;
-                    if (AGE <= 2 * 1000 * 1000) { c = Color::GREEN; }
-                    if (AGE > 2 * 1000 * 1000 && AGE <= 5 * 1000 * 1000) { c = Color::YELLOW; }
-                    if (AGE > 5 * 1000 * 1000) { c = Color::RED; }
-
-                    writeText(c, y++, x, sstr.str());
-                }
-            }
         });
 
         if (od4Session.isRunning()) {
-            using namespace std::literals::chrono_literals; // NOLINT
-            while (od4Session.isRunning()) {
-                std::this_thread::sleep_for(1s);
-            }
+            od4Session.timeTrigger(5, [&mapOfLastEnvelopesMutex, &mapOfLastEnvelopes, &scopeOfMetaMessages](){
+                std::lock_guard<std::mutex> lck(mapOfLastEnvelopesMutex);
+
+                if (!mapOfLastEnvelopes.empty()) {
+                    clearScreen();
+
+                    uint8_t y = 1;
+                    const uint8_t x = 1;
+                    for (auto e : mapOfLastEnvelopes) {
+                        for (auto ee : e.second) {
+                            auto env = ee.second;
+                            std::stringstream sstr;
+
+                            sstr << "Envelope: " << std::setfill(' ') << std::setw(5) << env.dataType() << std::setw(0) << "/" << env.senderStamp() << "; " << "sent: " << formatTimeStamp(env.sent()) << "; sample: " << formatTimeStamp(env.sampleTimeStamp());
+                            if (scopeOfMetaMessages.count(env.dataType()) > 0) {
+                                sstr << "; " << scopeOfMetaMessages[env.dataType()].messageName();
+                            }
+                            else {
+                                sstr << "; unknown data type";
+                            }
+                            sstr << std::endl;
+
+                            const auto AGE{cluon::time::deltaInMicroseconds(cluon::time::now(), env.received())};
+
+                            Color c = Color::DEFAULT;
+                            if (AGE <= 2 * 1000 * 1000) { c = Color::GREEN; }
+                            if (AGE > 2 * 1000 * 1000 && AGE <= 5 * 1000 * 1000) { c = Color::YELLOW; }
+                            if (AGE > 5 * 1000 * 1000) { c = Color::RED; }
+
+                            writeText(c, y++, x, sstr.str());
+                        }
+                    }
+                }
+                return !cluon::TerminateHandler::instance().isTerminated.load();
+            });
 
             retVal = 0;
         }
