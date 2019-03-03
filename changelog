@@ -1,3 +1,15 @@
+libcluon (0.0.121-1ppa1~bionic1) bionic; urgency=medium
+
+  * refactored cluon-livefeed; added cluon.data.RecorderCommand
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 03 Mar 2019 20:02:07 +0100
+
+libcluon (0.0.121-1ppa1~xenial1) xenial; urgency=medium
+
+  * refactored cluon-livefeed; added cluon.data.RecorderCommand
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 03 Mar 2019 20:02:07 +0100
+
 libcluon (0.0.120-1ppa1~bionic1) bionic; urgency=medium
 
   * Added support for large .rec files for rec2csv
