@@ -29,3 +29,7 @@ message cluon.data.PlayerStatus [id = 10] {
     uint32 currentEntryForPlayback [id = 3];
 }
 
+message cluon.data.RecorderCommand [id = 11] {
+    uint8 command [id = 1]; // 0 = nothing, 1 = record, 2 = stop
+}
+

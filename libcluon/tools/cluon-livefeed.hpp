@@ -95,13 +95,15 @@ inline int32_t cluon_livefeed(int32_t argc, char **argv) {
                 // Update mapping for tupel (dataType, senderStamp) --> Envelope.
                 auto entry = mapOfLastEnvelopes[envelope.dataType()];
                 if (0 != entry.count(envelope.senderStamp())) {
-                    lastTimeStamp = cluon::time::toMicroseconds(entry[envelope.senderStamp()].sampleTimeStamp());
+                    lastTimeStamp = cluon::time::toMicroseconds(entry[envelope.senderStamp()].sampleTimeStamp()); // LCOV_EXCL_LINE
                 }
-                currentTimeStamp = cluon::time::toMicroseconds(envelope.sampleTimeStamp());
-                entry[envelope.senderStamp()] = envelope;
-                mapOfLastEnvelopes[envelope.dataType()] = entry;
+                currentTimeStamp = cluon::time::toMicroseconds(envelope.sampleTimeStamp()); // LCOV_EXCL_LINE
+                if (currentTimeStamp != lastTimeStamp) {
+                    entry[envelope.senderStamp()] = envelope; // LCOV_EXCL_LINE
+                    mapOfLastEnvelopes[envelope.dataType()] = entry; // LCOV_EXCL_LINE
+                }
             }
-            {
+            if (currentTimeStamp != lastTimeStamp) {
                 // Update mapping for tupel (dataType, senderStamp) --> deltaToLastEnvelope.
                 auto entry = mapOfUpdateRates[envelope.dataType()];
 

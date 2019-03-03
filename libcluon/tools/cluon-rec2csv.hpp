@@ -158,8 +158,8 @@ inline int32_t cluon_rec2csv(int32_t argc, char **argv) {
 
                         // Keep track of buffer sizes.
                         if (mapOfEntriesSizes[KEY] > TEN_MB) {
-                            std::cerr << argv[0] << ": Buffer for '" << KEY << "' has consumed " << mapOfEntriesSizes[KEY] << "/" << TEN_MB << " bytes; dumping data to disk."<< std::endl;
-                            fileWriter();
+                            std::cerr << argv[0] << ": Buffer for '" << KEY << "' has consumed " << mapOfEntriesSizes[KEY] << "/" << TEN_MB << " bytes; dumping data to disk."<< std::endl; // LCOV_EXCL_LINE
+                            fileWriter(); // LCOV_EXCL_LINE
                         }
                     }
                 }
