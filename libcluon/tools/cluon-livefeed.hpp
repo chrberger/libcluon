@@ -109,9 +109,9 @@ inline int32_t cluon_livefeed(int32_t argc, char **argv) {
 
                 float average{0};
                 if (0 != entry.count(envelope.senderStamp())) {
-                    average = entry[envelope.senderStamp()];
-                    float freq = (static_cast<float>(currentTimeStamp - lastTimeStamp))/(1000.0f*1000.0f);
-                    average = (1.0f/freq)*0.1f + 0.9f*average;
+                    average = entry[envelope.senderStamp()]; // LCOV_EXCL_LINE
+                    float freq = (static_cast<float>(currentTimeStamp - lastTimeStamp))/(1000.0f*1000.0f); // LCOV_EXCL_LINE
+                    average = (1.0f/freq)*0.1f + 0.9f*average; // LCOV_EXCL_LINE
                 }
                 entry[envelope.senderStamp()] = average;
                 mapOfUpdateRates[envelope.dataType()] = entry;
