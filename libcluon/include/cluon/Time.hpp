@@ -65,7 +65,7 @@ inline cluon::data::TimeStamp convert(const std::chrono::system_clock::time_poin
 }
 
 /**
- * @return TimeStamp of now.
+ * @return TimeStamp of now from std::chrono::system_clock.
  */
 inline cluon::data::TimeStamp now() noexcept {
     return convert(std::chrono::system_clock::now());
