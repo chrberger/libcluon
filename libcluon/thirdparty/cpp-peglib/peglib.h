@@ -1,4 +1,4 @@
-﻿//
+//
 //  peglib.h
 //
 //  Copyright (c) 2015-18 Yuji Hirose. All rights reserved.
@@ -30,7 +30,7 @@
 #define PEGLIB_NO_CONSTEXPR_SUPPORT
 #elif (_MSC_VER >= 1800)
 // good to go
-#else (_MSC_VER < 1800)
+#else //(_MSC_VER < 1800)
 #error "Requires C+11 support"
 #endif
 #endif
@@ -40,12 +40,6 @@
 //#define PEGLIB_NO_UNICODE_CHARS
 
 namespace peg {
-
-#if __clang__ == 1 && __clang_major__ <= 5
-static void* enabler = nullptr; // workaround for Clang version <= 5.0.0
-#else
-extern void* enabler;
-#endif
 
 /*-----------------------------------------------------------------------------
  *  any
@@ -96,7 +90,7 @@ public:
 
     template <
         typename T,
-        typename std::enable_if<!std::is_same<T, any>::value>::type*& = enabler
+        typename std::enable_if<!std::is_same<T, any>::value, std::nullptr_t>::type = nullptr
     >
     T& get() {
         if (!content_) {
@@ -112,7 +106,7 @@ public:
 
     template <
         typename T,
-        typename std::enable_if<std::is_same<T, any>::value>::type*& = enabler
+        typename std::enable_if<std::is_same<T, any>::value, std::nullptr_t>::type = nullptr
     >
     T& get() {
         return *this;
@@ -120,7 +114,7 @@ public:
 
     template <
         typename T,
-        typename std::enable_if<!std::is_same<T, any>::value>::type*& = enabler
+        typename std::enable_if<!std::is_same<T, any>::value, std::nullptr_t>::type = nullptr
     >
     const T& get() const {
         assert(content_);
@@ -134,7 +128,7 @@ public:
 
     template <
         typename T,
-        typename std::enable_if<std::is_same<T, any>::value>::type*& = enabler
+        typename std::enable_if<std::is_same<T, any>::value, std::nullptr_t>::type = nullptr
     >
     const any& get() const {
         return *this;
@@ -454,6 +448,9 @@ struct SemanticValues : protected std::vector<any>
         return std::string(s_, n_);
     }
 
+    // Definition name
+    const std::string& name() const { return name_; }
+
     // Line number and column at which the matched string is
     std::pair<size_t, size_t> line_info() const {
         return peg::line_info(ss, s_);
@@ -518,6 +515,7 @@ private:
     size_t      n_;
     size_t      choice_count_;
     size_t      choice_;
+    std::string name_;
 
     template <typename F>
     auto transform(F f) const -> vector<typename std::remove_const<decltype(f(any()))>::type> {
@@ -555,7 +553,7 @@ private:
  */
 template <
     typename R, typename F,
-    typename std::enable_if<std::is_void<R>::value>::type*& = enabler,
+    typename std::enable_if<std::is_void<R>::value, std::nullptr_t>::type = nullptr,
     typename... Args>
 any call(F fn, Args&&... args) {
     fn(std::forward<Args>(args)...);
@@ -564,7 +562,7 @@ any call(F fn, Args&&... args) {
 
 template <
     typename R, typename F,
-    typename std::enable_if<std::is_same<typename std::remove_cv<R>::type, any>::value>::type*& = enabler,
+    typename std::enable_if<std::is_same<typename std::remove_cv<R>::type, any>::value, std::nullptr_t>::type = nullptr,
     typename... Args>
 any call(F fn, Args&&... args) {
     return fn(std::forward<Args>(args)...);
@@ -574,7 +572,7 @@ template <
     typename R, typename F,
     typename std::enable_if<
         !std::is_void<R>::value &&
-        !std::is_same<typename std::remove_cv<R>::type, any>::value>::type*& = enabler,
+        !std::is_same<typename std::remove_cv<R>::type, any>::value, std::nullptr_t>::type = nullptr,
     typename... Args>
 any call(F fn, Args&&... args) {
     return any(fn(std::forward<Args>(args)...));
@@ -587,26 +585,26 @@ public:
 
     Action(const Action& rhs) : fn_(rhs.fn_) {}
 
-    template <typename F, typename std::enable_if<!std::is_pointer<F>::value && !std::is_same<F, std::nullptr_t>::value>::type*& = enabler>
+    template <typename F, typename std::enable_if<!std::is_pointer<F>::value && !std::is_same<F, std::nullptr_t>::value, std::nullptr_t>::type = nullptr>
     Action(F fn) : fn_(make_adaptor(fn, &F::operator())) {}
 
-    template <typename F, typename std::enable_if<std::is_pointer<F>::value>::type*& = enabler>
+    template <typename F, typename std::enable_if<std::is_pointer<F>::value, std::nullptr_t>::type = nullptr>
     Action(F fn) : fn_(make_adaptor(fn, fn)) {}
 
-    template <typename F, typename std::enable_if<std::is_same<F, std::nullptr_t>::value>::type*& = enabler>
+    template <typename F, typename std::enable_if<std::is_same<F, std::nullptr_t>::value, std::nullptr_t>::type = nullptr>
     Action(F /*fn*/) {}
 
-    template <typename F, typename std::enable_if<!std::is_pointer<F>::value && !std::is_same<F, std::nullptr_t>::value>::type*& = enabler>
+    template <typename F, typename std::enable_if<!std::is_pointer<F>::value && !std::is_same<F, std::nullptr_t>::value, std::nullptr_t>::type = nullptr>
     void operator=(F fn) {
         fn_ = make_adaptor(fn, &F::operator());
     }
 
-    template <typename F, typename std::enable_if<std::is_pointer<F>::value>::type*& = enabler>
+    template <typename F, typename std::enable_if<std::is_pointer<F>::value, std::nullptr_t>::type = nullptr>
     void operator=(F fn) {
         fn_ = make_adaptor(fn, fn);
     }
 
-    template <typename F, typename std::enable_if<std::is_same<F, std::nullptr_t>::value>::type*& = enabler>
+    template <typename F, typename std::enable_if<std::is_same<F, std::nullptr_t>::value, std::nullptr_t>::type = nullptr>
     void operator=(F /*fn*/) {}
 
     Action& operator=(const Action& rhs) = default;
@@ -1649,8 +1647,6 @@ struct Ope::Visitor
 
 struct AssignIDToDefinition : public Ope::Visitor
 {
-    using Ope::Visitor::visit;
-
     void visit(Sequence& ope) override {
         for (auto op: ope.opes_) {
             op->accept(*this);
@@ -1682,8 +1678,6 @@ struct TokenChecker : public Ope::Visitor
 {
     TokenChecker() : has_token_boundary_(false), has_rule_(false) {}
 
-    using Ope::Visitor::visit;
-
     void visit(Sequence& ope) override {
         for (auto op: ope.opes_) {
             op->accept(*this);
@@ -1705,8 +1699,10 @@ struct TokenChecker : public Ope::Visitor
     void visit(Reference& ope) override;
     void visit(Whitespace& ope) override { ope.ope_->accept(*this); }
 
-    bool is_token() const {
-        return has_token_boundary_ || !has_rule_;
+    static bool is_token(Ope& ope) {
+        TokenChecker vis;
+        ope.accept(vis);
+        return vis.has_token_boundary_ || !vis.has_rule_;
     }
 
 private:
@@ -1717,8 +1713,6 @@ private:
 struct DetectLeftRecursion : public Ope::Visitor {
     DetectLeftRecursion(const std::string& name)
         : error_s(nullptr), name_(name), done_(false) {}
-
-    using Ope::Visitor::visit;
 
     void visit(Sequence& ope) override {
         for (auto op: ope.opes_) {
@@ -1774,8 +1768,6 @@ struct ReferenceChecker : public Ope::Visitor {
         const std::vector<std::string>& params)
         : grammar_(grammar), params_(params) {}
 
-    using Ope::Visitor::visit;
-
     void visit(Sequence& ope) override {
         for (auto op: ope.opes_) {
             op->accept(*this);
@@ -1814,8 +1806,6 @@ struct LinkReferences : public Ope::Visitor {
         const std::vector<std::string>& params)
         : grammar_(grammar), params_(params) {}
 
-    using Ope::Visitor::visit;
-
     void visit(Sequence& ope) override {
         for (auto op: ope.opes_) {
             op->accept(*this);
@@ -1850,8 +1840,6 @@ struct FindReference : public Ope::Visitor {
         const std::vector<std::shared_ptr<Ope>>& args,
         const std::vector<std::string>& params)
         : args_(args), params_(params) {}
-
-    using Ope::Visitor::visit;
 
     void visit(Sequence& ope) override {
         std::vector<std::shared_ptr<Ope>> opes;
@@ -1892,6 +1880,24 @@ struct FindReference : public Ope::Visitor {
 private:
     const std::vector<std::shared_ptr<Ope>>& args_;
     const std::vector<std::string>& params_;
+};
+
+struct IsPrioritizedChoice : public Ope::Visitor
+{
+    IsPrioritizedChoice() : is_prioritized_choice_(false) {}
+
+    void visit(PrioritizedChoice& /*ope*/) override {
+        is_prioritized_choice_ = true;
+    }
+
+    static bool is_prioritized_choice(Ope& ope) {
+        IsPrioritizedChoice vis;
+        ope.accept(vis);
+        return vis.is_prioritized_choice_;
+    }
+
+private:
+    bool is_prioritized_choice_;
 };
 
 /*
@@ -2044,9 +2050,7 @@ public:
 
     bool is_token() const {
         std::call_once(is_token_init_, [this]() {
-            TokenChecker vis;
-            get_core_operator()->accept(vis);
-            is_token_ = vis.is_token();
+            is_token_ = TokenChecker::is_token(*get_core_operator());
         });
         return is_token_;
     }
@@ -2185,8 +2189,7 @@ inline size_t Holder::parse(const char* s, size_t n, SemanticValues& sv, Context
     // Macro reference
     // TODO: need packrat support
     if (outer_->is_macro) {
-        const auto& rule = *ope_;
-        return rule.parse(s, n, sv, c, dt);
+        return ope_->parse(s, n, sv, c, dt);
     }
 
     size_t len;
@@ -2207,13 +2210,18 @@ inline size_t Holder::parse(const char* s, size_t n, SemanticValues& sv, Context
 
         auto& chldsv = c.push();
 
-        const auto& rule = *ope_;
-        len = rule.parse(s, n, chldsv, c, dt);
+        len = ope_->parse(s, n, chldsv, c, dt);
 
         // Invoke action
         if (success(len)) {
             chldsv.s_ = s;
             chldsv.n_ = len;
+            chldsv.name_ = outer_->name;
+
+            if (!IsPrioritizedChoice::is_prioritized_choice(*ope_)) {
+                chldsv.choice_count_ = 0;
+                chldsv.choice_ = 0;
+            }
 
             try {
                 a_val = reduce(chldsv, dt);
@@ -2366,6 +2374,9 @@ inline void DetectLeftRecursion::visit(Reference& ope) {
         refs_.insert(ope.name_);
         if (ope.rule_) {
             ope.rule_->accept(*this);
+            if (done_ == false) {
+                return;
+            }
         }
     }
     done_ = true;
@@ -2912,12 +2923,15 @@ template <typename Annotation>
 struct AstBase : public Annotation
 {
     AstBase(const char* a_path, size_t a_line, size_t a_column,
-            const char* a_name, size_t a_choice_count, size_t a_choice,
+            const char* a_name, size_t a_position, size_t a_length,
+            size_t a_choice_count, size_t a_choice,
             const std::vector<std::shared_ptr<AstBase>>& a_nodes)
         : path(a_path ? a_path : "")
         , line(a_line)
         , column(a_column)
         , name(a_name)
+        , position(a_position)
+        , length(a_length)
         , choice_count(a_choice_count)
         , choice(a_choice)
         , original_name(a_name)
@@ -2932,12 +2946,15 @@ struct AstBase : public Annotation
     {}
 
     AstBase(const char* a_path, size_t a_line, size_t a_column,
-            const char* a_name, size_t a_choice_count, size_t a_choice,
+            const char* a_name, size_t a_position, size_t a_length,
+            size_t a_choice_count, size_t a_choice,
             const std::string& a_token)
         : path(a_path ? a_path : "")
         , line(a_line)
         , column(a_column)
         , name(a_name)
+        , position(a_position)
+        , length(a_length)
         , choice_count(a_choice_count)
         , choice(a_choice)
         , original_name(a_name)
@@ -2952,11 +2969,14 @@ struct AstBase : public Annotation
     {}
 
     AstBase(const AstBase& ast, const char* a_original_name,
+            size_t a_position, size_t a_length,
             size_t a_original_choice_count, size_t a_original_choise)
         : path(ast.path)
         , line(ast.line)
         , column(ast.column)
         , name(ast.name)
+        , position(a_position)
+        , length(a_length)
         , choice_count(ast.choice_count)
         , choice(ast.choice)
         , original_name(a_original_name)
@@ -2977,6 +2997,8 @@ struct AstBase : public Annotation
     const size_t                      column;
 
     const std::string                 name;
+    size_t                            position;
+    size_t                            length;
     const size_t                      choice_count;
     const size_t                      choice;
     const std::string                 original_name;
@@ -2991,7 +3013,7 @@ struct AstBase : public Annotation
     const std::string                 token;
 
     std::vector<std::shared_ptr<AstBase<Annotation>>> nodes;
-    std::shared_ptr<AstBase<Annotation>>              parent;
+    std::weak_ptr<AstBase<Annotation>>                parent;
 };
 
 template <typename T>
@@ -3050,7 +3072,8 @@ struct AstOptimizer
         if (opt && original->nodes.size() == 1) {
             auto child = optimize(original->nodes[0], parent);
             return std::make_shared<T>(
-                *child, original->name.c_str(), original->choice_count, original->choice);
+                *child, original->name.c_str(), original->choice_count,
+                original->position, original->length, original->choice);
         }
 
         auto ast = std::make_shared<T>(*original);
@@ -3242,13 +3265,13 @@ public:
                     if (rule.is_token()) {
                         return std::make_shared<T>(
                             sv.path, line.first, line.second,
-                            name.c_str(), sv.choice_count(), sv.choice(),
+                            name.c_str(), std::distance(sv.ss, sv.c_str()), sv.length(), sv.choice_count(), sv.choice(),
                             sv.token());
                     }
 
                     auto ast = std::make_shared<T>(
                         sv.path, line.first, line.second,
-                        name.c_str(), sv.choice_count(), sv.choice(),
+                        name.c_str(), std::distance(sv.ss, sv.c_str()), sv.length(), sv.choice_count(), sv.choice(),
                         sv.transform<std::shared_ptr<T>>());
 
                     for (auto node: ast->nodes) {
