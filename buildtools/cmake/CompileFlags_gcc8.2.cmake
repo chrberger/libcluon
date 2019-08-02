@@ -121,7 +121,7 @@ set(GCC82_CXX_WARNING_FLAGS " \
     -Wsized-deallocation \
     -Wsizeof-array-argument \
     -Wsizeof-pointer-memaccess \
-    -Wstack-protector \
+    -Wno-error=stack-protector \
     -Wno-error=strict-aliasing \
     -Wstrict-aliasing=3 \
     -Wstrict-null-sentinel \
