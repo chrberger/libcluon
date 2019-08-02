@@ -1279,7 +1279,7 @@ public:
             return static_cast<size_t>(-1);
         }
 
-        char32_t cp;
+        char32_t cp = 0;
         auto len = decode_codepoint(s, n, cp);
 
         if (!ranges_.empty()) {
