@@ -26,8 +26,6 @@ _Say you want to quickly realize a distributed software system where individual 
 * [Features](#features)
 * [Dependencies](#dependencies)
 * [Installation on Ubuntu 18.04 LTS](#installation-on-ubuntu-1804-lts)
-* [Installation on Ubuntu 16.04 LTS](#installation-on-ubuntu-1604-lts)
-* [Installation on Ubuntu 14.04 LTS](#installation-on-ubuntu-1404-lts)
 * [Installation on Debian](#installation-on-debian)
 * [Installation on Alpine 3.7](#installation-on-alpine-37)
 * [Installation on Windows](#installation-on-windows)
@@ -65,23 +63,32 @@ No dependencies! All you need is a C++14-compliant compiler as the project ships
 As part of our CI strategy thanks to TravisCI and AppVeyor, we are continuously building with:
 
 * Darwin 16.7.0 (x86_64)/AppleClang 9.0.0.9000038
+
 * FreeBSD 11.1 (x86_64)/GCC 6.4.0
 * NetBSD 8.0 (x86_64)/GCC 5.5.0
 * OpenBSD 6.3 (x86_64)/clang 5.0.1
-* Ubuntu 14.04 LTS (armhf)/clang 3.8.1
-* Ubuntu 14.04 LTS (x86_64)/clang 3.8.0
-* Ubuntu 14.04 LTS (x86_64)/clang 3.9.1
-* Ubuntu 14.04 LTS (x86_64)/clang 4.0.1
-* Ubuntu 14.04 LTS (x86_64)/clang 5.0.0
-* Ubuntu 14.04 LTS (x86_64)/clang 5.0.2
-* Ubuntu 14.04 LTS (x86_64)/clang 6.0.1
-* Ubuntu 14.04 LTS (x86_64)/GCC 5.5.0
-* Ubuntu 14.04 LTS (x86_64)/GCC 6.4.0
-* Ubuntu 14.04 LTS (x86_64)/GCC 7.3.0
-* Ubuntu 14.04 LTS (x86_64)/GCC 8.0.1
-* Ubuntu 16.04 LTS (x86_64)/GCC 5.4.0
-* Ubuntu 16.04 LTS (x86_64)/GCC 7.3.0
+
 * Windows (x86_64)/MSVC 19.13.26129.0
+
+* Ubuntu 18.04 LTS (x86_64)/GCC 7.4.0
+* Ubuntu 18.04 LTS (x86_64)/clang 7.0.0
+
+* Ubuntu 16.04 LTS (x86_64)/GCC 5.4.0
+* Ubuntu 16.04 LTS (x86_64)/clang 7.0.0
+
+* Ubuntu 14.04 LTS (armhf)/clang 3.8.1
+
+* Ubuntu 14.04 LTS (x86_64)/GCC 8.0.1
+* Ubuntu 14.04 LTS (x86_64)/GCC 7.3.0
+* Ubuntu 14.04 LTS (x86_64)/GCC 6.4.0
+* Ubuntu 14.04 LTS (x86_64)/GCC 5.5.0
+
+* Ubuntu 14.04 LTS (x86_64)/clang 6.0.1
+* Ubuntu 14.04 LTS (x86_64)/clang 5.0.2
+* Ubuntu 14.04 LTS (x86_64)/clang 5.0.0
+* Ubuntu 14.04 LTS (x86_64)/clang 4.0.1
+* Ubuntu 14.04 LTS (x86_64)/clang 3.9.1
+* Ubuntu 14.04 LTS (x86_64)/clang 3.8.0
 
 
 ## Installation
@@ -101,37 +108,6 @@ Afterwards, update your package database and install `libcluon`:
 sudo apt-get update
 sudo apt-get install libcluon
 ```
-
-### Installation on Ubuntu 16.04 LTS
-We are providing pre-compiled binaries for Ubuntu 16.04 LTS (Xenial Xerus) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
-
-```
-sudo add-apt-repository ppa:chrberger/libcluon
-```
-
-Afterwards, update your package database and install `libcluon`:
-
-```
-sudo apt-get update
-sudo apt-get install libcluon
-```
-
-### Installation on Ubuntu 14.04 LTS
-To use `libcluon` on Ubuntu 14.04 LTS, you need to compile it from sources (only a C++ compiler and CMake are needed!) after upgrading your C++ compiler to get C++14 support:
-
-```
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt-get update
-sudo apt-get install gcc-6 g++-6
-```
-
-Afterwards, update the symlinks to your C++-compiler:
-
-```
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6
-```
-
-Now, you can continue with [building `libcluon` from sources](#build-from-sources-on-the-example-of-ubuntu-1604-lts).
 
 ### Installation on Debian
 To use `libcluon` on Debian, you need to add the repository key first:
