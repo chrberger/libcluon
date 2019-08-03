@@ -259,7 +259,7 @@ matrix:
     - os: linux
       dist: xenial
       if: branch = pre-release
-      compiler: gcc
+      compiler: clang
       env:
         - DO_COVERAGE=0
         - DO_COVERITY_SCAN=0
@@ -287,7 +287,7 @@ matrix:
     - os: linux
       dist: bionic
       if: branch = pre-release
-      compiler: gcc
+      compiler: clang
       env:
         - DO_COVERAGE=0
         - DO_COVERITY_SCAN=0
