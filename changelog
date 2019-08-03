@@ -1,3 +1,15 @@
+libcluon (0.0.122-1ppa1~bionic1) bionic; urgency=medium
+
+  * Upgrading 3rd party libraries; extending functionality for stringtoolbox; fixes from coverity scan
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 03 Aug 2019 15:57:28 +0200
+
+libcluon (0.0.122-1ppa1~xenial1) xenial; urgency=medium
+
+  * Upgrading 3rd party libraries; extending functionality for stringtoolbox; fixes from coverity scan
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 03 Aug 2019 15:57:28 +0200
+
 libcluon (0.0.121-1ppa1~bionic1) bionic; urgency=medium
 
   * refactored cluon-livefeed; added cluon.data.RecorderCommand
