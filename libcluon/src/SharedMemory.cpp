@@ -216,14 +216,16 @@ std::pair<bool, cluon::data::TimeStamp> SharedMemory::getTimeStamp() noexcept {
 #ifndef WIN32
     if ((retVal = isLocked())) {
         struct stat fileStatus;
-        fstat(m_fdForTimeStamping, &fileStatus);
+        auto r = fstat(m_fdForTimeStamping, &fileStatus);
+        if (0 == r) {
 #ifdef __APPLE__
-        sampleTimeStamp.seconds(static_cast<int32_t>(fileStatus.st_mtimespec.tv_sec))
-                       .microseconds(static_cast<int32_t>(fileStatus.st_mtimespec.tv_nsec/1000));
+            sampleTimeStamp.seconds(static_cast<int32_t>(fileStatus.st_mtimespec.tv_sec))
+                           .microseconds(static_cast<int32_t>(fileStatus.st_mtimespec.tv_nsec/1000));
 #else
-        sampleTimeStamp.seconds(static_cast<int32_t>(fileStatus.st_mtim.tv_sec))
-                       .microseconds(static_cast<int32_t>(fileStatus.st_mtim.tv_nsec/1000));
+            sampleTimeStamp.seconds(static_cast<int32_t>(fileStatus.st_mtim.tv_sec))
+                           .microseconds(static_cast<int32_t>(fileStatus.st_mtim.tv_nsec/1000));
 #endif
+        }
     }
 #endif
 

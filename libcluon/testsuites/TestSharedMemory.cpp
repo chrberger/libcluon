@@ -42,23 +42,24 @@ TEST_CASE("Testing time-stamps on files for POSIX using file descriptors.") {
     int fd = open(filename.c_str(), O_RDONLY);
 
     auto getModifiedTimeStamp = [](int _fd){
+        cluon::data::TimeStamp ts;
+
         struct stat fileStatus;
         {
             std::memset(&fileStatus, 0, sizeof(fileStatus));
             REQUIRE(0 == (fileStatus.st_atim.tv_sec + fileStatus.st_atim.tv_nsec));
             REQUIRE(0 == (fileStatus.st_mtim.tv_sec + fileStatus.st_mtim.tv_nsec));
         }
-        fstat(_fd, &fileStatus);
-        {
+        auto r = fstat(_fd, &fileStatus);
+        if (0 == r) {
             REQUIRE(0 < fileStatus.st_atim.tv_sec);
+            ts.seconds(static_cast<int32_t>(fileStatus.st_mtim.tv_sec))
+              .microseconds(static_cast<int32_t>(fileStatus.st_mtim.tv_nsec/1000));
         }
-        cluon::data::TimeStamp ts;
-        ts.seconds(static_cast<int32_t>(fileStatus.st_mtim.tv_sec))
-          .microseconds(static_cast<int32_t>(fileStatus.st_mtim.tv_nsec/1000));
         return ts;
     };
 
-    {
+    if (0 < fd) {
         cluon::data::TimeStamp ts{getModifiedTimeStamp(fd)};
         REQUIRE(0 < ts.seconds());
     }
@@ -695,7 +696,7 @@ TEST_CASE("Trying to open SharedMemory with empty name (SySV).") {
         REQUIRE(nullptr == sm1.data());
         REQUIRE(sm1.name().empty());
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -711,7 +712,7 @@ TEST_CASE("Trying to open SharedMemory with name without leading / (SySV).") {
         REQUIRE(nullptr == sm1.data());
         REQUIRE("/tmp/ABC" == sm1.name());
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -730,7 +731,7 @@ TEST_CASE("Trying to open SharedMemory with name without leading / and too long 
         REQUIRE(nullptr == sm1.data());
         REQUIRE(NAME_254 == sm1.name());
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -746,7 +747,7 @@ TEST_CASE("Trying to create SharedMemory with invalid name (SySV).") {
         REQUIRE(nullptr == sm1.data());
         REQUIRE("/tmp/nested/folders/not/supported" == sm1.name());
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -766,7 +767,7 @@ TEST_CASE("Trying to create SharedMemory with existing name (SySV).") {
     }
     fout.close();
     unlink("/tmp/libcluon-sysv-sharedmemory-c016cc2f-b98a-420f-a9c0-fac362c0d3f5");
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -792,7 +793,7 @@ TEST_CASE("Trying to create SharedMemory with correct name (SySV).") {
         sm1.unlock();
         REQUIRE(12345 == tmp);
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -845,7 +846,7 @@ TEST_CASE("Trying to create SharedMemory with correct name for already existing 
         sm1.notifyAll();
         REQUIRE(!sm1.valid());
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -878,7 +879,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and one reader and on
             REQUIRE(12345 == tmp);
         }
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -926,7 +927,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
 
         REQUIRE(54321 == tmp);
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -972,7 +973,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and separate thread t
 
         REQUIRE(23456 == tmp);
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -1036,7 +1037,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and two separate thre
         uint32_t tmp = *(reinterpret_cast<uint32_t *>(sm1.data()));
         REQUIRE(3 == tmp);
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -1144,7 +1145,7 @@ TEST_CASE("Trying to create SharedMemory with correct name and one separate thre
         REQUIRE(3456 == tmp);
         sm1.unlock();
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -1176,7 +1177,7 @@ TEST_CASE("Measure performance of using SharedMemory (SySV vs POSIX).") {
             cluon::data::TimeStamp after = cluon::time::now();
             std::clog << "SysV took " << cluon::time::deltaInMicroseconds(after, before) << " microseconds." << std::endl;
         }
-        putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+        putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
     }
     {
         const char *CLUON_SHAREDMEMORY_POSIX = getenv("CLUON_SHAREDMEMORY_POSIX");
@@ -1378,7 +1379,7 @@ TEST_CASE("Trying to create SharedMemory with correct name (SySV) and set time s
         }
         REQUIRE(12345 == tmp);
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
 
@@ -1433,7 +1434,6 @@ TEST_CASE("Trying to create SharedMemory with correct name and one separate thre
 
         REQUIRE(23456 == tmp);
     }
-    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=0" : "CLUON_SHAREDMEMORY_POSIX=0")));
+    putenv(const_cast<char *>((usePOSIX ? "CLUON_SHAREDMEMORY_POSIX=1" : "CLUON_SHAREDMEMORY_POSIX=0")));
 #endif
 }
-
