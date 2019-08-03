@@ -28,6 +28,7 @@ matrix:
   include:
     # clang 5.0: Regular build using Travis' default compiler for performance reasons to determine the code coverage when running the test cases on any branch (except for coverity_scan) or PR.
     - os: linux
+      dist: trusty
       if: branch != coverity_scan
       compiler: clang
       env:
@@ -69,6 +70,7 @@ matrix:
 
     # GCC 5: Build for pre-release to check if Linux/GCC-5 could be built.
     - os: linux
+      dist: trusty
       if: branch = pre-release
       compiler: gcc
       env:
@@ -88,6 +90,7 @@ matrix:
 
     # GCC 6: Build for pre-release to check if Linux/GCC-6 could be built.
     - os: linux
+      dist: trusty
       if: branch = pre-release
       compiler: gcc
       env:
@@ -107,6 +110,7 @@ matrix:
 
     # GCC 7: Build for pre-release to check if Linux/GCC-7 could be built.
     - os: linux
+      dist: trusty
       if: branch = pre-release
       compiler: gcc
       env:
@@ -145,6 +149,7 @@ matrix:
 
     # clang 3.8: Build for pre-release to check if Linux/clang-3.8 could be built.
     - os: linux
+      dist: trusty
       if: branch = pre-release
       compiler: clang
       env:
@@ -164,6 +169,7 @@ matrix:
 
     # clang 3.9: Build for pre-release to check if Linux/clang-3.9 could be built.
     - os: linux
+      dist: trusty
       if: branch = pre-release
       compiler: clang
       env:
@@ -183,6 +189,7 @@ matrix:
 
     # clang 4.0: Build for pre-release to check if Linux/clang-4.0 could be built.
     - os: linux
+      dist: trusty
       if: branch = pre-release
       compiler: clang
       env:
@@ -199,6 +206,7 @@ matrix:
 
     # clang 5.0: Build for pre-release to check if Linux/clang-5.0 could be built.
     - os: linux
+      dist: trusty
       if: branch = pre-release
       compiler: clang
       env:
@@ -216,6 +224,7 @@ matrix:
 
     # clang 6.0: Build for pre-release to check if Linux/clang-6.0 could be built.
     - os: linux
+      dist: trusty
       if: branch = pre-release
       compiler: gcc
       env:
