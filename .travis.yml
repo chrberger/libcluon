@@ -264,8 +264,8 @@ matrix:
         - DO_COVERAGE=0
         - DO_COVERITY_SCAN=0
         - DO_DOCKER_BUILD=0
-        - COMPILER_CC=clang-7
-        - COMPILER_CXX=clang++-7
+        - COMPILER_CC=cc
+        - COMPILER_CXX=c++
         - BUILD=Release
 
     # default GCC on Ubuntu Bionic.
@@ -292,8 +292,8 @@ matrix:
         - DO_COVERAGE=0
         - DO_COVERITY_SCAN=0
         - DO_DOCKER_BUILD=0
-        - COMPILER_CC=clang-7
-        - COMPILER_CXX=clang++-7
+        - COMPILER_CC=cc
+        - COMPILER_CXX=c++
         - BUILD=Release
 
 
