@@ -79,7 +79,7 @@ TEST_CASE("Testing time-stamps on files for POSIX using file descriptors.") {
 
     cluon::data::TimeStamp modifiedTimeStamp;
     setModifiedTimeStamp(fd, modifiedTimeStamp);
-    {
+    if (0 < fd) {
         cluon::data::TimeStamp ts{getModifiedTimeStamp(fd)};
         REQUIRE(0 == (ts.seconds() + ts.microseconds()));
     }

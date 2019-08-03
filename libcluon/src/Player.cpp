@@ -325,7 +325,10 @@ void Player::seekTo(float ratio) noexcept {
                 m_currentEnvelopeToReplay++;
             }
         }
-        m_nextEntryToReadFromRecFile = m_previousEnvelopeAlreadyReplayed = m_currentEnvelopeToReplay;
+        try {
+            std::lock_guard<std::mutex> lck(m_indexMutex);
+            m_nextEntryToReadFromRecFile = m_previousEnvelopeAlreadyReplayed = m_currentEnvelopeToReplay;
+        } catch (...) {} // LCOV_EXCL_LINE
 
         // Refill cache.
         m_envelopeCache.clear();
