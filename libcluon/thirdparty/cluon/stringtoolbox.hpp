@@ -78,9 +78,15 @@ inline std::vector<std::string> split(const std::string &str,
     if (i != prev) {
       retVal.emplace_back(str.substr(prev, i - prev));
     }
+    else {
+      retVal.emplace_back("");
+    }
   }
   if ((prev > 0) && (prev < str.size())) {
     retVal.emplace_back(str.substr(prev, str.size() - prev));
+  }
+  else if (prev > 0) {
+    retVal.emplace_back("");
   }
   return retVal;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018  Christian Berger
+ * Copyright (C) 2017-2019  Christian Berger
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -40,9 +40,9 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
             if (m.size() > 0) {
                 std::string match{m[0]};
                 std::vector<std::string> retVal = stringtoolbox::split(match, ':');
-                if ((retVal.size() == 1) || ((retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() == 0))) {
+                if ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() == 0) ) {
                     std::string keyOfNestedObject{stringtoolbox::trim(retVal[0])};
-                    keyOfNestedObject = stringtoolbox::split(keyOfNestedObject, '"')[0];
+                    keyOfNestedObject = stringtoolbox::split(keyOfNestedObject, '"')[1];
                     {
                         std::string suffix(m.suffix());
                         suffix   = stringtoolbox::trim(suffix);
@@ -59,11 +59,11 @@ std::map<std::string, FromJSONVisitor::JSONKeyValue> FromJSONVisitor::readKeyVal
 
                     result[keyOfNestedObject] = kv;
                 }
-                if ((retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() > 0)) {
+                if ( (retVal.size() == 2) && (stringtoolbox::trim(retVal[1]).size() > 0) ) {
                     auto e = std::make_pair(stringtoolbox::trim(retVal[0]), stringtoolbox::trim(retVal[1]));
 
                     JSONKeyValue kv;
-                    kv.m_key = stringtoolbox::split(e.first, '"')[0];
+                    kv.m_key = stringtoolbox::split(e.first, '"')[1];
 
                     if ((e.second.size() > 0) && (e.second.at(0) == '"')) {
                         kv.m_type  = JSONConstants::STRING;

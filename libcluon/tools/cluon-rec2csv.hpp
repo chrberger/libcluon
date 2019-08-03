@@ -141,7 +141,7 @@ inline int32_t cluon_rec2csv(int32_t argc, char **argv) {
                             // Extract timestamps.
                             std::vector<std::string> timeStampsWithHeader;
                             {
-                                // Skip senderStamp (as it is in file name) and serialzedData.
+                                // Skip senderStamp (as it is in file name) and serializedData.
                                 cluon::ToCSVVisitor csv(';', true, { {1,false}, {2,false}, {3,true}, {4,true}, {5,true}, {6,false} });
                                 env.accept(csv);
                                 timeStampsWithHeader = stringtoolbox::split(csv.csv(), '\n');

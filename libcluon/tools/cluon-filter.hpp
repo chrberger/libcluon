@@ -35,13 +35,16 @@ inline int32_t cluon_filter(int32_t argc, char **argv) {
             tmp += ",";
             auto entries = stringtoolbox::split(tmp, ',');
             for (auto e : entries) {
-                auto l = stringtoolbox::split(e, '/');
-                std::string toKeep{e};
-                if (0 == l.size()) {
-                    toKeep += "/0";
+                // Use only valid entries.
+                if (0 != e.size()) {
+                    auto l = stringtoolbox::split(e, '/');
+                    std::string toKeep{e};
+                    if (0 == l.size()) {
+                        toKeep += "/0";
+                    }
+                    std::cerr << argv[0] << " keeping " << toKeep << std::endl;
+                    mapOfEnvelopesToKeep[toKeep] = true;
                 }
-                std::cerr << argv[0] << " keeping " << toKeep << std::endl;
-                mapOfEnvelopesToKeep[toKeep] = true;
             }
         }
         std::map<std::string, bool> mapOfEnvelopesToDrop{};
@@ -50,13 +53,16 @@ inline int32_t cluon_filter(int32_t argc, char **argv) {
             tmp += ",";
             auto entries = stringtoolbox::split(tmp, ',');
             for (auto e : entries) {
-                auto l = stringtoolbox::split(e, '/');
-                std::string toDrop{e};
-                if (0 == l.size()) {
-                    toDrop += "/0";
+                // Use only valid entries.
+                if (0 != e.size()) {
+                    auto l = stringtoolbox::split(e, '/');
+                    std::string toDrop{e};
+                    if (0 == l.size()) {
+                        toDrop += "/0";
+                    }
+                    std::cerr << argv[0] << " dropping " << toDrop << std::endl;
+                    mapOfEnvelopesToDrop[toDrop] = true;
                 }
-                std::cerr << argv[0] << " dropping " << toDrop << std::endl;
-                mapOfEnvelopesToDrop[toDrop] = true;
             }
         }
 
