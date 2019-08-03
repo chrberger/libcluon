@@ -240,6 +240,32 @@ matrix:
           sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-6.0']
           packages: ['clang-6.0', 'g++-6']
 
+    # default GCC on Ubuntu Xenial.
+    - os: linux
+      dist: xenial
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=gcc
+        - COMPILER_CXX=g++
+        - BUILD=Release
+
+    # default GCC on Ubuntu Bionic.
+    - os: linux
+      dist: bionic
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=gcc
+        - COMPILER_CXX=g++
+        - BUILD=Release
+
 
     # GCC 6: Regular build to run coverity_scan analysis.
     - os: linux
