@@ -241,6 +241,7 @@ matrix:
           packages: ['clang-6.0', 'g++-6']
 
     # default GCC on Ubuntu Xenial.
+    # gcc 5.4: Build for pre-release to check if Linux/gcc-5.4 could be built.
     - os: linux
       dist: xenial
       if: branch = pre-release
@@ -253,7 +254,22 @@ matrix:
         - COMPILER_CXX=g++
         - BUILD=Release
 
+    # default clang on Ubuntu Xenial.
+    # clang 7.0: Build for pre-release to check if Linux/clang-7.0 could be built.
+    - os: linux
+      dist: xenial
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-7.0
+        - COMPILER_CXX=clang++-7.0
+        - BUILD=Release
+
     # default GCC on Ubuntu Bionic.
+    # gcc 7.4: Build for pre-release to check if Linux/gcc-7.4 could be built.
     - os: linux
       dist: bionic
       if: branch = pre-release
@@ -264,6 +280,20 @@ matrix:
         - DO_DOCKER_BUILD=0
         - COMPILER_CC=gcc
         - COMPILER_CXX=g++
+        - BUILD=Release
+
+    # default clang on Ubuntu Bionic.
+    # clang 7.0: Build for pre-release to check if Linux/clang-7.0 could be built.
+    - os: linux
+      dist: bionic
+      if: branch = pre-release
+      compiler: gcc
+      env:
+        - DO_COVERAGE=0
+        - DO_COVERITY_SCAN=0
+        - DO_DOCKER_BUILD=0
+        - COMPILER_CC=clang-7.0
+        - COMPILER_CXX=clang++-7.0
         - BUILD=Release
 
 
