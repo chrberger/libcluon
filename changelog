@@ -1,3 +1,15 @@
+libcluon (0.0.123-1ppa1~bionic1) bionic; urgency=medium
+
+  * upgrading to catch v2.9.2
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Aug 2019 23:59:10 +0200
+
+libcluon (0.0.123-1ppa1~xenial1) xenial; urgency=medium
+
+  * upgrading to catch v2.9.2
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Aug 2019 23:59:10 +0200
+
 libcluon (0.0.122-1ppa1~bionic1) bionic; urgency=medium
 
   * Upgrading 3rd party libraries; extending functionality for stringtoolbox; fixes from coverity scan
