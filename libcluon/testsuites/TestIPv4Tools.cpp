@@ -28,5 +28,9 @@ TEST_CASE("Test hostname resolution 127.0.0.1 to 127.0.0.1.") {
 
 TEST_CASE("Test hostname resolution 127.0.1 to 127.0.0.1.") {
     std::string resolvedHostname = cluon::getIPv4FromHostname("127.0.1");
+#ifdef WIN32
+    REQUIRE(resolvedHostname == "");
+#else
     REQUIRE(resolvedHostname == "127.0.0.1");
+#endif
 }
