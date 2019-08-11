@@ -56,6 +56,7 @@ for i in \
     cluon/MessageParser.hpp \
     cluon/TerminateHandler.hpp \
     cluon/NotifyingPipeline.hpp \
+    cluon/IPv4Tools.hpp \
     cluon/UDPPacketSizeConstraints.hpp \
     cluon/UDPSender.hpp \
     cluon/UDPReceiver.hpp \
@@ -94,6 +95,7 @@ for i in \
     MetaMessage.cpp \
     MessageParser.cpp \
     TerminateHandler.cpp \
+    IPv4Tools.cpp \
     UDPSender.cpp \
     UDPReceiver.cpp \
     TCPConnection.cpp \
