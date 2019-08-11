@@ -7,6 +7,7 @@
  */
 
 #include "cluon/UDPReceiver.hpp"
+#include "cluon/IPv4Tools.hpp"
 #include "cluon/TerminateHandler.hpp"
 #include "cluon/UDPPacketSizeConstraints.hpp"
 
@@ -56,7 +57,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
     , m_readFromSocketThread()
     , m_delegate(std::move(delegate)) {
     // Decompose given address string to check validity with numerical IPv4 address.
-    std::string tmp{receiveFromAddress};
+    std::string tmp{cluon::getIPv4FromHostname(receiveFromAddress)};
     std::replace(tmp.begin(), tmp.end(), '.', ' ');
     std::istringstream sstr{tmp};
     std::vector<int> receiveFromAddressTokens{std::istream_iterator<int>(sstr), std::istream_iterator<int>()};
