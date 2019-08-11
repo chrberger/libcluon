@@ -12,6 +12,7 @@
 #ifdef WIN32
     #include <Winsock2.h> // for WSAStartUp
     #include <ws2tcpip.h>
+    #include <iostream>
 #else
     #include <arpa/inet.h>
     #include <netdb.h>
