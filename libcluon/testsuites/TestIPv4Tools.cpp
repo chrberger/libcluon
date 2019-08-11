@@ -8,6 +8,7 @@
 
 #include "catch.hpp"
 
+#include "cluon/cluon.hpp"  // Necessary for the correcting linker settings on Win32.
 #include "cluon/IPv4Tools.hpp"
 
 TEST_CASE("Test hostname resolution localhost to 127.0.0.1.") {
