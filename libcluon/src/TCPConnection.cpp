@@ -7,6 +7,7 @@
  */
 
 #include "cluon/TCPConnection.hpp"
+#include "cluon/IPv4Tools.hpp"
 #include "cluon/TerminateHandler.hpp"
 
 // clang-format off
@@ -49,7 +50,7 @@ TCPConnection::TCPConnection(const std::string &address,
     : m_newDataDelegate(std::move(newDataDelegate))
     , m_connectionLostDelegate(std::move(connectionLostDelegate)) {
     // Decompose given address string to check validity with numerical IPv4 address.
-    std::string tmp{address};
+    std::string tmp{cluon::getIPv4FromHostname(address)};
     std::replace(tmp.begin(), tmp.end(), '.', ' ');
     std::istringstream sstr{tmp};
     std::vector<int> addressTokens{std::istream_iterator<int>(sstr), std::istream_iterator<int>()};
