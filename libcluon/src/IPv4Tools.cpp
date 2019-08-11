@@ -10,6 +10,7 @@
 
 // clang-format off
 #ifdef WIN32
+    #include <Winsock2.h> // for WSAStartUp
     #include <ws2tcpip.h>
 #else
     #include <arpa/inet.h>
@@ -27,6 +28,13 @@
 namespace cluon {
 
 std::string getIPv4FromHostname(const std::string &hostname) noexcept {
+#ifdef WIN32
+    // Load Winsock 2.2 DLL.
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        std::cerr << "[cluon::getIPv4FromHostname] Error while calling WSAStartUp: " << WSAGetLastError() << std::endl;
+    }
+#endif
     std::string result{""};
     if (!hostname.empty()) {
         struct addrinfo hint;
@@ -63,6 +71,9 @@ std::string getIPv4FromHostname(const std::string &hostname) noexcept {
             freeaddrinfo(listOfHosts);
         }
     }
+#ifdef WIN32
+    WSACleanup();
+#endif
     return result;
 }
 
