@@ -88,7 +88,7 @@ TEST_CASE("Trying to send data with empty sendToPort.") {
 }
 
 TEST_CASE("Trying to send data with incomplete sendToAddress.") {
-    cluon::UDPSender us6{"127.0.0", 1};
+    cluon::UDPSender us6{"localhos", 1};
     std::string TEST_DATA{"Hello World"};
     auto retVal6 = us6.send(std::move(TEST_DATA));
     REQUIRE(-1 == retVal6.first);

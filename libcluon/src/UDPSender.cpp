@@ -7,6 +7,7 @@
  */
 
 #include "cluon/UDPSender.hpp"
+#include "cluon/IPv4Tools.hpp"
 #include "cluon/UDPPacketSizeConstraints.hpp"
 
 // clang-format off
@@ -33,7 +34,7 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
     : m_socketMutex()
     , m_sendToAddress() {
     // Decompose given address into tokens to check validity with numerical IPv4 address.
-    std::string tmp{sendToAddress};
+    std::string tmp{cluon::getIPv4FromHostname(sendToAddress)};
     std::replace(tmp.begin(), tmp.end(), '.', ' ');
     std::istringstream sstr{tmp};
     std::vector<int> sendToAddressTokens{std::istream_iterator<int>(sstr), std::istream_iterator<int>()};
