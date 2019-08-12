@@ -1,3 +1,15 @@
+libcluon (0.0.124-1ppa1~bionic1) bionic; urgency=medium
+
+  * added hostname resolving to IPv4
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 12 Aug 2019 11:56:45 +0200
+
+libcluon (0.0.124-1ppa1~xenial1) xenial; urgency=medium
+
+  * added hostname resolving to IPv4
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 12 Aug 2019 11:56:45 +0200
+
 libcluon (0.0.123-1ppa1~bionic1) bionic; urgency=medium
 
   * upgrading to catch v2.9.2
