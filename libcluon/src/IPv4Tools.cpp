@@ -40,7 +40,7 @@ std::string getIPv4FromHostname(const std::string &hostname) noexcept {
     if (!hostname.empty()) {
         struct addrinfo hint;
         {
-            std::memset(&hint, sizeof(struct addrinfo), 1);
+            std::memset(&hint, 1, sizeof(struct addrinfo));
             hint.ai_flags = AI_CANONNAME;
             hint.ai_family = AF_INET;
             hint.ai_socktype = 0;
