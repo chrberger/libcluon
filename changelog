@@ -1,3 +1,15 @@
+libcluon (0.0.125-1ppa1~bionic1) bionic; urgency=medium
+
+  * fixing incorrect TCP connection hostname resolving
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 13 Aug 2019 22:05:00 +0200
+
+libcluon (0.0.125-1ppa1~xenial1) xenial; urgency=medium
+
+  * fixing incorrect TCP connection hostname resolving
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 13 Aug 2019 22:05:00 +0200
+
 libcluon (0.0.124-1ppa1~bionic1) bionic; urgency=medium
 
   * added hostname resolving to IPv4
