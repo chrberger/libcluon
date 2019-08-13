@@ -50,7 +50,8 @@ TCPConnection::TCPConnection(const std::string &address,
     : m_newDataDelegate(std::move(newDataDelegate))
     , m_connectionLostDelegate(std::move(connectionLostDelegate)) {
     // Decompose given address string to check validity with numerical IPv4 address.
-    std::string tmp{cluon::getIPv4FromHostname(address)};
+    std::string resolvedHostname{cluon::getIPv4FromHostname(address)};
+    std::string tmp{resolvedHostname};
     std::replace(tmp.begin(), tmp.end(), '.', ' ');
     std::istringstream sstr{tmp};
     std::vector<int> addressTokens{std::istream_iterator<int>(sstr), std::istream_iterator<int>()};
@@ -59,10 +60,10 @@ TCPConnection::TCPConnection(const std::string &address,
         && !(std::end(addressTokens) != std::find_if(addressTokens.begin(), addressTokens.end(), [](int a) { return (a < 0) || (a > 255); })) && (0 < port)) {
         // Check for valid IP address.
         struct sockaddr_in tmpSocketAddress {};
-        const bool isValid = (0 < ::inet_pton(AF_INET, address.c_str(), &(tmpSocketAddress.sin_addr)));
+        const bool isValid = (0 < ::inet_pton(AF_INET, resolvedHostname.c_str(), &(tmpSocketAddress.sin_addr)));
         if (isValid) {
             std::memset(&m_address, 0, sizeof(m_address));
-            m_address.sin_addr.s_addr = ::inet_addr(address.c_str());
+            m_address.sin_addr.s_addr = ::inet_addr(resolvedHostname.c_str());
             m_address.sin_family      = AF_INET;
             m_address.sin_port        = htons(port);
 #ifdef WIN32
