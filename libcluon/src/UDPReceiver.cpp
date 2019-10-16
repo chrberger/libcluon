@@ -22,6 +22,10 @@
 
     #include <iostream>
 #else
+    #ifdef __linux__
+        #include <linux/sockios.h>
+    #endif
+
     #include <arpa/inet.h>
     #include <sys/ioctl.h>
     #include <sys/socket.h>
