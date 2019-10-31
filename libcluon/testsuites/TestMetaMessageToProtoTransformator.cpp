@@ -21,7 +21,7 @@ TEST_CASE("Transforming empty message specification.") {
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(retVal.first.empty());
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 }
 
 TEST_CASE("Transforming broken message specification.") {
@@ -62,7 +62,7 @@ message MyMessage1 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -117,7 +117,7 @@ message MyMessage2 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -181,7 +181,7 @@ message MyPackage_MyMessage2 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -246,7 +246,7 @@ message MyPackage_SubPackage_MyMessage2 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -311,7 +311,7 @@ message MyPackage_MyMessage2 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -357,7 +357,7 @@ message MyPackage1_MyMessage1 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -394,7 +394,7 @@ message MyPackage1_MySubPackage_MyMessage1 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -431,7 +431,7 @@ message MyPackage1_MySubPackageMessage_MyMessage1 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -469,7 +469,7 @@ message MyPackage1_MySubPackage_MySubPackageMessage_MyMessage1 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -522,7 +522,7 @@ message MyMessage1 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -596,7 +596,7 @@ message MyMessage1 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -664,7 +664,7 @@ message MyMessage2 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;
@@ -739,7 +739,7 @@ message ABC_MyMessage2 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;
@@ -813,7 +813,7 @@ message DEF_MyMessage2 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;
@@ -888,7 +888,7 @@ message ABC_DEF_MyMessage2 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;
@@ -963,7 +963,7 @@ message ABC_GHI_DEF_MyMessage2 {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;

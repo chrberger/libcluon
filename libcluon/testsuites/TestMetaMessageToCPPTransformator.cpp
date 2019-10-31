@@ -21,7 +21,7 @@ TEST_CASE("Transforming empty message specification.") {
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(retVal.first.empty());
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 }
 
 TEST_CASE("Transforming broken message specification.") {
@@ -233,7 +233,7 @@ struct isTripletForwardVisitable<MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -633,7 +633,7 @@ struct isTripletForwardVisitable<MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -1042,7 +1042,7 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -1452,7 +1452,7 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -1862,7 +1862,7 @@ struct isTripletForwardVisitable<MyPackage::SubPackage::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -2079,7 +2079,7 @@ struct isTripletForwardVisitable<MyPackage1::MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -2287,7 +2287,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -2495,7 +2495,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackageMessage::MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -2704,7 +2704,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MySubPackageMessage::
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -3031,7 +3031,7 @@ struct isTripletForwardVisitable<MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -3498,7 +3498,7 @@ struct isTripletForwardVisitable<MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -3918,7 +3918,7 @@ struct isTripletForwardVisitable<MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;
@@ -4346,7 +4346,7 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;
@@ -4775,7 +4775,7 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;
@@ -5205,7 +5205,7 @@ struct isTripletForwardVisitable<ABC::DEF::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;
@@ -5635,7 +5635,7 @@ struct isTripletForwardVisitable<ABC::GHI::DEF::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;

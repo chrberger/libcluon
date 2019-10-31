@@ -330,7 +330,7 @@ message FaultyMyMessageA [id = 60006] {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(msg));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     auto listOfMessages = retVal.first;
     REQUIRE(1 == listOfMessages.size());
@@ -398,7 +398,7 @@ message FaultyMyMessageA [id = 30003] {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(msg));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     auto listOfMessages = retVal.first;
     REQUIRE(1 == listOfMessages.size());

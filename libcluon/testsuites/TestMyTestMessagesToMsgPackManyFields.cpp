@@ -57,7 +57,7 @@ TEST_CASE("Testing more than 0xF and less than 0xFFFF fields.") {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(msg.str());
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     auto listOfMessages = retVal.first;
     REQUIRE(1 == listOfMessages.size());
 
