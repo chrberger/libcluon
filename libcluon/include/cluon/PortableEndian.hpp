@@ -33,6 +33,14 @@
     #include <sys/endian.h>
 #elif (defined(_WIN16) || defined(_WIN32) || defined(_WIN64))
     #if BYTE_ORDER == LITTLE_ENDIAN
+        // Add missing definitions for MinGW.
+        #ifndef htonll
+            #define htonll(x) ((1==htonl(1)) ? (x) : (((uint64_t)htonl((x) & 0xFFFFFFFFUL)) << 32) | htonl((uint32_t)((x) >> 32)))
+        #endif
+        #ifndef ntohll
+            #define ntohll(x) ((1==ntohl(1)) ? (x) : (((uint64_t)ntohl((x) & 0xFFFFFFFFUL)) << 32) | ntohl((uint32_t)((x) >> 32)))
+        #endif
+
         #define htobe16(x) htons(x)
         #define htole16(x) (x)
         #define be16toh(x) ntohs(x)
