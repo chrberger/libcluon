@@ -147,8 +147,8 @@ void Player::resetIterators() noexcept {
 
 void Player::computeInitialCacheLevelAndFillCache() noexcept {
     if (m_recFileValid && (m_index.size() > 0)) {
-        int64_t smallestSampleTimePoint = (std::numeric_limits<int64_t>::max());
-        int64_t largestSampleTimePoint  = (std::numeric_limits<int64_t>::min());
+        int64_t smallestSampleTimePoint = (std::numeric_limits<int64_t>::max)();
+        int64_t largestSampleTimePoint  = (std::numeric_limits<int64_t>::min)();
         for (auto it = m_index.begin(); it != m_index.end(); it++) {
             smallestSampleTimePoint = (std::min)(smallestSampleTimePoint, it->first);
             largestSampleTimePoint  = (std::max)(largestSampleTimePoint, it->first);
