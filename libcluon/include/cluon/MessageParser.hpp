@@ -42,7 +42,7 @@ message myMessage.SubName [id = 1] {
 
 cluon::MessageParser mp;
 auto retVal = mp.parse(std::string(spec));
-if (retVal.second == cluon::MessageParser::MessageParserErrorCodes::NO_ERROR) {
+if (retVal.second == cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR) {
     auto listOfMessages = retVal.first;
     for (auto message : listOfMessages) {
         message.accept([](const cluon::MetaMessage &mm){ std::cout << "Message name = " << mm.messageName() <<
@@ -53,7 +53,7 @@ std::endl; });
 */
 class LIBCLUON_API MessageParser {
    public:
-    enum MessageParserErrorCodes : uint8_t { NO_ERROR = 0, SYNTAX_ERROR = 1, DUPLICATE_IDENTIFIERS = 2 };
+    enum MessageParserErrorCodes : uint8_t { NO_MESSAGEPARSER_ERROR = 0, SYNTAX_ERROR = 1, DUPLICATE_IDENTIFIERS = 2 };
 
    private:
     MessageParser(const MessageParser &) = delete;
@@ -69,7 +69,7 @@ class LIBCLUON_API MessageParser {
      *
      * @param input Message specification.
      * @return Pair: List of cluon::MetaMessages describing the specified messages and error code:
-     *         NO_ERROR: The given specification could be parsed successfully (list moght be non-empty).
+     *         NO_MESSAGEPARSER_ERROR: The given specification could be parsed successfully (list moght be non-empty).
      *         SYNTAX_ERROR: The given specification could not be parsed successfully (list is empty).
      *         DUPLICATE_IDENTIFIERS: The given specification contains ambiguous names or identifiers (list is empty).
      */

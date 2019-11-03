@@ -21,7 +21,7 @@ TEST_CASE("Transforming empty message specification.") {
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(retVal.first.empty());
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 }
 
 TEST_CASE("Transforming broken message specification.") {
@@ -54,15 +54,13 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyMessage1 {
-    
     optional string s = 1;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -94,9 +92,7 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyMessage1 {
-    
     optional string s = 1;
-    
 }
 )";
 
@@ -109,15 +105,13 @@ message MyMessage1 {
 
 // Message identifier: 2.
 message MyMessage2 {
-    
     optional string s = 1;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -158,9 +152,7 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyPackage_MyMessage1 {
-    
     optional string s = 1;
-    
 }
 )";
 
@@ -173,15 +165,13 @@ message MyPackage_MyMessage1 {
 
 // Message identifier: 2.
 message MyPackage_MyMessage2 {
-    
     optional string s = 1;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -223,9 +213,7 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyPackage_SubPackage_MyMessage1 {
-    
     optional string s = 1;
-    
 }
 )";
 
@@ -238,15 +226,13 @@ message MyPackage_SubPackage_MyMessage1 {
 
 // Message identifier: 2.
 message MyPackage_SubPackage_MyMessage2 {
-    
     optional string s = 1;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -288,9 +274,7 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyPackage_MyMessage1 {
-    
     optional string s = 1;
-    
 }
 )";
 
@@ -303,15 +287,13 @@ message MyPackage_MyMessage1 {
 
 // Message identifier: 2.
 message MyPackage_MyMessage2 {
-    
     optional string s = 1;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -349,15 +331,13 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyPackage1_MyMessage1 {
-    
     optional string s = 1;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -386,15 +366,13 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyPackage1_MySubPackage_MyMessage1 {
-    
     optional string s = 1;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -423,15 +401,13 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyPackage1_MySubPackageMessage_MyMessage1 {
-    
     optional string s = 1;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -461,15 +437,13 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyPackage1_MySubPackage_MySubPackageMessage_MyMessage1 {
-    
     optional string s = 1;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -502,27 +476,19 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyMessage1 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
     optional uint32 attribute4 = 4;
-    
     optional float attribute5 = 5;
-    
     optional double attribute6 = 6;
-    
     optional string attribute7 = 7;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -562,41 +528,26 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyMessage1 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
     optional uint32 attribute4 = 4;
-    
     optional sint32 attribute5 = 5;
-    
     optional uint32 attribute6 = 6;
-    
     optional sint32 attribute7 = 7;
-    
     optional uint32 attribute8 = 8;
-    
     optional sint64 attribute9 = 9;
-    
     optional uint64 attribute10 = 10;
-    
     optional float attribute11 = 11;
-    
     optional double attribute12 = 12;
-    
     optional string attribute13 = 13;
-    
     optional bytes attribute14 = 14;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToProtoTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -632,13 +583,9 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message MyMessage1 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
 }
 )";
     const char *EXPECTED_PROTO_2 = R"(
@@ -650,21 +597,16 @@ message MyMessage1 {
 
 // Message identifier: 2.
 message MyMessage2 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
     optional MyMessage1 attribute4 = 4;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;
@@ -707,13 +649,9 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message ABC_MyMessage1 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
 }
 )";
     const char *EXPECTED_PROTO_2 = R"(
@@ -725,21 +663,16 @@ message ABC_MyMessage1 {
 
 // Message identifier: 2.
 message ABC_MyMessage2 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
     optional ABC_MyMessage1 attribute4 = 4;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;
@@ -781,13 +714,9 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message DEF_MyMessage1 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
 }
 )";
     const char *EXPECTED_PROTO_2 = R"(
@@ -799,21 +728,16 @@ message DEF_MyMessage1 {
 
 // Message identifier: 2.
 message DEF_MyMessage2 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
     optional DEF_MyMessage1 attribute4 = 4;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;
@@ -856,13 +780,9 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message ABC_DEF_MyMessage1 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
 }
 )";
     const char *EXPECTED_PROTO_2 = R"(
@@ -874,21 +794,16 @@ message ABC_DEF_MyMessage1 {
 
 // Message identifier: 2.
 message ABC_DEF_MyMessage2 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
     optional ABC_DEF_MyMessage1 attribute4 = 4;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;
@@ -931,13 +846,9 @@ syntax = "proto2";
 
 // Message identifier: 1.
 message ABC_GHI_DEF_MyMessage1 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
 }
 )";
     const char *EXPECTED_PROTO_2 = R"(
@@ -949,21 +860,16 @@ message ABC_GHI_DEF_MyMessage1 {
 
 // Message identifier: 2.
 message ABC_GHI_DEF_MyMessage2 {
-    
     optional bool attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional sint32 attribute3 = 3;
-    
     optional ABC_GHI_DEF_MyMessage1 attribute4 = 4;
-    
 }
 )";
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
 
     cluon::MetaMessageToProtoTransformator t;

@@ -70,7 +70,7 @@ TEST_CASE("Testing MyTestMessage1.") {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(generatedMessageSpecification);
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     auto listOfMetaMessages = retVal.first;
     REQUIRE(1 == listOfMetaMessages.size());
 
@@ -133,7 +133,7 @@ message testdata.MyTestMessage6 [ id = 30006 ] {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(generatedMessageSpecification);
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     auto listOfMetaMessages = retVal.first;
     REQUIRE(2 == listOfMetaMessages.size());
 

@@ -329,7 +329,7 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                 std::vector<int32_t> tmpNumericalFieldIdentifiers{};
                 if (check4UniqueFieldNames(*ast, tmpPrefix, tmpMessageNames, tmpFieldNames, tmpNumericalMessageIdentifiers, tmpNumericalFieldIdentifiers)) {
                     transform2MetaMessages(*ast, listOfMetaMessages);
-                    retVal = {listOfMetaMessages, MessageParserErrorCodes::NO_ERROR};
+                    retVal = {listOfMetaMessages, MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR};
                 } else {
                     retVal = {listOfMetaMessages, MessageParserErrorCodes::DUPLICATE_IDENTIFIERS};
                 }

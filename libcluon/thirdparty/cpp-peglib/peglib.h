@@ -1,4 +1,4 @@
-//
+﻿//
 //  peglib.h
 //
 //  Copyright (c) 2015-18 Yuji Hirose. All rights reserved.
@@ -9,6 +9,7 @@
 #define CPPPEGLIB_PEGLIB_H
 
 #include <algorithm>
+#include <cctype>
 #include <cassert>
 #include <cstring>
 #include <functional>
@@ -432,6 +433,23 @@ inline std::pair<size_t, size_t> line_info(const char* start, const char* cur) {
 }
 
 /*
+* String tag
+*/
+#ifndef PEGLIB_NO_CONSTEXPR_SUPPORT
+inline constexpr unsigned int str2tag(const char* str, int h = 0) {
+    return !str[h] ? 5381 : (str2tag(str, h + 1) * 33) ^ static_cast<unsigned char>(str[h]);
+}
+
+namespace udl {
+
+inline constexpr unsigned int operator "" _(const char* s, size_t) {
+    return str2tag(s);
+}
+
+}
+#endif
+
+/*
 * Semantic values
 */
 struct SemanticValues : protected std::vector<any>
@@ -450,6 +468,10 @@ struct SemanticValues : protected std::vector<any>
 
     // Definition name
     const std::string& name() const { return name_; }
+
+#ifndef PEGLIB_NO_CONSTEXPR_SUPPORT
+    std::vector<unsigned int> tags;
+#endif
 
     // Line number and column at which the matched string is
     std::pair<size_t, size_t> line_info() const {
@@ -859,6 +881,7 @@ public:
         auto& sv = *value_stack[value_stack_size++];
         if (!sv.empty()) {
             sv.clear();
+            sv.tags.clear();
         }
         sv.reset();
         sv.path = path;
@@ -960,6 +983,7 @@ public:
             i += len;
         }
         sv.insert(sv.end(), chldsv.begin(), chldsv.end());
+        sv.tags.insert(sv.tags.end(), chldsv.tags.begin(), chldsv.tags.end());
         sv.s_ = chldsv.c_str();
         sv.n_ = chldsv.length();
         sv.tokens.insert(sv.tokens.end(), chldsv.tokens.begin(), chldsv.tokens.end());
@@ -1009,6 +1033,7 @@ public:
             auto len = rule.parse(s, n, chldsv, c, dt);
             if (success(len)) {
                 sv.insert(sv.end(), chldsv.begin(), chldsv.end());
+                sv.tags.insert(sv.tags.end(), chldsv.tags.begin(), chldsv.tags.end());
                 sv.s_ = chldsv.c_str();
                 sv.n_ = chldsv.length();
                 sv.choice_count_ = opes_.size();
@@ -1055,6 +1080,7 @@ public:
             } else {
                 if (sv.size() != save_sv_size) {
                     sv.erase(sv.begin() + static_cast<std::ptrdiff_t>(save_sv_size));
+                    sv.tags.erase(sv.tags.begin() + static_cast<std::ptrdiff_t>(save_sv_size));
                 }
                 if (sv.tokens.size() != save_tok_size) {
                     sv.tokens.erase(sv.tokens.begin() + static_cast<std::ptrdiff_t>(save_tok_size));
@@ -1113,6 +1139,7 @@ public:
             } else {
                 if (sv.size() != save_sv_size) {
                     sv.erase(sv.begin() + static_cast<std::ptrdiff_t>(save_sv_size));
+                    sv.tags.erase(sv.tags.begin() + static_cast<std::ptrdiff_t>(save_sv_size));
                 }
                 if (sv.tokens.size() != save_tok_size) {
                     sv.tokens.erase(sv.tokens.begin() + static_cast<std::ptrdiff_t>(save_tok_size));
@@ -1154,6 +1181,7 @@ public:
         } else {
             if (sv.size() != save_sv_size) {
                 sv.erase(sv.begin() + static_cast<std::ptrdiff_t>(save_sv_size));
+                sv.tags.erase(sv.tags.begin() + static_cast<std::ptrdiff_t>(save_sv_size));
             }
             if (sv.tokens.size() != save_tok_size) {
                 sv.tokens.erase(sv.tokens.begin() + static_cast<std::ptrdiff_t>(save_tok_size));
@@ -1233,8 +1261,9 @@ class LiteralString : public Ope
     , public std::enable_shared_from_this<LiteralString>
 {
 public:
-    LiteralString(const std::string& s)
+    LiteralString(const std::string& s, bool ignore_case)
         : lit_(s)
+        , ignore_case_(ignore_case)
         , init_is_word_(false)
         , is_word_(false)
         {}
@@ -1244,6 +1273,7 @@ public:
     void accept(Visitor& v) override;
 
     std::string lit_;
+    bool ignore_case_;
     mutable bool init_is_word_;
     mutable bool is_word_;
 };
@@ -1279,7 +1309,7 @@ public:
             return static_cast<size_t>(-1);
         }
 
-        char32_t cp = 0;
+        char32_t cp = '\0';
         auto len = decode_codepoint(s, n, cp);
 
         if (!ranges_.empty()) {
@@ -1564,8 +1594,12 @@ inline std::shared_ptr<Ope> npd(const std::shared_ptr<Ope>& ope) {
     return std::make_shared<NotPredicate>(ope);
 }
 
-inline std::shared_ptr<Ope> lit(const std::string& lit) {
-    return std::make_shared<LiteralString>(lit);
+inline std::shared_ptr<Ope> lit(const std::string& s) {
+    return std::make_shared<LiteralString>(s, false);
+}
+
+inline std::shared_ptr<Ope> liti(const std::string& s) {
+    return std::make_shared<LiteralString>(s, true);
 }
 
 inline std::shared_ptr<Ope> cls(const std::string& s) {
@@ -1674,6 +1708,33 @@ struct AssignIDToDefinition : public Ope::Visitor
     std::unordered_map<void*, size_t> ids;
 };
 
+struct IsLiteralToken : public Ope::Visitor
+{
+    IsLiteralToken() : result_(false) {}
+
+    void visit(PrioritizedChoice& ope) override {
+        for (auto op: ope.opes_) {
+            if (!IsLiteralToken::check(*op)) {
+                return;
+            }
+        }
+        result_ = true;
+    }
+
+    void visit(LiteralString& /*ope*/) override {
+        result_ = true;
+    }
+
+    static bool check(Ope& ope) {
+        IsLiteralToken vis;
+        ope.accept(vis);
+        return vis.result_;
+    }
+
+private:
+    bool result_;
+};
+
 struct TokenChecker : public Ope::Visitor
 {
     TokenChecker() : has_token_boundary_(false), has_rule_(false) {}
@@ -1700,6 +1761,10 @@ struct TokenChecker : public Ope::Visitor
     void visit(Whitespace& ope) override { ope.ope_->accept(*this); }
 
     static bool is_token(Ope& ope) {
+        if (IsLiteralToken::check(ope)) {
+            return true;
+        }
+
         TokenChecker vis;
         ope.accept(vis);
         return vis.has_token_boundary_ || !vis.has_rule_;
@@ -1884,20 +1949,20 @@ private:
 
 struct IsPrioritizedChoice : public Ope::Visitor
 {
-    IsPrioritizedChoice() : is_prioritized_choice_(false) {}
+    IsPrioritizedChoice() : result_(false) {}
 
     void visit(PrioritizedChoice& /*ope*/) override {
-        is_prioritized_choice_ = true;
+        result_ = true;
     }
 
-    static bool is_prioritized_choice(Ope& ope) {
+    static bool check(Ope& ope) {
         IsPrioritizedChoice vis;
         ope.accept(vis);
-        return vis.is_prioritized_choice_;
+        return vis.result_;
     }
 
 private:
-    bool is_prioritized_choice_;
+    bool result_;
 };
 
 /*
@@ -2105,18 +2170,18 @@ private:
  */
 
 inline size_t parse_literal(const char* s, size_t n, SemanticValues& sv, Context& c, any& dt,
-        const std::string& lit, bool& init_is_word, bool& is_word)
+        const std::string& lit, bool& init_is_word, bool& is_word, bool ignore_case)
 {
     size_t i = 0;
     for (; i < lit.size(); i++) {
-        if (i >= n || s[i] != lit[i]) {
+        if (i >= n || (ignore_case ? (std::tolower(s[i]) != std::tolower(lit[i])) : (s[i] != lit[i]))) {
             c.set_error_pos(s);
             return static_cast<size_t>(-1);
         }
     }
 
     // Word check
-    static Context dummy_c(nullptr, lit.data(), lit.size(), 0, nullptr, nullptr, false, nullptr);
+    static Context dummy_c(nullptr, c.s, c.l, 0, nullptr, nullptr, false, nullptr);
     static SemanticValues dummy_sv;
     static any dummy_dt;
 
@@ -2153,7 +2218,7 @@ inline size_t parse_literal(const char* s, size_t n, SemanticValues& sv, Context
 
 inline size_t LiteralString::parse(const char* s, size_t n, SemanticValues& sv, Context& c, any& dt) const {
     c.trace("LiteralString", s, n, sv, dt);
-    return parse_literal(s, n, sv, c, dt, lit_, init_is_word_, is_word_);
+    return parse_literal(s, n, sv, c, dt, lit_, init_is_word_, is_word_, ignore_case_);
 }
 
 inline size_t TokenBoundary::parse(const char* s, size_t n, SemanticValues& sv, Context& c, any& dt) const {
@@ -2218,7 +2283,7 @@ inline size_t Holder::parse(const char* s, size_t n, SemanticValues& sv, Context
             chldsv.n_ = len;
             chldsv.name_ = outer_->name;
 
-            if (!IsPrioritizedChoice::is_prioritized_choice(*ope_)) {
+            if (!IsPrioritizedChoice::check(*ope_)) {
                 chldsv.choice_count_ = 0;
                 chldsv.choice_ = 0;
             }
@@ -2240,6 +2305,7 @@ inline size_t Holder::parse(const char* s, size_t n, SemanticValues& sv, Context
     if (success(len)) {
         if (!outer_->ignoreSemanticValue) {
             sv.emplace_back(val);
+            sv.tags.emplace_back(str2tag(outer_->name.c_str()));
         }
     } else {
         if (outer_->error_message) {
@@ -2307,7 +2373,7 @@ inline size_t BackReference::parse(const char* s, size_t n, SemanticValues& sv, 
             const auto& lit = captures.at(name_);
             auto init_is_word = false;
             auto is_word = false;
-            return parse_literal(s, n, sv, c, dt, lit, init_is_word, is_word);
+            return parse_literal(s, n, sv, c, dt, lit, init_is_word, is_word, false);
         }
         ++it;
     }
@@ -2504,7 +2570,7 @@ private:
                                seq(g["BeginTok"], g["Expression"], g["EndTok"]),
                                seq(g["BeginCapScope"], g["Expression"], g["EndCapScope"]),
                                seq(g["BeginCap"], g["Expression"], g["EndCap"]),
-                               g["BackRef"], g["Literal"], g["Class"], g["DOT"]);
+                               g["BackRef"], g["LiteralI"], g["Literal"], g["Class"], g["DOT"]);
 
         g["Identifier"] <= seq(g["IdentCont"], g["Spacing"]);
         g["IdentCont"]  <= seq(g["IdentStart"], zom(g["IdentRest"]));
@@ -2513,6 +2579,9 @@ private:
         g["IdentStart"] <= cho(cls("a-zA-Z_%"), cls(range));
 
         g["IdentRest"]  <= cho(g["IdentStart"], cls("0-9"));
+
+        g["LiteralI"]   <= cho(seq(cls("'"), tok(zom(seq(npd(cls("'")), g["Char"]))), lit("'i"), g["Spacing"]),
+                               seq(cls("\""), tok(zom(seq(npd(cls("\"")), g["Char"]))), lit("\"i"), g["Spacing"]));
 
         g["Literal"]    <= cho(seq(cls("'"), tok(zom(seq(npd(cls("'")), g["Char"]))), cls("'"), g["Spacing"]),
                                seq(cls("\""), tok(zom(seq(npd(cls("\"")), g["Char"]))), cls("\""), g["Spacing"]));
@@ -2713,19 +2782,22 @@ private:
         g["IdentCont"] = [](const SemanticValues& sv) {
             return std::string(sv.c_str(), sv.length());
         };
-
         g["IdentStart"] = [](const SemanticValues& /*sv*/) {
             return std::string();
         };
-
         g["IdentRest"] = [](const SemanticValues& /*sv*/) {
             return std::string();
         };
 
+        g["LiteralI"] = [](const SemanticValues& sv) {
+            const auto& tok = sv.tokens.front();
+            return liti(resolve_escape_sequence(tok.first, tok.second));
+        };
         g["Literal"] = [](const SemanticValues& sv) {
             const auto& tok = sv.tokens.front();
             return lit(resolve_escape_sequence(tok.first, tok.second));
         };
+
         g["Class"] = [](const SemanticValues& sv) {
             auto ranges = sv.transform<std::pair<char32_t, char32_t>>();
             return cls(ranges);
@@ -2885,6 +2957,14 @@ private:
 
         // Automatic whitespace skipping
         if (grammar.count(WHITESPACE_DEFINITION_NAME)) {
+            for (auto& x: grammar) {
+                auto& rule = x.second;
+                auto ope = rule.get_core_operator();
+                if (IsLiteralToken::check(*ope)) {
+                    rule <= tok(ope);
+                }
+            }
+
             auto& rule = (*data.grammar)[start];
             rule.whitespaceOpe = wsp((*data.grammar)[WHITESPACE_DEFINITION_NAME].get_core_operator());
         }
@@ -2904,20 +2984,6 @@ private:
 /*-----------------------------------------------------------------------------
  *  AST
  *---------------------------------------------------------------------------*/
-
-const int AstDefaultTag = -1;
-
-#ifndef PEGLIB_NO_CONSTEXPR_SUPPORT
-inline constexpr unsigned int str2tag(const char* str, int h = 0) {
-    return !str[h] ? 5381 : (str2tag(str, h + 1) * 33) ^ static_cast<unsigned char>(str[h]);
-}
-
-namespace udl {
-inline constexpr unsigned int operator "" _(const char* s, size_t) {
-    return str2tag(s);
-}
-}
-#endif
 
 template <typename Annotation>
 struct AstBase : public Annotation

@@ -34,7 +34,7 @@ std::cout << generatedMessageSpecification << std::endl;
 
 cluon::MessageParser mp;
 auto retVal = mp.parse(generatedMessageSpecification);
-std::cout << (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+std::cout << (cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 \endcode
 */
 class LIBCLUON_API ToODVDVisitor {

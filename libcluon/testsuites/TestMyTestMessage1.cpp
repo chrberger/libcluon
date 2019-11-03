@@ -380,7 +380,7 @@ message MyMessageA [id = 30003] {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(msg));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     auto listOfMessages = retVal.first;
     REQUIRE(1 == listOfMessages.size());
@@ -487,7 +487,7 @@ message MyMessageA [id = 30003] {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(msg));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     auto listOfMessages = retVal.first;
     REQUIRE(1 == listOfMessages.size());
@@ -579,7 +579,7 @@ message example.MyTestMessage1 [id = 30001] {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(msg));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     auto listOfMessages = retVal.first;
     REQUIRE(1 == listOfMessages.size());
@@ -703,7 +703,7 @@ message MyTest.Envelope [id = 1] {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(msg));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     auto listOfMessages = retVal.first;
     REQUIRE(2 == listOfMessages.size());

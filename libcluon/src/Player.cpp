@@ -147,17 +147,17 @@ void Player::resetIterators() noexcept {
 
 void Player::computeInitialCacheLevelAndFillCache() noexcept {
     if (m_recFileValid && (m_index.size() > 0)) {
-        int64_t smallestSampleTimePoint = std::numeric_limits<int64_t>::max();
-        int64_t largestSampleTimePoint  = std::numeric_limits<int64_t>::min();
+        int64_t smallestSampleTimePoint = (std::numeric_limits<int64_t>::max)();
+        int64_t largestSampleTimePoint  = (std::numeric_limits<int64_t>::min)();
         for (auto it = m_index.begin(); it != m_index.end(); it++) {
-            smallestSampleTimePoint = std::min(smallestSampleTimePoint, it->first);
-            largestSampleTimePoint  = std::max(largestSampleTimePoint, it->first);
+            smallestSampleTimePoint = (std::min)(smallestSampleTimePoint, it->first);
+            largestSampleTimePoint  = (std::max)(largestSampleTimePoint, it->first);
         }
 
         const uint32_t ENTRIES_TO_READ_PER_SECOND_FOR_REALTIME_REPLAY
             = static_cast<uint32_t>(std::ceil(static_cast<float>(m_index.size()) * (static_cast<float>(Player::ONE_SECOND_IN_MICROSECONDS))
                                               / static_cast<float>(largestSampleTimePoint - smallestSampleTimePoint)));
-        m_desiredInitialLevel = std::max<uint32_t>(ENTRIES_TO_READ_PER_SECOND_FOR_REALTIME_REPLAY * Player::LOOK_AHEAD_IN_S, MIN_ENTRIES_FOR_LOOK_AHEAD);
+        m_desiredInitialLevel = (std::max<uint32_t>)(ENTRIES_TO_READ_PER_SECOND_FOR_REALTIME_REPLAY * Player::LOOK_AHEAD_IN_S, MIN_ENTRIES_FOR_LOOK_AHEAD);
 
         std::clog << "[cluon::Player]: Initializing cache with " << m_desiredInitialLevel << " entries." << std::endl;
 

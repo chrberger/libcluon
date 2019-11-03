@@ -59,7 +59,7 @@ message MyMessage [id = 123] {
 
 cluon::MessageParser mp;
 auto retVal = mp.parse(std::string(messageSpecification));
-if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second) {
+if (cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second) {
     cluon::GenericMessage gm;
     auto listOfMetaMessages = retVal.first;
     gm.createFrom(listOfMetaMessages[0], listOfMetaMessages);
@@ -154,7 +154,7 @@ message MyMessage [id = 123] {
 
 cluon::MessageParser mp;
 auto retVal = mp.parse(std::string(messageSpecification));
-if (cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second) {
+if (cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second) {
     cluon::GenericMessage gm;
     auto listOfMetaMessages = retVal.first;
     gm.createFrom(listOfMetaMessages[0], listOfMetaMessages);

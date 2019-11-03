@@ -16,7 +16,7 @@ TEST_CASE("Parsing empty message specification.") {
     cluon::MessageParser mp;
 
     const char *tmp = R"()";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Broken message specification.") {
@@ -32,7 +32,7 @@ TEST_CASE("Parsing package statement.") {
     const char *tmp = R"(
 package MyPackage;
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing package statement with comment after valid statement.") {
@@ -41,7 +41,7 @@ TEST_CASE("Parsing package statement with comment after valid statement.") {
     const char *tmp = R"(
 package MyPackage; // Added comment after valid statement.
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing extended package statement.") {
@@ -50,7 +50,7 @@ TEST_CASE("Parsing extended package statement.") {
     const char *tmp = R"(
 package MyPackage.withSubPackage;
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing broken package statement.") {
@@ -79,7 +79,7 @@ package MyPackage.withSubPackage;
 
 message myMessage [id = 1] {}
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing package and message statement with no fields and some comments.") {
@@ -92,7 +92,7 @@ package MyPackage.withSubPackage; // Comment 1
 message myMessage [id = 1] {}
 // Comment 4
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with no fields.") {
@@ -101,7 +101,7 @@ TEST_CASE("Parsing message statement with no fields.") {
     const char *tmp = R"(
 message myMessage [id = 1] {}
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing broken message statement with no fields.") {
@@ -119,7 +119,7 @@ TEST_CASE("Parsing message statement with extended name with no fields.") {
     const char *tmp = R"(
 message myMessage.SubName [id = 1] {}
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with no fields and "
@@ -129,7 +129,7 @@ TEST_CASE("Parsing message statement with extended name with no fields and "
     const char *tmp = R"(
 message myMessage.SubName [id = 1,] {}
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing broken message statement with extended name with no fields.") {
@@ -181,7 +181,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::INT8_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -198,7 +198,7 @@ message myMessage.SubName [id = 1] { // Comment 2
     int8  attribute1; // Coment 3
 } // Comment 4
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with one int8 field "
@@ -213,7 +213,7 @@ More comments
 */
 } // Comment 4
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with two int8 fields "
@@ -233,7 +233,7 @@ More comments
     int8  attribute2; /* Coment 3 */
 } // Comment 4
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with two int8 fields "
@@ -273,7 +273,7 @@ message myMessage.SubName [id = 1] {
 //}
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(1 == retVal.first.size());
 }
 
@@ -287,7 +287,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::UINT8_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -304,7 +304,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::INT16_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -321,7 +321,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::UINT16_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -338,7 +338,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::INT32_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -355,7 +355,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::UINT32_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -372,7 +372,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::INT64_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -389,7 +389,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::UINT64_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -406,7 +406,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::FLOAT_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -423,7 +423,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::DOUBLE_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -439,7 +439,7 @@ message myMessage.SubName [id = 1] {
     double attribute1 [default = 2];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with one double field "
@@ -451,7 +451,7 @@ message myMessage.SubName [id = 1] {
     double attribute1 [default = +2];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with one double field "
@@ -463,7 +463,7 @@ message myMessage.SubName [id = 1] {
     double attribute1 [default = +2.];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with one double field "
@@ -475,7 +475,7 @@ message myMessage.SubName [id = 1] {
     double attribute1 [default = -7];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with one double field "
@@ -487,7 +487,7 @@ message myMessage.SubName [id = 1] {
     double attribute1 [default = -7.];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with one char field "
@@ -500,7 +500,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::CHAR_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -517,7 +517,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::STRING_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -534,7 +534,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::BOOL_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -551,7 +551,7 @@ message myMessage.SubName [id = 1] {
 }
 )";
     auto retVal     = mp.parse(std::string(tmp));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(!retVal.first.empty());
     REQUIRE(!retVal.first.front().listOfMetaFields().empty());
     REQUIRE(cluon::MetaMessage::MetaField::BYTES_T == retVal.first.front().listOfMetaFields()[0].fieldDataType());
@@ -579,7 +579,7 @@ message myMessage.SubName [id = 1] {
     bool attribute1 [];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with one field and "
@@ -603,7 +603,7 @@ message myMessage.SubName [id = 1] {
     bool attribute1 [id = 10];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with all field types "
@@ -627,7 +627,7 @@ message myMessage.SubName [id = 1] {
     string attribute7;
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with various field "
@@ -645,7 +645,7 @@ message myMessage.SubName [id = 1] {
     string attribute7 [id = 7];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing two message statements with extended name with various "
@@ -673,7 +673,7 @@ message myMessage.SubNameB [id = 2] {
     string attribute7 [id = 7];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with various field "
@@ -691,7 +691,7 @@ message myMessage.SubName [id = 1] {
     string attribute7 [default = "Hello World."];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with various field "
@@ -709,7 +709,7 @@ message myMessage.SubName [id = 1] {
     string attribute7 [default = "Hello World.", id = 7];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with duplicated message identifiers in set of two messages.") {
@@ -1265,7 +1265,7 @@ message myMessage.SubName [id = 1] {
     string attribute7 [default = "ABC", id = 7];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with string field and "
@@ -1277,7 +1277,7 @@ message myMessage.SubName [id = 1] {
     string attribute7 [default = "", id = 7];
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with string field with "
@@ -1289,7 +1289,7 @@ message myMessage.SubName [id = 1] {
     string s;
 }
 )";
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == mp.parse(std::string(tmp)).second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == mp.parse(std::string(tmp)).second);
 }
 
 TEST_CASE("Parsing message statement with extended name with string field "
@@ -1306,7 +1306,7 @@ message myMessage.SubName [id = 1] {
     auto metaMessages = retVal.first;
     REQUIRE(!metaMessages.empty());
     REQUIRE("This.is.my.complex.Package" == metaMessages.front().packageName());
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 }
 
 TEST_CASE("Parsing nested messages.") {
@@ -1332,5 +1332,5 @@ message myPackage.MessageB [id = 2] {
     REQUIRE(cluon::MetaMessage::MetaField::MESSAGE_T == metaMessages[1].listOfMetaFields()[1].fieldDataType());
     REQUIRE("myPackage.MessageA" == metaMessages[0].messageName());
     REQUIRE("myPackage.MessageB" == metaMessages[1].messageName());
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 }

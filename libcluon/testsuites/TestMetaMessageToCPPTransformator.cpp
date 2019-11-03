@@ -21,7 +21,7 @@ TEST_CASE("Transforming empty message specification.") {
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
     REQUIRE(retVal.first.empty());
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 }
 
 TEST_CASE("Transforming broken message specification.") {
@@ -169,7 +169,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -177,7 +176,6 @@ class LIB_API MyMessage1 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -185,21 +183,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -207,16 +201,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 
 
@@ -233,7 +223,7 @@ struct isTripletForwardVisitable<MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -380,7 +370,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -388,7 +377,6 @@ class LIB_API MyMessage1 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -396,21 +384,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -418,16 +402,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 
 
@@ -569,7 +549,6 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        
         inline MyMessage2& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -577,7 +556,6 @@ class LIB_API MyMessage2 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -585,21 +563,17 @@ class LIB_API MyMessage2 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -607,16 +581,12 @@ class LIB_API MyMessage2 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 
 
@@ -633,7 +603,7 @@ struct isTripletForwardVisitable<MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -789,7 +759,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -797,7 +766,6 @@ class LIB_API MyMessage1 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -805,21 +773,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -827,16 +791,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }
 
@@ -978,7 +938,6 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        
         inline MyMessage2& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -986,7 +945,6 @@ class LIB_API MyMessage2 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -994,21 +952,17 @@ class LIB_API MyMessage2 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -1016,16 +970,12 @@ class LIB_API MyMessage2 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }
 
@@ -1042,7 +992,7 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -1199,7 +1149,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -1207,7 +1156,6 @@ class LIB_API MyMessage1 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -1215,21 +1163,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -1237,16 +1181,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }
 
@@ -1388,7 +1328,6 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        
         inline MyMessage2& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -1396,7 +1335,6 @@ class LIB_API MyMessage2 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -1404,21 +1342,17 @@ class LIB_API MyMessage2 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -1426,16 +1360,12 @@ class LIB_API MyMessage2 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }
 
@@ -1452,7 +1382,7 @@ struct isTripletForwardVisitable<MyPackage::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -1609,7 +1539,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -1617,7 +1546,6 @@ class LIB_API MyMessage1 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -1625,21 +1553,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -1647,16 +1571,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }}
 
@@ -1798,7 +1718,6 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        
         inline MyMessage2& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -1806,7 +1725,6 @@ class LIB_API MyMessage2 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -1814,21 +1732,17 @@ class LIB_API MyMessage2 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -1836,16 +1750,12 @@ class LIB_API MyMessage2 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }}
 
@@ -1862,7 +1772,7 @@ struct isTripletForwardVisitable<MyPackage::SubPackage::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
     REQUIRE(2 == retVal.first.size());
     {
         auto firstMetaMessage = retVal.first.front();
@@ -2015,7 +1925,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -2023,7 +1932,6 @@ class LIB_API MyMessage1 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -2031,21 +1939,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -2053,16 +1957,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }
 
@@ -2079,7 +1979,7 @@ struct isTripletForwardVisitable<MyPackage1::MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -2223,7 +2123,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -2231,7 +2130,6 @@ class LIB_API MyMessage1 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -2239,21 +2137,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -2261,16 +2155,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }}
 
@@ -2287,7 +2177,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -2431,7 +2321,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -2439,7 +2328,6 @@ class LIB_API MyMessage1 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -2447,21 +2335,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -2469,16 +2353,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }}
 
@@ -2495,7 +2375,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackageMessage::MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -2640,7 +2520,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& s(const std::string &v) noexcept {
             m_s = v;
             return *this;
@@ -2648,7 +2527,6 @@ class LIB_API MyMessage1 {
         inline std::string s() const noexcept {
             return m_s;
         }
-        
 
     public:
         template<class Visitor>
@@ -2656,21 +2534,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("s"s), m_s, visitor);
-            
             visitor.postVisit();
         }
 
@@ -2678,16 +2552,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("s"s), m_s, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_s{ ""s }; // field identifier = 1.
-        
 };
 }}}
 
@@ -2704,7 +2574,7 @@ struct isTripletForwardVisitable<MyPackage1::MySubPackage::MySubPackageMessage::
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -2853,7 +2723,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& attribute1(const bool &v) noexcept {
             m_attribute1 = v;
             return *this;
@@ -2861,7 +2730,6 @@ class LIB_API MyMessage1 {
         inline bool attribute1() const noexcept {
             return m_attribute1;
         }
-        
         inline MyMessage1& attribute2(const char &v) noexcept {
             m_attribute2 = v;
             return *this;
@@ -2869,7 +2737,6 @@ class LIB_API MyMessage1 {
         inline char attribute2() const noexcept {
             return m_attribute2;
         }
-        
         inline MyMessage1& attribute3(const int32_t &v) noexcept {
             m_attribute3 = v;
             return *this;
@@ -2877,7 +2744,6 @@ class LIB_API MyMessage1 {
         inline int32_t attribute3() const noexcept {
             return m_attribute3;
         }
-        
         inline MyMessage1& attribute4(const uint32_t &v) noexcept {
             m_attribute4 = v;
             return *this;
@@ -2885,7 +2751,6 @@ class LIB_API MyMessage1 {
         inline uint32_t attribute4() const noexcept {
             return m_attribute4;
         }
-        
         inline MyMessage1& attribute5(const float &v) noexcept {
             m_attribute5 = v;
             return *this;
@@ -2893,7 +2758,6 @@ class LIB_API MyMessage1 {
         inline float attribute5() const noexcept {
             return m_attribute5;
         }
-        
         inline MyMessage1& attribute6(const double &v) noexcept {
             m_attribute6 = v;
             return *this;
@@ -2901,7 +2765,6 @@ class LIB_API MyMessage1 {
         inline double attribute6() const noexcept {
             return m_attribute6;
         }
-        
         inline MyMessage1& attribute7(const std::string &v) noexcept {
             m_attribute7 = v;
             return *this;
@@ -2909,7 +2772,6 @@ class LIB_API MyMessage1 {
         inline std::string attribute7() const noexcept {
             return m_attribute7;
         }
-        
 
     public:
         template<class Visitor>
@@ -2917,63 +2779,47 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, visitor);
                 return;
             }
-            
             if (2 == fieldId) {
                 doVisit(2, std::move("char"s), std::move("attribute2"s), m_attribute2, visitor);
                 return;
             }
-            
             if (3 == fieldId) {
                 doVisit(3, std::move("int32_t"s), std::move("attribute3"s), m_attribute3, visitor);
                 return;
             }
-            
             if (4 == fieldId) {
                 doVisit(4, std::move("uint32_t"s), std::move("attribute4"s), m_attribute4, visitor);
                 return;
             }
-            
             if (5 == fieldId) {
                 doVisit(5, std::move("float"s), std::move("attribute5"s), m_attribute5, visitor);
                 return;
             }
-            
             if (6 == fieldId) {
                 doVisit(6, std::move("double"s), std::move("attribute6"s), m_attribute6, visitor);
                 return;
             }
-            
             if (7 == fieldId) {
                 doVisit(7, std::move("std::string"s), std::move("attribute7"s), m_attribute7, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, visitor);
-            
             doVisit(2, std::move("char"s), std::move("attribute2"s), m_attribute2, visitor);
-            
             doVisit(3, std::move("int32_t"s), std::move("attribute3"s), m_attribute3, visitor);
-            
             doVisit(4, std::move("uint32_t"s), std::move("attribute4"s), m_attribute4, visitor);
-            
             doVisit(5, std::move("float"s), std::move("attribute5"s), m_attribute5, visitor);
-            
             doVisit(6, std::move("double"s), std::move("attribute6"s), m_attribute6, visitor);
-            
             doVisit(7, std::move("std::string"s), std::move("attribute7"s), m_attribute7, visitor);
-            
             visitor.postVisit();
         }
 
@@ -2981,40 +2827,24 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(2, std::move("char"s), std::move("attribute2"s), m_attribute2, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(3, std::move("int32_t"s), std::move("attribute3"s), m_attribute3, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(4, std::move("uint32_t"s), std::move("attribute4"s), m_attribute4, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(5, std::move("float"s), std::move("attribute5"s), m_attribute5, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(6, std::move("double"s), std::move("attribute6"s), m_attribute6, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(7, std::move("std::string"s), std::move("attribute7"s), m_attribute7, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         bool m_attribute1{ false }; // field identifier = 1.
-        
         char m_attribute2{ '\0' }; // field identifier = 2.
-        
         int32_t m_attribute3{ 0 }; // field identifier = 3.
-        
         uint32_t m_attribute4{ 0 }; // field identifier = 4.
-        
         float m_attribute5{ 0.0f }; // field identifier = 5.
-        
         double m_attribute6{ 0.0 }; // field identifier = 6.
-        
         std::string m_attribute7{ ""s }; // field identifier = 7.
-        
 };
 
 
@@ -3031,7 +2861,7 @@ struct isTripletForwardVisitable<MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -3187,7 +3017,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& attribute1(const bool &v) noexcept {
             m_attribute1 = v;
             return *this;
@@ -3195,7 +3024,6 @@ class LIB_API MyMessage1 {
         inline bool attribute1() const noexcept {
             return m_attribute1;
         }
-        
         inline MyMessage1& attribute2(const char &v) noexcept {
             m_attribute2 = v;
             return *this;
@@ -3203,7 +3031,6 @@ class LIB_API MyMessage1 {
         inline char attribute2() const noexcept {
             return m_attribute2;
         }
-        
         inline MyMessage1& attribute3(const int8_t &v) noexcept {
             m_attribute3 = v;
             return *this;
@@ -3211,7 +3038,6 @@ class LIB_API MyMessage1 {
         inline int8_t attribute3() const noexcept {
             return m_attribute3;
         }
-        
         inline MyMessage1& attribute4(const uint8_t &v) noexcept {
             m_attribute4 = v;
             return *this;
@@ -3219,7 +3045,6 @@ class LIB_API MyMessage1 {
         inline uint8_t attribute4() const noexcept {
             return m_attribute4;
         }
-        
         inline MyMessage1& attribute5(const int16_t &v) noexcept {
             m_attribute5 = v;
             return *this;
@@ -3227,7 +3052,6 @@ class LIB_API MyMessage1 {
         inline int16_t attribute5() const noexcept {
             return m_attribute5;
         }
-        
         inline MyMessage1& attribute6(const uint16_t &v) noexcept {
             m_attribute6 = v;
             return *this;
@@ -3235,7 +3059,6 @@ class LIB_API MyMessage1 {
         inline uint16_t attribute6() const noexcept {
             return m_attribute6;
         }
-        
         inline MyMessage1& attribute7(const int32_t &v) noexcept {
             m_attribute7 = v;
             return *this;
@@ -3243,7 +3066,6 @@ class LIB_API MyMessage1 {
         inline int32_t attribute7() const noexcept {
             return m_attribute7;
         }
-        
         inline MyMessage1& attribute8(const uint32_t &v) noexcept {
             m_attribute8 = v;
             return *this;
@@ -3251,7 +3073,6 @@ class LIB_API MyMessage1 {
         inline uint32_t attribute8() const noexcept {
             return m_attribute8;
         }
-        
         inline MyMessage1& attribute9(const int64_t &v) noexcept {
             m_attribute9 = v;
             return *this;
@@ -3259,7 +3080,6 @@ class LIB_API MyMessage1 {
         inline int64_t attribute9() const noexcept {
             return m_attribute9;
         }
-        
         inline MyMessage1& attribute10(const uint64_t &v) noexcept {
             m_attribute10 = v;
             return *this;
@@ -3267,7 +3087,6 @@ class LIB_API MyMessage1 {
         inline uint64_t attribute10() const noexcept {
             return m_attribute10;
         }
-        
         inline MyMessage1& attribute11(const float &v) noexcept {
             m_attribute11 = v;
             return *this;
@@ -3275,7 +3094,6 @@ class LIB_API MyMessage1 {
         inline float attribute11() const noexcept {
             return m_attribute11;
         }
-        
         inline MyMessage1& attribute12(const double &v) noexcept {
             m_attribute12 = v;
             return *this;
@@ -3283,7 +3101,6 @@ class LIB_API MyMessage1 {
         inline double attribute12() const noexcept {
             return m_attribute12;
         }
-        
         inline MyMessage1& attribute13(const std::string &v) noexcept {
             m_attribute13 = v;
             return *this;
@@ -3291,7 +3108,6 @@ class LIB_API MyMessage1 {
         inline std::string attribute13() const noexcept {
             return m_attribute13;
         }
-        
         inline MyMessage1& attribute14(const std::string &v) noexcept {
             m_attribute14 = v;
             return *this;
@@ -3299,7 +3115,6 @@ class LIB_API MyMessage1 {
         inline std::string attribute14() const noexcept {
             return m_attribute14;
         }
-        
 
     public:
         template<class Visitor>
@@ -3307,112 +3122,82 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, visitor);
                 return;
             }
-            
             if (2 == fieldId) {
                 doVisit(2, std::move("char"s), std::move("attribute2"s), m_attribute2, visitor);
                 return;
             }
-            
             if (3 == fieldId) {
                 doVisit(3, std::move("int8_t"s), std::move("attribute3"s), m_attribute3, visitor);
                 return;
             }
-            
             if (4 == fieldId) {
                 doVisit(4, std::move("uint8_t"s), std::move("attribute4"s), m_attribute4, visitor);
                 return;
             }
-            
             if (5 == fieldId) {
                 doVisit(5, std::move("int16_t"s), std::move("attribute5"s), m_attribute5, visitor);
                 return;
             }
-            
             if (6 == fieldId) {
                 doVisit(6, std::move("uint16_t"s), std::move("attribute6"s), m_attribute6, visitor);
                 return;
             }
-            
             if (7 == fieldId) {
                 doVisit(7, std::move("int32_t"s), std::move("attribute7"s), m_attribute7, visitor);
                 return;
             }
-            
             if (8 == fieldId) {
                 doVisit(8, std::move("uint32_t"s), std::move("attribute8"s), m_attribute8, visitor);
                 return;
             }
-            
             if (9 == fieldId) {
                 doVisit(9, std::move("int64_t"s), std::move("attribute9"s), m_attribute9, visitor);
                 return;
             }
-            
             if (10 == fieldId) {
                 doVisit(10, std::move("uint64_t"s), std::move("attribute10"s), m_attribute10, visitor);
                 return;
             }
-            
             if (11 == fieldId) {
                 doVisit(11, std::move("float"s), std::move("attribute11"s), m_attribute11, visitor);
                 return;
             }
-            
             if (12 == fieldId) {
                 doVisit(12, std::move("double"s), std::move("attribute12"s), m_attribute12, visitor);
                 return;
             }
-            
             if (13 == fieldId) {
                 doVisit(13, std::move("std::string"s), std::move("attribute13"s), m_attribute13, visitor);
                 return;
             }
-            
             if (14 == fieldId) {
                 doVisit(14, std::move("std::string"s), std::move("attribute14"s), m_attribute14, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, visitor);
-            
             doVisit(2, std::move("char"s), std::move("attribute2"s), m_attribute2, visitor);
-            
             doVisit(3, std::move("int8_t"s), std::move("attribute3"s), m_attribute3, visitor);
-            
             doVisit(4, std::move("uint8_t"s), std::move("attribute4"s), m_attribute4, visitor);
-            
             doVisit(5, std::move("int16_t"s), std::move("attribute5"s), m_attribute5, visitor);
-            
             doVisit(6, std::move("uint16_t"s), std::move("attribute6"s), m_attribute6, visitor);
-            
             doVisit(7, std::move("int32_t"s), std::move("attribute7"s), m_attribute7, visitor);
-            
             doVisit(8, std::move("uint32_t"s), std::move("attribute8"s), m_attribute8, visitor);
-            
             doVisit(9, std::move("int64_t"s), std::move("attribute9"s), m_attribute9, visitor);
-            
             doVisit(10, std::move("uint64_t"s), std::move("attribute10"s), m_attribute10, visitor);
-            
             doVisit(11, std::move("float"s), std::move("attribute11"s), m_attribute11, visitor);
-            
             doVisit(12, std::move("double"s), std::move("attribute12"s), m_attribute12, visitor);
-            
             doVisit(13, std::move("std::string"s), std::move("attribute13"s), m_attribute13, visitor);
-            
             doVisit(14, std::move("std::string"s), std::move("attribute14"s), m_attribute14, visitor);
-            
             visitor.postVisit();
         }
 
@@ -3420,68 +3205,38 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("bool"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(2, std::move("char"s), std::move("attribute2"s), m_attribute2, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(3, std::move("int8_t"s), std::move("attribute3"s), m_attribute3, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(4, std::move("uint8_t"s), std::move("attribute4"s), m_attribute4, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(5, std::move("int16_t"s), std::move("attribute5"s), m_attribute5, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(6, std::move("uint16_t"s), std::move("attribute6"s), m_attribute6, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(7, std::move("int32_t"s), std::move("attribute7"s), m_attribute7, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(8, std::move("uint32_t"s), std::move("attribute8"s), m_attribute8, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(9, std::move("int64_t"s), std::move("attribute9"s), m_attribute9, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(10, std::move("uint64_t"s), std::move("attribute10"s), m_attribute10, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(11, std::move("float"s), std::move("attribute11"s), m_attribute11, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(12, std::move("double"s), std::move("attribute12"s), m_attribute12, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(13, std::move("std::string"s), std::move("attribute13"s), m_attribute13, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(14, std::move("std::string"s), std::move("attribute14"s), m_attribute14, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         bool m_attribute1{ true }; // field identifier = 1.
-        
         char m_attribute2{ 'c' }; // field identifier = 2.
-        
         int8_t m_attribute3{ -1 }; // field identifier = 3.
-        
         uint8_t m_attribute4{ 2 }; // field identifier = 4.
-        
         int16_t m_attribute5{ -3 }; // field identifier = 5.
-        
         uint16_t m_attribute6{ 4 }; // field identifier = 6.
-        
         int32_t m_attribute7{ -5 }; // field identifier = 7.
-        
         uint32_t m_attribute8{ 6 }; // field identifier = 8.
-        
         int64_t m_attribute9{ -7 }; // field identifier = 9.
-        
         uint64_t m_attribute10{ 8 }; // field identifier = 10.
-        
         float m_attribute11{ -9.5f }; // field identifier = 11.
-        
         double m_attribute12{ 10.6 }; // field identifier = 12.
-        
         std::string m_attribute13{ "Hello World"s }; // field identifier = 13.
-        
         std::string m_attribute14{ "Hello Galaxy"s }; // field identifier = 14.
-        
 };
 
 
@@ -3498,7 +3253,7 @@ struct isTripletForwardVisitable<MyMessage1> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto firstMetaMessage = retVal.first.front();
@@ -3646,7 +3401,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& attribute1(const std::string &v) noexcept {
             m_attribute1 = v;
             return *this;
@@ -3654,7 +3408,6 @@ class LIB_API MyMessage1 {
         inline std::string attribute1() const noexcept {
             return m_attribute1;
         }
-        
 
     public:
         template<class Visitor>
@@ -3662,21 +3415,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
-            
             visitor.postVisit();
         }
 
@@ -3684,16 +3433,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_attribute1{ ""s }; // field identifier = 1.
-        
 };
 
 
@@ -3835,7 +3580,6 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        
         inline MyMessage2& field1(const uint8_t &v) noexcept {
             m_field1 = v;
             return *this;
@@ -3843,7 +3587,6 @@ class LIB_API MyMessage2 {
         inline uint8_t field1() const noexcept {
             return m_field1;
         }
-        
         inline MyMessage2& field2(const MyMessage1 &v) noexcept {
             m_field2 = v;
             return *this;
@@ -3851,7 +3594,6 @@ class LIB_API MyMessage2 {
         inline MyMessage1 field2() const noexcept {
             return m_field2;
         }
-        
 
     public:
         template<class Visitor>
@@ -3859,28 +3601,22 @@ class LIB_API MyMessage2 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
                 return;
             }
-            
             if (2 == fieldId) {
                 doVisit(2, std::move("MyMessage1"s), std::move("field2"s), m_field2, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
-            
             doVisit(2, std::move("MyMessage1"s), std::move("field2"s), m_field2, visitor);
-            
             visitor.postVisit();
         }
 
@@ -3888,20 +3624,14 @@ class LIB_API MyMessage2 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(2, std::move("MyMessage1"s), std::move("field2"s), m_field2, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         uint8_t m_field1{ 0 }; // field identifier = 1.
-        
         MyMessage1 m_field2{  }; // field identifier = 2.
-        
 };
 
 
@@ -3918,7 +3648,7 @@ struct isTripletForwardVisitable<MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;
@@ -4074,7 +3804,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& attribute1(const std::string &v) noexcept {
             m_attribute1 = v;
             return *this;
@@ -4082,7 +3811,6 @@ class LIB_API MyMessage1 {
         inline std::string attribute1() const noexcept {
             return m_attribute1;
         }
-        
 
     public:
         template<class Visitor>
@@ -4090,21 +3818,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
-            
             visitor.postVisit();
         }
 
@@ -4112,16 +3836,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_attribute1{ ""s }; // field identifier = 1.
-        
 };
 }
 
@@ -4263,7 +3983,6 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        
         inline MyMessage2& field1(const uint8_t &v) noexcept {
             m_field1 = v;
             return *this;
@@ -4271,7 +3990,6 @@ class LIB_API MyMessage2 {
         inline uint8_t field1() const noexcept {
             return m_field1;
         }
-        
         inline MyMessage2& field2(const DEF::MyMessage1 &v) noexcept {
             m_field2 = v;
             return *this;
@@ -4279,7 +3997,6 @@ class LIB_API MyMessage2 {
         inline DEF::MyMessage1 field2() const noexcept {
             return m_field2;
         }
-        
 
     public:
         template<class Visitor>
@@ -4287,28 +4004,22 @@ class LIB_API MyMessage2 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
                 return;
             }
-            
             if (2 == fieldId) {
                 doVisit(2, std::move("DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
-            
             doVisit(2, std::move("DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
-            
             visitor.postVisit();
         }
 
@@ -4316,20 +4027,14 @@ class LIB_API MyMessage2 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(2, std::move("DEF::MyMessage1"s), std::move("field2"s), m_field2, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         uint8_t m_field1{ 0 }; // field identifier = 1.
-        
         DEF::MyMessage1 m_field2{  }; // field identifier = 2.
-        
 };
 }
 
@@ -4346,7 +4051,7 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;
@@ -4503,7 +4208,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& attribute1(const std::string &v) noexcept {
             m_attribute1 = v;
             return *this;
@@ -4511,7 +4215,6 @@ class LIB_API MyMessage1 {
         inline std::string attribute1() const noexcept {
             return m_attribute1;
         }
-        
 
     public:
         template<class Visitor>
@@ -4519,21 +4222,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
-            
             visitor.postVisit();
         }
 
@@ -4541,16 +4240,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_attribute1{ ""s }; // field identifier = 1.
-        
 };
 }
 
@@ -4692,7 +4387,6 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        
         inline MyMessage2& field1(const uint8_t &v) noexcept {
             m_field1 = v;
             return *this;
@@ -4700,7 +4394,6 @@ class LIB_API MyMessage2 {
         inline uint8_t field1() const noexcept {
             return m_field1;
         }
-        
         inline MyMessage2& field2(const DEF::MyMessage1 &v) noexcept {
             m_field2 = v;
             return *this;
@@ -4708,7 +4401,6 @@ class LIB_API MyMessage2 {
         inline DEF::MyMessage1 field2() const noexcept {
             return m_field2;
         }
-        
 
     public:
         template<class Visitor>
@@ -4716,28 +4408,22 @@ class LIB_API MyMessage2 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
                 return;
             }
-            
             if (2 == fieldId) {
                 doVisit(2, std::move("DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
-            
             doVisit(2, std::move("DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
-            
             visitor.postVisit();
         }
 
@@ -4745,20 +4431,14 @@ class LIB_API MyMessage2 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(2, std::move("DEF::MyMessage1"s), std::move("field2"s), m_field2, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         uint8_t m_field1{ 0 }; // field identifier = 1.
-        
         DEF::MyMessage1 m_field2{  }; // field identifier = 2.
-        
 };
 }
 
@@ -4775,7 +4455,7 @@ struct isTripletForwardVisitable<DEF::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;
@@ -4933,7 +4613,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& attribute1(const std::string &v) noexcept {
             m_attribute1 = v;
             return *this;
@@ -4941,7 +4620,6 @@ class LIB_API MyMessage1 {
         inline std::string attribute1() const noexcept {
             return m_attribute1;
         }
-        
 
     public:
         template<class Visitor>
@@ -4949,21 +4627,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
-            
             visitor.postVisit();
         }
 
@@ -4971,16 +4645,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_attribute1{ ""s }; // field identifier = 1.
-        
 };
 }}
 
@@ -5122,7 +4792,6 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        
         inline MyMessage2& field1(const uint8_t &v) noexcept {
             m_field1 = v;
             return *this;
@@ -5130,7 +4799,6 @@ class LIB_API MyMessage2 {
         inline uint8_t field1() const noexcept {
             return m_field1;
         }
-        
         inline MyMessage2& field2(const ABC::DEF::MyMessage1 &v) noexcept {
             m_field2 = v;
             return *this;
@@ -5138,7 +4806,6 @@ class LIB_API MyMessage2 {
         inline ABC::DEF::MyMessage1 field2() const noexcept {
             return m_field2;
         }
-        
 
     public:
         template<class Visitor>
@@ -5146,28 +4813,22 @@ class LIB_API MyMessage2 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
                 return;
             }
-            
             if (2 == fieldId) {
                 doVisit(2, std::move("ABC::DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
-            
             doVisit(2, std::move("ABC::DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
-            
             visitor.postVisit();
         }
 
@@ -5175,20 +4836,14 @@ class LIB_API MyMessage2 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(2, std::move("ABC::DEF::MyMessage1"s), std::move("field2"s), m_field2, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         uint8_t m_field1{ 0 }; // field identifier = 1.
-        
         ABC::DEF::MyMessage1 m_field2{  }; // field identifier = 2.
-        
 };
 }}
 
@@ -5205,7 +4860,7 @@ struct isTripletForwardVisitable<ABC::DEF::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;
@@ -5363,7 +5018,6 @@ class LIB_API MyMessage1 {
         ~MyMessage1() = default;
 
     public:
-        
         inline MyMessage1& attribute1(const std::string &v) noexcept {
             m_attribute1 = v;
             return *this;
@@ -5371,7 +5025,6 @@ class LIB_API MyMessage1 {
         inline std::string attribute1() const noexcept {
             return m_attribute1;
         }
-        
 
     public:
         template<class Visitor>
@@ -5379,21 +5032,17 @@ class LIB_API MyMessage1 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, visitor);
-            
             visitor.postVisit();
         }
 
@@ -5401,16 +5050,12 @@ class LIB_API MyMessage1 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("std::string"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         std::string m_attribute1{ ""s }; // field identifier = 1.
-        
 };
 }}}
 
@@ -5552,7 +5197,6 @@ class LIB_API MyMessage2 {
         ~MyMessage2() = default;
 
     public:
-        
         inline MyMessage2& field1(const uint8_t &v) noexcept {
             m_field1 = v;
             return *this;
@@ -5560,7 +5204,6 @@ class LIB_API MyMessage2 {
         inline uint8_t field1() const noexcept {
             return m_field1;
         }
-        
         inline MyMessage2& field2(const ABC::GHI::DEF::MyMessage1 &v) noexcept {
             m_field2 = v;
             return *this;
@@ -5568,7 +5211,6 @@ class LIB_API MyMessage2 {
         inline ABC::GHI::DEF::MyMessage1 field2() const noexcept {
             return m_field2;
         }
-        
 
     public:
         template<class Visitor>
@@ -5576,28 +5218,22 @@ class LIB_API MyMessage2 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
                 return;
             }
-            
             if (2 == fieldId) {
                 doVisit(2, std::move("ABC::GHI::DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, visitor);
-            
             doVisit(2, std::move("ABC::GHI::DEF::MyMessage1"s), std::move("field2"s), m_field2, visitor);
-            
             visitor.postVisit();
         }
 
@@ -5605,20 +5241,14 @@ class LIB_API MyMessage2 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("field1"s), m_field1, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(2, std::move("ABC::GHI::DEF::MyMessage1"s), std::move("field2"s), m_field2, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         uint8_t m_field1{ 0 }; // field identifier = 1.
-        
         ABC::GHI::DEF::MyMessage1 m_field2{  }; // field identifier = 2.
-        
 };
 }}}
 
@@ -5635,7 +5265,7 @@ struct isTripletForwardVisitable<ABC::GHI::DEF::MyMessage2> {
 
     cluon::MessageParser mp;
     auto retVal = mp.parse(std::string(input));
-    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_ERROR == retVal.second);
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
 
     cluon::MetaMessageToCPPTransformator t;
     auto listOfMessages = retVal.first;

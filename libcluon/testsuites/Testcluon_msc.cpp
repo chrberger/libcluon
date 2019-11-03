@@ -165,29 +165,17 @@ syntax = "proto2";
 
 // Message identifier: 30005.
 message testdata_MyTestMessage5 {
-    
     optional uint32 attribute1 = 1;
-    
     optional sint32 attribute2 = 2;
-    
     optional uint32 attribute3 = 3;
-    
     optional sint32 attribute4 = 4;
-    
     optional uint32 attribute5 = 5;
-    
     optional sint32 attribute6 = 6;
-    
     optional uint64 attribute7 = 7;
-    
     optional sint64 attribute8 = 8;
-    
     optional float attribute9 = 9;
-    
     optional double attribute10 = 10;
-    
     optional string attribute11 = 11;
-    
 }
 
 )";
@@ -367,7 +355,6 @@ class LIB_API MyTestMessage5 {
         ~MyTestMessage5() = default;
 
     public:
-        
         inline MyTestMessage5& attribute1(const uint8_t &v) noexcept {
             m_attribute1 = v;
             return *this;
@@ -375,7 +362,6 @@ class LIB_API MyTestMessage5 {
         inline uint8_t attribute1() const noexcept {
             return m_attribute1;
         }
-        
         inline MyTestMessage5& attribute2(const int8_t &v) noexcept {
             m_attribute2 = v;
             return *this;
@@ -383,7 +369,6 @@ class LIB_API MyTestMessage5 {
         inline int8_t attribute2() const noexcept {
             return m_attribute2;
         }
-        
         inline MyTestMessage5& attribute3(const uint16_t &v) noexcept {
             m_attribute3 = v;
             return *this;
@@ -391,7 +376,6 @@ class LIB_API MyTestMessage5 {
         inline uint16_t attribute3() const noexcept {
             return m_attribute3;
         }
-        
         inline MyTestMessage5& attribute4(const int16_t &v) noexcept {
             m_attribute4 = v;
             return *this;
@@ -399,7 +383,6 @@ class LIB_API MyTestMessage5 {
         inline int16_t attribute4() const noexcept {
             return m_attribute4;
         }
-        
         inline MyTestMessage5& attribute5(const uint32_t &v) noexcept {
             m_attribute5 = v;
             return *this;
@@ -407,7 +390,6 @@ class LIB_API MyTestMessage5 {
         inline uint32_t attribute5() const noexcept {
             return m_attribute5;
         }
-        
         inline MyTestMessage5& attribute6(const int32_t &v) noexcept {
             m_attribute6 = v;
             return *this;
@@ -415,7 +397,6 @@ class LIB_API MyTestMessage5 {
         inline int32_t attribute6() const noexcept {
             return m_attribute6;
         }
-        
         inline MyTestMessage5& attribute7(const uint64_t &v) noexcept {
             m_attribute7 = v;
             return *this;
@@ -423,7 +404,6 @@ class LIB_API MyTestMessage5 {
         inline uint64_t attribute7() const noexcept {
             return m_attribute7;
         }
-        
         inline MyTestMessage5& attribute8(const int64_t &v) noexcept {
             m_attribute8 = v;
             return *this;
@@ -431,7 +411,6 @@ class LIB_API MyTestMessage5 {
         inline int64_t attribute8() const noexcept {
             return m_attribute8;
         }
-        
         inline MyTestMessage5& attribute9(const float &v) noexcept {
             m_attribute9 = v;
             return *this;
@@ -439,7 +418,6 @@ class LIB_API MyTestMessage5 {
         inline float attribute9() const noexcept {
             return m_attribute9;
         }
-        
         inline MyTestMessage5& attribute10(const double &v) noexcept {
             m_attribute10 = v;
             return *this;
@@ -447,7 +425,6 @@ class LIB_API MyTestMessage5 {
         inline double attribute10() const noexcept {
             return m_attribute10;
         }
-        
         inline MyTestMessage5& attribute11(const std::string &v) noexcept {
             m_attribute11 = v;
             return *this;
@@ -455,7 +432,6 @@ class LIB_API MyTestMessage5 {
         inline std::string attribute11() const noexcept {
             return m_attribute11;
         }
-        
 
     public:
         template<class Visitor>
@@ -463,91 +439,67 @@ class LIB_API MyTestMessage5 {
             (void)fieldId;
             (void)visitor;
 //            visitor.preVisit(ID(), ShortName(), LongName());
-            
             if (1 == fieldId) {
                 doVisit(1, std::move("uint8_t"s), std::move("attribute1"s), m_attribute1, visitor);
                 return;
             }
-            
             if (2 == fieldId) {
                 doVisit(2, std::move("int8_t"s), std::move("attribute2"s), m_attribute2, visitor);
                 return;
             }
-            
             if (3 == fieldId) {
                 doVisit(3, std::move("uint16_t"s), std::move("attribute3"s), m_attribute3, visitor);
                 return;
             }
-            
             if (4 == fieldId) {
                 doVisit(4, std::move("int16_t"s), std::move("attribute4"s), m_attribute4, visitor);
                 return;
             }
-            
             if (5 == fieldId) {
                 doVisit(5, std::move("uint32_t"s), std::move("attribute5"s), m_attribute5, visitor);
                 return;
             }
-            
             if (6 == fieldId) {
                 doVisit(6, std::move("int32_t"s), std::move("attribute6"s), m_attribute6, visitor);
                 return;
             }
-            
             if (7 == fieldId) {
                 doVisit(7, std::move("uint64_t"s), std::move("attribute7"s), m_attribute7, visitor);
                 return;
             }
-            
             if (8 == fieldId) {
                 doVisit(8, std::move("int64_t"s), std::move("attribute8"s), m_attribute8, visitor);
                 return;
             }
-            
             if (9 == fieldId) {
                 doVisit(9, std::move("float"s), std::move("attribute9"s), m_attribute9, visitor);
                 return;
             }
-            
             if (10 == fieldId) {
                 doVisit(10, std::move("double"s), std::move("attribute10"s), m_attribute10, visitor);
                 return;
             }
-            
             if (11 == fieldId) {
                 doVisit(11, std::move("std::string"s), std::move("attribute11"s), m_attribute11, visitor);
                 return;
             }
-            
 //            visitor.postVisit();
         }
 
         template<class Visitor>
         inline void accept(Visitor &visitor) {
             visitor.preVisit(ID(), ShortName(), LongName());
-            
             doVisit(1, std::move("uint8_t"s), std::move("attribute1"s), m_attribute1, visitor);
-            
             doVisit(2, std::move("int8_t"s), std::move("attribute2"s), m_attribute2, visitor);
-            
             doVisit(3, std::move("uint16_t"s), std::move("attribute3"s), m_attribute3, visitor);
-            
             doVisit(4, std::move("int16_t"s), std::move("attribute4"s), m_attribute4, visitor);
-            
             doVisit(5, std::move("uint32_t"s), std::move("attribute5"s), m_attribute5, visitor);
-            
             doVisit(6, std::move("int32_t"s), std::move("attribute6"s), m_attribute6, visitor);
-            
             doVisit(7, std::move("uint64_t"s), std::move("attribute7"s), m_attribute7, visitor);
-            
             doVisit(8, std::move("int64_t"s), std::move("attribute8"s), m_attribute8, visitor);
-            
             doVisit(9, std::move("float"s), std::move("attribute9"s), m_attribute9, visitor);
-            
             doVisit(10, std::move("double"s), std::move("attribute10"s), m_attribute10, visitor);
-            
             doVisit(11, std::move("std::string"s), std::move("attribute11"s), m_attribute11, visitor);
-            
             visitor.postVisit();
         }
 
@@ -555,56 +507,32 @@ class LIB_API MyTestMessage5 {
         inline void accept(PreVisitor &&preVisit, Visitor &&visit, PostVisitor &&postVisit) {
             (void)visit; // Prevent warnings from empty messages.
             std::forward<PreVisitor>(preVisit)(ID(), ShortName(), LongName());
-            
             doTripletForwardVisit(1, std::move("uint8_t"s), std::move("attribute1"s), m_attribute1, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(2, std::move("int8_t"s), std::move("attribute2"s), m_attribute2, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(3, std::move("uint16_t"s), std::move("attribute3"s), m_attribute3, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(4, std::move("int16_t"s), std::move("attribute4"s), m_attribute4, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(5, std::move("uint32_t"s), std::move("attribute5"s), m_attribute5, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(6, std::move("int32_t"s), std::move("attribute6"s), m_attribute6, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(7, std::move("uint64_t"s), std::move("attribute7"s), m_attribute7, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(8, std::move("int64_t"s), std::move("attribute8"s), m_attribute8, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(9, std::move("float"s), std::move("attribute9"s), m_attribute9, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(10, std::move("double"s), std::move("attribute10"s), m_attribute10, preVisit, visit, postVisit);
-            
             doTripletForwardVisit(11, std::move("std::string"s), std::move("attribute11"s), m_attribute11, preVisit, visit, postVisit);
-            
             std::forward<PostVisitor>(postVisit)();
         }
 
     private:
-        
         uint8_t m_attribute1{ 1 }; // field identifier = 1.
-        
         int8_t m_attribute2{ -1 }; // field identifier = 2.
-        
         uint16_t m_attribute3{ 100 }; // field identifier = 3.
-        
         int16_t m_attribute4{ -100 }; // field identifier = 4.
-        
         uint32_t m_attribute5{ 10000 }; // field identifier = 5.
-        
         int32_t m_attribute6{ -10000 }; // field identifier = 6.
-        
         uint64_t m_attribute7{ 12345 }; // field identifier = 7.
-        
         int64_t m_attribute8{ -12345 }; // field identifier = 8.
-        
         float m_attribute9{ -1.2345f }; // field identifier = 9.
-        
         double m_attribute10{ -10.2345 }; // field identifier = 10.
-        
         std::string m_attribute11{ "Hello World!"s }; // field identifier = 11.
-        
 };
 }
 
