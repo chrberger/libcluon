@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018  Christian Berger
+ * Copyright (C) 2017-2019  Christian Berger
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,6 +15,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <limits>
 #include <string>
 
 inline int32_t cluon_filter(int32_t argc, char **argv) {
@@ -23,9 +24,11 @@ inline int32_t cluon_filter(int32_t argc, char **argv) {
     if ( ( (0 == commandlineArguments.count("keep")) && (0 == commandlineArguments.count("drop")) )
          || ( (1 == commandlineArguments.count("keep")) && (1 == commandlineArguments.count("drop")) ) ) {
         std::cerr << argv[0] << " filters Envelopes from stdin to stdout." << std::endl;
-        std::cerr << "Usage:   " << argv[0] << " --keep=<list of messageID/senderStamp pairs to keep> --drop=<list of messageID/senderStamp pairs to drop>" << std::endl;
+        std::cerr << "Usage:   " << argv[0] << " --keep=<list of messageID/senderStamp pairs to keep> --drop=<list of messageID/senderStamp pairs to drop> [--skip=<number of Envelopes to skip>] [--start=<keep Envelopes after this timepoint in Epoch seconds>] [--end=<keep Envelopes until this timepoint in Epoch seconds>] " << std::endl;
         std::cerr << "Example: " << argv[0] << " --keep=19/0,25/1" << std::endl;
         std::cerr << "         " << argv[0] << " --drop=19/0,25/1" << std::endl;
+        std::cerr << "         " << argv[0] << " --skip=300" << std::endl;
+        std::cerr << "         " << argv[0] << " --start=1569916731" << std::endl;
         std::cerr << "         --keep and --drop cannot be used simultaneously." << std::endl;
         retCode = 1;
     } else {
@@ -66,23 +69,34 @@ inline int32_t cluon_filter(int32_t argc, char **argv) {
             }
         }
 
+        const uint32_t SKIP{(commandlineArguments.count("skip") != 0) ? static_cast<uint32_t>(std::stoi(commandlineArguments["skip"])) : 0};
+        const int32_t START{(commandlineArguments.count("start") != 0) ? static_cast<int32_t>(std::stoi(commandlineArguments["start"])) : 0};
+        const int32_t END{(commandlineArguments.count("end") != 0) ? static_cast<int32_t>(std::stoi(commandlineArguments["end"])) : (std::numeric_limits<int32_t>::max)()};
+
         bool foundData{false};
+	uint32_t counter{0};
         do {
             auto retVal = cluon::extractEnvelope(std::cin);
             foundData = retVal.first;
             if (0 < retVal.second.dataType()) {
-                std::stringstream sstr;
-                sstr << retVal.second.dataType() << "/" << retVal.second.senderStamp();
-                std::string str = sstr.str();
-                if ( (0 < mapOfEnvelopesToKeep.size()) && mapOfEnvelopesToKeep.count(str)) {
-                    str = cluon::serializeEnvelope(std::move(retVal.second));
-                    std::cout << str;
-                    std::cout.flush();
-                }
-                if ( (0 < mapOfEnvelopesToDrop.size()) && !mapOfEnvelopesToDrop.count(str)) {
-                    str = cluon::serializeEnvelope(std::move(retVal.second));
-                    std::cout << str;
-                    std::cout.flush();
+			    counter++;
+                if (counter > SKIP) {
+                    cluon::data::TimeStamp sampleTimeStamp = retVal.second.sampleTimeStamp();
+                    if ( (sampleTimeStamp.seconds() > START) && (sampleTimeStamp.seconds() < END) ) {
+                        std::stringstream sstr;
+                        sstr << retVal.second.dataType() << "/" << retVal.second.senderStamp();
+                        std::string str = sstr.str();
+                        if ( (0 < mapOfEnvelopesToKeep.size()) && mapOfEnvelopesToKeep.count(str)) {
+                            str = cluon::serializeEnvelope(std::move(retVal.second));
+                            std::cout << str;
+                            std::cout.flush();
+                        }
+                        if ( (0 < mapOfEnvelopesToDrop.size()) && !mapOfEnvelopesToDrop.count(str)) {
+                            str = cluon::serializeEnvelope(std::move(retVal.second));
+                            std::cout << str;
+                            std::cout.flush();
+                        }
+                    }
                 }
             }
         } while (std::cin.good() && foundData);
