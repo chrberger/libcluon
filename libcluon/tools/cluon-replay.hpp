@@ -179,18 +179,18 @@ inline int32_t cluon_replay(int32_t argc, char **argv) {
                     std::lock_guard<std::mutex> lck(playerCommandMutex);
                     if ( (playerCommand.command() == 1) || (playerCommand.command() == 2) ) {
                         play = !(2 == playerCommand.command()); // LCOV_EXCL_LINE
-                        std::clog << PROGRAM << ": Change state: " << +playerCommand.command() << ", play = " << play << std::endl;
+                        std::cerr << PROGRAM << ": Change state: " << +playerCommand.command() << ", play = " << play << std::endl;
                     }
 
                     if (3 == playerCommand.command()) {
-                        std::clog << PROGRAM << ": Change state: " << +playerCommand.command() << ", seekTo: " << playerCommand.seekTo() << std::endl;
+                        std::cerr << PROGRAM << ": Change state: " << +playerCommand.command() << ", seekTo: " << playerCommand.seekTo() << std::endl;
                         player.seekTo(playerCommand.seekTo());
                     }
 
                     if (4 == playerCommand.command()) {
                         play = false;
                         step = true;
-                        std::clog << PROGRAM << ": Change state: " << +playerCommand.command() << ", play = " << play << std::endl;
+                        std::cerr << PROGRAM << ": Change state: " << +playerCommand.command() << ", play = " << play << std::endl;
                     }
 
                     playCommandUpdate = false;
