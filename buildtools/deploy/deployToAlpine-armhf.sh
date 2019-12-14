@@ -85,6 +85,7 @@ RUN apk add --update \
     gcc \
     make \
     upx \
+    linux-headers \
     alpine-sdk
 
 RUN adduser -D berger && \

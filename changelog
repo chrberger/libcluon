@@ -1,3 +1,27 @@
+libcluon (0.0.127-1ppa1~bionic1) bionic; urgency=medium
+
+  * fixes for MinGW/Windows and Visual Studio 2019
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 03 Nov 2019 15:20:05 +0100
+
+libcluon (0.0.127-1ppa1~xenial1) xenial; urgency=medium
+
+  * fixes for MinGW/Windows and Visual Studio 2019
+
+ -- Christian Berger <christian.berger@gu.se>  Sun, 03 Nov 2019 15:20:05 +0100
+
+libcluon (0.0.126-1ppa1~bionic1) bionic; urgency=medium
+
+  * fix for SIOCGSTAMP
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 16 Oct 2019 07:11:29 +0200
+
+libcluon (0.0.126-1ppa1~xenial1) xenial; urgency=medium
+
+  * fix for SIOCGSTAMP
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 16 Oct 2019 07:11:29 +0200
+
 libcluon (0.0.125-1ppa1~bionic1) bionic; urgency=medium
 
   * fixing incorrect TCP connection hostname resolving
