@@ -37,7 +37,7 @@ inline int64_t toMicroseconds(const cluon::data::TimeStamp &tp) noexcept {
 /**
  * @param AFTER First time stamp.
  * @param BEFORE Second time stamp.
- * @return Delta (BEFORE - AFTER) between two TimeStamps in microseconds.
+ * @return Delta (AFTER - BEFORE) between two TimeStamps in microseconds.
  */
 inline int64_t deltaInMicroseconds(const cluon::data::TimeStamp &AFTER, const cluon::data::TimeStamp &BEFORE) noexcept {
     return toMicroseconds(AFTER) - toMicroseconds(BEFORE);
