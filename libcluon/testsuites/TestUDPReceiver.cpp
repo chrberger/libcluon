@@ -139,8 +139,8 @@ TEST_CASE("Testing multicast with faulty 224.0.0.1 address.") {
     REQUIRE(!hasDataReceived);
 }
 
-#ifdef LOCAL_DEVELOPMENT_HOST
-TEST_CASE("Testing broadcast with 192.168.100.255 address.") {
+#ifndef WIN32
+TEST_CASE("Testing broadcast with 255.255.255.255 address.") {
     // Setup data structures to receive data from UDPReceiver.
     std::atomic<bool> hasDataReceived{false};
     std::string data;
@@ -149,14 +149,14 @@ TEST_CASE("Testing broadcast with 192.168.100.255 address.") {
     REQUIRE(!hasDataReceived);
 
     cluon::UDPReceiver ur4(
-        "192.168.100.255", 1239, [&hasDataReceived, &data ](std::string && d, std::string &&, std::chrono::system_clock::time_point &&) noexcept {
+        "255.255.255.255", 1239, [&hasDataReceived, &data ](std::string && d, std::string &&, std::chrono::system_clock::time_point &&) noexcept {
             data = std::move(d);
             hasDataReceived.store(true);
         });
     REQUIRE(ur4.isRunning());
 
     // Setup UDPSender.
-    cluon::UDPSender us4{"192.168.100.255", 1239};
+    cluon::UDPSender us4{"255.255.255.255", 1239};
     std::string TEST_DATA{"Hello Broadcast"};
     const auto TEST_DATA_SIZE{TEST_DATA.size()};
     auto retVal4 = us4.send(std::move(TEST_DATA));
@@ -170,4 +170,3 @@ TEST_CASE("Testing broadcast with 192.168.100.255 address.") {
     REQUIRE("Hello Broadcast" == data);
 }
 #endif
-

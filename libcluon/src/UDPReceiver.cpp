@@ -72,7 +72,7 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
         && (0 < receiveFromPort)) {
         // Check for valid IP address.
         struct sockaddr_in tmpSocketAddress {};
-        const bool isValid = (0 < ::inet_pton(AF_INET, receiveFromAddress.c_str(), &(tmpSocketAddress.sin_addr))) && (224 > receiveFromAddressTokens[0]);
+        const bool isValid = (0 < ::inet_pton(AF_INET, receiveFromAddress.c_str(), &(tmpSocketAddress.sin_addr))) && (224 > receiveFromAddressTokens[0] || 255 == receiveFromAddressTokens[0]); // Accept regular IP addresses (ie., non-multicast addesses and the network-wide broadcast address 255.255.255.255.
 
         // Check for UDP multicast, i.e., IP address range [225.0.0.1 - 239.255.255.255].
         m_isMulticast = (((224 < receiveFromAddressTokens[0]) && (receiveFromAddressTokens[0] <= 239))
@@ -84,25 +84,28 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
         // Check whether given address is a broadcast address.
         bool isBroadcast{false};
         {
-            struct ifaddrs *ifaddr{nullptr};
-            if (0 == getifaddrs(&ifaddr)) {
-                for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-                    if (ifa->ifa_addr == NULL) {
-                        continue;
-                    }
+            isBroadcast |= (receiveFromAddress == "255.255.255.255");
+            if (!isBroadcast) {
+                struct ifaddrs *ifaddr{nullptr};
+                if (0 == getifaddrs(&ifaddr)) {
+                    for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+                        if (ifa->ifa_addr == NULL) {
+                            continue;
+                        }
 
-                    if (ifa->ifa_addr->sa_family == AF_INET) {
-                        char broadcastAddress[NI_MAXHOST];
-                        if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
-                               sizeof(struct sockaddr_in),
-                               broadcastAddress, NI_MAXHOST,
-                               NULL, 0, NI_NUMERICHOST)) {
-                             std::string _tmp{broadcastAddress};
-                             isBroadcast |= (_tmp.compare(receiveFromAddress) == 0);
+                        if (ifa->ifa_addr->sa_family == AF_INET) {
+                            char broadcastAddress[NI_MAXHOST];
+                            if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
+                                   sizeof(struct sockaddr_in),
+                                   broadcastAddress, NI_MAXHOST,
+                                   NULL, 0, NI_NUMERICHOST)) {
+                                 std::string _tmp{broadcastAddress};
+                                 isBroadcast |= (_tmp.compare(receiveFromAddress) == 0);
+                            }
                         }
                     }
+                    freeifaddrs(ifaddr);
                 }
-                freeifaddrs(ifaddr);
             }
         }
 #endif

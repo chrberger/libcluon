@@ -62,26 +62,28 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
         // Check whether given address is a broadcast address.
         bool isBroadcast{false};
         {
-            struct ifaddrs *ifaddr{nullptr};
-            if (0 == getifaddrs(&ifaddr)) {
-                for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-                    if (ifa->ifa_addr == NULL) {
-                        continue;
-                    }
+            isBroadcast |= (sendToAddress == "255.255.255.255");
+            if (!isBroadcast) {
+                struct ifaddrs *ifaddr{nullptr};
+                if (0 == getifaddrs(&ifaddr)) {
+                    for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+                        if (ifa->ifa_addr == NULL) {
+                            continue;
+                        }
 
-                    if (ifa->ifa_addr->sa_family == AF_INET) {
-                        char broadcastAddress[NI_MAXHOST];
-                        if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
-                               sizeof(struct sockaddr_in),
-                               broadcastAddress, NI_MAXHOST,
-                               NULL, 0, NI_NUMERICHOST)) {
-                             std::string _tmp{broadcastAddress};
-                             isBroadcast |= (_tmp.compare(sendToAddress) == 0);
-                             std::cerr << "found broadcast address: " << broadcastAddress << ": " << isBroadcast << std::endl;
+                        if (ifa->ifa_addr->sa_family == AF_INET) {
+                            char broadcastAddress[NI_MAXHOST];
+                            if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
+                                   sizeof(struct sockaddr_in),
+                                   broadcastAddress, NI_MAXHOST,
+                                   NULL, 0, NI_NUMERICHOST)) {
+                                 std::string _tmp{broadcastAddress};
+                                 isBroadcast |= (_tmp.compare(sendToAddress) == 0);
+                            }
                         }
                     }
+                    freeifaddrs(ifaddr);
                 }
-                freeifaddrs(ifaddr);
             }
         }
 #endif
