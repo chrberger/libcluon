@@ -70,16 +70,21 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
                         if (ifa->ifa_addr == NULL) {
                             continue;
                         }
-
-                        if (ifa->ifa_addr->sa_family == AF_INET) {
-                            char broadcastAddress[NI_MAXHOST];
-                            if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
-                                   sizeof(struct sockaddr_in),
-                                   broadcastAddress, NI_MAXHOST,
-                                   NULL, 0, NI_NUMERICHOST)) {
-                                 std::string _tmp{broadcastAddress};
-                                 isBroadcast |= (_tmp.compare(sendToAddress) == 0);
-                            }
+                        char broadcastAddress[NI_MAXHOST];
+#ifdef __APPLE__
+                        if (0 == getnameinfo(ifa->ifa_dstaddr,
+                               sizeof(struct sockaddr_in),
+                               broadcastAddress, NI_MAXHOST,
+                               NULL, 0, NI_NUMERICHOST))
+#else
+                        if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
+                               sizeof(struct sockaddr_in),
+                               broadcastAddress, NI_MAXHOST,
+                               NULL, 0, NI_NUMERICHOST))
+#endif
+                        {
+                             std::string _tmp{broadcastAddress};
+                             isBroadcast |= (_tmp.compare(sendToAddress) == 0);
                         }
                     }
                     freeifaddrs(ifaddr);

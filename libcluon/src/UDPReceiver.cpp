@@ -95,10 +95,18 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
 
                         if (ifa->ifa_addr->sa_family == AF_INET) {
                             char broadcastAddress[NI_MAXHOST];
+#ifdef __APPLE__
+                            if (0 == getnameinfo(ifa->ifa_dstaddr,
+                                   sizeof(struct sockaddr_in),
+                                   broadcastAddress, NI_MAXHOST,
+                                   NULL, 0, NI_NUMERICHOST))
+#else
                             if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
                                    sizeof(struct sockaddr_in),
                                    broadcastAddress, NI_MAXHOST,
-                                   NULL, 0, NI_NUMERICHOST)) {
+                                   NULL, 0, NI_NUMERICHOST))
+#endif
+                            {
                                  std::string _tmp{broadcastAddress};
                                  isBroadcast |= (_tmp.compare(receiveFromAddress) == 0);
                             }
