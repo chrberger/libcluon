@@ -49,7 +49,6 @@ set(GCC7_CXX_WARNING_FLAGS " \
     -Wempty-body \
     -Wendif-labels \
     -Wenum-compare \
-    -Werror-implicit-function-declaration \
     -Wextra \
     -Wfloat-conversion \
     -Wfloat-equal \
