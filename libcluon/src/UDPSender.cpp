@@ -11,10 +11,10 @@
 #include "cluon/UDPPacketSizeConstraints.hpp"
 
 // clang-format off
-#ifdef WIN32
-    #include <iostream>
-#else
+#ifndef WIN32
     #include <arpa/inet.h>
+    #include <ifaddrs.h>
+    #include <netdb.h>
     #include <sys/socket.h>
     #include <sys/types.h>
     #include <unistd.h>
@@ -24,6 +24,7 @@
 #include <cerrno>
 #include <cstring>
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <sstream>
 #include <vector>
@@ -56,6 +57,57 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
 #endif
 
         m_socket = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+#ifndef WIN32
+        // Check whether given address is a broadcast address.
+        bool isBroadcast{false};
+        {
+            struct ifaddrs *ifaddr{nullptr};
+            if (0 == getifaddrs(&ifaddr)) {
+                for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+                    if (ifa->ifa_addr == NULL) {
+                        continue;
+                    }
+
+                    if (ifa->ifa_addr->sa_family == AF_INET) {
+                        char broadcastAddress[NI_MAXHOST];
+                        if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
+                               sizeof(struct sockaddr_in),
+                               broadcastAddress, NI_MAXHOST,
+                               NULL, 0, NI_NUMERICHOST)) {
+                             std::string _tmp{broadcastAddress};
+                             isBroadcast |= (_tmp.compare(sendToAddress) == 0);
+                             std::cerr << "found broadcast address: " << broadcastAddress << ": " << isBroadcast << std::endl;
+                        }
+                    }
+                }
+                freeifaddrs(ifaddr);
+            }
+        }
+#endif
+
+#ifndef WIN32
+        if (!(m_socket < 0) && isBroadcast) {
+            // Enabling broadcast.
+            uint32_t YES = 1;
+            // clang-format off
+            auto retVal = ::setsockopt(m_socket, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<char *>(&YES), sizeof(YES)); // NOLINT
+            // clang-format on
+            if (0 > retVal) {
+#ifdef WIN32 // LCOV_EXCL_LINE
+                auto errorCode = WSAGetLastError();
+#else
+                auto errorCode = errno; // LCOV_EXCL_LINE
+#endif                                  // LCOV_EXCL_LINE
+                std::cerr << "[cluon::UDPSender] Failed to perform socket operation: ";
+#ifdef WIN32
+                std::cerr << errorCode << std::endl;
+#else
+                std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl;
+#endif
+            }
+        }
+#endif
 
         // Bind to random address/port but store sender port.
         if (!(m_socket < 0)) {

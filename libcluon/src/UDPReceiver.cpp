@@ -27,10 +27,10 @@
     #endif
 
     #include <arpa/inet.h>
+    #include <fcntl.h>
     #include <sys/ioctl.h>
     #include <sys/socket.h>
     #include <sys/types.h>
-    #include <fcntl.h>
     #include <unistd.h>
 #endif
 
@@ -80,6 +80,33 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                          && ((0 <= receiveFromAddressTokens[2]) && (receiveFromAddressTokens[2] <= 255))
                          && ((1 <= receiveFromAddressTokens[3]) && (receiveFromAddressTokens[3] <= 255)));
 
+#ifndef WIN32
+        // Check whether given address is a broadcast address.
+        bool isBroadcast{false};
+        {
+            struct ifaddrs *ifaddr{nullptr};
+            if (0 == getifaddrs(&ifaddr)) {
+                for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+                    if (ifa->ifa_addr == NULL) {
+                        continue;
+                    }
+
+                    if (ifa->ifa_addr->sa_family == AF_INET) {
+                        char broadcastAddress[NI_MAXHOST];
+                        if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
+                               sizeof(struct sockaddr_in),
+                               broadcastAddress, NI_MAXHOST,
+                               NULL, 0, NI_NUMERICHOST)) {
+                             std::string _tmp{broadcastAddress};
+                             isBroadcast |= (_tmp.compare(receiveFromAddress) == 0);
+                        }
+                    }
+                }
+                freeifaddrs(ifaddr);
+            }
+        }
+#endif
+
         std::memset(&m_receiveFromAddress, 0, sizeof(m_receiveFromAddress));
 #ifdef WIN32
         // According to http://www.sockets.com/err_lst1.htm, the binding is
@@ -124,6 +151,24 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                 closeSocket(errorCode); // LCOV_EXCL_LINE
             }
         }
+
+#ifndef WIN32
+        if (!(m_socket < 0) && isBroadcast) {
+            // Enabling broadcast.
+            uint32_t YES = 1;
+            // clang-format off
+            auto retVal = ::setsockopt(m_socket, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<char *>(&YES), sizeof(YES)); // NOLINT
+            // clang-format on
+            if (0 > retVal) {
+#ifdef WIN32 // LCOV_EXCL_LINE
+                auto errorCode = WSAGetLastError();
+#else
+                auto errorCode = errno; // LCOV_EXCL_LINE
+#endif                                  // LCOV_EXCL_LINE
+                closeSocket(errorCode); // LCOV_EXCL_LINE
+            }
+        }
+#endif
 
         if (!(m_socket < 0)) {
             // Trying to enable non_blocking mode.
