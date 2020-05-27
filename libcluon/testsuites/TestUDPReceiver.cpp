@@ -140,6 +140,7 @@ TEST_CASE("Testing multicast with faulty 224.0.0.1 address.") {
 }
 
 #ifndef WIN32
+#ifndef __APPLE__
 TEST_CASE("Testing broadcast with 255.255.255.255 address.") {
     // Setup data structures to receive data from UDPReceiver.
     std::atomic<bool> hasDataReceived{false};
@@ -148,20 +149,20 @@ TEST_CASE("Testing broadcast with 255.255.255.255 address.") {
     REQUIRE(data.empty());
     REQUIRE(!hasDataReceived);
 
-    cluon::UDPReceiver ur4(
+    cluon::UDPReceiver ur6(
         "255.255.255.255", 1239, [&hasDataReceived, &data ](std::string && d, std::string &&, std::chrono::system_clock::time_point &&) noexcept {
             data = std::move(d);
             hasDataReceived.store(true);
         });
-    REQUIRE(ur4.isRunning());
+    REQUIRE(ur6.isRunning());
 
     // Setup UDPSender.
-    cluon::UDPSender us4{"255.255.255.255", 1239};
+    cluon::UDPSender us6{"255.255.255.255", 1239};
     std::string TEST_DATA{"Hello Broadcast"};
     const auto TEST_DATA_SIZE{TEST_DATA.size()};
-    auto retVal4 = us4.send(std::move(TEST_DATA));
-    REQUIRE(TEST_DATA_SIZE == retVal4.first);
-    REQUIRE(0 == retVal4.second);
+    auto retVal6 = us6.send(std::move(TEST_DATA));
+    REQUIRE(TEST_DATA_SIZE == retVal6.first);
+    REQUIRE(0 == retVal6.second);
 
     // Yield the UDP receiver so that the embedded thread has time to process the data.
     do { std::this_thread::yield(); } while (!hasDataReceived.load());
@@ -169,4 +170,5 @@ TEST_CASE("Testing broadcast with 255.255.255.255 address.") {
     REQUIRE(hasDataReceived);
     REQUIRE("Hello Broadcast" == data);
 }
+#endif
 #endif
