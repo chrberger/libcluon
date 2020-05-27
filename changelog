@@ -1,3 +1,21 @@
+libcluon (0.0.129-1ppa1~focal1) focal; urgency=medium
+
+  * added Ubuntu Focal to deploy targets
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 27 May 2020 12:25:02 +0200
+
+libcluon (0.0.129-1ppa1~bionic1) bionic; urgency=medium
+
+  * added Ubuntu Focal to deploy targets
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 27 May 2020 12:25:02 +0200
+
+libcluon (0.0.129-1ppa1~xenial1) xenial; urgency=medium
+
+  * added Ubuntu Focal to deploy targets
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 27 May 2020 12:25:02 +0200
+
 libcluon (0.0.128-1ppa1~bionic1) bionic; urgency=medium
 
   * support for UDP broadcast
