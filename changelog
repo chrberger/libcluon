@@ -1,3 +1,21 @@
+libcluon (0.0.131-1ppa1~focal1) focal; urgency=medium
+
+  * updating Mustache to v4.1 and cpp-peglib to v0.1.7
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 27 May 2020 17:21:04 +0200
+
+libcluon (0.0.131-1ppa1~bionic1) bionic; urgency=medium
+
+  * updating Mustache to v4.1 and cpp-peglib to v0.1.7
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 27 May 2020 17:21:04 +0200
+
+libcluon (0.0.131-1ppa1~xenial1) xenial; urgency=medium
+
+  * updating Mustache to v4.1 and cpp-peglib to v0.1.7
+
+ -- Christian Berger <christian.berger@gu.se>  Wed, 27 May 2020 17:21:04 +0200
+
 libcluon (0.0.130-1ppa1~focal1) focal; urgency=medium
 
   * compile fixes for Ubuntu Focal
