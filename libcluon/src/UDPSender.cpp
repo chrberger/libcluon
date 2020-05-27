@@ -68,7 +68,7 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
                 if (0 == getifaddrs(&ifaddr)) {
                     for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
                         if (ifa->ifa_addr == NULL) {
-                            continue;
+                            continue; // LCOV_EXCL_LINE
                         }
                         char broadcastAddress[NI_MAXHOST];
 #ifdef __APPLE__
@@ -106,12 +106,12 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
 #else
                 auto errorCode = errno; // LCOV_EXCL_LINE
 #endif                                  // LCOV_EXCL_LINE
-                std::cerr << "[cluon::UDPSender] Failed to perform socket operation: ";
-#ifdef WIN32
-                std::cerr << errorCode << std::endl;
+                std::cerr << "[cluon::UDPSender] Failed to perform socket operation: "; // LCOV_EXCL_LINE
+#ifdef WIN32 // LCOV_EXCL_LINE
+                std::cerr << errorCode << std::endl; 
 #else
-                std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl;
-#endif
+                std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl; // LCOV_EXCL_LINE
+#endif // LCOV_EXCL_LINE
             }
         }
 #endif
