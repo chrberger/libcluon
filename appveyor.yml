@@ -55,7 +55,7 @@ deploy:
   subject: chrberger
   repo: libcluon
   package: libcluon-win64-debug
-  version: master
+  version: master2
   publish: true
   override: true
   explode: true
