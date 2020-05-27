@@ -1089,7 +1089,11 @@ TEST_CASE("Testing MyTestMessage4 of size 0xdb.") {
     REQUIRE(tmp.attribute1().empty());
 
     std::string value;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
     for (uint32_t i = 0; i < std::numeric_limits<uint16_t>::max() + 2; i++) { value += "A"; }
+#pragma GCC diagnostic pop
 
     tmp.attribute1(value);
     REQUIRE(value == tmp.attribute1());
