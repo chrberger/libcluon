@@ -89,19 +89,19 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                 struct ifaddrs *ifaddr{nullptr};
                 if (0 == getifaddrs(&ifaddr)) {
                     for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-                        if (ifa->ifa_addr == NULL) {
-                            continue;
-                        }
+                        if (NULL == ifa->ifa_addr) continue; // LCOV_EXCL_LINE
 
                         if (ifa->ifa_addr->sa_family == AF_INET) {
                             char broadcastAddress[NI_MAXHOST];
 #ifdef __APPLE__
-                            if (0 == getnameinfo(ifa->ifa_dstaddr,
+                            if (NULL == ifa->ifa_dstaddr) continue; // LCOV_EXCL_LINE
+                            if (0 == ::getnameinfo(ifa->ifa_dstaddr,
                                    sizeof(struct sockaddr_in),
                                    broadcastAddress, NI_MAXHOST,
                                    NULL, 0, NI_NUMERICHOST))
 #else
-                            if (0 == getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
+                            if (NULL == ifa->ifa_ifu.ifu_broadaddr) continue; // LCOV_EXCL_LINE
+                            if (0 == ::getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
                                    sizeof(struct sockaddr_in),
                                    broadcastAddress, NI_MAXHOST,
                                    NULL, 0, NI_NUMERICHOST))
