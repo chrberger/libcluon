@@ -1,3 +1,21 @@
+libcluon (0.0.132-1ppa1~focal1) focal; urgency=medium
+
+  * fixing segfault Alpine Linux
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 06 Jun 2020 00:09:47 +0200
+
+libcluon (0.0.132-1ppa1~bionic1) bionic; urgency=medium
+
+  * fixing segfault Alpine Linux
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 06 Jun 2020 00:09:47 +0200
+
+libcluon (0.0.132-1ppa1~xenial1) xenial; urgency=medium
+
+  * fixing segfault Alpine Linux
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 06 Jun 2020 00:09:47 +0200
+
 libcluon (0.0.131-1ppa1~focal1) focal; urgency=medium
 
   * updating Mustache to v4.1 and cpp-peglib to v0.1.7
