@@ -526,14 +526,14 @@ TEST_CASE("Dynamically creating messages for complex message.") {
 //    uint8 attribute4 [default = 2, id = 4];
 //    int16 attribute5 [default = -3, id = 5];
 //    uint16 attribute6 [default = 4, id = 6];
-//    int32 attribute7 [default = -5, id = 7];
+//    int32 attribute7 [default = -5, id = 9];
 //    uint32 attribute8 [default = 6, id = 8];
-//    int64 attribute9 [default = -7, id = 9];
-//    uint64 attribute10 [default = 8, id = 10];
-//    float attribute11 [default = -9.5, id = 11];
-//    double attribute12 [default = 10.6, id = 12];
-//    string attribute13 [default = "Hello World", id = 13];
-//    bytes attribute14 [default = "Hello Galaxy", id = 14];
+//    int64 attribute9 [default = -7, id = 10];
+//    uint64 attribute10 [default = 8, id = 11];
+//    float attribute11 [default = -9.5, id = 12];
+//    double attribute12 [default = 10.6, id = 13];
+//    string attribute13 [default = "Hello World", id = 14];
+//    bytes attribute14 [default = "Hello Galaxy", id = 15];
 //}
 
 message example.MyTestMessage1 [id = 30001] {
@@ -543,14 +543,14 @@ message example.MyTestMessage1 [id = 30001] {
     uint8 field4 [id = 4];
     int16 field5 [id = 5];
     uint16 field6 [id = 6];
-    int32 field7 [id = 7];
+    int32 field7 [id = 9];
     uint32 field8 [id = 8];
-    int64 field9 [id = 9];
-    uint64 field10 [id = 10];
-    float field11 [id = 11];
-    double field12 [id = 12];
-    string field13 [id = 13];
-    bytes field14 [id = 14];
+    int64 field9 [id = 10];
+    uint64 field10 [id = 11];
+    float field11 [id = 12];
+    double field12 [id = 13];
+    string field13 [id = 14];
+    bytes field14 [id = 15];
 }
 )";
 
