@@ -1,3 +1,21 @@
+libcluon (0.0.136-1ppa1~focal1) focal; urgency=medium
+
+  * revised buildsystem
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 20 Jul 2020 19:21:26 +0000
+
+libcluon (0.0.136-1ppa1~bionic1) bionic; urgency=medium
+
+  * revised buildsystem
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 20 Jul 2020 19:21:26 +0000
+
+libcluon (0.0.136-1ppa1~xenial1) xenial; urgency=medium
+
+  * revised buildsystem
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 20 Jul 2020 19:21:26 +0000
+
 libcluon (0.0.135-1ppa1~focal1) focal; urgency=medium
 
   * revised buildsystem
