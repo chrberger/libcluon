@@ -1,3 +1,21 @@
+libcluon (0.0.133-1ppa1~focal1) focal; urgency=medium
+
+  * adjusted README.md
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 20 Jul 2020 17:38:27 +0000
+
+libcluon (0.0.133-1ppa1~bionic1) bionic; urgency=medium
+
+  * adjusted README.md
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 20 Jul 2020 17:38:27 +0000
+
+libcluon (0.0.133-1ppa1~xenial1) xenial; urgency=medium
+
+  * adjusted README.md
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 20 Jul 2020 17:38:27 +0000
+
 libcluon (0.0.132-1ppa1~focal1) focal; urgency=medium
 
   * fixing segfault Alpine Linux
