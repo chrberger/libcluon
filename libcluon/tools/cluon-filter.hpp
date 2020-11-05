@@ -11,6 +11,7 @@
 
 #include "cluon/cluon.hpp"
 #include "cluon/Envelope.hpp"
+#include "cluon/Time.hpp"
 #include "cluon/stringtoolbox.hpp"
 
 #include <cstdint>
@@ -26,14 +27,14 @@ inline int32_t cluon_filter(int32_t argc, char **argv) {
         std::cerr << argv[0] << " filters Envelopes from stdin to stdout." << std::endl;
         std::cerr << "NOTE! To use the --start/--stop filters, the Envelopes must be chronologically sorted when using --exit." << std::endl;
         std::cerr << "If you are in doubt, simply use cluon-replay and replay to stdout to feed this filter as cluon-replay is sorting by sample timestamp." << std::endl;
-        std::cerr << "Usage:   " << argv[0] << " --keep=<list of messageID/senderStamp pairs to keep> --drop=<list of messageID/senderStamp pairs to drop> [--skip=<number of Envelopes to skip>] [--start=<keep Envelopes after this timepoint in Epoch seconds>] [--end=<keep Envelopes until this timepoint in Epoch seconds> [--exit]]" << std::endl;
+        std::cerr << "Usage:   " << argv[0] << " --keep=<list of messageID/senderStamp pairs to keep> --drop=<list of messageID/senderStamp pairs to drop> [--skip=<number of Envelopes to skip>] [--start=<keep Envelopes after this timepoint in Epoch microseconds>] [--end=<keep Envelopes until this timepoint in Epoch microseconds> [--exit]]" << std::endl;
         std::cerr << "Example: " << argv[0] << " --keep=19/0,25/1" << std::endl;
         std::cerr << "         " << argv[0] << " --drop=19/0,25/1" << std::endl;
         std::cerr << "         " << argv[0] << " --skip=300" << std::endl;
-        std::cerr << "         " << argv[0] << " --start=1569916731" << std::endl;
-        std::cerr << "         " << argv[0] << " --end=1569917000" << std::endl;
-        std::cerr << "         " << argv[0] << " --end=+1000  end after 1000s" << std::endl;
-        std::cerr << "         " << argv[0] << " --end=1569917000 --exit  exit after first Envelope encountered after end time point" << std::endl;
+        std::cerr << "         " << argv[0] << " --start=1569916731000000" << std::endl;
+        std::cerr << "         " << argv[0] << " --end=1569917000123456" << std::endl;
+        std::cerr << "         " << argv[0] << " --end=+1000000000  end after 1000s" << std::endl;
+        std::cerr << "         " << argv[0] << " --end=1569917000123456 --exit  exit after first Envelope encountered after end time point" << std::endl;
         std::cerr << "         --keep and --drop cannot be used simultaneously." << std::endl;
         retCode = 1;
     } else {
@@ -75,8 +76,8 @@ inline int32_t cluon_filter(int32_t argc, char **argv) {
         }
 
         const uint32_t SKIP{(commandlineArguments.count("skip") != 0) ? static_cast<uint32_t>(std::stoi(commandlineArguments["skip"])) : 0};
-        const int32_t START{(commandlineArguments.count("start") != 0) ? static_cast<int32_t>(std::stoi(commandlineArguments["start"])) : 0};
-        int32_t END{(commandlineArguments.count("end") != 0) ? static_cast<int32_t>(std::stoi(commandlineArguments["end"])) : (std::numeric_limits<int32_t>::max)()};
+        const int64_t START{(commandlineArguments.count("start") != 0) ? static_cast<int64_t>(std::stoll(commandlineArguments["start"])) : 0};
+        int64_t END{(commandlineArguments.count("end") != 0) ? static_cast<int64_t>(std::stoll(commandlineArguments["end"])) : (std::numeric_limits<int64_t>::max)()};
         bool isRelativeEnd{false};
         if (commandlineArguments.count("end") != 0) {
             std::string END_TMP = commandlineArguments["end"];
@@ -96,10 +97,10 @@ inline int32_t cluon_filter(int32_t argc, char **argv) {
                     cluon::data::TimeStamp sampleTimeStamp = retVal.second.sampleTimeStamp();
                     if (isRelativeEnd && !endInitialized) {
                         endInitialized = true;
-                        END += (START > 0 ? START : sampleTimeStamp.seconds());
+                        END += (START > 0 ? START : cluon::time::toMicroseconds(sampleTimeStamp));
                         std::cerr << "Keeping Envelopes in the interval (" << START << ", " << END << ")." << std::endl;
                     }
-                    if ( (sampleTimeStamp.seconds() > START) && (sampleTimeStamp.seconds() < END) ) {
+                    if ( (cluon::time::toMicroseconds(sampleTimeStamp) > START) && (cluon::time::toMicroseconds(sampleTimeStamp) < END) ) {
                         std::stringstream sstr;
                         sstr << retVal.second.dataType() << "/" << retVal.second.senderStamp();
                         std::string str = sstr.str();
@@ -114,7 +115,7 @@ inline int32_t cluon_filter(int32_t argc, char **argv) {
                             std::cout.flush();
                         }
                     }
-                    if ( !(sampleTimeStamp.seconds() < END) && EXIT ) {
+                    if ( !(cluon::time::toMicroseconds(sampleTimeStamp) < END) && EXIT ) {
                         exit(0);
                     }
                 }
