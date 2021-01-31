@@ -105,12 +105,6 @@ performance:
 deployToAlpine:
 	./buildtools/deploy/deployToAlpine.sh
 
-deployToAlpine-armhf:
-	./buildtools/deploy/deployToAlpine-armhf.sh
-
-deployToAlpine-aarch64:
-	./buildtools/deploy/deployToAlpine-aarch64.sh
-
 deployToJavaScript:
 	./buildtools/deploy/deployToJavaScript.sh
 
@@ -120,7 +114,7 @@ deployToLaunchpad:
 deployToHeaderOnly:
 	./buildtools/deploy/deployToHeaderOnly.sh
 
-deploy: deployToLaunchpad docs deployToHeaderOnly deployToAlpine deployToJavaScript deployToAlpine-armhf deployToAlpine-aarch64
+deploy: deployToLaunchpad docs deployToHeaderOnly deployToJavaScript deployToAlpine
 
 docs:
 	./buildtools/deploy/generateDocumentation.sh

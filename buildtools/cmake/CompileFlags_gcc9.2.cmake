@@ -123,7 +123,7 @@ set(GCC82_CXX_WARNING_FLAGS " \
     -Wno-error=strict-aliasing \
     -Wstrict-aliasing=3 \
     -Wstrict-null-sentinel \
-    -Wstrict-overflow \
+    -Wno-error=strict-overflow \
     -Wstrict-overflow=5 \
     -Wno-error=suggest-attribute=const \
     -Wno-error=suggest-attribute=format \
