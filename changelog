@@ -1,3 +1,21 @@
+libcluon (0.0.139-1ppa1~focal1) focal; urgency=medium
+
+  * updates to README.md
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 01 Feb 2021 17:44:46 +0000
+
+libcluon (0.0.139-1ppa1~bionic1) bionic; urgency=medium
+
+  * updates to README.md
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 01 Feb 2021 17:44:46 +0000
+
+libcluon (0.0.139-1ppa1~xenial1) xenial; urgency=medium
+
+  * updates to README.md
+
+ -- Christian Berger <christian.berger@gu.se>  Mon, 01 Feb 2021 17:44:46 +0000
+
 libcluon (0.0.138-1ppa1~focal1) focal; urgency=medium
 
   * fixes to updated build system
