@@ -25,9 +25,10 @@ _Say you want to quickly realize a distributed software system where individual 
 ## Table of Contents
 * [Features](#features)
 * [Dependencies](#dependencies)
+* [Installation on Ubuntu 20.04 LTS](#installation-on-ubuntu-2004-lts)
 * [Installation on Ubuntu 18.04 LTS](#installation-on-ubuntu-1804-lts)
 * [Installation on Debian](#installation-on-debian)
-* [Installation on Alpine 3.7](#installation-on-alpine-37)
+* [Installation on Alpine 3.13](#installation-on-alpine-313)
 * [Installation on Windows](#installation-on-windows)
 * [Build from sources on the example of Ubuntu 16.04 LTS](#build-from-sources-on-the-example-of-ubuntu-1604-lts)
 * [Tutorials](#tutorials--api-documentation)
@@ -43,7 +44,7 @@ _Say you want to quickly realize a distributed software system where individual 
 * Native implementation of [LCM](http://lcm-proj.github.io/type_specification.html)/[ZCM](http://zerocm.github.io/zcm/) for data serialization & deserialization: [Example](https://wandbox.org/permlink/ItJnZ3VVnZsqL28y)
 * Native implementation of [JSON](https://www.json.org/) for data serialization & deserialization: [Example](https://wandbox.org/permlink/qyvkWIzGZFiBnTvm)
 * Native implementation of [MsgPack](https://msgpack.org/) for data serialization & deserialization: [Example](https://wandbox.org/permlink/qFNxlA8zwZj2if0P)
-* libcluon natively available for JavaScript via [Emscripten](https://github.com/kripken/emscripten): [libcluon.js](https://bintray.com/chrberger/libcluon/javascript#files)
+* libcluon natively available for JavaScript via [Emscripten](https://github.com/kripken/emscripten): [libcluon.js](https://bintray.com/chrberger/libcluon/javascript/master2#files/)
 * Portable implementation of publish/subscribe communication (Linux, MacOSX, Windows): [Example](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestUDPReceiver.cpp#L111)
 * Intermediate Data Representation (IDR) enables flexible message transformations at runtime; for example: Convert [Protobuf to JSON](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestMyTestMessage1.cpp#L348) or convert [OD4 to JSON](https://github.com/chrberger/libcluon/blob/master/libcluon/tools/cluon-OD4toJSON.cpp) or convert [LCM to JSON](https://github.com/chrberger/libcluon/blob/master/libcluon/tools/cluon-LCMtoJSON.cpp) at runtime without generating any data structures beforehand
 * Message self-reflection to extract portable message specifications at runtime: [Examples](https://github.com/chrberger/libcluon/blob/master/libcluon/testsuites/TestToODVDVisitor.cpp#L32)
@@ -95,6 +96,20 @@ As part of our CI strategy thanks to TravisCI and AppVeyor, we are continuously 
 ### Installation as single-file, header-only library
 `libcluon` is provided as [header-only](https://github.com/chrberger/libcluon/tree/gh-pages/headeronly), single-file library as well - just drop [cluon-complete.hpp](https://chrberger.github.io/libcluon/headeronly/cluon-complete.hpp) into your project, `#include "cluon-complete.hpp"` where you want to use libcluon, and compile your project with a modern C++ compiler (C++14 or newer).
 
+### Installation on Ubuntu 20.04 LTS
+We are providing pre-compiled binaries for Ubuntu 20.04 LTS (Focal Fossa) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
+
+```
+sudo add-apt-repository ppa:chrberger/libcluon
+```
+
+Afterwards, update your package database and install `libcluon`:
+
+```
+sudo apt-get update
+sudo apt-get install libcluon
+```
+
 ### Installation on Ubuntu 18.04 LTS
 We are providing pre-compiled binaries for Ubuntu 18.04 LTS (Bionic Beaver) via Ubuntu's Launchpad for `amd64`, `i386`, `armfh`, and `arm64`; simply add the following PPA to your sources list:
 
@@ -132,11 +147,11 @@ Now, you can finally install `libcluon`:
 sudo apt update && sudo apt install libcluon
 ```
 
-### Installation on Alpine 3.7
-We are providing pre-compiled binaries for Alpine 3.7 for `x86_64`, `armfh`, and `aarch64`; simply install the pre-compile `.apk` package as follows:
+### Installation on Alpine 3.13
+We are providing pre-compiled binaries for Alpine 3.13 for `x86_64`, `armfh`, and `aarch64`; simply install the pre-compile `.apk` package as follows:
 
 ```
-apk add libcluon --no-cache --repository https://chrberger.github.io/libcluon/alpine/v3.7 --allow-untrusted
+apk add libcluon --no-cache --repository https://chrberger.github.io/libcluon/alpine/v3.13 --allow-untrusted
 ```
 
 ### Installation on Windows

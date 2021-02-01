@@ -101,7 +101,7 @@ docker run --rm -i -v $PWD:/opt/source -v /var/run/docker.sock:/var/run/docker.s
 
 ################################################################################
 # Deploy.
-curl -T libcluon.js -uchrberger:$CHRBERGER_JFROG https://api.bintray.com/content/chrberger/libcluon/javascript/master/${RELEASE_VERSION}/ && \
-    curl -X POST -uchrberger:${CHRBERGER_JFROG} https://api.bintray.com/content/chrberger/libcluon/javascript/master/publish && \
+curl -T libcluon.js -uchrberger:$CHRBERGER_JFROG https://api.bintray.com/content/chrberger/libcluon/javascript/master2/${RELEASE_VERSION}/ && \
+    curl -X POST -uchrberger:${CHRBERGER_JFROG} https://api.bintray.com/content/chrberger/libcluon/javascript/master2/publish && \
     rm -fr tmp.javascript && rm -f libcluon.js
 
