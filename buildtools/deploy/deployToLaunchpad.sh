@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2017  Christian Berger
+# Copyright (C) 2021  Christian Berger
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -239,9 +239,9 @@ while [ $x -gt 0 ]; do
 done
 
 # Push Debian source package to Launchpad.
-dput ppa:chrberger/libcluon libcluon_${UBUNTU_RELEASE}_source.changes
+#dput ppa:chrberger/libcluon libcluon_${UBUNTU_RELEASE}_source.changes
 
-cat libcluon/debian/changelog > ../changelog
+#cat libcluon/debian/changelog > ../changelog
 
 cd ..
 

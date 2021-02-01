@@ -135,9 +135,9 @@ rm -fr tmp.alpine && \
     openssl rsa -in ~/.ssh/christian.berger@gu.se.priv -pubout > alpine/abuild/key.rsa.pub && \
     DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform "linux/amd64,linux/arm64,linux/arm/v7" -t chrberger/alpine-libcluon-builder2 -o type=local,dest=export . && \
     git clone --branch gh-pages --depth 1 git@github.com:chrberger/libcluon.git && \
-    cp -r export/linux_amd64/home/berger/packages/berger/x86_64 libcluon/alpine/v3.13/x86_64 && \
-    cp -r export/linux_arm64/home/berger/packages/berger/aarch64 libcluon/alpine/v3.13/aarch64 && \
-    cp -r export/linux_arm_v7/home/berger/packages/berger/armv7 libcluon/alpine/v3.13/armv7 && \
+    cp -r export/linux_amd64/home/berger/packages/berger/x86_64 libcluon/alpine/v3.13 && \
+    cp -r export/linux_arm64/home/berger/packages/berger/aarch64 libcluon/alpine/v3.13 && \
+    cp -r export/linux_arm_v7/home/berger/packages/berger/armv7 libcluon/alpine/v3.13 && \
     cd libcluon && git add -f alpine/v3.13/* && git commit -s -m "Updated apk (x86_64, aarch64, armv7)" && git push origin gh-pages && \
     curl -H "Content-Type: application/json" --data '{"build": true}' -X POST https://registry.hub.docker.com/u/chrberger/cluon/trigger/${CHRBERGER_DOCKER_CLUON}/
 
