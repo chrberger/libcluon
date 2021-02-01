@@ -239,9 +239,9 @@ while [ $x -gt 0 ]; do
 done
 
 # Push Debian source package to Launchpad.
-#dput ppa:chrberger/libcluon libcluon_${UBUNTU_RELEASE}_source.changes
+dput ppa:chrberger/libcluon libcluon_${UBUNTU_RELEASE}_source.changes
 
-#cat libcluon/debian/changelog > ../changelog
+cat libcluon/debian/changelog > ../changelog
 
 cd ..
 
