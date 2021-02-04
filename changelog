@@ -1,3 +1,21 @@
+libcluon (0.0.140-1ppa1~focal1) focal; urgency=medium
+
+  * fix for ToCSVVisitor to apply mask settings to nested types
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 04 Feb 2021 12:19:45 +0000
+
+libcluon (0.0.140-1ppa1~bionic1) bionic; urgency=medium
+
+  * fix for ToCSVVisitor to apply mask settings to nested types
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 04 Feb 2021 12:19:45 +0000
+
+libcluon (0.0.140-1ppa1~xenial1) xenial; urgency=medium
+
+  * fix for ToCSVVisitor to apply mask settings to nested types
+
+ -- Christian Berger <christian.berger@gu.se>  Thu, 04 Feb 2021 12:19:45 +0000
+
 libcluon (0.0.139-1ppa1~focal1) focal; urgency=medium
 
   * updates to README.md
