@@ -103,14 +103,16 @@ class LIBCLUON_API ToCSVVisitor {
     void visit(uint32_t &id, std::string &&typeName, std::string &&name, T &value) noexcept {
         (void)id;
         (void)typeName;
-        constexpr bool IS_NESTED{true};
-        ToCSVVisitor csvVisitor(name, m_delimiter, m_withHeader, IS_NESTED);
-        value.accept(csvVisitor);
+        if ((0 == m_mask.count(id)) || m_mask[id]) {
+            constexpr bool IS_NESTED{true};
+            ToCSVVisitor csvVisitor(name, m_delimiter, m_withHeader, IS_NESTED);
+            value.accept(csvVisitor);
 
-        if (m_fillHeader) {
-            m_bufferHeader << csvVisitor.m_bufferHeader.str();
+            if (m_fillHeader) {
+                m_bufferHeader << csvVisitor.m_bufferHeader.str();
+            }
+            m_bufferValues << csvVisitor.m_bufferValues.str();
         }
-        m_bufferValues << csvVisitor.m_bufferValues.str();
     }
 
    private:
