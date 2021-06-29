@@ -86,11 +86,14 @@ class LIBCLUON_API UDPReceiver {
      * @param receiveFromPort Port to receive UDP packets from.
      * @param delegate Functional (noexcept) to handle received bytes; parameters are received data, sender, timestamp.
      * @param localSendFromPort Port that an application is using to send data. This port (> 0) is ignored when data is received.
+     * @param interfaceAssociatedAddress Optional numerical IPv4 address associated with a interface. If given, will be used to
+     * specify which interface to use when joining a multicast group.
      */
     UDPReceiver(const std::string &receiveFromAddress,
                 uint16_t receiveFromPort,
                 std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate,
-                uint16_t localSendFromPort = 0) noexcept;
+                uint16_t localSendFromPort                    = 0,
+                const std::string &interfaceAssociatedAddress = "") noexcept;
     ~UDPReceiver() noexcept;
 
     /**

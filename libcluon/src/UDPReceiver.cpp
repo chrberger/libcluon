@@ -54,7 +54,8 @@ namespace cluon {
 UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                          uint16_t receiveFromPort,
                          std::function<void(std::string &&, std::string &&, std::chrono::system_clock::time_point &&)> delegate,
-                         uint16_t localSendFromPort) noexcept
+                         uint16_t localSendFromPort,
+                         const std::string &interfaceAssociatedAddress) noexcept
     : m_localSendFromPort(localSendFromPort)
     , m_receiveFromAddress()
     , m_mreq()
@@ -236,8 +237,8 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
             if (m_isMulticast) {
                 // Join the multicast group.
                 m_mreq.imr_multiaddr.s_addr = ::inet_addr(receiveFromAddress.c_str());
-                m_mreq.imr_interface.s_addr = htonl(INADDR_ANY);
                 // clang-format off
+                m_mreq.imr_interface.s_addr = interfaceAssociatedAddress.empty() ? htonl(INADDR_ANY) : ::inet_addr(interfaceAssociatedAddress.c_str());
                 auto retval                 = ::setsockopt(m_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, reinterpret_cast<char *>(&m_mreq), sizeof(m_mreq)); // NOLINT
                 // clang-format on
                 if (0 > retval) { // LCOV_EXCL_LINE
