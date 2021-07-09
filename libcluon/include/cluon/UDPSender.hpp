@@ -66,8 +66,10 @@ class LIBCLUON_API UDPSender {
      *
      * @param sendToAddress Numerical IPv4 address to send a UDP packet to.
      * @param sendToPort Port to send a UDP packet to.
+     * @param interfaceAssociatedAddress Optional numerical IPv4 address associated with a interface. If given, will be used to
+     * specify which interface to use when sending to a multicast group.
      */
-    UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noexcept;
+    UDPSender(const std::string &sendToAddress, uint16_t sendToPort, const std::string &interfaceAssociatedAddress = "") noexcept;
     ~UDPSender() noexcept;
 
     /**

@@ -31,7 +31,7 @@
 
 namespace cluon {
 
-UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noexcept
+UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort, const std::string &interfaceAssociatedAddress) noexcept
     : m_socketMutex()
     , m_sendToAddress() {
     // Decompose given address into tokens to check validity with numerical IPv4 address.
@@ -58,6 +58,11 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
 
         m_socket = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
+        // Check for UDP multicast, i.e., IP address range [225.0.0.1 - 239.255.255.255].
+        bool isMulticast
+            = (((224 < sendToAddressTokens[0]) && (sendToAddressTokens[0] <= 239)) && ((0 <= sendToAddressTokens[1]) && (sendToAddressTokens[1] <= 255))
+               && ((0 <= sendToAddressTokens[2]) && (sendToAddressTokens[2] <= 255)) && ((1 <= sendToAddressTokens[3]) && (sendToAddressTokens[3] <= 255)));
+
 #ifndef WIN32
         // Check whether given address is a broadcast address.
         bool isBroadcast{false};
@@ -67,24 +72,21 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
                 struct ifaddrs *ifaddr{nullptr};
                 if (0 == getifaddrs(&ifaddr)) {
                     for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-                        if (NULL == ifa->ifa_addr) continue; // LCOV_EXCL_LINE
+                        if (NULL == ifa->ifa_addr)
+                            continue; // LCOV_EXCL_LINE
                         char broadcastAddress[NI_MAXHOST];
 #ifdef __APPLE__
-                        if (NULL == ifa->ifa_dstaddr) continue; // LCOV_EXCL_LINE
-                        if (0 == ::getnameinfo(ifa->ifa_dstaddr,
-                               sizeof(struct sockaddr_in),
-                               broadcastAddress, NI_MAXHOST,
-                               NULL, 0, NI_NUMERICHOST))
+                        if (NULL == ifa->ifa_dstaddr)
+                            continue; // LCOV_EXCL_LINE
+                        if (0 == ::getnameinfo(ifa->ifa_dstaddr, sizeof(struct sockaddr_in), broadcastAddress, NI_MAXHOST, NULL, 0, NI_NUMERICHOST))
 #else
-                        if (NULL == ifa->ifa_ifu.ifu_broadaddr) continue; // LCOV_EXCL_LINE
-                        if (0 == ::getnameinfo(ifa->ifa_ifu.ifu_broadaddr,
-                               sizeof(struct sockaddr_in),
-                               broadcastAddress, NI_MAXHOST,
-                               NULL, 0, NI_NUMERICHOST))
+                        if (NULL == ifa->ifa_ifu.ifu_broadaddr)
+                            continue; // LCOV_EXCL_LINE
+                        if (0 == ::getnameinfo(ifa->ifa_ifu.ifu_broadaddr, sizeof(struct sockaddr_in), broadcastAddress, NI_MAXHOST, NULL, 0, NI_NUMERICHOST))
 #endif
                         {
-                             std::string _tmp{broadcastAddress};
-                             isBroadcast |= (_tmp.compare(sendToAddress) == 0);
+                            std::string _tmp{broadcastAddress};
+                            isBroadcast |= (_tmp.compare(sendToAddress) == 0);
                         }
                     }
                     freeifaddrs(ifaddr);
@@ -104,11 +106,34 @@ UDPSender::UDPSender(const std::string &sendToAddress, uint16_t sendToPort) noex
 #ifdef WIN32 // LCOV_EXCL_LINE
                 auto errorCode = WSAGetLastError();
 #else
-                auto errorCode = errno; // LCOV_EXCL_LINE
-#endif                                  // LCOV_EXCL_LINE
+                auto errorCode = errno;                                                      // LCOV_EXCL_LINE
+#endif                                                                                  // LCOV_EXCL_LINE
                 std::cerr << "[cluon::UDPSender] Failed to perform socket operation: "; // LCOV_EXCL_LINE
+#ifdef WIN32                                                                            // LCOV_EXCL_LINE
+                std::cerr << errorCode << std::endl;
+#else
+                std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl; // LCOV_EXCL_LINE
+#endif // LCOV_EXCL_LINE
+            }
+        }
+#endif
+
+#ifndef WIN32
+        if (!(m_socket < 0) && isMulticast) {
+            struct in_addr interface_addr;
+            interface_addr.s_addr = interfaceAssociatedAddress.empty() ? htonl(INADDR_ANY) : ::inet_addr(interfaceAssociatedAddress.c_str());
+            // clang-format off
+            auto retVal = ::setsockopt(m_socket, IPPROTO_IP, IP_MULTICAST_IF, reinterpret_cast<char *>(&interface_addr), sizeof(interface_addr)); // NOLINT
+            // clang-format on
+            if (0 > retVal) {
 #ifdef WIN32 // LCOV_EXCL_LINE
-                std::cerr << errorCode << std::endl; 
+                auto errorCode = WSAGetLastError();
+#else
+                auto errorCode = errno;                                                      // LCOV_EXCL_LINE
+#endif                                                                                  // LCOV_EXCL_LINE
+                std::cerr << "[cluon::UDPSender] Failed to perform socket operation: "; // LCOV_EXCL_LINE
+#ifdef WIN32                                                                            // LCOV_EXCL_LINE
+                std::cerr << errorCode << std::endl;
 #else
                 std::cerr << ::strerror(errorCode) << " (" << errorCode << ")" << std::endl; // LCOV_EXCL_LINE
 #endif // LCOV_EXCL_LINE
