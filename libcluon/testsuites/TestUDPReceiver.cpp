@@ -77,7 +77,7 @@ TEST_CASE("Creating UDPReceiver and receive data.") {
     std::string TEST_DATA{"Hello World"};
     const auto TEST_DATA_SIZE{TEST_DATA.size()};
     auto retVal2 = us2.send(std::move(TEST_DATA));
-    REQUIRE(TEST_DATA_SIZE == retVal2.first);
+    REQUIRE(TEST_DATA_SIZE == static_cast<unsigned int>(retVal2.first));
     REQUIRE(0 == retVal2.second);
 
     // Yield the UDP receiver so that the embedded thread has time to process the data.
@@ -117,7 +117,7 @@ TEST_CASE("Testing multicast with 226.x.y.z address.") {
     std::string TEST_DATA{"Hello Multicast Group"};
     const auto TEST_DATA_SIZE{TEST_DATA.size()};
     auto retVal4 = us4.send(std::move(TEST_DATA));
-    REQUIRE(TEST_DATA_SIZE == retVal4.first);
+    REQUIRE(TEST_DATA_SIZE == static_cast<unsigned int>(retVal4.first));
     REQUIRE(0 == retVal4.second);
 
     // Yield the UDP receiver so that the embedded thread has time to process the data.
@@ -161,7 +161,7 @@ TEST_CASE("Testing broadcast with 255.255.255.255 address.") {
     std::string TEST_DATA{"Hello Broadcast"};
     const auto TEST_DATA_SIZE{TEST_DATA.size()};
     auto retVal6 = us6.send(std::move(TEST_DATA));
-    REQUIRE(TEST_DATA_SIZE == retVal6.first);
+    REQUIRE(TEST_DATA_SIZE == static_cast<unsigned int>(retVal6.first));
     REQUIRE(0 == retVal6.second);
 
     // Yield the UDP receiver so that the embedded thread has time to process the data.

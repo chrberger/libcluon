@@ -83,7 +83,7 @@ TEST_CASE("Creating TCPServer and receive data from one connection.") {
     std::string TEST_DATA{"Hello World"};
     const auto TEST_DATA_SIZE{TEST_DATA.size()};
     auto retVal2 = conn3.send(std::move(TEST_DATA));
-    REQUIRE(TEST_DATA_SIZE == retVal2.first);
+    REQUIRE(TEST_DATA_SIZE == static_cast<unsigned int>(retVal2.first));
     REQUIRE(0 == retVal2.second);
 
     {
@@ -151,7 +151,7 @@ TEST_CASE("Creating TCPServer and receive data from multiple connections.") {
         std::string TEST_DATA{"Hello World " + std::to_string(i)};
         const auto TEST_DATA_SIZE{TEST_DATA.size()};
         auto retVal2 = conn4.send(std::move(TEST_DATA));
-        REQUIRE(TEST_DATA_SIZE == retVal2.first);
+        REQUIRE(TEST_DATA_SIZE == static_cast<unsigned int>(retVal2.first));
         REQUIRE(0 == retVal2.second);
 
         using namespace std::literals::chrono_literals; // NOLINT

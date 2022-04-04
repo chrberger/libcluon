@@ -30,7 +30,7 @@ TEST_CASE_METHOD(TestFixture_UDPSender, "Send test data.") {
     std::string TEST_DATA{"Hello World"};
     const auto TEST_DATA_SIZE = TEST_DATA.size();
     auto retVal2              = m_us.send(std::move(TEST_DATA));
-    REQUIRE(TEST_DATA_SIZE == retVal2.first);
+    REQUIRE(TEST_DATA_SIZE == static_cast<unsigned int>(retVal2.first));
     REQUIRE(0 == retVal2.second);
 }
 
