@@ -212,7 +212,7 @@ endif()
 # Include Catch unit test framework (MUST follow this project's targets as
 # ${LIBRARIES} is used in the cmake file for catch.hpp).
 include_directories(../buildtools/xUnit)
-if("${WEB}" STREQUAL "")
+if( ("${WEB}" STREQUAL "") AND NOT("${SKIP_TESTS}" STREQUAL "1") )
     include(xUnitCatch)
 endif()
 
