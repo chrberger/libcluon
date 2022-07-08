@@ -40,6 +40,7 @@ namespace cluon {
 
 TCPConnection::TCPConnection(const int32_t &socket) noexcept
     : m_socket(socket)
+    , m_cleanup(false)
     , m_newDataDelegate(nullptr)
     , m_connectionLostDelegate(nullptr) {
     if (!(m_socket < 0)) {
@@ -135,7 +136,9 @@ void TCPConnection::closeSocket(int errorCode) noexcept {
 #ifdef WIN32
         ::shutdown(m_socket, SD_BOTH);
         ::closesocket(m_socket);
-        WSACleanup();
+        if(m_cleanup){
+            WSACleanup();
+        }
 #else
         ::shutdown(m_socket, SHUT_RDWR);                                             // Disallow further read/write operations.
         ::close(m_socket);
