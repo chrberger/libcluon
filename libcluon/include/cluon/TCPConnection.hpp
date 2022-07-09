@@ -145,6 +145,7 @@ class LIBCLUON_API TCPConnection {
    private:
     mutable std::mutex m_socketMutex{};
     int32_t m_socket{-1};
+    bool m_cleanup{true};//if not created from TCPServer,call WSACleanup
     struct sockaddr_in m_address {};
 
     std::atomic<bool> m_readFromSocketThreadRunning{false};
