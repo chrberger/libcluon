@@ -133,7 +133,7 @@ rm -fr tmp.alpine && \
     cd tmp.alpine && \
     cat ~/.ssh/christian.berger@gu.se.priv > alpine/abuild/key.rsa && \
     openssl rsa -in ~/.ssh/christian.berger@gu.se.priv -pubout > alpine/abuild/key.rsa.pub && \
-    DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --platform "linux/amd64,linux/arm64,linux/arm/v7" -t chrberger/alpine-libcluon-builder2 -o type=local,dest=export . && \
+    DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build --no-cache --platform "linux/amd64,linux/arm64,linux/arm/v7" -t chrberger/alpine-libcluon-builder2 -o type=local,dest=export . && \
     git clone --branch gh-pages --depth 1 git@github.com:chrberger/libcluon.git && \
     cp -r export/linux_amd64/home/berger/packages/berger/x86_64 libcluon/alpine/v3.13 && \
     cp -r export/linux_arm64/home/berger/packages/berger/aarch64 libcluon/alpine/v3.13 && \

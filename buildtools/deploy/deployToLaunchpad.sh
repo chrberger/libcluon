@@ -28,7 +28,7 @@ echo "One line description starting with * : "
 read RELEASE_TEXT
 
 # Create one release for each current LTS...
-for UBUNTU_CODE_NAME in xenial bionic focal; do
+for UBUNTU_CODE_NAME in xenial bionic focal jammy; do
 
 UBUNTU_RELEASE="${RELEASE_VERSION}-1ppa1~${UBUNTU_CODE_NAME}1"
 

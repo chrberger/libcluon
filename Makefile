@@ -105,8 +105,8 @@ performance:
 deployToAlpine:
 	./buildtools/deploy/deployToAlpine.sh
 
-deployToJavaScript:
-	./buildtools/deploy/deployToJavaScript.sh
+#deployToJavaScript:
+#	./buildtools/deploy/deployToJavaScript.sh
 
 deployToLaunchpad:
 	./buildtools/deploy/deployToLaunchpad.sh
@@ -114,7 +114,8 @@ deployToLaunchpad:
 deployToHeaderOnly:
 	./buildtools/deploy/deployToHeaderOnly.sh
 
-deploy: deployToLaunchpad docs deployToHeaderOnly deployToJavaScript deployToAlpine
+#deploy: deployToLaunchpad docs deployToHeaderOnly deployToJavaScript deployToAlpine
+deploy: deployToLaunchpad docs deployToHeaderOnly deployToAlpine
 
 docs:
 	./buildtools/deploy/generateDocumentation.sh
