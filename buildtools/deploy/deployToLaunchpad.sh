@@ -255,6 +255,7 @@ git commit -a -s -m "Releasing v${RELEASE_VERSION}" && git push origin master
 # Push release to Github
 RELEASE_DATA='{"tag_name": "v'${RELEASE_VERSION}'","target_commitish": "'$(git rev-parse HEAD)'","name": "v'${RELEASE_VERSION}'","body": "'${RELEASE_TEXT}'","draft": false,"prerelease": false}'
 echo $RELEASE_DATA
-curl --data "$RELEASE_DATA" https://api.github.com/repos/chrberger/libcluon/releases?access_token=$CHRBERGER_GH
+#curl --data "$RELEASE_DATA" https://api.github.com/repos/chrberger/libcluon/releases?access_token=$CHRBERGER_GH
+curl  -H "Authorization: $CHRBERGER_GH" --data "$RELEASE_DATA" https://api.github.com/repos/chrberger/libcluon/releases
 
 rm -fr tmp.launchpad
