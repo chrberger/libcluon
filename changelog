@@ -1,3 +1,27 @@
+libcluon (0.0.142-1ppa1~jammy1) jammy; urgency=medium
+
+  * testing build environment
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Sep 2022 14:52:10 +0200
+
+libcluon (0.0.142-1ppa1~focal1) focal; urgency=medium
+
+  * testing build environment
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Sep 2022 14:52:10 +0200
+
+libcluon (0.0.142-1ppa1~bionic1) bionic; urgency=medium
+
+  * testing build environment
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Sep 2022 14:52:10 +0200
+
+libcluon (0.0.142-1ppa1~xenial1) xenial; urgency=medium
+
+  * testing build environment
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Sep 2022 14:52:10 +0200
+
 libcluon (0.0.141-1ppa1~jammy1) jammy; urgency=medium
 
   * adding Ubuntu 22.04 Jammy Jellyfish for deployment
