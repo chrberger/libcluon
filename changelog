@@ -1,3 +1,27 @@
+libcluon (0.0.143-1ppa1~jammy1) jammy; urgency=medium
+
+  * curl release fix
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Sep 2022 14:58:35 +0200
+
+libcluon (0.0.143-1ppa1~focal1) focal; urgency=medium
+
+  * curl release fix
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Sep 2022 14:58:35 +0200
+
+libcluon (0.0.143-1ppa1~bionic1) bionic; urgency=medium
+
+  * curl release fix
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Sep 2022 14:58:35 +0200
+
+libcluon (0.0.143-1ppa1~xenial1) xenial; urgency=medium
+
+  * curl release fix
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 09 Sep 2022 14:58:35 +0200
+
 libcluon (0.0.142-1ppa1~jammy1) jammy; urgency=medium
 
   * testing build environment
