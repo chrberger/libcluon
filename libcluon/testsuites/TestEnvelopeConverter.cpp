@@ -527,14 +527,14 @@ message TestMessageA [id = 30001] {
     uint8 attribute4 [default = 2, id = 4];
     int16 attribute5 [default = -3, id = 5];
     uint16 attribute6 [default = 4, id = 6];
-    int32 attribute7 [default = -5, id = 9];
+    int32 attribute7 [default = -5, id = 7];
     uint32 attribute8 [default = 6, id = 8];
-    int64 attribute9 [default = -7, id = 10];
-    uint64 attribute10 [default = 8, id = 11];
-    float attribute11 [default = -9.5, id = 12];
-    double attribute12 [default = 10.6, id = 13];
-    string attribute13 [default = "Hello World", id = 14];
-    bytes attribute14 [default = "Hello Galaxy", id = 15];
+    int64 attribute9 [default = -7, id = 9];
+    uint64 attribute10 [default = 8, id = 10];
+    float attribute11 [default = -9.5, id = 11];
+    double attribute12 [default = 10.6, id = 12];
+    string attribute13 [default = "Hello World", id = 13];
+    bytes attribute14 [default = "Hello Galaxy", id = 14];
 }
 )";
 
@@ -560,6 +560,148 @@ message TestMessageA [id = 30001] {
 "attribute12":10.6,
 "attribute13":"SGVsbG8gV29ybGQ=",
 "attribute14":"SGVsbG8gR2FsYXh5"}})";
+
+    cluon::EnvelopeConverter envConverter;
+    REQUIRE(1 == envConverter.setMessageSpecification(std::string(messageSpecification)));
+
+    // Test with Envelope:
+    const std::string JSON_A = envConverter.getJSONFromEnvelope(env);
+    REQUIRE(std::string(JSON) == JSON_A);
+
+    // Test without OD4 header:
+    const std::string JSON_B = envConverter.getJSONFromProtoEncodedEnvelope(envelopeAsProto);
+    REQUIRE(std::string(JSON) == JSON_B);
+
+    // Test with OD4-header:
+    const std::string JSON_C = envConverter.getJSONFromProtoEncodedEnvelope(output);
+    REQUIRE(std::string(JSON) == JSON_C);
+}
+
+TEST_CASE("Transform Envelope into JSON represention for complex payload for non-consecutive IDs.") {
+    cluon::data::Envelope env;
+    REQUIRE(env.serializedData().empty());
+    REQUIRE(0 == env.senderStamp());
+    REQUIRE(0 == env.dataType());
+    REQUIRE(0 == env.sent().seconds());
+    REQUIRE(0 == env.sent().microseconds());
+    REQUIRE(0 == env.received().seconds());
+    REQUIRE(0 == env.received().microseconds());
+    REQUIRE(0 == env.sampleTimeStamp().seconds());
+    REQUIRE(0 == env.sampleTimeStamp().microseconds());
+
+    cluon::data::TimeStamp ts1;
+    ts1.seconds(1).microseconds(2);
+    cluon::data::TimeStamp ts2;
+    ts2.seconds(10).microseconds(20);
+    cluon::data::TimeStamp ts3;
+    ts3.seconds(100).microseconds(200);
+
+    env.senderStamp(2).sent(ts1).received(ts2).sampleTimeStamp(ts3).dataType(30012);
+    {
+       testdata::MyTestMessage12 msg1;
+        REQUIRE('c' == msg1.attribute2());
+        REQUIRE(-1 == msg1.attribute3());
+        REQUIRE(2 == msg1.attribute4());
+        REQUIRE(-3 == msg1.attribute5());
+        REQUIRE(4 == msg1.attribute6());
+        REQUIRE(-5 == msg1.attribute9());
+        REQUIRE(6 == msg1.attribute8());
+        REQUIRE(-7 == msg1.attribute10());
+        REQUIRE(8 == msg1.attribute11());
+        REQUIRE(-9.5 == Approx(msg1.attribute12()));
+        REQUIRE(10.6 == Approx(msg1.attribute13()));
+        REQUIRE("Hello World" == msg1.attribute14());
+        REQUIRE("Hello Galaxy" == msg1.attribute15());
+
+        cluon::ToProtoVisitor proto;
+        msg1.accept(proto);
+        env.serializedData(proto.encodedData());
+    }
+
+    REQUIRE(2 == env.senderStamp());
+    REQUIRE(30012 == env.dataType());
+    REQUIRE(1 == env.sent().seconds());
+    REQUIRE(2 == env.sent().microseconds());
+    REQUIRE(10 == env.received().seconds());
+    REQUIRE(20 == env.received().microseconds());
+    REQUIRE(100 == env.sampleTimeStamp().seconds());
+    REQUIRE(200 == env.sampleTimeStamp().microseconds());
+
+    REQUIRE(61 == env.serializedData().size());
+
+    // Next, turn Envelope into Proto-encoded byte stream.
+    std::string envelopeAsProto;
+    {
+        cluon::ToProtoVisitor proto;
+        env.accept(proto);
+        envelopeAsProto = proto.encodedData();
+    }
+
+    uint32_t length{static_cast<uint32_t>(envelopeAsProto.size())}; // NOLINT
+    length <<= 8;
+    length = htole32(length);
+
+    std::stringstream sstr;
+    // Add OD4 header.
+    constexpr unsigned char OD4_HEADER_BYTE0 = 0x0D;
+    constexpr unsigned char OD4_HEADER_BYTE1 = 0xA4;
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE0));
+    auto posByte1 = sstr.tellp();
+    sstr.write(reinterpret_cast<char *>(&length), static_cast<std::streamsize>(sizeof(uint32_t)));
+    auto posByte5 = sstr.tellp();
+    sstr.seekp(posByte1);
+    sstr.put(static_cast<char>(OD4_HEADER_BYTE1));
+    sstr.seekp(posByte5);
+
+    // Write payload.
+    sstr.write(&envelopeAsProto[0], static_cast<std::streamsize>(envelopeAsProto.size()));
+
+    const std::string output{sstr.str()};
+
+    // output contains now an Envelope in a structure similar to how
+    // a Container would be encoded.
+
+    const char *messageSpecification = R"(
+message TestMessageA [id = 30012] {
+    bool attribute1 [default = true, id = 1];
+    char attribute2 [default = 'c', id = 2];
+    int8 attribute3 [default = -1, id = 3];
+    uint8 attribute4 [default = 2, id = 4];
+    int16 attribute5 [default = -3, id = 5];
+    uint16 attribute6 [default = 4, id = 6];
+    int32 attribute9 [default = -5, id = 9];
+    uint32 attribute8 [default = 6, id = 8];
+    int64 attribute10 [default = -7, id = 10];
+    uint64 attribute11 [default = 8, id = 11];
+    float attribute12 [default = -9.5, id = 12];
+    double attribute13 [default = 10.6, id = 13];
+    string attribute14 [default = "Hello World", id = 14];
+    bytes attribute15 [default = "Hello Galaxy", id = 15];
+}
+)";
+
+    const char *JSON = R"({"dataType":30012,
+"sent":{"seconds":1,
+"microseconds":2},
+"received":{"seconds":10,
+"microseconds":20},
+"sampleTimeStamp":{"seconds":100,
+"microseconds":200},
+"senderStamp":2,
+"TestMessageA":{"attribute1":1,
+"attribute2":"c",
+"attribute3":-1,
+"attribute4":2,
+"attribute5":-3,
+"attribute6":4,
+"attribute9":-5,
+"attribute8":6,
+"attribute10":-7,
+"attribute11":8,
+"attribute12":-9.5,
+"attribute13":10.6,
+"attribute14":"SGVsbG8gV29ybGQ=",
+"attribute15":"SGVsbG8gR2FsYXh5"}})";
 
     cluon::EnvelopeConverter envConverter;
     REQUIRE(1 == envConverter.setMessageSpecification(std::string(messageSpecification)));

@@ -16,14 +16,14 @@ message testdata.MyTestMessage1 [id = 30001] {
     uint8 attribute4 [default = 2, id = 4];
     int16 attribute5 [default = -3, id = 5];
     uint16 attribute6 [default = 4, id = 6];
-    int32 attribute7 [default = -5, id = 9];
+    int32 attribute7 [default = -5, id = 7];
     uint32 attribute8 [default = 6, id = 8];
-    int64 attribute9 [default = -7, id = 10];
-    uint64 attribute10 [default = 8, id = 11];
-    float attribute11 [default = -9.5, id = 12];
-    double attribute12 [default = 10.6, id = 13];
-    string attribute13 [default = "Hello World", id = 14];
-    bytes attribute14 [default = "Hello Galaxy", id = 15];
+    int64 attribute9 [default = -7, id = 9];
+    uint64 attribute10 [default = 8, id = 10];
+    float attribute11 [default = -9.5, id = 11];
+    double attribute12 [default = 10.6, id = 12];
+    string attribute13 [default = "Hello World", id = 13];
+    bytes attribute14 [default = "Hello Galaxy", id = 14];
 }
 
 message testdata.MyTestMessage2 [id = 30002] {
@@ -77,4 +77,23 @@ message testdata.MyTestMessage10 [id = 30010] {
 }
 
 message testdata.MyTestMessage11 [id = 30011] {}
+
+// Message with non-consecutive IDs
+message testdata.MyTestMessage12 [id = 30012] {
+    bool attribute1 [default = true, id = 1];
+    char attribute2 [default = 'c', id = 2];
+    int8 attribute3 [default = -1, id = 3];
+    uint8 attribute4 [default = 2, id = 4];
+    int16 attribute5 [default = -3, id = 5];
+    uint16 attribute6 [default = 4, id = 6];
+    int32 attribute9 [default = -5, id = 9];
+    uint32 attribute8 [default = 6, id = 8];
+    int64 attribute10 [default = -7, id = 10];
+    uint64 attribute11 [default = 8, id = 11];
+    float attribute12 [default = -9.5, id = 12];
+    double attribute13 [default = 10.6, id = 13];
+    string attribute14 [default = "Hello World", id = 14];
+    bytes attribute15 [default = "Hello Galaxy", id = 15];
+}
+
 
