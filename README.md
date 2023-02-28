@@ -184,7 +184,7 @@ cd build
 Next, run `cmake` to create the necessary build files:
 
 ```
-cmake ..
+cmake ../libcluon
 ```
 
 Finally, compile and install the software:

@@ -553,14 +553,10 @@ struct SemanticValues : protected std::vector<any> {
 
   // Transform the semantic value vector to another vector
   template <typename T>
-  std::vector<T> transform(size_t beg = 0,
-                           size_t end = static_cast<size_t>(-1)) const {
-    std::vector<T> r;
-    end = (std::min)(end, size());
-    for (size_t i = beg; i < end; i++) {
-      r.emplace_back(any_cast<T>((*this)[i]));
-    }
-    return r;
+  auto transform(size_t beg = 0, size_t end = static_cast<size_t>(-1)) const
+      -> vector<T> {
+    return this->transform(beg, end,
+                           [](const any &v) { return any_cast<T>(v); });
   }
 
   using std::vector<any>::iterator;
@@ -598,6 +594,27 @@ private:
   size_t choice_count_ = 0;
   size_t choice_ = 0;
   std::string name_;
+
+  template <typename F>
+  auto transform(F f) const
+      -> vector<typename std::remove_const<decltype(f(any()))>::type> {
+    vector<typename std::remove_const<decltype(f(any()))>::type> r;
+    for (const auto &v : *this) {
+      r.emplace_back(f(v));
+    }
+    return r;
+  }
+
+  template <typename F>
+  auto transform(size_t beg, size_t end, F f) const
+      -> vector<typename std::remove_const<decltype(f(any()))>::type> {
+    vector<typename std::remove_const<decltype(f(any()))>::type> r;
+    end = (std::min)(end, size());
+    for (size_t i = beg; i < end; i++) {
+      r.emplace_back(f((*this)[i]));
+    }
+    return r;
+  }
 };
 
 /*
@@ -823,8 +840,6 @@ public:
 
   std::vector<std::shared_ptr<SemanticValues>> value_stack;
   size_t value_stack_size = 0;
-
-  std::vector<Definition *> rule_stack;
   std::vector<std::vector<std::shared_ptr<Ope>>> args_stack;
 
   bool in_token = false;
@@ -913,13 +928,13 @@ public:
       auto &sv = *value_stack[value_stack_size];
       if (!sv.empty()) {
         sv.clear();
-        if (!sv.tags.empty()) { sv.tags.clear(); }
+        sv.tags.clear();
       }
       sv.s_ = nullptr;
       sv.n_ = 0;
       sv.choice_count_ = 0;
       sv.choice_ = 0;
-      if (!sv.tokens.empty()) { sv.tokens.clear(); }
+      sv.tokens.clear();
     }
 
     auto &sv = *value_stack[value_stack_size++];
@@ -947,7 +962,7 @@ public:
       capture_scope_stack.emplace_back(std::map<std::string, std::string>());
     } else {
       auto &cs = capture_scope_stack[capture_scope_stack_size];
-      if (!cs.empty()) { cs.clear(); }
+      cs.clear();
     }
     capture_scope_stack_size++;
   }
@@ -1055,7 +1070,8 @@ public:
         c.pop();
         c.pop_capture_scope();
       });
-      auto len = ope->parse(s, n, chldsv, c, dt);
+      const auto &rule = *ope;
+      auto len = rule.parse(s, n, chldsv, c, dt);
       if (success(len)) {
         if (!chldsv.empty()) {
           for (size_t i = 0; i < chldsv.size(); i++) {
@@ -1208,7 +1224,8 @@ public:
       c.pop();
       c.pop_capture_scope();
     });
-    auto len = ope_->parse(s, n, chldsv, c, dt);
+    const auto &rule = *ope_;
+    auto len = rule.parse(s, n, chldsv, c, dt);
     if (success(len)) {
       c.set_error_pos(s);
       return static_cast<size_t>(-1);
@@ -1238,12 +1255,8 @@ public:
 class LiteralString : public Ope,
                       public std::enable_shared_from_this<LiteralString> {
 public:
-  LiteralString(std::string &&s, bool ignore_case)
-      : lit_(s), ignore_case_(ignore_case),
-        is_word_(false) {}
-
   LiteralString(const std::string &s, bool ignore_case)
-      : lit_(s), ignore_case_(ignore_case),
+      : lit_(s), ignore_case_(ignore_case), init_is_word_(false),
         is_word_(false) {}
 
   size_t parse_core(const char *s, size_t n, SemanticValues &sv, Context &c,
@@ -1253,7 +1266,7 @@ public:
 
   std::string lit_;
   bool ignore_case_;
-  mutable std::once_flag init_is_word_;
+  mutable bool init_is_word_;
   mutable bool is_word_;
 };
 
@@ -1601,11 +1614,11 @@ inline std::shared_ptr<Ope> dic(const std::vector<std::string> &v) {
   return std::make_shared<Dictionary>(v);
 }
 
-inline std::shared_ptr<Ope> lit(std::string &&s) {
+inline std::shared_ptr<Ope> lit(const std::string &s) {
   return std::make_shared<LiteralString>(s, false);
 }
 
-inline std::shared_ptr<Ope> liti(std::string &&s) {
+inline std::shared_ptr<Ope> liti(const std::string &s) {
   return std::make_shared<LiteralString>(s, true);
 }
 
@@ -1706,7 +1719,6 @@ struct Ope::Visitor {
 };
 
 struct IsReference : public Ope::Visitor {
-  using Ope::Visitor::visit;
   void visit(Reference & /*ope*/) override { is_reference = true; }
   bool is_reference = false;
 };
@@ -1742,8 +1754,6 @@ struct TraceOpeName : public Ope::Visitor {
 };
 
 struct AssignIDToDefinition : public Ope::Visitor {
-  using Ope::Visitor::visit;
-
   void visit(Sequence &ope) override {
     for (auto op : ope.opes_) {
       op->accept(*this);
@@ -1765,14 +1775,11 @@ struct AssignIDToDefinition : public Ope::Visitor {
   void visit(Holder &ope) override;
   void visit(Reference &ope) override;
   void visit(Whitespace &ope) override { ope.ope_->accept(*this); }
-  void visit(PrecedenceClimbing &ope) override;
 
   std::unordered_map<void *, size_t> ids;
 };
 
 struct IsLiteralToken : public Ope::Visitor {
-  using Ope::Visitor::visit;
-
   void visit(PrioritizedChoice &ope) override {
     for (auto op : ope.opes_) {
       if (!IsLiteralToken::check(*op)) { return; }
@@ -1794,8 +1801,6 @@ private:
 };
 
 struct TokenChecker : public Ope::Visitor {
-  using Ope::Visitor::visit;
-
   void visit(Sequence &ope) override {
     for (auto op : ope.opes_) {
       op->accept(*this);
@@ -1811,7 +1816,7 @@ struct TokenChecker : public Ope::Visitor {
   void visit(Capture &ope) override { ope.ope_->accept(*this); }
   void visit(TokenBoundary & /*ope*/) override { has_token_boundary_ = true; }
   void visit(Ignore &ope) override { ope.ope_->accept(*this); }
-  void visit(WeakHolder &ope) override;
+  void visit(WeakHolder &ope) override { ope.weak_.lock()->accept(*this); }
   void visit(Reference &ope) override;
   void visit(Whitespace &ope) override { ope.ope_->accept(*this); }
   void visit(PrecedenceClimbing &ope) override { ope.atom_->accept(*this); }
@@ -1890,8 +1895,6 @@ private:
 };
 
 struct HasEmptyElement : public Ope::Visitor {
-  using Ope::Visitor::visit;
-
   HasEmptyElement(std::list<std::pair<const char *, std::string>> &refs)
       : refs_(refs) {}
 
@@ -1927,9 +1930,6 @@ struct HasEmptyElement : public Ope::Visitor {
   }
   void visit(AndPredicate & /*ope*/) override { set_error(); }
   void visit(NotPredicate & /*ope*/) override { set_error(); }
-  void visit(LiteralString &ope) override {
-    if (ope.lit_.empty()) { set_error(); }
-  }
   void visit(CaptureScope &ope) override { ope.ope_->accept(*this); }
   void visit(Capture &ope) override { ope.ope_->accept(*this); }
   void visit(TokenBoundary &ope) override { ope.ope_->accept(*this); }
@@ -1954,8 +1954,6 @@ private:
 };
 
 struct DetectInfiniteLoop : public Ope::Visitor {
-  using Ope::Visitor::visit;
-
   DetectInfiniteLoop(const char *s, const std::string &name) {
     refs_.emplace_back(s, name);
   }
@@ -2006,8 +2004,6 @@ private:
 };
 
 struct ReferenceChecker : public Ope::Visitor {
-  using Ope::Visitor::visit;
-
   ReferenceChecker(const Grammar &grammar,
                    const std::vector<std::string> &params)
       : grammar_(grammar), params_(params) {}
@@ -2044,8 +2040,6 @@ private:
 };
 
 struct LinkReferences : public Ope::Visitor {
-  using Ope::Visitor::visit;
-
   LinkReferences(Grammar &grammar, const std::vector<std::string> &params)
       : grammar_(grammar), params_(params) {}
 
@@ -2078,8 +2072,6 @@ private:
 };
 
 struct FindReference : public Ope::Visitor {
-  using Ope::Visitor::visit;
-
   FindReference(const std::vector<std::shared_ptr<Ope>> &args,
                 const std::vector<std::string> &params)
       : args_(args), params_(params) {}
@@ -2157,8 +2149,6 @@ private:
 };
 
 struct IsPrioritizedChoice : public Ope::Visitor {
-  using Ope::Visitor::visit;
-
   void visit(PrioritizedChoice & /*ope*/) override { result_ = true; }
 
   static bool check(Ope &ope) {
@@ -2361,7 +2351,7 @@ private:
 
 inline size_t parse_literal(const char *s, size_t n, SemanticValues &sv,
                             Context &c, any &dt, const std::string &lit,
-                            std::once_flag &init_is_word, bool &is_word,
+                            bool &init_is_word, bool &is_word,
                             bool ignore_case) {
   size_t i = 0;
   for (; i < lit.size(); i++) {
@@ -2378,17 +2368,18 @@ inline size_t parse_literal(const char *s, size_t n, SemanticValues &sv,
   static SemanticValues dummy_sv;
   static any dummy_dt;
 
-  std::call_once(init_is_word, [&]() {
+  if (!init_is_word) { // TODO: Protect with mutex
     if (c.wordOpe) {
       auto len =
           c.wordOpe->parse(lit.data(), lit.size(), dummy_sv, dummy_c, dummy_dt);
       is_word = success(len);
     }
-  });
+    init_is_word = true;
+  }
 
   if (is_word) {
-    NotPredicate ope(c.wordOpe);
-    auto len = ope.parse(s + i, n - i, dummy_sv, dummy_c, dummy_dt);
+    auto ope = std::make_shared<NotPredicate>(c.wordOpe);
+    auto len = ope->parse(s + i, n - i, dummy_sv, dummy_c, dummy_dt);
     if (fail(len)) { return static_cast<size_t>(-1); }
     i += len;
   }
@@ -2461,9 +2452,10 @@ inline size_t TokenBoundary::parse_core(const char *s, size_t n,
                                         any &dt) const {
   c.in_token = true;
   auto se = make_scope_exit([&]() { c.in_token = false; });
-  auto len = ope_->parse(s, n, sv, c, dt);
+  const auto &rule = *ope_;
+  auto len = rule.parse(s, n, sv, c, dt);
   if (success(len)) {
-    sv.tokens.emplace_back(std::make_pair(s, len));
+    sv.tokens.push_back(std::make_pair(s, len));
 
     if (c.whitespaceOpe) {
       auto l = c.whitespaceOpe->parse(s + len, n - len, sv, c, dt);
@@ -2481,12 +2473,8 @@ inline size_t Holder::parse_core(const char *s, size_t n, SemanticValues &sv,
   }
 
   // Macro reference
-  if (outer_->is_macro) {
-    c.rule_stack.push_back(outer_);
-    auto len = ope_->parse(s, n, sv, c, dt);
-    c.rule_stack.pop_back();
-    return len;
-  }
+  // TODO: need packrat support
+  if (outer_->is_macro) { return ope_->parse(s, n, sv, c, dt); }
 
   size_t len;
   any val;
@@ -2502,9 +2490,7 @@ inline size_t Holder::parse_core(const char *s, size_t n, SemanticValues &sv,
 
     auto &chldsv = c.push();
 
-    c.rule_stack.push_back(outer_);
     len = ope_->parse(s, n, chldsv, c, dt);
-    c.rule_stack.pop_back();
 
     // Invoke action
     if (success(len)) {
@@ -2533,7 +2519,7 @@ inline size_t Holder::parse_core(const char *s, size_t n, SemanticValues &sv,
 
   if (success(len)) {
     if (!outer_->ignoreSemanticValue) {
-      sv.emplace_back(std::move(val));
+      sv.emplace_back(val);
       sv.tags.emplace_back(str2tag(outer_->name.c_str()));
     }
   } else {
@@ -2569,13 +2555,13 @@ inline size_t Reference::parse_core(const char *s, size_t n, SemanticValues &sv,
     // Reference rule
     if (rule_->is_macro) {
       // Macro
-      FindReference vis(c.top_args(), c.rule_stack.back()->params);
+      FindReference vis(c.top_args(), rule_->params);
 
       // Collect arguments
       std::vector<std::shared_ptr<Ope>> args;
       for (auto arg : args_) {
         arg->accept(vis);
-        args.emplace_back(std::move(vis.found_ope));
+        args.push_back(vis.found_ope);
       }
 
       c.push_args(std::move(args));
@@ -2584,8 +2570,6 @@ inline size_t Reference::parse_core(const char *s, size_t n, SemanticValues &sv,
       return ope->parse(s, n, sv, c, dt);
     } else {
       // Definition
-      c.push_args(std::vector<std::shared_ptr<Ope>>());
-      auto se = make_scope_exit([&]() { c.pop_args(); });
       auto ope = get_core_operator();
       return ope->parse(s, n, sv, c, dt);
     }
@@ -2609,7 +2593,7 @@ inline size_t BackReference::parse_core(const char *s, size_t n,
     const auto &cs = c.capture_scope_stack[index];
     if (cs.find(name_) != cs.end()) {
       const auto &lit = cs.at(name_);
-      std::once_flag init_is_word;
+      auto init_is_word = false;
       auto is_word = false;
       return parse_literal(s, n, sv, c, dt, lit, init_is_word, is_word, false);
     }
@@ -2750,13 +2734,6 @@ inline void AssignIDToDefinition::visit(Reference &ope) {
     ope.rule_->accept(*this);
   }
 }
-
-inline void AssignIDToDefinition::visit(PrecedenceClimbing &ope) {
-  ope.atom_->accept(*this);
-  ope.binop_->accept(*this);
-}
-
-inline void TokenChecker::visit(WeakHolder & /*ope*/) { has_rule_ = true; }
 
 inline void TokenChecker::visit(Reference &ope) {
   if (ope.is_macro_) {
@@ -3159,7 +3136,7 @@ private:
         case Loop::Type::opt: return opt(ope);
         case Loop::Type::zom: return zom(ope);
         case Loop::Type::oom: return oom(ope);
-        default: // Regex-like repetition
+        case Loop::Type::rep: // Regex-like repetition
           return rep(ope, loop.range.first, loop.range.second);
         }
       }
@@ -3550,10 +3527,9 @@ private:
 
 template <typename Annotation> struct AstBase : public Annotation {
   AstBase(const char *a_path, size_t a_line, size_t a_column,
-          const char *a_name,
-          const std::vector<std::shared_ptr<AstBase>> &a_nodes,
-          size_t a_position = 0, size_t a_length = 0, size_t a_choice_count = 0,
-          size_t a_choice = 0)
+          const char *a_name, size_t a_position, size_t a_length,
+          size_t a_choice_count, size_t a_choice,
+          const std::vector<std::shared_ptr<AstBase>> &a_nodes)
       : path(a_path ? a_path : ""), line(a_line), column(a_column),
         name(a_name), position(a_position), length(a_length),
         choice_count(a_choice_count), choice(a_choice), original_name(a_name),
@@ -3562,8 +3538,8 @@ template <typename Annotation> struct AstBase : public Annotation {
         nodes(a_nodes) {}
 
   AstBase(const char *a_path, size_t a_line, size_t a_column,
-          const char *a_name, const std::string &a_token, size_t a_position = 0,
-          size_t a_length = 0, size_t a_choice_count = 0, size_t a_choice = 0)
+          const char *a_name, size_t a_position, size_t a_length,
+          size_t a_choice_count, size_t a_choice, const std::string &a_token)
       : path(a_path ? a_path : ""), line(a_line), column(a_column),
         name(a_name), position(a_position), length(a_length),
         choice_count(a_choice_count), choice(a_choice), original_name(a_name),
@@ -3571,9 +3547,9 @@ template <typename Annotation> struct AstBase : public Annotation {
         tag(str2tag(a_name)), original_tag(tag), is_token(true),
         token(a_token) {}
 
-  AstBase(const AstBase &ast, const char *a_original_name,
-          size_t a_position = 0, size_t a_length = 0,
-          size_t a_original_choice_count = 0, size_t a_original_choise = 0)
+  AstBase(const AstBase &ast, const char *a_original_name, size_t a_position,
+          size_t a_length, size_t a_original_choice_count,
+          size_t a_original_choise)
       : path(ast.path), line(ast.line), column(ast.column), name(ast.name),
         position(a_position), length(a_length), choice_count(ast.choice_count),
         choice(ast.choice), original_name(a_original_name),
@@ -3637,15 +3613,16 @@ ast_to_s(const std::shared_ptr<T> &ptr,
 }
 
 struct AstOptimizer {
-  AstOptimizer(bool mode, const std::vector<std::string> &rules = {})
-      : mode_(mode), rules_(rules) {}
+  AstOptimizer(bool optimize_nodes,
+               const std::vector<std::string> &filters = {})
+      : optimize_nodes_(optimize_nodes), filters_(filters) {}
 
   template <typename T>
   std::shared_ptr<T> optimize(std::shared_ptr<T> original,
                               std::shared_ptr<T> parent = nullptr) {
-    auto found =
-        std::find(rules_.begin(), rules_.end(), original->name) != rules_.end();
-    bool opt = mode_ ? !found : found;
+    auto found = std::find(filters_.begin(), filters_.end(), original->name) !=
+                 filters_.end();
+    bool opt = optimize_nodes_ ? !found : found;
 
     if (opt && original->nodes.size() == 1) {
       auto child = optimize(original->nodes[0], parent);
@@ -3665,166 +3642,12 @@ struct AstOptimizer {
   }
 
 private:
-  const bool mode_;
-  const std::vector<std::string> rules_;
+  const bool optimize_nodes_;
+  const std::vector<std::string> filters_;
 };
 
 struct EmptyType {};
 typedef AstBase<EmptyType> Ast;
-
-template <typename T = Ast> void add_ast_action(Definition &rule) {
-  rule.action = [&](const SemanticValues &sv) {
-    auto line = sv.line_info();
-
-    if (rule.is_token()) {
-      return std::make_shared<T>(sv.path, line.first, line.second,
-                                 rule.name.c_str(), sv.token(),
-                                 std::distance(sv.ss, sv.c_str()), sv.length(),
-                                 sv.choice_count(), sv.choice());
-    }
-
-    auto ast = std::make_shared<T>(
-        sv.path, line.first, line.second, rule.name.c_str(),
-        sv.transform<std::shared_ptr<T>>(), std::distance(sv.ss, sv.c_str()),
-        sv.length(), sv.choice_count(), sv.choice());
-
-    for (auto node : ast->nodes) {
-      node->parent = ast;
-    }
-    return ast;
-  };
-}
-
-#define PEG_EXPAND(...) __VA_ARGS__
-#define PEG_CONCAT(a, b) a##b
-#define PEG_CONCAT2(a, b) PEG_CONCAT(a, b)
-
-#define PEG_PICK(                                                              \
-    a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, \
-    a17, a18, a19, a20, a21, a22, a23, a24, a25, a26, a27, a28, a29, a30, a31, \
-    a32, a33, a34, a35, a36, a37, a38, a39, a40, a41, a42, a43, a44, a45, a46, \
-    a47, a48, a49, a50, a51, a52, a53, a54, a55, a56, a57, a58, a59, a60, a61, \
-    a62, a63, a64, a65, a66, a67, a68, a69, a70, a71, a72, a73, a74, a75, a76, \
-    a77, a78, a79, a80, a81, a82, a83, a84, a85, a86, a87, a88, a89, a90, a91, \
-    a92, a93, a94, a95, a96, a97, a98, a99, a100, ...)                         \
-  a100
-
-#define PEG_COUNT(...)                                                         \
-  PEG_EXPAND(PEG_PICK(                                                         \
-      __VA_ARGS__, 100, 99, 98, 97, 96, 95, 94, 93, 92, 91, 90, 89, 88, 87,    \
-      86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69,  \
-      68, 67, 66, 65, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51,  \
-      50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,  \
-      32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15,  \
-      14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0))
-
-#define PEG_DEF_1(r)                                                           \
-  peg::Definition r;                                                           \
-  r.name = #r;                                                                 \
-  peg::add_ast_action(r);
-
-#define PEG_DEF_2(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_1(__VA_ARGS__))
-#define PEG_DEF_3(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_2(__VA_ARGS__))
-#define PEG_DEF_4(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_3(__VA_ARGS__))
-#define PEG_DEF_5(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_4(__VA_ARGS__))
-#define PEG_DEF_6(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_5(__VA_ARGS__))
-#define PEG_DEF_7(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_6(__VA_ARGS__))
-#define PEG_DEF_8(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_7(__VA_ARGS__))
-#define PEG_DEF_9(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_8(__VA_ARGS__))
-#define PEG_DEF_10(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_9(__VA_ARGS__))
-#define PEG_DEF_11(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_10(__VA_ARGS__))
-#define PEG_DEF_12(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_11(__VA_ARGS__))
-#define PEG_DEF_13(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_12(__VA_ARGS__))
-#define PEG_DEF_14(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_13(__VA_ARGS__))
-#define PEG_DEF_15(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_14(__VA_ARGS__))
-#define PEG_DEF_16(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_15(__VA_ARGS__))
-#define PEG_DEF_17(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_16(__VA_ARGS__))
-#define PEG_DEF_18(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_17(__VA_ARGS__))
-#define PEG_DEF_19(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_18(__VA_ARGS__))
-#define PEG_DEF_20(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_19(__VA_ARGS__))
-#define PEG_DEF_21(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_20(__VA_ARGS__))
-#define PEG_DEF_22(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_21(__VA_ARGS__))
-#define PEG_DEF_23(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_22(__VA_ARGS__))
-#define PEG_DEF_24(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_23(__VA_ARGS__))
-#define PEG_DEF_25(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_24(__VA_ARGS__))
-#define PEG_DEF_26(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_25(__VA_ARGS__))
-#define PEG_DEF_27(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_26(__VA_ARGS__))
-#define PEG_DEF_28(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_27(__VA_ARGS__))
-#define PEG_DEF_29(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_28(__VA_ARGS__))
-#define PEG_DEF_30(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_29(__VA_ARGS__))
-#define PEG_DEF_31(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_30(__VA_ARGS__))
-#define PEG_DEF_32(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_31(__VA_ARGS__))
-#define PEG_DEF_33(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_32(__VA_ARGS__))
-#define PEG_DEF_34(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_33(__VA_ARGS__))
-#define PEG_DEF_35(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_34(__VA_ARGS__))
-#define PEG_DEF_36(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_35(__VA_ARGS__))
-#define PEG_DEF_37(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_36(__VA_ARGS__))
-#define PEG_DEF_38(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_37(__VA_ARGS__))
-#define PEG_DEF_39(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_38(__VA_ARGS__))
-#define PEG_DEF_40(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_39(__VA_ARGS__))
-#define PEG_DEF_41(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_40(__VA_ARGS__))
-#define PEG_DEF_42(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_41(__VA_ARGS__))
-#define PEG_DEF_43(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_42(__VA_ARGS__))
-#define PEG_DEF_44(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_43(__VA_ARGS__))
-#define PEG_DEF_45(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_44(__VA_ARGS__))
-#define PEG_DEF_46(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_45(__VA_ARGS__))
-#define PEG_DEF_47(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_46(__VA_ARGS__))
-#define PEG_DEF_48(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_47(__VA_ARGS__))
-#define PEG_DEF_49(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_48(__VA_ARGS__))
-#define PEG_DEF_50(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_49(__VA_ARGS__))
-#define PEG_DEF_51(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_50(__VA_ARGS__))
-#define PEG_DEF_52(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_51(__VA_ARGS__))
-#define PEG_DEF_53(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_52(__VA_ARGS__))
-#define PEG_DEF_54(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_53(__VA_ARGS__))
-#define PEG_DEF_55(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_54(__VA_ARGS__))
-#define PEG_DEF_56(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_55(__VA_ARGS__))
-#define PEG_DEF_57(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_56(__VA_ARGS__))
-#define PEG_DEF_58(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_57(__VA_ARGS__))
-#define PEG_DEF_59(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_58(__VA_ARGS__))
-#define PEG_DEF_60(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_59(__VA_ARGS__))
-#define PEG_DEF_61(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_60(__VA_ARGS__))
-#define PEG_DEF_62(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_61(__VA_ARGS__))
-#define PEG_DEF_63(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_62(__VA_ARGS__))
-#define PEG_DEF_64(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_63(__VA_ARGS__))
-#define PEG_DEF_65(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_64(__VA_ARGS__))
-#define PEG_DEF_66(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_65(__VA_ARGS__))
-#define PEG_DEF_67(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_66(__VA_ARGS__))
-#define PEG_DEF_68(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_67(__VA_ARGS__))
-#define PEG_DEF_69(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_68(__VA_ARGS__))
-#define PEG_DEF_70(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_69(__VA_ARGS__))
-#define PEG_DEF_71(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_70(__VA_ARGS__))
-#define PEG_DEF_72(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_71(__VA_ARGS__))
-#define PEG_DEF_73(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_72(__VA_ARGS__))
-#define PEG_DEF_74(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_73(__VA_ARGS__))
-#define PEG_DEF_75(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_74(__VA_ARGS__))
-#define PEG_DEF_76(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_75(__VA_ARGS__))
-#define PEG_DEF_77(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_76(__VA_ARGS__))
-#define PEG_DEF_78(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_77(__VA_ARGS__))
-#define PEG_DEF_79(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_78(__VA_ARGS__))
-#define PEG_DEF_80(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_79(__VA_ARGS__))
-#define PEG_DEF_81(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_80(__VA_ARGS__))
-#define PEG_DEF_82(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_81(__VA_ARGS__))
-#define PEG_DEF_83(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_82(__VA_ARGS__))
-#define PEG_DEF_84(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_83(__VA_ARGS__))
-#define PEG_DEF_85(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_84(__VA_ARGS__))
-#define PEG_DEF_86(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_85(__VA_ARGS__))
-#define PEG_DEF_87(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_86(__VA_ARGS__))
-#define PEG_DEF_88(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_87(__VA_ARGS__))
-#define PEG_DEF_89(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_88(__VA_ARGS__))
-#define PEG_DEF_90(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_89(__VA_ARGS__))
-#define PEG_DEF_91(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_90(__VA_ARGS__))
-#define PEG_DEF_92(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_91(__VA_ARGS__))
-#define PEG_DEF_93(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_92(__VA_ARGS__))
-#define PEG_DEF_94(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_93(__VA_ARGS__))
-#define PEG_DEF_95(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_94(__VA_ARGS__))
-#define PEG_DEF_96(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_95(__VA_ARGS__))
-#define PEG_DEF_97(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_96(__VA_ARGS__))
-#define PEG_DEF_98(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_97(__VA_ARGS__))
-#define PEG_DEF_99(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_98(__VA_ARGS__))
-#define PEG_DEF_100(r1, ...) PEG_EXPAND(PEG_DEF_1(r1) PEG_DEF_99(__VA_ARGS__))
-
-#define AST_DEFINITIONS(...)                                                   \
-  PEG_EXPAND(PEG_CONCAT2(PEG_DEF_, PEG_COUNT(__VA_ARGS__))(__VA_ARGS__))
 
 /*-----------------------------------------------------------------------------
  *  parser
@@ -3955,8 +3778,31 @@ public:
 
   template <typename T = Ast> parser &enable_ast() {
     for (auto &x : *grammar_) {
+      const auto &name = x.first;
       auto &rule = x.second;
-      if (!rule.action) { add_ast_action<T>(rule); }
+
+      if (!rule.action) {
+        rule.action = [&](const SemanticValues &sv) {
+          auto line = sv.line_info();
+
+          if (rule.is_token()) {
+            return std::make_shared<T>(
+                sv.path, line.first, line.second, name.c_str(),
+                std::distance(sv.ss, sv.c_str()), sv.length(),
+                sv.choice_count(), sv.choice(), sv.token());
+          }
+
+          auto ast = std::make_shared<T>(
+              sv.path, line.first, line.second, name.c_str(),
+              std::distance(sv.ss, sv.c_str()), sv.length(), sv.choice_count(),
+              sv.choice(), sv.transform<std::shared_ptr<T>>());
+
+          for (auto node : ast->nodes) {
+            node->parent = ast;
+          }
+          return ast;
+        };
+      }
     }
     return *this;
   }

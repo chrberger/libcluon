@@ -54,14 +54,14 @@ TEST_CASE("Testing MyTestMessage1.") {
     uint8 attribute4 [ default = 0, id = 4 ];
     int16 attribute5 [ default = 0, id = 5 ];
     uint16 attribute6 [ default = 0, id = 6 ];
-    int32 attribute7 [ default = 0, id = 9 ];
+    int32 attribute7 [ default = 0, id = 7 ];
     uint32 attribute8 [ default = 0, id = 8 ];
-    int64 attribute9 [ default = 0, id = 10 ];
-    uint64 attribute10 [ default = 0, id = 11 ];
-    float attribute11 [ default = 0.0, id = 12 ];
-    double attribute12 [ default = 0.0, id = 13 ];
-    string attribute13 [ default = "", id = 14 ];
-    string attribute14 [ default = "", id = 15 ];
+    int64 attribute9 [ default = 0, id = 9 ];
+    uint64 attribute10 [ default = 0, id = 10 ];
+    float attribute11 [ default = 0.0, id = 11 ];
+    double attribute12 [ default = 0.0, id = 12 ];
+    string attribute13 [ default = "", id = 13 ];
+    string attribute14 [ default = "", id = 14 ];
 }
 )";
 
