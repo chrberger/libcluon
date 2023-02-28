@@ -1,3 +1,27 @@
+libcluon (0.0.145-1ppa1~jammy1) jammy; urgency=medium
+
+  * integrating bugfix for parser for non-consecutive IDs
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 28 Feb 2023 23:58:19 +0100
+
+libcluon (0.0.145-1ppa1~focal1) focal; urgency=medium
+
+  * integrating bugfix for parser for non-consecutive IDs
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 28 Feb 2023 23:58:19 +0100
+
+libcluon (0.0.145-1ppa1~bionic1) bionic; urgency=medium
+
+  * integrating bugfix for parser for non-consecutive IDs
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 28 Feb 2023 23:58:19 +0100
+
+libcluon (0.0.145-1ppa1~xenial1) xenial; urgency=medium
+
+  * integrating bugfix for parser for non-consecutive IDs
+
+ -- Christian Berger <christian.berger@gu.se>  Tue, 28 Feb 2023 23:58:19 +0100
+
 libcluon (0.0.144-1ppa1~jammy1) jammy; urgency=medium
 
   * GH deploy fix
