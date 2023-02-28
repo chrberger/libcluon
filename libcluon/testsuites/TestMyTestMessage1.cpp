@@ -535,7 +535,6 @@ TEST_CASE("Dynamically creating messages for complex message.") {
 //    string attribute13 [default = "Hello World", id = 13];
 //    bytes attribute14 [default = "Hello Galaxy", id = 14];
 //}
-
 message example.MyTestMessage1 [id = 30001] {
     bool field1 [id = 1];
     char field2 [id = 2];
@@ -652,6 +651,146 @@ message example.MyTestMessage1 [id = 30001] {
         REQUIRE(10.6 == Approx(src.attribute12()));
         REQUIRE("Hello World" == src.attribute13());
         REQUIRE("Hello Galaxy" == src.attribute14());
+    }
+}
+
+TEST_CASE("Dynamically creating messages for complex message with non-consecutive IDs.") {
+    const char *msg = R"(
+// Original message:
+//message testdata.MyTestMessage12 [id = 30012] {
+//    bool attribute1 [default = true, id = 1];
+//    char attribute2 [default = 'c', id = 2];
+//    int8 attribute3 [default = -1, id = 3];
+//    uint8 attribute4 [default = 2, id = 4];
+//    int16 attribute5 [default = -3, id = 5];
+//    uint16 attribute6 [default = 4, id = 6];
+//    int32 attribute9 [default = -5, id = 9];
+//    uint32 attribute8 [default = 6, id = 8];
+//    int64 attribute10 [default = -7, id = 10];
+//    uint64 attribute11 [default = 8, id = 11];
+//    float attribute12 [default = -9.5, id = 12];
+//    double attribute13 [default = 10.6, id = 13];
+//    string attribute14 [default = "Hello World", id = 14];
+//    bytes attribute15 [default = "Hello Galaxy", id = 15];
+//}
+
+message example.MyTestMessage12 [id = 30012] {
+    bool field1 [id = 1];
+    char field2 [id = 2];
+    int8 field3 [id = 3];
+    uint8 field4 [id = 4];
+    int16 field5 [id = 5];
+    uint16 field6 [id = 6];
+    int32 field7 [id = 9];
+    uint32 field8 [id = 8];
+    int64 field9 [id = 10];
+    uint64 field10 [id = 11];
+    float field11 [id = 12];
+    double field12 [id = 13];
+    string field13 [id = 14];
+    bytes field14 [id = 15];
+}
+)";
+
+    testdata::MyTestMessage12 msg1;
+    REQUIRE(true == msg1.attribute1());
+    REQUIRE('c' == msg1.attribute2());
+    REQUIRE(-1 == msg1.attribute3());
+    REQUIRE(2 == msg1.attribute4());
+    REQUIRE(-3 == msg1.attribute5());
+    REQUIRE(4 == msg1.attribute6());
+    REQUIRE(-5 == msg1.attribute9());
+    REQUIRE(6 == msg1.attribute8());
+    REQUIRE(-7 == msg1.attribute10());
+    REQUIRE(8 == msg1.attribute11());
+    REQUIRE(-9.5 == Approx(msg1.attribute12()));
+    REQUIRE(10.6 == Approx(msg1.attribute13()));
+    REQUIRE("Hello World" == msg1.attribute14());
+    REQUIRE("Hello Galaxy" == msg1.attribute15());
+
+    cluon::ToProtoVisitor proto;
+    msg1.accept(proto);
+    std::string s = proto.encodedData();
+
+    std::stringstream sstr{s};
+    cluon::FromProtoVisitor protoDecoder;
+    protoDecoder.decodeFrom(sstr);
+
+    cluon::MessageParser mp;
+    auto retVal = mp.parse(std::string(msg));
+    REQUIRE(cluon::MessageParser::MessageParserErrorCodes::NO_MESSAGEPARSER_ERROR == retVal.second);
+
+    auto listOfMessages = retVal.first;
+    REQUIRE(1 == listOfMessages.size());
+
+    cluon::MetaMessage m = listOfMessages.front();
+
+    cluon::GenericMessage gm;
+    gm.createFrom(m, listOfMessages);
+
+    REQUIRE(30012 == gm.ID());
+    REQUIRE("MyTestMessage12" == gm.ShortName());
+    REQUIRE("example.MyTestMessage12" == gm.LongName());
+
+    // Set values in GenericMessage from ProtoDecoder.
+    gm.accept(protoDecoder);
+
+    // Turn GenericMessage back into Proto and decode C++ message.
+    {
+        testdata::MyTestMessage12 src;
+        src.attribute1(false)
+            .attribute2('a')
+            .attribute3(-10)
+            .attribute4(20)
+            .attribute5(-30)
+            .attribute6(40)
+            .attribute9(-50)
+            .attribute8(60)
+            .attribute10(-70)
+            .attribute11(80)
+            .attribute12(-90.5)
+            .attribute13(100.6)
+            .attribute14("World, Hello")
+            .attribute15("Galaxy, Hello");
+
+        REQUIRE(!src.attribute1());
+        REQUIRE('a' == src.attribute2());
+        REQUIRE(-10 == src.attribute3());
+        REQUIRE(20 == src.attribute4());
+        REQUIRE(-30 == src.attribute5());
+        REQUIRE(40 == src.attribute6());
+        REQUIRE(-50 == src.attribute9());
+        REQUIRE(60 == src.attribute8());
+        REQUIRE(-70 == src.attribute10());
+        REQUIRE(80 == src.attribute11());
+        REQUIRE(-90.5 == Approx(src.attribute12()));
+        REQUIRE(100.6 == Approx(src.attribute13()));
+        REQUIRE("World, Hello" == src.attribute14());
+        REQUIRE("Galaxy, Hello" == src.attribute15());
+
+        cluon::ToProtoVisitor proto2;
+        gm.accept(proto2);
+        std::string s2 = proto2.encodedData();
+
+        std::stringstream sstr2{s2};
+        cluon::FromProtoVisitor protoDecoder2;
+        protoDecoder2.decodeFrom(sstr2);
+
+        src.accept(protoDecoder2);
+        REQUIRE(src.attribute1());
+        REQUIRE('c' == src.attribute2());
+        REQUIRE(-1 == src.attribute3());
+        REQUIRE(2 == src.attribute4());
+        REQUIRE(-3 == src.attribute5());
+        REQUIRE(4 == src.attribute6());
+        REQUIRE(-5 == src.attribute9());
+        REQUIRE(6 == src.attribute8());
+        REQUIRE(-7 == src.attribute10());
+        REQUIRE(8 == src.attribute11());
+        REQUIRE(-9.5 == Approx(src.attribute12()));
+        REQUIRE(10.6 == Approx(src.attribute13()));
+        REQUIRE("Hello World" == src.attribute14());
+        REQUIRE("Hello Galaxy" == src.attribute15());
     }
 }
 

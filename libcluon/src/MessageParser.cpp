@@ -24,19 +24,14 @@ namespace cluon {
 std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> MessageParser::parse(const std::string &input) {
     const char *grammarMessageSpecificationLanguage = R"(
         MESSAGES_SPECIFICATION      <- PACKAGE_DECLARATION? MESSAGE_DECLARATION*
-        PACKAGE_DECLARATION         <- 'package' PACKAGE_IDENTIFIER ';'
-        PACKAGE_IDENTIFIER          <- < IDENTIFIER ('.' IDENTIFIER)* >
+        PACKAGE_DECLARATION         <- 'package' PACKAGE_NAME ';'
+        PACKAGE_NAME                <- < NAME ('.' NAME)* >
 
-        MESSAGE_DECLARATION         <- 'message' MESSAGE_IDENTIFIER MESSAGE_OPTIONS '{' FIELD* '}'
-        MESSAGE_IDENTIFIER          <- < IDENTIFIER ('.' IDENTIFIER)* >
-        MESSAGE_OPTIONS             <- '[' 'id' '=' NATURAL_NUMBER ','? ']'
+        MESSAGE_DECLARATION         <- 'message' MESSAGE_NAME '[' IDENTIFIER ','? ']' '{' FIELD* '}'
+        MESSAGE_NAME                <- < NAME ('.' NAME)* >
 
-        FIELD                       <- PRIMITIVE_FIELD
-
-        PRIMITIVE_FIELD             <- PRIMITIVE_TYPE IDENTIFIER ('[' PRIMITIVE_FIELD_OPTIONS ']')? ';'
-        PRIMITIVE_FIELD_OPTIONS     <- PRIMITIVE_FIELD_DEFAULT? ','? NUMERICAL_FIELD_IDENTIFIER?
-        NUMERICAL_FIELD_IDENTIFIER  <- 'id' '=' NATURAL_NUMBER
-        PRIMITIVE_FIELD_DEFAULT     <- 'default' '=' (FLOAT_NUMBER / BOOL / CHARACTER / STRING)
+        FIELD                       <- PRIMITIVE_TYPE NAME ('[' (((DEFAULT / IDENTIFIER) ','?)+)? ']')? ';'
+        DEFAULT                     <- 'default' '=' (FLOAT_NUMBER / BOOL / CHARACTER / STRING)
         PRIMITIVE_TYPE              <- < 'bool' / 'float' / 'double' /
                                          'char' /
                                          'bytes' / 'string' /
@@ -46,9 +41,11 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                                          'int64' / 'uint64' /
                                          MESSAGE_TYPE >
 
-        MESSAGE_TYPE                <- < IDENTIFIER ('.' IDENTIFIER)* >
+        MESSAGE_TYPE                <- < NAME ('.' NAME)* >
 
-        IDENTIFIER                  <- < [a-zA-Z][a-zA-Z0-9_]* >
+        IDENTIFIER                  <- 'id' '=' NATURAL_NUMBER
+
+        NAME                        <- < [a-zA-Z][a-zA-Z0-9_]* >
         DIGIT                       <- < [0-9] >
         NATURAL_NUMBER              <- < [1-9] DIGIT* >
         FLOAT_NUMBER                <- < ('+' / '-')? DIGIT DIGIT* (('.') DIGIT*)? >
@@ -71,6 +68,7 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                                                                                       std::vector<int32_t> &numericalFieldIdentifiers) {
             bool retVal = true;
             // First, we need to visit the children of AST node MESSAGES_SPECIFICATION.
+
             if ("MESSAGES_SPECIFICATION" == ast.name) {
                 for (const auto &node : ast.nodes) {
                     retVal &= checkForUniqueFieldNames(*node, prefix, messageNames, fieldNames, numericalMessageIdentifiers, numericalFieldIdentifiers);
@@ -116,12 +114,12 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                 retVal = true;
 
                 for (const auto &node : ast.nodes) {
-                    if ("MESSAGE_IDENTIFIER" == node->name) {
+                    if ("MESSAGE_NAME" == node->original_name) {
                         prefix = node->token;
                         messageNames.push_back(::stringtoolbox::trim(prefix));
-                    } else if ("NATURAL_NUMBER" == node->name) {
+                    } else if ("IDENTIFIER" == node->original_name) {
                         numericalMessageIdentifiers.push_back(std::stoi(node->token));
-                    } else if ("PRIMITIVE_FIELD" == node->name) {
+                    } else if ("FIELD" == node->original_name) {
                         retVal &= checkForUniqueFieldNames(*node, prefix, messageNames, fieldNames, numericalMessageIdentifiers, numericalFieldIdentifiers);
                     }
                 }
@@ -161,26 +159,18 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                     }
                 }
             }
-            // Within AST node MESSAGE_DECLARATION, we have PRIMITIVE_FIELD from
+            // Within AST node MESSAGE_DECLARATION, we have FIELD from
             // which we need to extract the field "token".
-            if (ast.name == "PRIMITIVE_FIELD") {
-                // Extract the value of entry "IDENTIFIER".
-                auto nodeIdentifier = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->name == "IDENTIFIER"); });
-                if (nodeIdentifier != std::end(ast.nodes)) {
-                    fieldNames.push_back((*nodeIdentifier)->token);
+            if (ast.original_name == "FIELD") {
+                // Extract the value of entry "NAME".
+                auto nodeName = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->original_name == "NAME"); });
+                if (nodeName != std::end(ast.nodes)) {
+                    fieldNames.push_back((*nodeName)->token);
                 }
 
-                // Visit this node's children to check for duplicated numerical identifiers.
-                for (const auto &node : ast.nodes) {
-                    retVal &= checkForUniqueFieldNames(*node, prefix, messageNames, fieldNames, numericalMessageIdentifiers, numericalFieldIdentifiers);
-                }
-            }
-            // Within AST node PRIMITIVE_FIELD, we have PRIMITIVE_FIELD_OPTIONS from
-            // which we need to extract the field "token".
-            if (ast.name == "PRIMITIVE_FIELD_OPTIONS") {
                 // Extract the value of entry "IDENTIFIER".
                 auto nodeNumericalFieldIdentifier
-                    = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->name == "NATURAL_NUMBER"); });
+                    = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->original_name == "IDENTIFIER"); });
                 if (nodeNumericalFieldIdentifier != std::end(ast.nodes)) {
                     numericalFieldIdentifiers.push_back(std::stoi((*nodeNumericalFieldIdentifier)->token));
                 }
@@ -200,47 +190,37 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
                   mm.packageName(::stringtoolbox::trim(_packageName));
                   uint32_t fieldIdentifierCounter{0};
                   for (const auto &e : _node.nodes) {
-                      if ("MESSAGE_IDENTIFIER" == e->name) {
+                      if ("MESSAGE_NAME" == e->original_name) {
                           std::string _messageName = e->token;
                           mm.messageName(::stringtoolbox::trim(_messageName));
-                      } else if ("NATURAL_NUMBER" == e->name) {
+                      } else if ("IDENTIFIER" == e->original_name) {
                           mm.messageIdentifier(std::stoi(e->token));
-                      } else if ("PRIMITIVE_FIELD" == e->name) {
-                          std::string _fieldName;
-                          auto fieldName = std::find_if(std::begin(e->nodes), std::end(e->nodes), [](auto a) { return (a->name == "IDENTIFIER"); });
-                          if (fieldName != std::end(e->nodes)) {
-                              _fieldName = (*fieldName)->token;
-                          }
-
+                      } else if ("FIELD" == e->original_name) {
                           std::string _fieldDataType;
-                          auto fieldDataType = std::find_if(std::begin(e->nodes), std::end(e->nodes), [](auto a) { return (a->name == "PRIMITIVE_TYPE"); });
-                          if (fieldDataType != std::end(e->nodes)) {
-                              _fieldDataType = (*fieldDataType)->token;
-                          }
-
-                          fieldIdentifierCounter++; // Automatically count expected field identifiers in case of missing
-                                                    // field options.
-                          std::string _fieldIdentifier;
-                          auto fieldIdentifier = std::find_if(std::begin(e->nodes), std::end(e->nodes), [](auto a) { return (a->name == "NATURAL_NUMBER"); });
-                          if (fieldIdentifier != std::end(e->nodes)) {
-                              _fieldIdentifier = (*fieldIdentifier)->token;
-                          }
-
+                          std::string _fieldName;
                           std::string _fieldDefaultInitializerValue;
-                          auto primitiveFieldOptions
-                              = std::find_if(std::begin(e->nodes), std::end(e->nodes), [](auto a) { return (a->name == "PRIMITIVE_FIELD_OPTIONS"); });
-                          if (primitiveFieldOptions != std::end(e->nodes)) {
-                              for (const auto &f : (*primitiveFieldOptions)->nodes) {
-                                  if ("NATURAL_NUMBER" != f->name) {
-                                      if ("STRING" == f->name) {
-                                          _fieldDefaultInitializerValue = "\"" + f->token + "\""; // NOLINT
-                                      } else if ("CHARACTER" == f->name) {
-                                          _fieldDefaultInitializerValue = "'" + f->token + "'";
-                                      } else {
-                                          _fieldDefaultInitializerValue = f->token;
-                                      }
+                          std::string _fieldIdentifier;
+                          for (const auto &f : e->nodes) {
+                              if ("PRIMITIVE_TYPE" == f->original_name) {
+                                  _fieldDataType = f->token;
+                              } else if ("NAME" == f->original_name) {
+                                  _fieldName = f->token;
+                              } else if ("DEFAULT" == f->original_name) {
+                                  if ("STRING" == f->name) {
+                                      _fieldDefaultInitializerValue = "\"" + f->token + "\""; // NOLINT
+                                  } else if ("CHARACTER" == f->name) {
+                                      _fieldDefaultInitializerValue = "'" + f->token + "'";
+                                  } else {
+                                      _fieldDefaultInitializerValue = f->token;
                                   }
+                              } else if ("IDENTIFIER" == f->original_name) {
+                                  _fieldIdentifier = f->token;
                               }
+                          }
+
+                          if (_fieldIdentifier.empty()) {
+                              // Automatically count expected field identifiers in case of missing field options.
+                              fieldIdentifierCounter++;
                           }
 
                           std::map<std::string, MetaMessage::MetaField::MetaFieldDataTypes> STRING_TO_DATATYPE_MAP = {
@@ -281,8 +261,8 @@ std::pair<std::vector<MetaMessage>, MessageParser::MessageParserErrorCodes> Mess
 
               // Case: "package XYZ" present.
               if ("MESSAGES_SPECIFICATION" == ast.name) {
-                  // Extract the value of entry "PACKAGE_IDENTIFIER".
-                  auto nodeIdentifier = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->name == "PACKAGE_IDENTIFIER"); });
+                  // Extract the value of entry "PACKAGE_NAME".
+                  auto nodeIdentifier = std::find_if(std::begin(ast.nodes), std::end(ast.nodes), [](auto a) { return (a->name == "PACKAGE_NAME"); });
                   std::string packageName;
                   if (nodeIdentifier != std::end(ast.nodes)) {
                       packageName = (*nodeIdentifier)->token;

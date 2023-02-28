@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018  Christian Berger
+ * Copyright (c) 2018-2020  Christian Berger
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,7 +69,7 @@ inline std::string replaceAll(const std::string &str,
  * @return std::vector<std:string> where the given string is split along delimiter.
  */
 inline std::vector<std::string> split(const std::string &str,
-                                      const char &delimiter) noexcept {
+                               const char &delimiter) noexcept {
   std::vector<std::string> retVal{};
   std::string::size_type prev{0};
   for (std::string::size_type i{str.find_first_of(delimiter, prev)};
@@ -82,7 +82,7 @@ inline std::vector<std::string> split(const std::string &str,
       retVal.emplace_back("");
     }
   }
-  if ((prev > 0) && (prev < str.size())) {
+  if (prev < str.size()) {
     retVal.emplace_back(str.substr(prev, str.size() - prev));
   }
   else if (prev > 0) {
