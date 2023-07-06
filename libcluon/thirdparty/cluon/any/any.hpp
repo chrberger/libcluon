@@ -16,6 +16,9 @@
 #ifndef LINB_ANY_HPP
 #define LINB_ANY_HPP
 #pragma once
+#if defined(__APPLE__)
+  #include <utility>
+#endif
 #include <typeinfo>
 #include <type_traits>
 #include <stdexcept>
