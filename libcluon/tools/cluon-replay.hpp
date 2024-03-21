@@ -30,7 +30,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv) {
     auto commandlineArguments = cluon::getCommandlineArguments(argc, argv);
     if (1 == argc) {
         std::cerr << PROGRAM << " replays a .rec file into an OpenDaVINCI session or to stdout; if playing back to an OD4Session using parameter --cid, you can specify the optional parameter --stdout to also playback to stdout; --keeprunning keeps " << PROGRAM << " open at the end of a recording file." << std::endl;
-        std::cerr << "Usage:   " << PROGRAM << " [--cid=<OpenDaVINCI session> [--stdout] [--keeprunning]] recording.rec" << std::endl;
+        std::cerr << "Usage:   " << PROGRAM << " [--cid=<OpenDaVINCI session> [--stdout] [--keeprunning]] [--nodelay] recording.rec" << std::endl;
         std::cerr << "Example: " << PROGRAM << " --cid=111 file.rec" << std::endl;
         std::cerr << "         " << PROGRAM << " --cid=111 --stdout file.rec" << std::endl;
         std::cerr << "         " << PROGRAM << " file.rec" << std::endl;
@@ -39,6 +39,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv) {
     else {
         const bool playBackToStdout = ( (0 != commandlineArguments.count("stdout")) || (0 == commandlineArguments.count("cid")) );
         const bool keepRunning = (0 != commandlineArguments.count("keeprunning"));
+        const bool noDelay = (0 != commandlineArguments.count("nodelay"));
 
         std::string recFile;
         for (auto e : commandlineArguments) {
@@ -208,11 +209,15 @@ inline int32_t cluon_replay(int32_t argc, char **argv) {
                             std::cout << cluon::serializeEnvelope(std::move(e));
                             std::cout.flush();
                         }
-                        std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(player.delay()));
+                        if (!noDelay) {
+                            std::this_thread::sleep_for(std::chrono::duration<int32_t, std::micro>(player.delay()));
+                        }
                     }
                 }
                 else {
-                    std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100)); // LCOV_EXCL_LINE
+                    if (!noDelay) {
+                        std::this_thread::sleep_for(std::chrono::duration<int32_t, std::milli>(100)); // LCOV_EXCL_LINE
+                    }
                 } // LCOV_EXCL_LINE
 
                 // Reset step.
