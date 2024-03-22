@@ -1,3 +1,27 @@
+libcluon (0.0.147-1ppa1~jammy1) jammy; urgency=medium
+
+  * fix for non-threaded nodelay replay
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 22 Mar 2024 09:05:18 +0100
+
+libcluon (0.0.147-1ppa1~focal1) focal; urgency=medium
+
+  * fix for non-threaded nodelay replay
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 22 Mar 2024 09:05:18 +0100
+
+libcluon (0.0.147-1ppa1~bionic1) bionic; urgency=medium
+
+  * fix for non-threaded nodelay replay
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 22 Mar 2024 09:05:18 +0100
+
+libcluon (0.0.147-1ppa1~xenial1) xenial; urgency=medium
+
+  * fix for non-threaded nodelay replay
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 22 Mar 2024 09:05:18 +0100
+
 libcluon (0.0.146-1ppa1~jammy1) jammy; urgency=medium
 
   * added --nodelay to cluon-replay
