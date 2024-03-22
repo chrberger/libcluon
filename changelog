@@ -1,3 +1,27 @@
+libcluon (0.0.148-1ppa1~jammy1) jammy; urgency=medium
+
+  * changing clog to cerr in Player
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 22 Mar 2024 10:43:42 +0100
+
+libcluon (0.0.148-1ppa1~focal1) focal; urgency=medium
+
+  * changing clog to cerr in Player
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 22 Mar 2024 10:43:42 +0100
+
+libcluon (0.0.148-1ppa1~bionic1) bionic; urgency=medium
+
+  * changing clog to cerr in Player
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 22 Mar 2024 10:43:42 +0100
+
+libcluon (0.0.148-1ppa1~xenial1) xenial; urgency=medium
+
+  * changing clog to cerr in Player
+
+ -- Christian Berger <christian.berger@gu.se>  Fri, 22 Mar 2024 10:43:42 +0100
+
 libcluon (0.0.147-1ppa1~jammy1) jammy; urgency=medium
 
   * fix for non-threaded nodelay replay
