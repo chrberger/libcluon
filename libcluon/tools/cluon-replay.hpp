@@ -101,7 +101,7 @@ inline int32_t cluon_replay(int32_t argc, char **argv) {
                 }
             }
             constexpr bool AUTOREWIND{false};
-            constexpr bool THREADING{true};
+            const bool THREADING{!noDelay};
             cluon::Player player(recFile, AUTOREWIND, THREADING);
             player.setPlayerListener([&playerStatusUpdate, &playerStatusMutex, &playerStatus](cluon::data::PlayerStatus &&ps){
                 {

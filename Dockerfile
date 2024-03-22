@@ -28,3 +28,11 @@ RUN mkdir build && \
     cd build && \
     cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/tmp ../libcluon && \
     make && make test && make install
+
+# Part to deploy libcluon.
+FROM alpine:3.15 as deploy
+MAINTAINER Christian Berger "christian.berger@gu.se"
+RUN apk update && \
+    apk --no-cache add \
+        libstdc++
+COPY --from=builder /tmp/bin/* /usr/bin/

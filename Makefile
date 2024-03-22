@@ -115,7 +115,7 @@ deployToHeaderOnly:
 	./buildtools/deploy/deployToHeaderOnly.sh
 
 #deploy: deployToLaunchpad docs deployToHeaderOnly deployToJavaScript deployToAlpine
-deploy: deployToLaunchpad docs deployToHeaderOnly deployToAlpine
+deploy: deployToLaunchpad docs deployToHeaderOnly
 
 docs:
 	./buildtools/deploy/generateDocumentation.sh
