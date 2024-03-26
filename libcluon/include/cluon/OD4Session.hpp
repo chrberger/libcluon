@@ -89,8 +89,12 @@ class LIBCLUON_API OD4Session {
      *        if a nullptr is passed, the method dataTrigger can be used to set
      *        message specific delegates. Please note that it is NOT possible
      *        to have both: a delegate for "catch-all" and the data-triggered ones.
+     * @param interfaceAssociatedAddress Optional numerical IPv4 address associated with an interface. If given, will be used to
+     * specify which interface to use when setting up the OD4 session.
      */
-    OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&envelope)> delegate = nullptr) noexcept;
+    OD4Session(uint16_t CID,
+               std::function<void(cluon::data::Envelope &&envelope)> delegate = nullptr,
+               const std::string &interfaceAssociatedAddress                  = "") noexcept;
 
     /**
      * This method will send a given Envelope to this OpenDaVINCI v4 session.
