@@ -37,8 +37,7 @@ inline int32_t cluon_msc(int32_t argc, char **argv) {
         return 1;
     }
 
-    std::string outputFilename;
-    commandline({"--out"}) >> outputFilename;
+    std::string outputFilename = commandline("--out").str();
 
     const bool generateCPP = commandline[{"--cpp"}];
     const bool generateProto = commandline[{"--proto"}];
