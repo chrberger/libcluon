@@ -1,3 +1,27 @@
+libcluon (0.0.149-1ppa1~jammy1) jammy; urgency=medium
+
+  * cluon-msc allows blanks in output
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 12 Apr 2025 16:50:55 +0200
+
+libcluon (0.0.149-1ppa1~focal1) focal; urgency=medium
+
+  * cluon-msc allows blanks in output
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 12 Apr 2025 16:50:55 +0200
+
+libcluon (0.0.149-1ppa1~bionic1) bionic; urgency=medium
+
+  * cluon-msc allows blanks in output
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 12 Apr 2025 16:50:55 +0200
+
+libcluon (0.0.149-1ppa1~xenial1) xenial; urgency=medium
+
+  * cluon-msc allows blanks in output
+
+ -- Christian Berger <christian.berger@gu.se>  Sat, 12 Apr 2025 16:50:55 +0200
+
 libcluon (0.0.148-1ppa1~jammy1) jammy; urgency=medium
 
   * changing clog to cerr in Player
