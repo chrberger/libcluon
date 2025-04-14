@@ -18,9 +18,9 @@
 
 namespace cluon {
 
-OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&envelope)> delegate) noexcept
+OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&envelope)> delegate, const std::string &interfaceAssociatedAddress) noexcept
     : m_receiver{nullptr}
-    , m_sender{"225.0.0." + std::to_string(CID), 12175}
+    , m_sender{"225.0.0." + std::to_string(CID), 12175, interfaceAssociatedAddress}
     , m_delegate(std::move(delegate))
     , m_mapOfDataTriggeredDelegatesMutex{}
     , m_mapOfDataTriggeredDelegates{} {
@@ -30,7 +30,8 @@ OD4Session::OD4Session(uint16_t CID, std::function<void(cluon::data::Envelope &&
         [this](std::string &&data, std::string &&from, std::chrono::system_clock::time_point &&timepoint) {
             this->callback(std::move(data), std::move(from), std::move(timepoint));
         },
-        m_sender.getSendFromPort() /* passing our local send from port to the UDPReceiver to filter out our own bytes */);
+        m_sender.getSendFromPort() /* passing our local send from port to the UDPReceiver to filter out our own bytes */,
+        interfaceAssociatedAddress);
 }
 
 void OD4Session::timeTrigger(float freq, std::function<bool()> delegate) noexcept {
