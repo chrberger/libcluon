@@ -5,7 +5,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # Warning flags based on and generated from: https://raw.githubusercontent.com/Barro/compiler-warnings/master/gcc/warnings-gcc-7.txt
-set(GCC82_CXX_WARNING_FLAGS " \
+set(GCC92_CXX_WARNING_FLAGS " \
     -fno-pie \
     -no-pie \
     -pedantic \
