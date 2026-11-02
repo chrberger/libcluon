@@ -40,7 +40,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     endif ()
     if (NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 9.2))
         include(CompileFlags_gcc9.2)
-        set(CXX_WARNING_FLAGS ${GCC82_CXX_WARNING_FLAGS})
+        set(CXX_WARNING_FLAGS ${GCC92_CXX_WARNING_FLAGS})
     endif ()
 endif()
 
