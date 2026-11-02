@@ -59,6 +59,7 @@
 
 #include "cluon/PortableEndian.hpp"
 
+#include <cstdint>
 #include <map>
 #include <string>
 
