@@ -291,15 +291,6 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
         }
 
         if (!(m_socket < 0)) {
-            // Constructing the receiving thread could fail.
-            try {
-                m_readFromSocketThread = std::thread(&UDPReceiver::readFromSocket, this);
-
-                // Let the operating system spawn the thread.
-                using namespace std::literals::chrono_literals; // NOLINT
-                do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
-            } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
-
             try {
                 m_pipeline = std::make_shared<cluon::NotifyingPipeline<PipelineEntry>>(
                     [this](PipelineEntry &&entry) { this->m_delegate(std::move(entry.m_data), std::move(entry.m_from), std::move(entry.m_sampleTime)); });
@@ -308,6 +299,15 @@ UDPReceiver::UDPReceiver(const std::string &receiveFromAddress,
                     using namespace std::literals::chrono_literals; // NOLINT
                     do { std::this_thread::sleep_for(1ms); } while (!m_pipeline->isRunning());
                 }
+            } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
+
+            // Constructing the receiving thread could fail.
+            try {
+                m_readFromSocketThread = std::thread(&UDPReceiver::readFromSocket, this);
+
+                // Let the operating system spawn the thread.
+                using namespace std::literals::chrono_literals; // NOLINT
+                do { std::this_thread::sleep_for(1ms); } while (!m_readFromSocketThreadRunning.load());
             } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
         }
     }
