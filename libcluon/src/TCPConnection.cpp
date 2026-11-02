@@ -148,6 +148,16 @@ void TCPConnection::closeSocket(int errorCode) noexcept {
 }
 
 void TCPConnection::startReadingFromSocket() noexcept {
+    try {
+        m_pipeline = std::make_shared<cluon::NotifyingPipeline<PipelineEntry>>(
+            [this](PipelineEntry &&entry) { this->m_newDataDelegate(std::move(entry.m_data), std::move(entry.m_sampleTime)); });
+        if (m_pipeline) {
+            // Let the operating system spawn the thread.
+            using namespace std::literals::chrono_literals; // NOLINT
+            do { std::this_thread::sleep_for(1ms); } while (!m_pipeline->isRunning());
+        }
+    } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
+
     // Constructing a thread could fail.
     try {
         m_readFromSocketThread = std::thread(&TCPConnection::readFromSocket, this);
@@ -158,16 +168,6 @@ void TCPConnection::startReadingFromSocket() noexcept {
     } catch (...) {          // LCOV_EXCL_LINE
         closeSocket(ECHILD); // LCOV_EXCL_LINE
     }
-
-    try {
-        m_pipeline = std::make_shared<cluon::NotifyingPipeline<PipelineEntry>>(
-            [this](PipelineEntry &&entry) { this->m_newDataDelegate(std::move(entry.m_data), std::move(entry.m_sampleTime)); });
-        if (m_pipeline) {
-            // Let the operating system spawn the thread.
-            using namespace std::literals::chrono_literals; // NOLINT
-            do { std::this_thread::sleep_for(1ms); } while (!m_pipeline->isRunning());
-        }
-    } catch (...) { closeSocket(ECHILD); } // LCOV_EXCL_LINE
 }
 
 void TCPConnection::setOnNewData(std::function<void(std::string &&, std::chrono::system_clock::time_point &&)> newDataDelegate) noexcept {
